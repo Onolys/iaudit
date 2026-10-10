@@ -15,7 +15,7 @@ Source of truth: docs/agent_files/feat-review-ui-20261010-2330/06-fixtures-harde
 
 ## Task 1 — Fixture pairs and contracts README
 What it is / what it means: Hand-authored fictional mock data for the warnings and span-flag states (PRD R1, R2; Decisions 1-4, 7).
-What changes at a high level: Add `partial.request.json`/`partial.response.json` (status `partial`, 2 sections, `section_not_processed` plus one other warning, 2-3 claims in the processed section) and `out-of-range.*` (a few claims, exactly one span past the section length) to `docs/contracts/examples/`, using 03's naming convention, unique `request_id`s, offsets from the default example, mission wording, no real names. Update the examples row of `docs/contracts/README.md` to list both and say `out-of-range` intentionally breaks rule 1. No `schema_version` bump.
+What changes at a high level: Add `partial.request.json`/`partial.response.json` (status `partial`, 2 sections, `section_not_processed` plus one other warning, 2-3 claims in the processed section) and `out-of-range.*` (a few claims, exactly one span past the section length) to `docs/contracts/examples/`, using 03/T2's naming convention, unique `request_id`s, offsets from the default example, mission wording, no real names. Update the examples row of `docs/contracts/README.md` to list both and say `out-of-range` intentionally breaks rule 1. No `schema_version` bump.
 Done when: both pairs exist, schemas unchanged (`git diff` empty on `*.schema.json`), README row updated in the same commit.
 
 ## Task 2 — Fixture validation test

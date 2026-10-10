@@ -5,7 +5,7 @@ date: 2026-10-10
 ---
 # Tasks: 04 Review shell and left pane
 
-Source of truth: docs/agent_files/feat-review-ui-20261010-2330/04-review-shell-left-pane/PRD.md. Builds the app screen, selection/navigation state, header and the left pane. Depends on 01, 02, 03 (02 for analysis helpers, 03 for loader and state views) and composes 05's `ClaimDetail`; declare the dependency, no placeholder is specified.
+Source of truth: docs/agent_files/feat-review-ui-20261010-2330/04-review-shell-left-pane/PRD.md. Builds the app screen, selection/navigation state, header and the left pane. Depends on 01, 02, 03 (02 for analysis helpers, 03/T3 for loader, 03/T4 for state views) and composes 05's `ClaimDetail`; declare the dependency, no placeholder is specified.
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
@@ -19,7 +19,7 @@ What changes at a high level: Add `reviewState.ts` with the `Nav`/`ReviewState` 
 Done when: tests show click inside the active list keeps nav and moves position, outside clears nav, step clamps, navigate to empty is a no-op; zero counts are disabled.
 
 ## Task 2 — App screen and header
-What it is / what it means: The top-level screen driven by the 03 loader (PRD R1, R2, R7; Decisions 8, 11).
+What it is / what it means: The top-level screen driven by the 03/T3 loader (PRD R1, R2, R7; Decisions 8, 11).
 What changes at a high level: Wire `App` to `useAuditLoader`: idle prompt text, `LoadingView`, `ErrorScreen`, and on ok `WarningsBanner` plus `ReviewShell` keyed by a `loadId` counter bumped on each entry into ok. Build `Header` with the hidden file input (reset value after pick, enabled while loading, calls `loadFile`), file name, `request_id` or "No request ID", "Mock data" chip, and `VerdictCounts` at scope `'all'`. Wrap to two rows below ~1100 px; app `min-width` 960 px.
 Done when: example mock load shows five counts of 1 and `example-001`; re-uploading the same file re-fires and resets the review; no stale audit during loading or error.
 
