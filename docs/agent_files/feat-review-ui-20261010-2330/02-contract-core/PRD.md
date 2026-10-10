@@ -29,7 +29,7 @@ Every visible highlight and quote is a position into the uploaded input. A singl
 
 ## Requirements
 
-**R1 Types** (`types.ts`): hand-written `AuditRequest`, `Turn`, `Section`, `AuditResponse`, `Claim`, `Evidence`, `Concern`, `Warning`, `Span`, `Pointer`. Enum lists are `as const` arrays (`VERDICTS`, `CONCERN_TYPES`, `EVIDENCE_ROLES`, `WARNING_CODES`, `STATUSES`) with unions derived from them. A **drift test** asserts each array equals the matching `enum` in the imported schema (same order; concern order = mission checks 1-12).
+**R1 Types** (`types.ts`): hand-written `AuditRequest`, `Turn`, `Section`, `AuditResponse`, `Claim`, `Evidence`, `Concern`, `Warning`, `Span`, `Pointer`. Enum lists are `as const` arrays (`VERDICTS`, `CONCERN_TYPES`, `EVIDENCE_ROLES`, `WARNING_CODES`, `STATUSES`) with unions derived from them, except `Verdict` and `EvidenceRole`, which are defined in SP01 tokens and re-exported here (SP01 D8); `VERDICTS`/`EVIDENCE_ROLES` are typed against them. A **drift test** asserts each array equals the matching `enum` in the imported schema (same order; concern order = mission checks 1-12).
 
 **R2 Validators** (`schemas.ts`, `validate.ts`): one module-level `Ajv2020` instance (`ajv/dist/2020`; both schemas declare `https://json-schema.org/draft/2020-12/schema` [verified]) compiling both schemas imported via `@contracts`. Options: `allErrors: true, allowUnionTypes: true, strictTypes: false`; leave `strictSchema` default (unknown keywords still fail). `ajv-formats` not needed (no `format` keyword [verified]). Schemas use only internal `#/$defs` refs, no cross-file `$ref`, relative `$id`s that do not collide [verified].
 - `validateRequest(raw: unknown): Result<AuditRequest, ValidationIssue[]>`
@@ -86,7 +86,7 @@ claim + request --walkSpan / orderEvidence / buildChunks--> render data
 `index.ts` is the only import surface for other sub-projects. Consumers:
 - **SP03** `validateRequest`, `validateResponse`, `ResponseError.kind` -> error screens; `notProcessedSections`, `response.warnings` for banner.
 - **SP04** owns app state `{request, response, selectedClaimId, nav: {verdict, scope: 'all'|sectionIndex, claimIds, position} | null}`; calls `analyzeResponse`, `claimIdsFor`, `segmentSection`, `counts`.
-- **SP05** renders `ClaimDetail({claim, request, spanOutOfRange})`; calls `walkSpan`, `orderEvidence`, `buildChunks`. The `claim.id` -> `ClaimCheck` lookup is in the analysis object; `spanOutOfRange` is its boolean.
+- **SP05** renders `ClaimDetail({claim, request, check: ClaimCheck})`; calls `walkSpan`, `orderEvidence`, `buildChunks`. SP04 passes `check` = `analysis.checks[claim.id]`; `check.spanOutOfRange` is the boolean.
 
 Verified in a scratch project: `new Ajv2020({})` logs strictTypes warnings (`contains`/`minItems` without `type`) and **`strict: true` throws** on the response schema (union type on `score`; `if/then` bodies without `type`; with `strictRequired` on, `then: {required}` too). The chosen options validate the example pair true and a `contradicted` claim without contradicting evidence false. `[verified: ajv 8 run 2026-10-10]`
 
@@ -115,6 +115,7 @@ Verified in a scratch project: `new Ajv2020({})` logs strictTypes warnings (`con
 - [OPEN] ZWJ/combining sequences are several code points; a span may cut mid-grapheme (contract defines code points, so we follow it). Cosmetic only; confirm acceptable.
 - [OPEN] Friendly wording for Ajv messages on `contains`/`minContains` failures ("must contain at least 1 valid item(s)"): raw message ships here; SP03 may map by path.
 - [OPEN] Performance ceiling for very long transcripts (thousands of turns): R5 caching assumed enough; measure on SP06's long fixture.
+- [OPEN] Interface gaps found by consumers (SP03/04/05): (a) element type of `ResponseAnalysis.orderedClaims` (SP04 assumes `Claim[]`; the Architecture sketch lists it without a type); (b) `ResponseAnalysis` is sketched with a `notProcessed` field while R6 defines `notProcessedSections(response)` as a function - pick one surface; (c) `ClaimCheck.evidence` key (`evidenceIndexOrId`) is ambiguous - SP05 keys by evidence `id`; (d) `orderEvidence(request, claim, checks)` third arg: SP05 passes one `ClaimCheck`, R7 names `checks`; (e) `ResponseAnalysis.checks` (used by SP04/05) is named only in the Architecture sketch, not in R3/R6.
 - [DEFERRED] Whether `partial` + `section_not_processed` should also gate claims in that section; SP04.
 - [DEFERRED] Export of warnings-to-claim join (`span_out_of_range` warnings from the backend vs our own bounds flag); SP03/04 decide the banner copy. Our flag is authoritative for rendering.
 

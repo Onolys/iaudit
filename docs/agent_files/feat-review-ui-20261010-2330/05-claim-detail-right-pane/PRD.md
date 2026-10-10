@@ -32,7 +32,7 @@ This pane is where a reviewer decides whether a potential concern is valid. It m
 ```ts
 ClaimDetail({ claim: Claim, request: AuditRequest, check: ClaimCheck }) // check from SP02 analysis.checks[claim.id]
 ```
-`check.spanOutOfRange` is the flag named in the SP02/SP04 interface; the full `ClaimCheck` is passed because `orderEvidence(request, claim, checks)` needs per-evidence results. [OPEN] SP04 must pass `check`, not just the boolean. `ClaimDetail` wraps its body in `key={claim.id}` so all local state resets when selection changes (D1).
+`check.spanOutOfRange` is the flag named in the SP02/SP04 interface; the full `ClaimCheck` is passed because `orderEvidence(request, claim, checks)` needs per-evidence results. [RESOLVED: SP04 PRD updated to pass `check`.] `ClaimDetail` wraps its body in `key={claim.id}` so all local state resets when selection changes (D1).
 
 **R2 Header block.** Verdict badge from `VERDICT_STYLE` (icon + label + colour, all three). Explanation as plain text. For `insufficient_evidence`, a fixed line under the explanation: "Not substantiated by the supplied interview. This is not the same as contradicted." If `check.spanOutOfRange`, a warning strip at top: "A position returned for this claim does not fit the supplied input. Affected text is withheld; other content is unchanged."
 
@@ -91,7 +91,7 @@ ClaimDetail (key=claim.id)
 ## Risks / Open Questions
 - [OPEN] Shared-turn painting (D4) is a design on paper; confirm it reads clearly at SP06 with the two-role fixture, adjust visuals only.
 - [OPEN] Turn number base: 0-based `#index` vs 1-based for reviewers; 0-based chosen to match the contract. Confirm with user.
-- [OPEN] SP04 must supply `check` and mount `ClaimDetail` inside its container; confirm when PRD 04 is final.
+- [RESOLVED: PRD 04 mounts `ClaimDetail` in `RightPane` with `check={analysis.checks[claim.id]}`] SP04 supplies `check`.
 - [OPEN] Very long single turns (thousands of chars) make an excerpt tall; no truncation is planned (truncation would hide evidence). Revisit if SP06's long fixture is unwieldy.
 - [DEFERRED] Scroll-to-excerpt on concern click (emphasis only for v1).
 - [DEFERRED] Persisting expansion across claim changes.
