@@ -11,4 +11,5 @@
 | [testing/](testing/) | How to test, and what to verify before a release | Contributors |
 | [specs/](specs/) | Normative behavior contracts with acceptance criteria | Contributors and coding agents |
 | [examples/](examples/) | Runnable public-API usage examples | Users |
+| [contracts/](contracts/) | Machine-readable audit request and response contracts | Frontend, backend, and coding agents |
 | [agent_files/](agent_files/) | Branch-scoped agent artifacts, one folder per branch | Coding agents |
