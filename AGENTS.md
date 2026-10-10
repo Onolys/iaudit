@@ -19,7 +19,10 @@ Never invent quotations, speaker identities, or timestamps.
 | `docs/testing/` | How to test, and what to verify before a release | Contributors |
 | `docs/specs/` | Normative behavior contracts with acceptance criteria | Contributors and coding agents |
 | `docs/examples/` | Runnable public-API usage examples | Users |
+| `docs/contracts/` | Machine-readable audit request and response contracts | Frontend, backend, and coding agents |
 | `docs/agent_files/` | Branch-scoped agent artifacts, one folder per branch | Coding agents |
+
+The contract's lists of verdicts and concern types mirror `docs/mission.md`. When the mission changes, update the contracts and bump `schema_version`.
 
 ## Agent-generated files
 
