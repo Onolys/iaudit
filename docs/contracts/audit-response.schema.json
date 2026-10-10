@@ -1,0 +1,327 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "audit-response.schema.json",
+  "title": "AuditResponse",
+  "description": "Body of one evidence-consistency audit response, schema 1.0.0. Positions only: do not copy transcript text or timestamps. One request yields one response. No streaming and no background job.",
+  "type": "object",
+  "required": ["schema_version", "status", "warnings", "claims"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Echo of the request's request_id, unchanged. Omit only when the request omitted it."
+    },
+    "status": {
+      "enum": ["complete", "partial"],
+      "description": "partial means at least one assessment section was not processed."
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Warning" }
+    },
+    "claims": {
+      "type": "array",
+      "description": "One entry per classified span of reasoning, including out_of_scope. Spans must not overlap.",
+      "items": { "$ref": "#/$defs/Claim" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "partial" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "warnings": {
+            "contains": {
+              "type": "object",
+              "required": ["code"],
+              "properties": { "code": { "const": "section_not_processed" } }
+            },
+            "minContains": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "Pointer": {
+      "type": "object",
+      "required": ["index", "char"],
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Section index for a claim. Turn index for evidence."
+        },
+        "char": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Unicode code-point offset within that item. The end offset is exclusive."
+        }
+      }
+    },
+    "Span": {
+      "type": "object",
+      "required": ["start", "end"],
+      "additionalProperties": false,
+      "properties": {
+        "start": { "$ref": "#/$defs/Pointer" },
+        "end": { "$ref": "#/$defs/Pointer" }
+      }
+    },
+    "Claim": {
+      "type": "object",
+      "required": ["id", "span", "verdict", "explanation", "concerns", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the response. Referenced by warnings.claim_id."
+        },
+        "span": {
+          "description": "Position in assessment. start.index must equal end.index.",
+          "allOf": [{ "$ref": "#/$defs/Span" }]
+        },
+        "verdict": {
+          "enum": [
+            "supported",
+            "partially_supported",
+            "contradicted",
+            "insufficient_evidence",
+            "out_of_scope"
+          ]
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the verdict was reached. Must not copy transcript text or a timestamp."
+        },
+        "out_of_scope_reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Required when verdict is out_of_scope. Omit otherwise."
+        },
+        "suggested_revision": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "description": "Proposed rewording only. Never applied automatically. Must not copy transcript text."
+        },
+        "concerns": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Concern" }
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Evidence" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "verdict": { "const": "supported" } },
+            "required": ["verdict"]
+          },
+          "then": {
+            "properties": {
+              "evidence": {
+                "contains": {
+                  "type": "object",
+                  "required": ["role"],
+                  "properties": { "role": { "const": "supporting" } }
+                },
+                "minContains": 1,
+                "not": {
+                  "contains": {
+                    "type": "object",
+                    "required": ["role"],
+                    "properties": { "role": { "const": "contradicting" } }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "verdict": { "const": "contradicted" } },
+            "required": ["verdict"]
+          },
+          "then": {
+            "properties": {
+              "evidence": {
+                "contains": {
+                  "type": "object",
+                  "required": ["role"],
+                  "properties": { "role": { "const": "contradicting" } }
+                },
+                "minContains": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "verdict": { "const": "partially_supported" } },
+            "required": ["verdict"]
+          },
+          "then": {
+            "properties": {
+              "concerns": { "minItems": 1 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "verdict": { "const": "insufficient_evidence" } },
+            "required": ["verdict"]
+          },
+          "then": {
+            "properties": {
+              "evidence": {
+                "not": {
+                  "contains": {
+                    "type": "object",
+                    "required": ["role"],
+                    "properties": { "role": { "const": "contradicting" } }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "verdict": { "const": "out_of_scope" } },
+            "required": ["verdict"]
+          },
+          "then": {
+            "required": ["out_of_scope_reason"],
+            "properties": {
+              "concerns": { "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": { "verdict": { "const": "out_of_scope" } },
+              "required": ["verdict"]
+            }
+          },
+          "then": {
+            "not": { "required": ["out_of_scope_reason"] }
+          }
+        }
+      ]
+    },
+    "Concern": {
+      "type": "object",
+      "required": ["type", "explanation", "evidence_ids"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "description": "Mirrors docs/mission.md checks 1–12, in that order. When the mission changes, update this list and bump schema_version.",
+          "enum": [
+            "unsupported_claim",
+            "contradictory_evidence",
+            "wrong_attribution",
+            "timeframe_mismatch",
+            "negation_reversal",
+            "certainty_inflation",
+            "frequency_severity_inflation",
+            "context_stripping",
+            "question_as_answer",
+            "correction_ignored",
+            "conflicting_accounts_flattened",
+            "unsupported_causal_link"
+          ]
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_ids": {
+          "type": "array",
+          "description": "Ids of evidence items on this same claim. May be empty.",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "Evidence": {
+      "type": "object",
+      "required": ["id", "role", "span"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique within the claim."
+        },
+        "role": {
+          "enum": ["supporting", "contradicting", "qualifying"]
+        },
+        "span": {
+          "description": "Position in transcript. index is the turn index. May cross turns.",
+          "allOf": [{ "$ref": "#/$defs/Span" }]
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional paraphrase. Must not copy transcript text or a timestamp."
+        }
+      }
+    },
+    "Warning": {
+      "type": "object",
+      "required": ["code", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "section_not_processed",
+            "span_out_of_range",
+            "ambiguous_speaker",
+            "input_truncated",
+            "other"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claim_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section_index": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "code": { "const": "section_not_processed" } },
+            "required": ["code"]
+          },
+          "then": { "required": ["section_index"] }
+        },
+        {
+          "if": {
+            "properties": { "code": { "const": "span_out_of_range" } },
+            "required": ["code"]
+          },
+          "then": { "required": ["claim_id"] }
+        }
+      ]
+    }
+  }
+}
