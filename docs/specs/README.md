@@ -6,4 +6,4 @@ Normative behavior contracts with acceptance criteria.
 
 The audit JSON contracts live in [../contracts/](../contracts/). This section is for behavior specs a schema cannot express.
 
-- [review-ui-brainstorm.md](review-ui-brainstorm.md): draft handoff for the visual review tool (decisions so far and open questions).
+No specs yet. The visual review brainstorm lives in [../agent_files/ab-20261010-221456-a271e3e2/brainstorming.md](../agent_files/ab-20261010-221456-a271e3e2/brainstorming.md).
