@@ -1,0 +1,197 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "example-001",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c-supported",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 56
+        }
+      },
+      "verdict": "supported",
+      "explanation": "A caregiver turn reports two recent medication lapses. The respondent later limits those lapses to an illness. That limit does not change what the caregiver reported, which is all this claim asserts.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e-caregiver",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 4,
+              "char": 0
+            },
+            "end": {
+              "index": 4,
+              "char": 43
+            }
+          }
+        },
+        {
+          "id": "e-illness",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 5,
+              "char": 0
+            },
+            "end": {
+              "index": 5,
+              "char": 48
+            }
+          },
+          "note": "A later respondent turn limits the same lapses to an illness. It does not deny the caregiver's report."
+        }
+      ]
+    },
+    {
+      "id": "c-contradicted",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 57
+        },
+        "end": {
+          "index": 0,
+          "char": 97
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "The respondent denied losing keys. The assessment asserts the opposite and presents it as frequent.",
+      "suggested_revision": "The patient denied losing keys.",
+      "concerns": [
+        {
+          "type": "negation_reversal",
+          "explanation": "A denial is written as a positive habit.",
+          "evidence_ids": [
+            "e-denial"
+          ]
+        },
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "A denied behavior is described as frequent.",
+          "evidence_ids": [
+            "e-denial"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e-denial",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 1,
+              "char": 0
+            },
+            "end": {
+              "index": 1,
+              "char": 25
+            }
+          },
+          "note": "The respondent's answer denies the behavior the assessment asserts."
+        }
+      ]
+    },
+    {
+      "id": "c-partial",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 98
+        },
+        "end": {
+          "index": 0,
+          "char": 148
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The respondent reported a single missed appointment last year, tied to travel. The assessment stretches that into missed appointments across the whole year and drops the travel limit.",
+      "suggested_revision": "The patient reported one missed appointment last year, during travel.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "One missed appointment is written as a pattern across the year.",
+          "evidence_ids": [
+            "e-appointments"
+          ]
+        },
+        {
+          "type": "context_stripping",
+          "explanation": "The travel limit on that appointment is omitted.",
+          "evidence_ids": [
+            "e-appointments"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e-appointments",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 2,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 45
+            }
+          },
+          "note": "Read the respondent's answer with the preceding question. One event is described, with a travel limit."
+        }
+      ]
+    },
+    {
+      "id": "c-insufficient",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 149
+        },
+        "end": {
+          "index": 0,
+          "char": 181
+        }
+      },
+      "verdict": "insufficient_evidence",
+      "explanation": "The supplied interview does not discuss work, so this claim is not substantiated. That is not the same as a contradiction.",
+      "suggested_revision": null,
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "Nothing in the supplied interview establishes a work problem.",
+          "evidence_ids": []
+        }
+      ],
+      "evidence": []
+    },
+    {
+      "id": "c-oos",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 182
+        },
+        "end": {
+          "index": 0,
+          "char": 227
+        }
+      },
+      "verdict": "out_of_scope",
+      "explanation": "This is a diagnostic conclusion. The audit does not check whether behaviors meet a criterion.",
+      "out_of_scope_reason": "Diagnostic criterion, not a factual claim about the interview.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": []
+    }
+  ]
+}

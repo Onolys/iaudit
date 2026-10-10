@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "example-001",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you been losing your keys lately?",
+      "timestamp": "00:01:02"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No. I don't lose my keys.",
+      "timestamp": "00:01:08"
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What about appointments?"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I missed one last year, when I was traveling."
+    },
+    {
+      "id": "t4",
+      "speaker": "caretaker1",
+      "role": "informant",
+      "text": "She forgot her medication twice last month."
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "text": "That was only while I had the flu. I'm fine now."
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-memory",
+      "label": "Memory",
+      "score": 2,
+      "text": "The caregiver reported two medication lapses last month. The patient frequently loses their keys. They missed appointments throughout the past year. The patient has trouble at work. This meets criterion A for a memory disorder."
+    }
+  ]
+}
