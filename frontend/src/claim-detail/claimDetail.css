@@ -1,0 +1,13 @@
+.cd-root { display: flex; flex-direction: column; gap: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.cd-badge { display: inline-block; border: 1px solid; border-radius: 999px; padding: 2px 10px; font-weight: 600; }
+.cd-explanation { margin: 8px 0 0; }
+.cd-note-line { margin: 4px 0 0; color: var(--verdict-insufficient-evidence); font-style: italic; }
+.cd-warning { margin: 8px 0 0; padding: 6px 10px; border: 1px solid var(--verdict-partially-supported); background: #fef3c7; border-radius: 4px; }
+.cd-suggestion { border: 1px solid #9ca3af; border-radius: 6px; padding: 8px 12px; }
+.cd-suggestion h3, .cd-concerns h3, .cd-excerpts h3 { margin: 0 0 6px; font-size: 0.9rem; }
+.cd-suggestion p { margin: 0; }
+.cd-concerns ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.cd-concern { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; font: inherit; white-space: inherit; }
+button.cd-concern { cursor: pointer; }
+button.cd-concern[aria-pressed="true"] { border-color: #111827; background: var(--selected-claim-bg); }
+.cd-concern-static { border-style: dashed; }
