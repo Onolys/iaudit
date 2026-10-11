@@ -8,6 +8,7 @@ This is the JSON **body** of one synchronous call. HTTP path, method, and auth a
 |---|---|
 | [audit-request.schema.json](audit-request.schema.json) | Input. Machine-checked structure. |
 | [audit-response.schema.json](audit-response.schema.json) | Output. Machine-checked structure. |
+| [error-response.schema.json](error-response.schema.json) | Body of any non-2xx reply. See [Error response](#error-response). |
 | [examples/request.json](examples/request.json), [examples/response.json](examples/response.json) | One fictional worked example. |
 | This file | Conventions, field meanings, allowed values, and rules a schema cannot express. |
 
@@ -182,6 +183,29 @@ Rules 2–6 and 11 are also enforced by the response schema.
 - Colour and layout are not part of this contract. Verdict drives the left pane. Evidence `role` drives the right pane.
 - The right pane can expand past an excerpt. Expansion uses the same transcript array; it is not a new field.
 - Do not treat `label` or `score` as an audit result.
+
+## Error response
+
+Any non-2xx reply carries this body instead of an audit. Example: [examples/error.json](examples/error.json). It is an additive new file, so the request/response contract stays at `1.0.0`. HTTP path and CORS stay out of scope.
+
+| Field | Required | Meaning |
+|---|---|---|
+| `schema_version` | yes | Always `"1.0.0"`. |
+| `request_id` | no | Echo of the request id, when known. |
+| `error.code` | yes | One value from the table below. |
+| `error.message` | yes | Human-readable plain text, shown to the reviewer as-is. |
+
+| Code | Typical HTTP status | Meaning |
+|---|---|---|
+| `invalid_request` | 400, 422 | The request body is malformed or fails the request schema. |
+| `unsupported_version` | 400 | `schema_version` is not supported. |
+| `payload_too_large` | 413 | The request is too large to process. |
+| `rate_limited` | 429 | Too many requests. Retry later. |
+| `internal_error` | 500 | The backend failed. |
+| `unavailable` | 502, 503, 504 | The backend is down or overloaded. |
+| `other` | any | Anything else, explained in `message`. |
+
+Consumer rule: if the body validates against the schema, show `error.message`. If not (empty, HTML, other JSON), fall back to generic text for the HTTP status. Never render an audit from an error body.
 
 ## Non-goals
 
