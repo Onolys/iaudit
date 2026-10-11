@@ -1,0 +1,653 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-09",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c-mem-1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 124
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The daughter gives the behaviour, when it started, and the recent worsening.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 5,
+              "char": 22
+            },
+            "end": {
+              "index": 5,
+              "char": 170
+            }
+          },
+          "note": "The informant describes repeated questions and their course."
+        }
+      ]
+    },
+    {
+      "id": "c-mem-2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 125
+        },
+        "end": {
+          "index": 0,
+          "char": 166
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "Asked directly, he denies repeating himself and suggests his daughter may be exaggerating.",
+      "suggested_revision": "Mr Okafor denies repeating himself; his daughter reports repeated questions within single calls.",
+      "concerns": [
+        {
+          "type": "negation_reversal",
+          "explanation": "A denial is recorded as an acknowledgement.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 6,
+              "char": 0
+            },
+            "end": {
+              "index": 7,
+              "char": 34
+            }
+          },
+          "note": "A direct question and a denial."
+        }
+      ]
+    },
+    {
+      "id": "c-mem-3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 167
+        },
+        "end": {
+          "index": 0,
+          "char": 213
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "His first account described an earlier day. His daughter corrected him and he accepted the correction.",
+      "suggested_revision": "Initially described Sunday's visit as the previous day's events, then accepted his daughter's correction.",
+      "concerns": [
+        {
+          "type": "correction_ignored",
+          "explanation": "The first answer is kept as accurate despite a correction he accepted.",
+          "evidence_ids": [
+            "e2",
+            "e3"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 12,
+              "char": 0
+            },
+            "end": {
+              "index": 12,
+              "char": 75
+            }
+          },
+          "note": "The first, tentative recall."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 13,
+              "char": 0
+            },
+            "end": {
+              "index": 13,
+              "char": 61
+            }
+          },
+          "note": "The informant corrects the day."
+        },
+        {
+          "id": "e3",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 14,
+              "char": 0
+            },
+            "end": {
+              "index": 14,
+              "char": 38
+            }
+          },
+          "note": "He accepts the correction."
+        }
+      ]
+    },
+    {
+      "id": "c-mem-4",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 214
+        },
+        "end": {
+          "index": 0,
+          "char": 267
+        }
+      },
+      "verdict": "supported",
+      "explanation": "He gives the length of his railway career and describes detailed recall of the line.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 16,
+              "char": 0
+            },
+            "end": {
+              "index": 16,
+              "char": 101
+            }
+          },
+          "note": "Detailed recall of his career."
+        }
+      ]
+    },
+    {
+      "id": "c-func-1",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 0
+        },
+        "end": {
+          "index": 1,
+          "char": 112
+        }
+      },
+      "verdict": "supported",
+      "explanation": "He says he cooks, and his daughter describes the two gas incidents and the valve.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 18,
+              "char": 0
+            },
+            "end": {
+              "index": 18,
+              "char": 50
+            }
+          },
+          "note": "Still cooks."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 19,
+              "char": 0
+            },
+            "end": {
+              "index": 19,
+              "char": 60
+            }
+          },
+          "note": "The informant reports two gas incidents."
+        },
+        {
+          "id": "e3",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 19,
+              "char": 101
+            },
+            "end": {
+              "index": 19,
+              "char": 139
+            }
+          },
+          "note": "A safety valve was fitted."
+        }
+      ]
+    },
+    {
+      "id": "c-func-2",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 113
+        },
+        "end": {
+          "index": 1,
+          "char": 171
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "He says he handles all of it, but his daughter says she has handled the bills since August, after duplicate payments. He still shops with cash.",
+      "suggested_revision": "Mr Okafor reports managing his finances; his daughter reports taking over bill payments in August after duplicate payments, while he still does his own cash shopping.",
+      "concerns": [
+        {
+          "type": "conflicting_accounts_flattened",
+          "explanation": "The respondent's account is kept and the informant's conflicting account is dropped.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        },
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "Independence that the informant places before last summer is written in the present tense.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 22,
+              "char": 0
+            },
+            "end": {
+              "index": 23,
+              "char": 21
+            }
+          },
+          "note": "The respondent's account."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 24,
+              "char": 0
+            },
+            "end": {
+              "index": 24,
+              "char": 89
+            }
+          },
+          "note": "The informant took over in August."
+        },
+        {
+          "id": "e3",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 24,
+              "char": 90
+            },
+            "end": {
+              "index": 24,
+              "char": 131
+            }
+          },
+          "note": "Some financial tasks continue."
+        }
+      ]
+    },
+    {
+      "id": "c-func-3",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 172
+        },
+        "end": {
+          "index": 1,
+          "char": 226
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "His daughter describes him phoning, unsure of the way home on a familiar route. He puts it down to roadworks, and she confirms there were roadworks but is unsure that explains it.",
+      "suggested_revision": "His daughter reports one episode in the spring of uncertainty on a familiar route; Mr Okafor attributes it to roadworks, and she is unsure that fully explains it.",
+      "concerns": [
+        {
+          "type": "conflicting_accounts_flattened",
+          "explanation": "One side of a disputed account is stated as fact, without his explanation or her uncertainty.",
+          "evidence_ids": [
+            "e1",
+            "e2",
+            "e3"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 29,
+              "char": 0
+            },
+            "end": {
+              "index": 29,
+              "char": 115
+            }
+          },
+          "note": "The informant's account."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 30,
+              "char": 0
+            },
+            "end": {
+              "index": 30,
+              "char": 57
+            }
+          },
+          "note": "The respondent's explanation."
+        },
+        {
+          "id": "e3",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 32,
+              "char": 0
+            },
+            "end": {
+              "index": 32,
+              "char": 63
+            }
+          },
+          "note": "The informant's uncertainty."
+        }
+      ]
+    },
+    {
+      "id": "c-func-4",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 227
+        },
+        "end": {
+          "index": 1,
+          "char": 303
+        }
+      },
+      "verdict": "supported",
+      "explanation": "Both people say he manages personal care without difficulty.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 33,
+              "char": 0
+            },
+            "end": {
+              "index": 35,
+              "char": 36
+            }
+          },
+          "note": "Both accounts agree."
+        }
+      ]
+    },
+    {
+      "id": "c-orient-1",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 0
+        },
+        "end": {
+          "index": 2,
+          "char": 58
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "He first offered the fourteenth as a question, then corrected himself straight away to the fifteenth.",
+      "suggested_revision": "Gave the day and month, briefly hesitating between two dates before settling on the fifteenth.",
+      "concerns": [
+        {
+          "type": "correction_ignored",
+          "explanation": "The tentative first answer is kept and the immediate self-correction is dropped.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 37,
+              "char": 17
+            },
+            "end": {
+              "index": 37,
+              "char": 67
+            }
+          },
+          "note": "Self-corrects to a different date."
+        }
+      ]
+    },
+    {
+      "id": "c-orient-2",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 59
+        },
+        "end": {
+          "index": 2,
+          "char": 108
+        }
+      },
+      "verdict": "supported",
+      "explanation": "He states the year and names the clinic, the hospital and the floor.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 38,
+              "char": 0
+            },
+            "end": {
+              "index": 39,
+              "char": 18
+            }
+          },
+          "note": "Names the year."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 41,
+              "char": 0
+            },
+            "end": {
+              "index": 41,
+              "char": 56
+            }
+          },
+          "note": "Names the location."
+        }
+      ]
+    },
+    {
+      "id": "c-orient-3",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 109
+        },
+        "end": {
+          "index": 2,
+          "char": 187
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "His daughter describes the increase in placeholder words. He himself reports only occasional tip-of-the-tongue moments, which he sees as normal.",
+      "suggested_revision": "His daughter reports more frequent use of placeholder words; Mr Okafor describes occasional word-finding pauses that he considers normal.",
+      "concerns": [
+        {
+          "type": "wrong_attribution",
+          "explanation": "An observation made by the informant is recorded as his own report.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 44,
+              "char": 0
+            },
+            "end": {
+              "index": 44,
+              "char": 42
+            }
+          },
+          "note": "The informant's observation."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 43,
+              "char": 0
+            },
+            "end": {
+              "index": 43,
+              "char": 65
+            }
+          },
+          "note": "His own, milder account."
+        }
+      ]
+    },
+    {
+      "id": "c-orient-4",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 188
+        },
+        "end": {
+          "index": 2,
+          "char": 217
+        }
+      },
+      "verdict": "insufficient_evidence",
+      "explanation": "Night-time wandering is not mentioned by either speaker. Sleep is discussed only as sound at night with new afternoon naps.",
+      "suggested_revision": "Reports sleeping well at night; his daughter notes new afternoon napping. Night-time wandering was not discussed.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "No passage in the supplied interview describes night-time wandering.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 47,
+              "char": 0
+            },
+            "end": {
+              "index": 49,
+              "char": 57
+            }
+          },
+          "note": "The only discussion of sleep."
+        }
+      ]
+    },
+    {
+      "id": "c-orient-5",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 218
+        },
+        "end": {
+          "index": 2,
+          "char": 266
+        }
+      },
+      "verdict": "out_of_scope",
+      "explanation": "This is a diagnostic conclusion, not a factual statement about the interview.",
+      "out_of_scope_reason": "A diagnosis depends on formal testing and external criteria that are not part of this interview.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": []
+    }
+  ]
+}

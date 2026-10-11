@@ -1,0 +1,636 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-08",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c-school-1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 116
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The mother relays the October note from the teacher, covering both unfinished written work and leaving the seat.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 128
+            }
+          },
+          "note": "The parent relays the teacher's note."
+        }
+      ]
+    },
+    {
+      "id": "c-school-2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 117
+        },
+        "end": {
+          "index": 0,
+          "char": 203
+        }
+      },
+      "verdict": "supported",
+      "explanation": "Leo himself describes starting to write, thinking about other things, and running out of time.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 7,
+              "char": 0
+            },
+            "end": {
+              "index": 7,
+              "char": 86
+            }
+          },
+          "note": "The child's own account of drifting off."
+        }
+      ]
+    },
+    {
+      "id": "c-school-3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 204
+        },
+        "end": {
+          "index": 0,
+          "char": 255
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Leo says he sometimes leaves his seat. The view that it happens too often is the teacher's, which he passes on.",
+      "suggested_revision": "Leo says he sometimes leaves his seat to sharpen his pencil; he reports that his teacher thinks this happens too much.",
+      "concerns": [
+        {
+          "type": "wrong_attribution",
+          "explanation": "The teacher's judgement is recorded as the child's own admission.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 9,
+              "char": 0
+            },
+            "end": {
+              "index": 9,
+              "char": 64
+            }
+          },
+          "note": "Sometimes leaves his seat; the judgement is the teacher's."
+        }
+      ]
+    },
+    {
+      "id": "c-school-4",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 256
+        },
+        "end": {
+          "index": 0,
+          "char": 316
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "One incident is described, a push in the lunch queue after the other boy cut in. The mother says nothing like it had happened at school before.",
+      "suggested_revision": "One incident of pushing a peer in the lunch queue, which Leo says followed the peer cutting in; no previous incidents at school.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "A single incident becomes repeated altercations.",
+          "evidence_ids": [
+            "e2"
+          ]
+        },
+        {
+          "type": "context_stripping",
+          "explanation": "The reported provocation and the apology are left out.",
+          "evidence_ids": [
+            "e1",
+            "e3"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 13,
+              "char": 8
+            },
+            "end": {
+              "index": 13,
+              "char": 136
+            }
+          },
+          "note": "One incident, with the provocation described."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 16,
+              "char": 0
+            },
+            "end": {
+              "index": 17,
+              "char": 18
+            }
+          },
+          "note": "No earlier incidents at school."
+        },
+        {
+          "id": "e3",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 15,
+              "char": 0
+            },
+            "end": {
+              "index": 15,
+              "char": 70
+            }
+          },
+          "note": "The child's account, including an apology."
+        }
+      ]
+    },
+    {
+      "id": "c-school-5",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 317
+        },
+        "end": {
+          "index": 0,
+          "char": 409
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The mother gives the duration, the number of homework nights and the need to sit beside him.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 19,
+              "char": 0
+            },
+            "end": {
+              "index": 19,
+              "char": 107
+            }
+          },
+          "note": "Duration and the need for supervision."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 21,
+              "char": 0
+            },
+            "end": {
+              "index": 21,
+              "char": 52
+            }
+          },
+          "note": "Number of homework nights."
+        }
+      ]
+    },
+    {
+      "id": "c-peers-1",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 0
+        },
+        "end": {
+          "index": 1,
+          "char": 88
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "This is the mother's view, not Leo's. Leo describes several friends and a recent party invitation, so the two accounts differ.",
+      "suggested_revision": "His mother worries that he has one close friend and few party invitations; Leo describes several friends he plays with and a recent party invitation.",
+      "concerns": [
+        {
+          "type": "wrong_attribution",
+          "explanation": "The parent's concern is presented as the child's own report.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "conflicting_accounts_flattened",
+          "explanation": "The child's and the parent's differing accounts are merged into one, keeping only the parent's version.",
+          "evidence_ids": [
+            "e1",
+            "e2",
+            "e3"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 25,
+              "char": 19
+            },
+            "end": {
+              "index": 25,
+              "char": 100
+            }
+          },
+          "note": "The parent's account."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 23,
+              "char": 0
+            },
+            "end": {
+              "index": 23,
+              "char": 59
+            }
+          },
+          "note": "The child describes several friends."
+        },
+        {
+          "id": "e3",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 26,
+              "char": 0
+            },
+            "end": {
+              "index": 27,
+              "char": 34
+            }
+          },
+          "note": "The child describes a recent invitation."
+        }
+      ]
+    },
+    {
+      "id": "c-peers-2",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 89
+        },
+        "end": {
+          "index": 1,
+          "char": 162
+        }
+      },
+      "verdict": "supported",
+      "explanation": "Leo describes one occasion when peers would not let him play tag because he changes the rules.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 29,
+              "char": 4
+            },
+            "end": {
+              "index": 29,
+              "char": 97
+            }
+          },
+          "note": "One exclusion, and the reason given."
+        }
+      ]
+    },
+    {
+      "id": "c-peers-3",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 163
+        },
+        "end": {
+          "index": 1,
+          "char": 258
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Difficulty with turn-taking in board games is described. The mother also says he does better with his grandfather, so it is not consistent across adults.",
+      "suggested_revision": "His mother describes difficulty waiting his turn in board games, noting that he does better with his grandfather.",
+      "concerns": [
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The informant gives an exception that conflicts with the claim of consistency.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 33,
+              "char": 0
+            },
+            "end": {
+              "index": 33,
+              "char": 54
+            }
+          },
+          "note": "Difficulty with turn-taking."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 33,
+              "char": 55
+            },
+            "end": {
+              "index": 33,
+              "char": 100
+            }
+          },
+          "note": "Better with one adult."
+        }
+      ]
+    },
+    {
+      "id": "c-home-1",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 0
+        },
+        "end": {
+          "index": 2,
+          "char": 125
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The mother gives the bedtime, the usual time he is still awake, and that it has been this way since toddlerhood.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 35,
+              "char": 0
+            },
+            "end": {
+              "index": 35,
+              "char": 65
+            }
+          },
+          "note": "Bedtime and how late he is awake."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 42,
+              "char": 0
+            },
+            "end": {
+              "index": 43,
+              "char": 31
+            }
+          },
+          "note": "Long-standing difficulty."
+        }
+      ]
+    },
+    {
+      "id": "c-home-2",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 126
+        },
+        "end": {
+          "index": 2,
+          "char": 184
+        }
+      },
+      "verdict": "insufficient_evidence",
+      "explanation": "The change was made about a month ago, and the mother is unsure yet whether it has helped. No conclusion either way is established.",
+      "suggested_revision": "Tablet use at bedtime stopped roughly four weeks ago; it is too early to tell whether this has helped.",
+      "concerns": [
+        {
+          "type": "certainty_inflation",
+          "explanation": "The informant's uncertainty is turned into a definite finding of no benefit.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 39,
+              "char": 37
+            },
+            "end": {
+              "index": 39,
+              "char": 125
+            }
+          },
+          "note": "Recent change; the effect is uncertain."
+        }
+      ]
+    },
+    {
+      "id": "c-home-3",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 185
+        },
+        "end": {
+          "index": 2,
+          "char": 224
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The mother says he sometimes calls himself stupid when frustrated with homework, and Leo says he feels this only when he cannot do the writing.",
+      "suggested_revision": "Sometimes calls himself stupid when frustrated with homework; Leo says he feels this way only about writing tasks.",
+      "concerns": [
+        {
+          "type": "context_stripping",
+          "explanation": "The narrow, homework-specific setting is left out, so it reads as a general self-view.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 45,
+              "char": 14
+            },
+            "end": {
+              "index": 45,
+              "char": 78
+            }
+          },
+          "note": "Occasional, and tied to homework."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 46,
+              "char": 0
+            },
+            "end": {
+              "index": 47,
+              "char": 45
+            }
+          },
+          "note": "The child limits it to writing."
+        }
+      ]
+    },
+    {
+      "id": "c-home-4",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 225
+        },
+        "end": {
+          "index": 2,
+          "char": 335
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The mother reports milestones on time, a normal hearing check last year, and no recent eye check.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 51,
+              "char": 0
+            },
+            "end": {
+              "index": 51,
+              "char": 27
+            }
+          },
+          "note": "Milestones on time."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 55,
+              "char": 0
+            },
+            "end": {
+              "index": 55,
+              "char": 70
+            }
+          },
+          "note": "Hearing and vision checks."
+        }
+      ]
+    },
+    {
+      "id": "c-home-5",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 336
+        },
+        "end": {
+          "index": 2,
+          "char": 403
+        }
+      },
+      "verdict": "out_of_scope",
+      "explanation": "This is a diagnostic impression, not a factual statement about the interview.",
+      "out_of_scope_reason": "A diagnostic impression depends on external criteria and observations outside this interview, which the audit does not assess.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": []
+    }
+  ]
+}
