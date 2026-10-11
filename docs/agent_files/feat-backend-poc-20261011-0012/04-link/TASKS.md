@@ -14,7 +14,7 @@ Source of truth: [PRD.md](PRD.md). For each in-scope claim, find the transcript 
 | 3 | Linker prompt and call with one `cache_prefix` | 2 | done |
 | 4 | Validation: shortlist membership, `locate()` dry run, snapping, answer status, `ambiguous_turns` | 3, 02 | done |
 | 5 | Retry and per-claim `stalled` | 4 | done |
-| 6 | `LinkResult`, entry points, logging, config, fixture test through `assemble` | 5 | todo |
+| 6 | `LinkResult`, entry points, logging, config, fixture test through `assemble` | 5 | done |
 | 7 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
 
 ## Task 1 — Shortlist

@@ -1,11 +1,16 @@
 """R3: one mid-tier call per in-scope claim."""
 
+import asyncio
 import re
 
+from iaudit_backend.assembler.models import EvidenceDraft
 from iaudit_backend.atomize.models import AtomicClaim
 from iaudit_backend.llm import LLMBadOutput, LLMError, LLMRequest, LLMTimeout
+from iaudit_backend.models import Turn
+from iaudit_backend.prep import PrepResult
+from iaudit_backend.safe_log import log_event
 
-from .context import LinkContext
+from .context import LinkContext, build_link_context
 from .models import LinkerOutput, LinkResult
 from .prompt import build_prompt
 from .validate import validate_output
@@ -39,7 +44,7 @@ def _retry_user(user: str, counts) -> str:
     )
 
 
-async def link_one(claim: AtomicClaim, lctx: LinkContext, ctx) -> LinkResult:
+async def _link(claim: AtomicClaim, lctx: LinkContext, ctx) -> LinkResult:
     if claim.scope != "in_scope":
         return LinkResult(claim_id=claim.id, mode=lctx.mode)
     sl = lctx.select(claim)
@@ -101,3 +106,39 @@ async def link_one(claim: AtomicClaim, lctx: LinkContext, ctx) -> LinkResult:
         return res
     res.evidence, res.ambiguous_turns = v.evidence, v.ambiguous_turns
     return res
+
+
+async def link_one(claim: AtomicClaim, lctx: LinkContext, ctx) -> LinkResult:
+    """Link one claim. Never raises for per-claim failures; logs counts only."""
+    res = await _link(claim, lctx, ctx)
+    if claim.scope == "in_scope":
+        c = res.counts
+        dropped = sum(
+            c.get(k, 0)
+            for k in ("not_in_shortlist", "unlocatable", "empty_text", "item_dropped", "dup_key")
+        )
+        log_event(
+            "link_claim",
+            request_id=ctx.request_id,
+            claim_id=claim.id,
+            mode=res.mode,
+            shortlist_size=len(res.shortlist),
+            items_returned=c.get("items_returned", 0),
+            items_kept=c.get("items_kept", 0),
+            dropped=dropped,
+            coerced=c.get("coerced", 0),
+            retries=c.get("retries", 0),
+            **({"failure": res.reason} if res.status == "stalled" else {}),
+        )
+    return res
+
+
+def to_evidence_drafts(r: LinkResult) -> list[EvidenceDraft]:
+    """Drafts for 02. Inference items stay internal; their premises are ordinary items."""
+    return [e.draft for e in r.evidence if e.link_type != "inference"]
+
+
+async def link_claims(claims: list[AtomicClaim], prep: PrepResult, turns: list[Turn], ctx):
+    """Gather wrapper over build_link_context + link_one."""
+    lctx = build_link_context(turns, prep, ctx)
+    return list(await asyncio.gather(*(link_one(c, lctx, ctx) for c in claims)))
