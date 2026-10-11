@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AuditRequest, Claim, ClaimCheck } from "../contract";
+import type { AuditRequest, Claim, ClaimCheck, Evidence } from "../contract";
 import { orderEvidence } from "../contract";
 import { ExcerptList } from "./ExcerptList";
 import { ConcernList } from "./ConcernList";
@@ -13,6 +13,10 @@ export interface ClaimDetailProps {
   check: ClaimCheck;
 }
 
+/** Duplicate evidence ids are tolerated by ignoring all but the first occurrence. */
+const firstPerId = (list: Evidence[]): Evidence[] =>
+  list.filter((e, i) => list.findIndex((o) => o.id === e.id) === i);
+
 /** Remounts per claim so the active concern and expansion never leak between claims. */
 export function ClaimDetail(props: ClaimDetailProps) {
   return <ClaimDetailBody key={props.claim.id} {...props} />;
@@ -20,7 +24,9 @@ export function ClaimDetail(props: ClaimDetailProps) {
 
 function ClaimDetailBody({ claim, request, check }: ClaimDetailProps) {
   const [activeConcern, setActiveConcern] = useState<number | null>(null);
-  const { placed, unplaceable } = orderEvidence(request, claim, check);
+  const ordered = orderEvidence(request, claim, check);
+  const placed = firstPerId(ordered.placed);
+  const unplaceable = firstPerId(ordered.unplaceable);
   const placedIds = new Set(placed.map((e) => e.id));
   const active = activeConcern === null ? undefined : claim.concerns[activeConcern];
   const activeIds = active ? new Set(active.evidence_ids) : null;

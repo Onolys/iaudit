@@ -133,4 +133,21 @@ describe("excerpts", () => {
     expect(screen.getByText(/Excerpt position out of range — Qualifying — n/)).toBeTruthy();
     expect(screen.getByRole("alert")).toBeTruthy();
   });
+
+  it("ignores later evidence that reuses an id (different turns) without throwing", () => {
+    const a = { id: "dup", role: "supporting" as const, span: span(0, 0, 0, 5) };
+    const b = { id: "dup", role: "contradicting" as const, span: span(3, 0, 3, 9) };
+    const { container } = render(<ClaimDetail {...inlineProps(req, claimOf([b, a]))} />);
+    expect(turns(container)).toEqual([0]);
+    expect(screen.getAllByText("Supporting")).toHaveLength(1);
+    expect(screen.queryByText("Contradicting")).toBeNull();
+  });
+
+  it("ignores a duplicate id within the same turn", () => {
+    const a = { id: "dup", role: "supporting" as const, span: span(1, 0, 1, 10) };
+    const b = { id: "dup", role: "qualifying" as const, span: span(1, 0, 1, 10) };
+    const { container } = render(<ClaimDetail {...inlineProps(req, claimOf([a, b]))} />);
+    expect(container.querySelectorAll(".cd-overlap")).toHaveLength(0);
+    expect(screen.getAllByText("Supporting")).toHaveLength(1);
+  });
 });
