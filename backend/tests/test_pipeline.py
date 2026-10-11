@@ -15,6 +15,7 @@ from iaudit_backend.pipeline import (
     make_pipeline,
     run_with_backstop,
 )
+from iaudit_backend.pipeline.full import FullPipeline
 
 
 def make_ctx(settings=None, deadline_in=60.0, request_id="r1") -> RequestContext:
@@ -45,8 +46,8 @@ async def test_stub_pipeline_omits_request_id_when_absent(example_request):
 
 def test_factory():
     assert isinstance(make_pipeline(Settings(pipeline="stub")), StubPipeline)
-    with pytest.raises(NotImplementedError):
-        make_pipeline(Settings(pipeline="full"))
+    assert isinstance(make_pipeline(Settings(pipeline="full")), FullPipeline)
+    assert isinstance(make_pipeline(Settings()), FullPipeline)  # full is the default
 
 
 def test_context_budget():

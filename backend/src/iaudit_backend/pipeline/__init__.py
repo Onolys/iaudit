@@ -56,7 +56,9 @@ class StubPipeline:
 def make_pipeline(settings: Settings) -> Pipeline:
     if settings.pipeline == "stub":
         return StubPipeline()
-    raise NotImplementedError("the full pipeline arrives with sub-project 06")
+    from .full import FullPipeline  # imported here: full.py imports this module
+
+    return FullPipeline()
 
 
 async def run_with_backstop(

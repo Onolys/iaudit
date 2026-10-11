@@ -18,7 +18,7 @@ def test_defaults():
     assert s.llm_max_retries == 1
     assert s.llm_max_concurrency == 20
     assert s.llm_mode == "live"
-    assert s.pipeline == "stub"
+    assert s.pipeline == "full"
     assert s.log_level == "INFO"
 
 

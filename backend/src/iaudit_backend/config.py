@@ -73,7 +73,7 @@ class Settings(BaseSettings):
     pipeline_max_claims: int = 80
     # Misc
     log_level: str = "INFO"
-    pipeline: Literal["stub", "full"] = "stub"
+    pipeline: Literal["stub", "full"] = "full"
 
     @field_validator("cors_origins", mode="before")
     @classmethod
