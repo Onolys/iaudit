@@ -3,6 +3,7 @@
 from iaudit_backend.config import Settings
 from iaudit_backend.models import AuditRequest
 
+from .locate import Match, locate
 from .models import (
     AssembleOutcome,
     AssembleReport,
@@ -24,8 +25,10 @@ __all__ = [
     "EvidenceDraft",
     "ExcerptSegment",
     "InternalAudit",
+    "Match",
     "SectionFailure",
     "assemble",
+    "locate",
 ]
 
 
