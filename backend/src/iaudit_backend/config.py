@@ -51,6 +51,16 @@ class Settings(BaseSettings):
     link_concurrency: int = 20
     link_retry: bool = True
     link_widen_on_empty: bool = False
+    # Check (SP05)
+    check_concurrency: int = 20
+    check_max_tokens: int = 1500
+    check_min_conf_p0: float = 0.5
+    check_min_conf_p1: float = 0.6
+    check_step_material: int = 1
+    check_contradict_gap: int = 3
+    check_rate_ratio: float = 1.5
+    check_suggest_revision: bool = True
+    check_retry: bool = True
     # Misc
     log_level: str = "INFO"
     pipeline: Literal["stub", "full"] = "stub"
