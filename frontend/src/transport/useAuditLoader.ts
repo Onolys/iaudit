@@ -50,6 +50,11 @@ export function useAuditLoader(deps?: AuditDeps): AuditLoader {
       }
       const result = await auditRequest(request, { signal: ctl.signal, deps: depsRef.current });
       if (!current()) return;
+      // Cancel wins even when the work finished first (e.g. mock fixtures still loading).
+      if (ctl.signal.aborted) {
+        commit({ status: "error", fileName, error: { kind: "cancelled" } });
+        return;
+      }
       commit(result.ok ? { status: "ok", fileName, result: result.value } : { status: "error", fileName, error: result.error });
     },
     [commit],

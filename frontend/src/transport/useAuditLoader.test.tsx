@@ -137,4 +137,35 @@ describe("useAuditLoader", () => {
     await act(async () => m.calls[0].resolve(new Response(responseA)));
     expect(result.current.state).toEqual({ status: "idle" });
   });
+
+  it("cancel while mock fixtures are still loading shows cancelled, not the audit", async () => {
+    let release!: (t: string) => void;
+    const slow = new Promise<string>((r) => (release = r));
+    const registry = [{ name: "default", loadRequest: () => Promise.resolve(requestA), loadResponse: () => slow }];
+    const { result } = renderHook(() =>
+      useAuditLoader({ fetch: vi.fn() as never, config: { mock: true, auditUrl: null }, registry, mockDelayMs: 0 }),
+    );
+    act(() => void result.current.loadFile(file(requestA)));
+    await waitFor(() => expect(result.current.state).toMatchObject({ status: "loading", requestId: "example-001" }));
+    await act(async () => await new Promise((r) => setTimeout(r, 10)));
+    act(() => result.current.cancel());
+    await act(async () => release(responseA));
+    expect(result.current.state).toMatchObject({ status: "error", error: { kind: "cancelled" } });
+  });
+
+  it("a rejecting file read ends in an error, not endless loading", async () => {
+    const { result } = setup();
+    const bad = { name: "x.json", text: () => Promise.reject(new Error("NotReadable")) } as unknown as File;
+    await act(async () => void (await result.current.loadFile(bad)));
+    expect(result.current.state).toMatchObject({ status: "error", error: { kind: "invalid_request_file" } });
+  });
+
+  it("a failing mock fixture load ends in an error", async () => {
+    const registry = [{ name: "default", loadRequest: () => Promise.reject(new Error("chunk")), loadResponse: async () => "" }];
+    const { result } = renderHook(() =>
+      useAuditLoader({ fetch: vi.fn() as never, config: { mock: true, auditUrl: null }, registry, mockDelayMs: 0 }),
+    );
+    await act(async () => void (await result.current.loadFile(file(requestA))));
+    expect(result.current.state).toMatchObject({ status: "error", error: { kind: "network" } });
+  });
 });

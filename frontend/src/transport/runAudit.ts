@@ -24,7 +24,12 @@ const fail = <T = never>(error: LoadError): Result<T, LoadError> => ({ ok: false
 
 /** Read and validate an uploaded request file. Nothing is sent anywhere. */
 export async function readRequestFile(file: Pick<File, "text">): Promise<Result<AuditRequest, LoadError>> {
-  const text = (await file.text()).replace(/^\uFEFF/, "");
+  let text: string;
+  try {
+    text = (await file.text()).replace(/^\uFEFF/, "");
+  } catch {
+    return fail({ kind: "invalid_request_file", reason: "not_json", message: "the file could not be read" });
+  }
   if (text.trim() === "") return fail({ kind: "invalid_request_file", reason: "empty" });
   let raw: unknown;
   try {
@@ -46,9 +51,15 @@ export async function auditRequest(
   const { mock, auditUrl } = deps.config;
   if (!mock && !auditUrl) return fail({ kind: "config_missing" });
 
-  const body = mock
-    ? await lookupMock(request, { registry: deps.registry, signal: opts.signal, delayMs: deps.mockDelayMs })
-    : await postAudit(auditUrl!, request, { fetch: deps.fetch, signal: opts.signal });
+  let body: Result<string, LoadError>;
+  try {
+    body = mock
+      ? await lookupMock(request, { registry: deps.registry, signal: opts.signal, delayMs: deps.mockDelayMs })
+      : await postAudit(auditUrl!, request, { fetch: deps.fetch, signal: opts.signal });
+  } catch {
+    // A lazy fixture chunk failed to load.
+    return fail({ kind: "network", url: "bundled mock fixtures" });
+  }
   if (!body.ok) return body;
 
   if (body.value.trim() === "") return fail({ kind: "invalid_response", reason: "empty" });
