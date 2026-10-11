@@ -29,6 +29,14 @@ curl http://localhost:8000/healthz
 
 The health check returns `{"status":"ok"}`. Without a key, audits return 503.
 
+To try an audit without a key, start the stub pipeline and post the contract example. It returns 200 with an empty valid audit (`IAUDIT_LLM_MODE=stub` returns 503 instead):
+
+```bash
+IAUDIT_PIPELINE=stub uv run uvicorn iaudit_backend.app:app --port 8000
+curl -s -X POST http://localhost:8000/v1/audit -H 'content-type: application/json' \
+  -d @../docs/contracts/examples/request.json
+```
+
 ## Test
 
 ```bash
