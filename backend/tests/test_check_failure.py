@@ -177,3 +177,9 @@ async def test_drafts_pass_the_assembler_without_repair(make_ctx):
     (claim_out,) = res.response["claims"]
     assert claim_out["verdict"] == "partially_supported"
     assert [x["type"] for x in claim_out["concerns"]] == ["frequency_severity_inflation"]
+
+
+def test_floor_count_fields_are_loggable():
+    from iaudit_backend.safe_log import ALLOWED_FIELDS
+
+    assert {"items_below_floor", "inferences_below_floor", "flags_below_floor"} <= ALLOWED_FIELDS

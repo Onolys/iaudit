@@ -66,3 +66,11 @@ def test_verifier_flag_demotes_cited_keys_with_the_same_gate():
     assert it.demote is None
     apply_timeframe(claim("x"), [it], [flag("high")])
     assert it.demote == "timeframe"
+
+
+def test_timeframe_flag_without_keys_applies_to_all_judged_items():
+    it = judged("unspecified")
+    apply_timeframe(
+        claim("x", timeframe_explicit=True), [it], [FlagObs(type="timeframe_mismatch", conf="high")]
+    )
+    assert it.demote == "timeframe"

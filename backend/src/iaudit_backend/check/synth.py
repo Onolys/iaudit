@@ -53,7 +53,7 @@ def apply_timeframe(claim: AtomicClaim, items: list[JudgedEvidence], flags: list
         k
         for f in flags
         if f.type == "timeframe_mismatch" and (not implicit or f.conf == "high")
-        for k in f.keys
+        for k in (f.keys or [it.key for it in items])
     }
     n = 0
     for it in items:
@@ -243,9 +243,12 @@ def _merge(concerns: list[Concern]) -> list[Concern]:
         if m is None:
             merged[c.type] = Concern(c.type, list(c.keys), c.direction, c.scale)
             continue
+        if m.direction and c.direction and m.direction != c.direction:
+            # opposite directions: report the inflating one, with only its own items and scale
+            if c.direction == "inflates":
+                merged[c.type] = Concern(c.type, list(c.keys), c.direction, c.scale)
+            continue
         m.keys = list(dict.fromkeys([*m.keys, *c.keys]))
-        if c.direction == "inflates":
-            m.direction = "inflates"
         if c.scale and m.scale and c.scale != m.scale:
             m.scale = "frequency and severity"
     return list(merged.values())
@@ -261,7 +264,11 @@ def dedup(concerns: list[Concern]) -> list[Concern]:
                 if not lc.keys or not hc.keys or set(lc.keys) & set(hc.keys):
                     del cs[low]
                     break
+    # D5 precedence: conflicting accounts > correction ignored > generic contradiction
     if ConcernType.conflicting_accounts_flattened in cs:
+        cs.pop(ConcernType.correction_ignored, None)
+        cs.pop(ConcernType.contradictory_evidence, None)
+    if ConcernType.correction_ignored in cs:
         cs.pop(ConcernType.contradictory_evidence, None)
     if any(t != ConcernType.unsupported_claim for t in cs):
         cs.pop(ConcernType.unsupported_claim, None)

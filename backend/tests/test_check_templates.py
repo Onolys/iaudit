@@ -107,3 +107,10 @@ INFL = [Concern(ConcernType.frequency_severity_inflation, ["k"], "inflates", "fr
 )
 def test_suggested_revision_rules(text, verdict, concerns, cfg, ok):
     assert (vet_revision(text, verdict, concerns, cfg) is not None) is ok
+
+
+def test_banned_words_in_suggested_revision_are_rejected():
+    assert (
+        vet_revision("Alex deliberately skips meetings.", Verdict.partially_supported, INFL, CFG)
+        is None
+    )

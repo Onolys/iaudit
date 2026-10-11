@@ -164,3 +164,17 @@ async def test_no_call_when_budget_is_exhausted(make_ctx):
     ctx = make_ctx(llm=stub({"items": [item()]}, seen), deadline_in=0.5)
     r = await verify(claim("x"), link(ev()), PREP, PREP.turns, ctx)
     assert seen == [] and r.stall == "timeout"
+
+
+async def test_missing_inference_judgment_is_retried_then_stalls(make_ctx):
+    lk = link(
+        ev(n=1), ev(n=2, turn=5),
+        ev(n=3, lt="inference", premises=["c0.1:e1", "c0.1:e2"], step="Both."),
+    )  # fmt: skip
+    plain = {"items": [item("c0.1:e1"), item("c0.1:e2")]}
+    full = {**plain, "inferences": [{"key": "c0.1:e3", "step_acceptable": True}]}
+    seen: list = []
+    r = await verify(claim("x"), lk, PREP, PREP.turns, make_ctx(llm=stub([plain, full], seen)))
+    assert r.stall is None and r.retries == 1 and "c0.1:e3" in seen[1].user
+    r = await verify(claim("x"), lk, PREP, PREP.turns, make_ctx(llm=stub(plain)))
+    assert (r.stall, r.unjudged) == ("bad_output", ["c0.1:e3"])

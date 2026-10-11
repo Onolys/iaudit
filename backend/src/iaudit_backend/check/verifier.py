@@ -152,7 +152,8 @@ def clean_output(out: VerifierOutput, link: LinkResult) -> tuple[VerifierOutput,
             seen_inf.add(g.key)
             infs.append(g)
     cleaned = out.model_copy(update={"items": items, "flags": flags, "inferences": infs})
-    return cleaned, [k for k in plain if k not in seen]
+    missing = [k for k in plain if k not in seen] + [k for k in inf if k not in seen_inf]
+    return cleaned, missing
 
 
 def apply_floors(out: VerifierOutput, cfg: Settings) -> tuple[VerifierOutput, dict[str, int]]:

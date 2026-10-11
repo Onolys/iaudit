@@ -72,6 +72,7 @@ ALLOWED_FIELDS = frozenset(
         "flags_below_floor",
         "flags_suppressed",
         "items_below_floor",
+        "inferences_below_floor",
         "items_dropped",
         "role_skipped",
         "role_disagreements",

@@ -13,6 +13,11 @@ from iaudit_backend.models import ConcernType, Role, Verdict
 
 from .models import Concern
 
+BANNED = re.compile(
+    r"fabricat|\blie\b|\blies\b|\blying\b|false claim|dishonest|misconduct|deliberate"
+    r"|misrepresent",
+    re.IGNORECASE,
+)
 _MAX_REVISION_WORDS = 40
 _TIMESTAMP = re.compile(r"\b\d{1,2}:\d{2}(?::\d{2})?\b|\[\d")
 REVISABLE = frozenset(
@@ -125,6 +130,11 @@ def vet_revision(
     if not any(c.type in REVISABLE for c in concerns):
         return None
     text = " ".join(text.split())
-    if not text or _TIMESTAMP.search(text) or len(text.split()) > _MAX_REVISION_WORDS:
+    if (
+        not text
+        or _TIMESTAMP.search(text)
+        or BANNED.search(text)
+        or len(text.split()) > _MAX_REVISION_WORDS
+    ):
         return None
     return text

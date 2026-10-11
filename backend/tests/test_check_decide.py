@@ -219,15 +219,55 @@ def test_other_person_entailment_is_wrong_attribution_not_support():
     assert (d.verdict, types(d)) == (V.partially_supported, [CT.wrong_attribution])
 
 
-def test_dedup_one_per_type_keys_unioned_and_inflates_wins():
+def test_dedup_same_direction_unions_keys_and_scales():
     out = dedup(
         [
-            Concern(CT.frequency_severity_inflation, ["a"], "understates", "severity"),
+            Concern(CT.frequency_severity_inflation, ["a"], "inflates", "severity"),
             Concern(CT.frequency_severity_inflation, ["b"], "inflates", "frequency"),
         ]
     )
     assert len(out) == 1 and out[0].keys == ["a", "b"] and out[0].direction == "inflates"
     assert out[0].scale == "frequency and severity"
+
+
+def test_dedup_opposite_directions_report_the_inflating_one_only():
+    for order in (("understates", "inflates"), ("inflates", "understates")):
+        scale = {"inflates": "frequency", "understates": "severity"}
+        out = dedup(
+            [
+                Concern(
+                    CT.frequency_severity_inflation, ["i" if d == "inflates" else "u"], d, scale[d]
+                )
+                for d in order
+            ]
+        )
+        assert [(c.direction, c.scale, c.keys) for c in out] == [("inflates", "frequency", ["i"])]
+
+
+def test_mixed_direction_amounts_never_say_inflates_the_severity():
+    c = claim(
+        "Alex struggles.",
+        quantities=[
+            {"kind": "frequency", "raw": "always", "bucket": "always"},
+            {"kind": "severity", "raw": "mild", "bucket": "mild"},
+        ],
+    )
+    it = j(
+        frequency=[{"raw": "often", "basis": "relative"}],
+        severity=[{"raw": "severe", "basis": "relative"}],
+    )
+    (cn,) = run([it], c=c).concerns
+    assert (cn.direction, cn.scale) == ("inflates", "frequency")
+
+
+def test_d5_correction_ignored_replaces_generic_contradiction():
+    items = [j(1), j(2, rel="contradicts", polarity="affirmed")]
+    d = run(items, ("correction_ignored", ["c0.1:e1"]))
+    assert (d.row, types(d)) == ("D5", [CT.correction_ignored])
+    d = run(
+        items, ("correction_ignored", ["c0.1:e1"]), ("conflicting_accounts_flattened", ["c0.1:e1"])
+    )
+    assert types(d) == [CT.conflicting_accounts_flattened]
 
 
 def test_dedup_specific_suppresses_generic_on_same_items_only():
