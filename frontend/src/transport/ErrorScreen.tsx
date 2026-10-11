@@ -26,6 +26,7 @@ const RESPONSE_REASON = {
   wrong_version: "The service response uses an unsupported schema version.",
   schema: "The service response does not match the audit response schema.",
   duplicate_claim_id: "The service response contains a duplicate claim id.",
+  duplicate_evidence_id: "The service response contains a duplicate evidence id within a claim.",
 } as const;
 
 function describe(error: LoadError): { title: string; detail: ReactNode } {
@@ -72,6 +73,7 @@ function describe(error: LoadError): { title: string; detail: ReactNode } {
             <p>
               {RESPONSE_REASON[error.reason]}
               {error.reason === "duplicate_claim_id" && error.claimId ? ` (${error.claimId})` : ""}
+              {error.reason === "duplicate_evidence_id" && error.claimId ? ` (${error.claimId}/${error.evidenceId})` : ""}
               {error.reason === "not_json" && error.message ? ` ${error.message}` : ""}
             </p>
             {error.issues ? <Issues issues={error.issues} /> : null}

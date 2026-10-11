@@ -75,6 +75,9 @@ export async function auditRequest(
     if (e.kind === "request_id_mismatch") return fail(e);
     if (e.kind === "schema") return fail({ kind: "invalid_response", reason: "schema", issues: e.issues });
     if (e.kind === "duplicate_claim_id") return fail({ kind: "invalid_response", reason: "duplicate_claim_id", claimId: e.id });
+    if (e.kind === "duplicate_evidence_id") {
+      return fail({ kind: "invalid_response", reason: "duplicate_evidence_id", claimId: e.claimId, evidenceId: e.id });
+    }
     return fail({ kind: "invalid_response", reason: e.kind });
   }
   return {
