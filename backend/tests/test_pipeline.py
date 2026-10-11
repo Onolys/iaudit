@@ -51,7 +51,7 @@ def test_factory():
 
 def test_context_budget():
     ctx = make_ctx(Settings(llm_timeout_s=30), deadline_in=100)
-    assert ctx.call_timeout("link") == 30
+    assert ctx.call_timeout("link") == 20  # stage cap below the LLM_TIMEOUT_S ceiling
     ctx = make_ctx(Settings(llm_timeout_s=30), deadline_in=10)
     assert 9 < ctx.call_timeout("link") <= 10
     ctx = make_ctx(deadline_in=MIN_CALL_S / 2)

@@ -61,6 +61,16 @@ class Settings(BaseSettings):
     check_rate_ratio: float = 1.5
     check_suggest_revision: bool = True
     check_retry: bool = True
+    # Orchestration (SP06)
+    assemble_reserve_s: float = 3
+    min_call_s: float = 4
+    cancel_grace_s: float = 1
+    prep_soft_timeout_s: float = 10
+    prep_call_timeout_s: float = 10
+    atomize_call_timeout_s: float = 25
+    link_call_timeout_s: float = 20
+    check_call_timeout_s: float = 20
+    pipeline_max_claims: int = 80
     # Misc
     log_level: str = "INFO"
     pipeline: Literal["stub", "full"] = "stub"

@@ -10,7 +10,7 @@ from iaudit_backend.config import Settings
 from iaudit_backend.llm import LLMClient, MetricsCollector
 from iaudit_backend.models import AuditRequest, AuditResponse, Status
 
-MIN_CALL_S = 2.0  # below this remaining budget a stage should not start an LLM call
+MIN_CALL_S = 4.0  # default of Settings.min_call_s: below this remaining budget no call starts
 BACKSTOP_GRACE_S = 2.0
 
 
@@ -30,9 +30,10 @@ class RequestContext:
     def call_timeout(self, stage: str) -> float | None:
         """Per-call timeout bounded by the remaining budget; None when too little is left."""
         left = self.remaining()
-        if left < MIN_CALL_S:
+        if left < self.settings.min_call_s:
             return None
-        return min(self.settings.llm_timeout_s, left)
+        cap = getattr(self.settings, f"{stage}_call_timeout_s", self.settings.llm_timeout_s)
+        return min(cap, self.settings.llm_timeout_s, left)
 
     @property
     def fixture_scope(self) -> str | None:
