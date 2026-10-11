@@ -10,7 +10,7 @@ Source of truth: [PRD.md](PRD.md). A runnable `backend/` service serving `POST /
 | # | Task | Depends on | Status |
 |---|---|---|---|
 | 1 | Project skeleton: uv, ruff, pytest, src layout | none | done |
-| 2 | Contract loader: schemas read in place, fail at startup | 1 | todo |
+| 2 | Contract loader: schemas read in place, fail at startup | 1 | done |
 | 3 | `IAUDIT_*` settings | 1 | todo |
 | 4 | Internal models and enum-drift test | 2 | todo |
 | 5 | Error mapping to contract error bodies | 2 | todo |
