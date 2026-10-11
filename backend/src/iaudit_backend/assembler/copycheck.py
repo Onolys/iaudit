@@ -8,7 +8,7 @@ from iaudit_backend.models import AuditRequest, Verdict
 from .normalize import normalize
 from .repair import EXPLANATIONS, GENERIC_OUT_OF_SCOPE
 
-_QUOTED = re.compile(r'"([^"]+)"|“([^”]+)”|‘([^’]+)’')
+_QUOTED = re.compile(r""""([^"]+)"|“([^”]+)”|‘([^’]+)’|(?<!\w)'(.+?)'(?!\w)""")
 _TIME = re.compile(r"\b\d\d:\d\d\b")
 _END = ".!?"
 _MIN_QUOTE_WORDS = 4

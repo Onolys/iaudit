@@ -24,6 +24,7 @@ GENERIC_OUT_OF_SCOPE = "This statement cannot be checked against the supplied in
 UNSUPPORTED_CONCERN = "Nothing verifiable in the supplied interview establishes this claim."
 CONTRADICTORY_CONCERN = "An excerpt in the supplied interview conflicts with this claim."
 CHANGED_WARNING = "Verdict was adjusted because cited evidence could not be verified."
+CONFLICT_WARNING = "Verdict was adjusted because a contradicting excerpt conflicts with it."
 STALLED_WARNING = "Claim was not audited in the available time."
 
 
@@ -97,10 +98,12 @@ def repair_claim(lc: LocatedClaim, ev: EvidenceResult, report: AssembleReport) -
         return [e["id"] for e in evidence if e["role"] == role.value]
 
     changed = False
+    conflict = False
 
     def change(new: Verdict, code: str) -> None:
-        nonlocal verdict, changed
+        nonlocal verdict, changed, conflict
         verdict, changed = new, True
+        conflict = conflict or code.endswith("_with_contradiction")
         report.repair(code)
 
     if verdict == Verdict.supported and not ids_of(EvidenceRole.supporting):
@@ -124,7 +127,7 @@ def repair_claim(lc: LocatedClaim, ev: EvidenceResult, report: AssembleReport) -
     notes: list[str] = []
     if changed:
         explanation, revision = EXPLANATIONS[verdict], None
-        notes.append(CHANGED_WARNING)
+        notes.append(CONFLICT_WARNING if conflict else CHANGED_WARNING)
     return RepairedClaim(
         {
             "verdict": verdict.value,

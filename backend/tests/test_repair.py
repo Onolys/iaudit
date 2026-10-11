@@ -198,3 +198,12 @@ def test_never_upgrades_to_supported(v, roles):
         # supported survives only with support and no contradiction
         ok = "supporting" in roles.values() and "contradicting" not in roles.values()
         assert (out.claim["verdict"] == "supported") == ok
+
+
+def test_conflict_repairs_use_their_own_warning_text():
+    changed, _ = go("supported", evres(a="qualifying"))
+    conflict, _ = go("supported", evres(a="supporting", b="contradicting"))
+    conflict5, _ = go("insufficient_evidence", evres(b="contradicting"))
+    assert conflict.notes == conflict5.notes
+    assert conflict.notes != changed.notes
+    assert "contradict" in conflict.notes[0].lower()

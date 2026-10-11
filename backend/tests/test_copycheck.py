@@ -128,3 +128,32 @@ def test_every_verdict_has_a_fallback(example_request):
         c["concerns"], c["evidence"] = [], []
         go(example_request, c)
         assert c["explanation"] and "00:01" not in c["explanation"]
+
+
+def test_straight_single_quoted_transcript_excerpt_stripped(example_request):
+    c = claim(explanation="He said 'No. I don't lose my keys.' outright. The assessment differs.")
+    notes, r = go(example_request, c)
+    assert c["explanation"] == "The assessment differs."
+    assert notes and r.repairs["copy_explanation"] == 1
+
+
+def test_single_quoted_excerpt_without_contraction_stripped(example_request):
+    c = claim(explanation="He said 'I missed one last year' which limits it.")
+    go(example_request, c)
+    assert c["explanation"] == "The cited excerpts conflict with this claim."
+
+
+def test_plain_contractions_left_alone(example_request):
+    text = (
+        "The respondent didn't confirm it and the caregiver doesn't say otherwise. It isn't clear."
+    )
+    c = claim(explanation=text)
+    notes, _ = go(example_request, c)
+    assert notes == [] and c["explanation"] == text
+
+
+def test_possessive_apostrophes_not_treated_as_quotes(example_request):
+    text = "The patient's answer and the clinician's reading of the caregiver's report differ."
+    c = claim(explanation=text)
+    notes, _ = go(example_request, c)
+    assert notes == [] and c["explanation"] == text
