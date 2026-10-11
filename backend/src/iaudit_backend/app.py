@@ -29,7 +29,7 @@ from iaudit_backend.pipeline import (
     make_pipeline,
     run_with_backstop,
 )
-from iaudit_backend.safe_log import log_event
+from iaudit_backend.safe_log import log_event, setup_logging
 
 log = logging.getLogger("iaudit")
 SUPPORTED_VERSION = "1.0.0"
@@ -64,7 +64,7 @@ def create_app(
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         contract.get_contracts()  # fail fast on a missing or invalid schema
-        logging.getLogger("iaudit").setLevel(settings.log_level)
+        setup_logging(settings.log_level)
         app.state.llm = llm or make_client(settings)
         app.state.pipeline = pipeline or make_pipeline(settings)
         log.info("startup config=%s", json.dumps(settings.safe_summary(), sort_keys=True))

@@ -89,3 +89,21 @@ def test_sentinel_never_in_logs_or_errors(caplog, example_request):
     assert len(texts) == 8
     assert SENTINEL not in caplog.text
     assert all(SENTINEL not in t for t in texts)
+
+
+def test_lines_print_to_stderr_without_caplog(capsys, example_request):
+    """Under uvicorn nothing else configures logging: the app must attach its own handler."""
+    with TestClient(create_app(Settings(pipeline="stub", llm_mode="stub"))) as c:
+        assert c.post("/v1/audit", content=json.dumps(example_request)).status_code == 200
+    err = capsys.readouterr().err
+    assert "startup config=" in err
+    assert "audit_request" in err and "request_id=" in err
+
+
+def test_setup_logging_is_idempotent():
+    from iaudit_backend.safe_log import setup_logging
+
+    setup_logging("INFO")
+    setup_logging("INFO")
+    handlers = [h for h in logging.getLogger("iaudit").handlers if getattr(h, "_iaudit", False)]
+    assert len(handlers) == 1

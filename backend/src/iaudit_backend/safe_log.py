@@ -1,8 +1,36 @@
 """PHI-safe logging: an allowlist of field names; text-like names are always dropped."""
 
 import logging
+import sys
 
 log = logging.getLogger("iaudit")
+
+
+class _StderrHandler(logging.StreamHandler):
+    """Writes to whatever sys.stderr is at emit time (survives stream swaps)."""
+
+    _iaudit = True
+
+    def __init__(self) -> None:
+        super().__init__(sys.stderr)
+
+    @property
+    def stream(self):
+        return sys.stderr
+
+    @stream.setter
+    def stream(self, _value) -> None:
+        pass
+
+
+def setup_logging(level: str = "INFO") -> None:
+    """Attach one stderr handler to the iaudit logger; safe to call repeatedly."""
+    log.setLevel(level)
+    if not any(getattr(h, "_iaudit", False) for h in log.handlers):
+        h = _StderrHandler()
+        h.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s"))
+        log.addHandler(h)
+
 
 ALLOWED_FIELDS = frozenset(
     {
