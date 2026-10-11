@@ -1,0 +1,51 @@
+import type { AuditRequest, Result } from "../contract";
+import { readErrorMessage } from "./errorBody";
+import type { LoadError } from "./errors";
+
+export const TIMEOUT_MS = 120_000;
+
+export interface PostDeps {
+  fetch: typeof fetch;
+  signal: AbortSignal;
+}
+
+/** POST the request; resolves to the response body text on 2xx. Never throws. */
+export async function postAudit(
+  url: string,
+  request: AuditRequest,
+  { fetch: doFetch, signal }: PostDeps,
+): Promise<Result<string, LoadError>> {
+  if (signal.aborted) return { ok: false, error: { kind: "cancelled" } };
+
+  const controller = new AbortController();
+  let reason: "timeout" | "cancelled" | undefined;
+  const abort = (why: "timeout" | "cancelled") => {
+    reason ??= why;
+    controller.abort();
+  };
+  const onCancel = () => abort("cancelled");
+  signal.addEventListener("abort", onCancel);
+  const timer = setTimeout(() => abort("timeout"), TIMEOUT_MS);
+
+  try {
+    const res = await doFetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      credentials: "omit",
+      body: JSON.stringify(request),
+      signal: controller.signal,
+    });
+    const text = await res.text();
+    if (res.ok) return { ok: true, value: text };
+    const message = readErrorMessage(text);
+    const kind = res.status >= 400 && res.status < 500 ? "http_4xx" : "http_5xx";
+    return { ok: false, error: { kind, status: res.status, message } };
+  } catch {
+    if (reason === "timeout") return { ok: false, error: { kind: "timeout", seconds: TIMEOUT_MS / 1000 } };
+    if (reason === "cancelled") return { ok: false, error: { kind: "cancelled" } };
+    return { ok: false, error: { kind: "network", url } };
+  } finally {
+    clearTimeout(timer);
+    signal.removeEventListener("abort", onCancel);
+  }
+}
