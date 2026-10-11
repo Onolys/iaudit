@@ -1,9 +1,8 @@
 import asyncio
-from pathlib import Path
 
 import pytest
+from atomize_helpers import FIXTURES, ROSTER, adhd_section, raw
 
-from eval.adhd import faithful_request
 from iaudit_backend.atomize import atomize_section, atomize_sections
 from iaudit_backend.atomize.models import AtomizerOutput
 from iaudit_backend.atomize.prompt import Speaker, build_cache_prefix
@@ -15,34 +14,7 @@ from iaudit_backend.llm import (
     LLMUnavailable,
     StubClient,
 )
-from iaudit_backend.models import AuditRequest, Section, Turn
-
-FIXTURES = Path(__file__).parent / "fixtures" / "llm"
-ROSTER = [Speaker("clinician1", "interviewer"), Speaker("alex1", "respondent")]
-
-
-def adhd_section() -> Section:
-    return AuditRequest.model_validate(faithful_request()).assessment[0]
-
-
-def raw(**over):
-    base = {
-        "ref": "a",
-        "segments": ["Alex forgets"],
-        "proposition": "Alex forgets.",
-        "scope": "in_scope",
-        "oos_category": None,
-        "subject_text": "Alex",
-        "subject_speaker": "alex1",
-        "reported_by": [{"source": "self", "speaker": "alex1"}],
-        "polarity": "affirmed",
-        "quantities": [],
-        "timeframe": "current",
-        "timeframe_explicit": False,
-        "hedged": False,
-    }
-    base.update(over)
-    return base
+from iaudit_backend.models import Section, Turn
 
 
 def stub_with(output: dict | None = None, capture: list | None = None):
@@ -59,7 +31,8 @@ def stub_with(output: dict | None = None, capture: list | None = None):
 
 async def test_fixture_replay_of_adhd_section_returns_parsed_claims(make_ctx):
     ctx = make_ctx(llm=FixtureClient(FIXTURES), request_id="adhd-faithful")
-    res = await atomize_section(adhd_section(), ROSTER, ctx, index=0)
+    roster = [*ROSTER, Speaker("sam1", "informant")]
+    res = await atomize_section(adhd_section(), roster, ctx, index=0)
     assert res.status == "ok" and res.section_index == 0 and res.failure is None
     assert [c.id for c in res.claims] == [f"c0.{n}" for n in range(1, 12)]
     assert all(c.section_index == 0 for c in res.claims)
@@ -178,7 +151,11 @@ async def test_atomize_sections_is_concurrent_ordered_and_isolated(make_ctx):
 
 async def test_link_refs_are_remapped_to_claim_ids(make_ctx):
     out = {
-        "claims": [raw(ref="x"), raw(ref="y"), raw(ref="z")],
+        "claims": [
+            raw(ref="x", segments=["Alex is slow"]),
+            raw(ref="y", segments=["Alex forgets"]),
+            raw(ref="z", segments=["Alex naps"]),
+        ],
         "links": [
             {
                 "type": "causal",
@@ -190,5 +167,7 @@ async def test_link_refs_are_remapped_to_claim_ids(make_ctx):
         ],
     }
     ctx = make_ctx(llm=stub_with(out))
-    res = await atomize_section(Section(id="s", text="t"), ROSTER, ctx, index=1)
+    res = await atomize_section(
+        Section(id="s", text="Alex is slow. Alex forgets. Alex naps."), ROSTER, ctx, index=1
+    )
     assert (res.links[0].cause_ids, res.links[0].effect_id) == (["c1.2", "c1.3"], "c1.1")

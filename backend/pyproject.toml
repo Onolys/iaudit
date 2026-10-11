@@ -36,3 +36,7 @@ select = ["E", "F", "I", "UP", "B"]
 testpaths = ["tests", "eval/tests"]
 asyncio_mode = "auto"
 pythonpath = ["src", "."]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E501"]
+"eval/tests/**" = ["E501"]
