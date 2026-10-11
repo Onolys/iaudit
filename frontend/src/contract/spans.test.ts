@@ -73,7 +73,7 @@ describe("segmentSection", () => {
   const claim = (id: string, s: Span): Claim => ({
     id, span: s, verdict: "supported", explanation: "x", concerns: [], evidence: [],
   });
-  const check = (ok: boolean) => ({ spanOutOfRange: !ok, claimSpanOk: ok, evidence: {} });
+  const check = (ok: boolean) => ({ spanOutOfRange: !ok, claimSpanOk: ok, overlapsEarlier: false, evidence: {} });
   it("partitions into plain gaps and claims", () => {
     const cs = [claim("a", sp(0, 2, 0, 4)), claim("b", sp(0, 6, 0, 10))];
     const pieces = segmentSection(request, 0, { a: check(true), b: check(true) }, cs);

@@ -116,6 +116,8 @@ export interface AuditResponse {
 export interface ClaimCheck {
   spanOutOfRange: boolean;
   claimSpanOk: boolean;
+  /** true = in range but overlaps an earlier claim, so it cannot be highlighted */
+  overlapsEarlier: boolean;
   /** key = Evidence.id; true = placeable */
   evidence: Record<string, boolean>;
 }
