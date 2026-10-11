@@ -14,7 +14,7 @@ Source of truth: [PRD.md](PRD.md). Rules-only dialogue acts and question-answer 
 | 3 | `scales.py` ordinal scales | 01 | done |
 | 4 | `AtomicClaim` model, fixed `oos_reason`, config | 01 | done |
 | 5 | Atomizer prompt and "Jordan" few-shot | 4 | done |
-| 6 | `atomize_section` / `atomize_sections` call | 3, 5, 02/T2 | todo |
+| 6 | `atomize_section` / `atomize_sections` call | 3, 5, 02/T2 | done |
 | 7 | Span resolution, validation, one retry, section failures | 6 | todo |
 | 8 | Counts-only logging and sentinel test | 7 | todo |
 | 9 | [OPTIONAL, gated] Optional items | all core in every SP | todo |

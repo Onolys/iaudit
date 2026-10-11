@@ -121,3 +121,18 @@ class AtomicClaim(_ClaimFields):
     @property
     def oos_reason(self) -> str | None:
         return OOS_REASONS[self.oos_category] if self.oos_category else None
+
+
+class SectionAtoms(_M):
+    """Result for one assessment section. A failed section never carries guessed claims."""
+
+    section_index: int
+    status: Literal["ok", "failed"]
+    claims: list[AtomicClaim] = Field(default_factory=list)
+    links: list[CausalLink] = Field(default_factory=list)
+    dropped: int = 0
+    coverage_gaps: int = 0
+    retries: int = 0
+    failure: (
+        Literal["timeout", "unavailable", "bad_output", "no_claims", "too_many_dropped"] | None
+    ) = None
