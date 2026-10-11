@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-01",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How has your memory been since the spring?",
+      "timestamp": "00:00:04"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mostly fine. I forget names sometimes, but that's always been me.",
+      "timestamp": "00:00:09"
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you ever get lost driving somewhere familiar?",
+      "timestamp": "00:00:21"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Never. I drive to the market every week.",
+      "timestamp": "00:00:25"
+    },
+    {
+      "id": "t4",
+      "speaker": "caretaker1",
+      "role": "informant",
+      "text": "He did miss the turn for the market once in June.",
+      "timestamp": "00:00:40"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Once, because of the roadworks.",
+      "timestamp": "00:00:47"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-memory",
+      "label": "Memory",
+      "score": 1,
+      "text": "The patient reports occasional difficulty recalling names. He frequently gets lost while driving. Since spring his memory has declined sharply."
+    }
+  ]
+}

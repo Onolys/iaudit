@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "¿Cómo está, José? How's the café job going? 🙂"
+    },
+    {
+      "id": "t1",
+      "speaker": "José",
+      "role": "respondent",
+      "text": "Bien 👍 I work mornings, 6–11."
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": ""
+    },
+    {
+      "id": "t3",
+      "speaker": "Inés",
+      "role": "informant",
+      "text": "He told me he’s tired after shifts 😴 but he sleeps fine."
+    },
+    {
+      "id": "t4",
+      "speaker": "José",
+      "role": "respondent",
+      "text": "Tired? A bit. Not every day though."
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-work",
+      "label": "Work · Função 💼",
+      "score": "n/a",
+      "text": "José 👍 works mornings at a café. He is exhausted every day 😴 because the early shifts disrupt his sleep. Inés and José agree he is fatigued."
+    }
+  ]
+}
