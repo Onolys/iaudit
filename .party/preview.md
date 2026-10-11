@@ -34,3 +34,9 @@ local-setup work. Do not invent repository-specific values.
 ## Quirks and troubleshooting
 
 <!-- Repository-specific failures, workarounds, and notes for later sessions. -->
+
+## Verified (frontend)
+
+- Install: `cd frontend && npm ci`.
+- Start: `cd frontend && VITE_MOCK=true npm run dev -- --host 0.0.0.0 --port 5173` (mock mode needs no backend; upload `docs/contracts/examples/request.json`).
+- Tests: `npm test` and `npm run typecheck` in `frontend/`.
