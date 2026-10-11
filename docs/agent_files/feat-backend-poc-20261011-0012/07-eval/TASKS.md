@@ -9,10 +9,10 @@ Source of truth: [PRD.md](PRD.md). 07a builds the ADHD faithful fixture plus 8 s
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | ADHD 26-turn faithful fixture with sha256 pin | 01 | todo |
-| 2 | `spec.json` and `build_adhd.py` generating the 8 variants | 1 | todo |
-| 3 | Expected JSON per fixture | 2 | todo |
-| 4 | Core self-tests: schema-valid requests, byte-identical rebuild | 3 | todo |
+| 1 | ADHD 26-turn faithful fixture with sha256 pin | 01 | done |
+| 2 | `spec.json` and `build_adhd.py` generating the 8 variants | 1 | done |
+| 3 | Expected JSON per fixture | 2 | done |
+| 4 | Core self-tests: schema-valid requests, byte-identical rebuild | 3 | done |
 | 5 | `eval/smoke.py` pass/fail runner | 4, 06 | todo |
 | 6 | [OPTIONAL, gated] 07b harness and optional items | all core in every SP | todo |
 
