@@ -23,6 +23,7 @@ class FullPipeline:
         llm_deadline = ctx.deadline - cfg.assemble_reserve_s
         sctx = dataclasses.replace(ctx, deadline=llm_deadline)  # stages see the LLM deadline
         st = RunState()
+        ctx.extras["run_state"] = st
         try:
             roster = roster_from_turns(req.transcript)
             st.spawn(lambda: prep_flow(st, req, sctx))
