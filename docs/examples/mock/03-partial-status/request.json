@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-03-partial",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "Dr. Okafor",
+      "text": "Who handles the household bills?"
+    },
+    {
+      "id": "t1",
+      "speaker": "Rosa",
+      "text": "My son does them now."
+    },
+    {
+      "id": "t2",
+      "speaker": "Mateo (son)",
+      "text": "No, Mum still does them. I just check."
+    },
+    {
+      "id": "t3",
+      "speaker": "Rosa",
+      "text": "Right, I do them. He checks."
+    },
+    {
+      "id": "t4",
+      "speaker": "Unknown voice",
+      "text": "She paid the water bill twice in March."
+    },
+    {
+      "id": "t5",
+      "speaker": "Dr. Okafor",
+      "text": "And cooking?"
+    },
+    {
+      "id": "t6",
+      "speaker": "Rosa",
+      "text": "I cook every day."
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-finance",
+      "label": "Finances",
+      "text": "Her son now manages the household bills. She paid the water bill twice in March, per her son."
+    },
+    {
+      "id": "sec-adl",
+      "label": "Daily living",
+      "text": "Cooks daily without help."
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-03-partial",
+  "status": "partial",
+  "warnings": [
+    {
+      "code": "section_not_processed",
+      "message": "The daily living section was not audited in this mock run.",
+      "section_index": 1
+    },
+    {
+      "code": "ambiguous_speaker",
+      "message": "One turn has an unidentified speaker; it was not assigned to a person."
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 40
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "The respondent first said her son handles the bills, then both she and her son corrected that: she pays them and he checks.",
+      "suggested_revision": "She pays the household bills; her son checks them.",
+      "concerns": [
+        {
+          "type": "correction_ignored",
+          "explanation": "The later correction is not reflected.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        },
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The corrected account conflicts with the claim.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 1,
+              "char": 0
+            },
+            "end": {
+              "index": 1,
+              "char": 21
+            }
+          },
+          "note": "The first answer names the son."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 2,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 28
+            }
+          },
+          "note": "The son and then the respondent correct the first answer."
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 41
+        },
+        "end": {
+          "index": 0,
+          "char": 93
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "A duplicate payment is mentioned, but by a speaker who is not identified as the son.",
+      "suggested_revision": "An unidentified speaker reported a duplicate utility payment in early spring.",
+      "concerns": [
+        {
+          "type": "wrong_attribution",
+          "explanation": "The report is credited to a named person the transcript does not identify.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 4,
+              "char": 0
+            },
+            "end": {
+              "index": 4,
+              "char": 39
+            }
+          },
+          "note": "An unidentified speaker reports a repeated payment."
+        }
+      ]
+    }
+  ]
+}

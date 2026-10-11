@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0.0",
+  "status": "complete",
+  "warnings": [
+    {
+      "code": "other",
+      "message": "One turn is empty; it was kept in place so later indexes do not shift."
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 27
+        }
+      },
+      "verdict": "supported",
+      "explanation": "Some trouble with stairs was reported in answer to the question.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 0,
+              "char": 0
+            },
+            "end": {
+              "index": 2,
+              "char": 5
+            }
+          },
+          "note": "The question, an empty turn, then a short yes-like answer."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 2,
+              "char": 6
+            },
+            "end": {
+              "index": 2,
+              "char": 14
+            }
+          },
+          "note": "The answer ties the trouble to one joint."
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 28
+        },
+        "end": {
+          "index": 0,
+          "char": 48
+        }
+      },
+      "verdict": "insufficient_evidence",
+      "explanation": "No walking aid is mentioned anywhere in the interview.",
+      "suggested_revision": null,
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "Nothing in the supplied interview addresses a walking aid.",
+          "evidence_ids": []
+        }
+      ],
+      "evidence": []
+    },
+    {
+      "id": "c3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 49
+        },
+        "end": {
+          "index": 0,
+          "char": 78
+        }
+      },
+      "verdict": "out_of_scope",
+      "explanation": "This is an overall functional judgment, not a report of a statement.",
+      "out_of_scope_reason": "An overall mobility rating needs observation the transcript does not provide.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": []
+    }
+  ]
+}

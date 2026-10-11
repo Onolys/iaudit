@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0.0",
+  "transcript": [
+    {
+      "id": "a",
+      "speaker": "speaker A",
+      "text": "Any trouble with stairs?"
+    },
+    {
+      "id": "b",
+      "speaker": "speaker B",
+      "text": ""
+    },
+    {
+      "id": "c",
+      "speaker": "speaker B",
+      "text": "Some. My knee."
+    },
+    {
+      "id": "d",
+      "speaker": "speaker A",
+      "text": "Okay."
+    }
+  ],
+  "assessment": [
+    {
+      "id": "s1",
+      "text": "Has difficulty with stairs. Uses a cane at home. Mobility is impaired overall."
+    }
+  ]
+}

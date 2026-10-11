@@ -1,0 +1,243 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-02",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c-sleep-1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 25
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent answered yes when asked about sleeping through the night.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 0,
+              "char": 0
+            },
+            "end": {
+              "index": 1,
+              "char": 4
+            }
+          },
+          "note": "A yes/no question followed by a yes."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 26
+        },
+        "end": {
+          "index": 0,
+          "char": 43
+        }
+      },
+      "verdict": "insufficient_evidence",
+      "explanation": "The question about napping was echoed back rather than answered.",
+      "suggested_revision": null,
+      "concerns": [
+        {
+          "type": "question_as_answer",
+          "explanation": "The interviewer's question is treated as the respondent's answer.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 2,
+              "char": 20
+            },
+            "end": {
+              "index": 3,
+              "char": 9
+            }
+          },
+          "note": "The reply repeats the question and gives no answer."
+        }
+      ]
+    },
+    {
+      "id": "c-mood-1",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 0
+        },
+        "end": {
+          "index": 1,
+          "char": 34
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "A difficult period was described, but it was placed in the previous winter; the current month was described as okay.",
+      "suggested_revision": "Reports a difficult period last winter; describes the current month as okay.",
+      "concerns": [
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "A past difficulty is written in the present tense.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 5,
+              "char": 0
+            },
+            "end": {
+              "index": 5,
+              "char": 22
+            }
+          },
+          "note": "A hard period is reported in the past."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 5,
+              "char": 23
+            },
+            "end": {
+              "index": 5,
+              "char": 48
+            }
+          },
+          "note": "The present is described as fine."
+        }
+      ]
+    },
+    {
+      "id": "c-mood-2",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 35
+        },
+        "end": {
+          "index": 1,
+          "char": 69
+        }
+      },
+      "verdict": "out_of_scope",
+      "explanation": "This is a diagnostic interpretation rather than a report of what was said.",
+      "out_of_scope_reason": "Diagnostic labels depend on external criteria the interview does not supply.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": []
+    },
+    {
+      "id": "c-app-1",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 0
+        },
+        "end": {
+          "index": 2,
+          "char": 21
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Two meals were described as usual, not as a fixed daily pattern.",
+      "suggested_revision": null,
+      "concerns": [
+        {
+          "type": "certainty_inflation",
+          "explanation": "A hedged habit is written as a rule.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 7,
+              "char": 0
+            },
+            "end": {
+              "index": 7,
+              "char": 30
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-app-2",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 22
+        },
+        "end": {
+          "index": 2,
+          "char": 60
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Lunch is skipped on busy days. The interview does not mention stress as the reason.",
+      "suggested_revision": "Skips lunch on busy work days.",
+      "concerns": [
+        {
+          "type": "unsupported_causal_link",
+          "explanation": "Busyness is restated as stress and given as the cause.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 7,
+              "char": 31
+            },
+            "end": {
+              "index": 7,
+              "char": 62
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

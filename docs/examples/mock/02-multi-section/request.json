@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-02",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Are you sleeping through the night?"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes."
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "And during the day, do you nap?"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Do I nap? Hmm."
+    },
+    {
+      "id": "t4",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How is your mood lately?"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Last winter was rough. This month has been okay."
+    },
+    {
+      "id": "t6",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Are you eating regular meals?"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Breakfast and dinner, usually. I skip lunch when work is busy."
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-sleep",
+      "label": "Sleep",
+      "score": 0,
+      "text": "Sleeps through the night. Takes daily naps."
+    },
+    {
+      "id": "sec-mood",
+      "label": "Mood",
+      "score": "moderate",
+      "text": "Currently experiencing a low mood. Likely seasonal affective pattern."
+    },
+    {
+      "id": "sec-appetite",
+      "label": "Appetite",
+      "score": 2,
+      "text": "Eats two meals a day. Skips lunch because of stress at work."
+    }
+  ]
+}
