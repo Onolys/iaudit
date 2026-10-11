@@ -35,3 +35,5 @@ select = ["E", "F", "I", "UP", "B"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["src"]
+markers = ["live: real provider call; opt-in with IAUDIT_LIVE=1 and ANTHROPIC_API_KEY"]
+addopts = "-m 'not live'"
