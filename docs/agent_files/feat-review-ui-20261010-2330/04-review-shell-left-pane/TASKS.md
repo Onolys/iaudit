@@ -9,7 +9,7 @@ Source of truth: docs/agent_files/feat-review-ui-20261010-2330/04-review-shell-l
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Review state reducer and VerdictCounts | none | todo |
+| 1 | Review state reducer and VerdictCounts | none | done |
 | 2 | App screen and header | 1 | todo |
 | 3 | Left pane, claim text and right-pane container | 1, 2, 05 | todo |
 
