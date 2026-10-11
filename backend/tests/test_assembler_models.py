@@ -56,7 +56,7 @@ def test_assemble_echoes_request_id(example_request):
     req = AuditRequest.model_validate(example_request)
     out = assemble(req, InternalAudit(), Settings())
     assert out.response["request_id"] == "example-001"
-    assert out.response["status"] == "complete"
+    assert out.response["status"] == "partial"  # section 0 has text but no claims
     assert isinstance(out.report, AssembleReport)
 
 

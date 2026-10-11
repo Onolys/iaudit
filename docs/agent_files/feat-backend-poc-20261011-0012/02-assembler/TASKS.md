@@ -15,7 +15,7 @@ Source of truth: [PRD.md](PRD.md). Turns internal drafts from 03-05 into a contr
 | 4 | Claim resolution and overlap policy | 2 | done |
 | 5 | Repair table | 3, 4 | done |
 | 6 | Rule 9 core copy check | 5 | done |
-| 7 | Warnings and status | 5 | todo |
+| 7 | Warnings and status | 5 | done |
 | 8 | Final validation: `check_rules` and schema, quarantine once | 6, 7 | todo |
 | 9 | Reproduce `examples/response.json` spans | 8 | todo |
 | 10 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
