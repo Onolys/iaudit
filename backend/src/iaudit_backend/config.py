@@ -39,6 +39,18 @@ class Settings(BaseSettings):
     atomize_max_claims: int = 30
     atomize_max_tokens: int = 4000
     atomize_retry: bool = True
+    # Link (SP04)
+    link_mode: Literal["auto", "whole", "shortlist"] = "auto"
+    link_whole_max_tokens: int = 8000
+    link_fallback_max_tokens: int = 24000
+    link_top_k: int = 8
+    link_correction_window: int = 4
+    link_max_shortlist: int = 30
+    link_max_items: int = 8
+    link_max_tokens: int = 1200
+    link_concurrency: int = 20
+    link_retry: bool = True
+    link_widen_on_empty: bool = False
     # Misc
     log_level: str = "INFO"
     pipeline: Literal["stub", "full"] = "stub"
