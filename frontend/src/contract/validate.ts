@@ -16,7 +16,8 @@ export type ResponseError =
   | { kind: "wrong_version" }
   | { kind: "schema"; issues: ValidationIssue[] }
   | { kind: "request_id_mismatch"; expected: string; received: string | undefined }
-  | { kind: "duplicate_claim_id"; id: string };
+  | { kind: "duplicate_claim_id"; id: string }
+  | { kind: "duplicate_evidence_id"; claimId: string; id: string };
 
 const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true, strictTypes: false });
 const checkRequest = ajv.compile(requestSchema);
@@ -61,6 +62,13 @@ export function validateResponse(
   for (const c of response.claims) {
     if (seen.has(c.id)) return { ok: false, error: { kind: "duplicate_claim_id", id: c.id } };
     seen.add(c.id);
+    const evidenceIds = new Set<string>();
+    for (const ev of c.evidence) {
+      if (evidenceIds.has(ev.id)) {
+        return { ok: false, error: { kind: "duplicate_evidence_id", claimId: c.id, id: ev.id } };
+      }
+      evidenceIds.add(ev.id);
+    }
   }
   return { ok: true, value: response };
 }

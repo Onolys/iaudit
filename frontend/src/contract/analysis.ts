@@ -17,17 +17,18 @@ export function analyzeResponse(request: AuditRequest, response: AuditResponse):
   const sectionLengths = itemLengths(request, "assessment");
   const turnLengths = itemLengths(request, "transcript");
 
-  const checks: Record<string, ClaimCheck> = {};
+  const checks: Record<string, ClaimCheck> = Object.create(null);
   const overall = zeros();
   const bySection: Record<number, VerdictCounts> = {};
   request.assessment.forEach((_, i) => (bySection[i] = zeros()));
 
   for (const claim of response.claims) {
     const claimSpanOk = isSpanValid(claim.span, sectionLengths, true);
-    const evidence: Record<string, boolean> = {};
+    const evidence: Record<string, boolean> = Object.create(null);
     for (const ev of claim.evidence) evidence[ev.id] = (evidence[ev.id] ?? true) && isSpanValid(ev.span, turnLengths, false);
     checks[claim.id] = {
       claimSpanOk,
+      overlapsEarlier: false,
       evidence,
       spanOutOfRange: !claimSpanOk || Object.values(evidence).some((ok) => !ok),
     };
@@ -44,6 +45,13 @@ export function analyzeResponse(request: AuditRequest, response: AuditResponse):
       a.span.start.char - b.span.start.char ||
       a.span.end.char - b.span.end.char,
   );
+  // Mirrors segmentSection: a claim starting before the previous one ended is not highlighted.
+  const cursors: Record<number, number> = Object.create(null);
+  for (const c of valid) {
+    const cursor = cursors[c.span.start.index] ?? 0;
+    if (c.span.start.char < cursor) checks[c.id].overlapsEarlier = true;
+    else cursors[c.span.start.index] = c.span.end.char;
+  }
   return { orderedClaims: [...valid, ...invalid], checks, counts: { overall, bySection } };
 }
 

@@ -111,9 +111,28 @@ describe("orderEvidence", () => {
       ],
     } as unknown as Claim;
     const out = orderEvidence(req(), claim, {
-      spanOutOfRange: true, claimSpanOk: true, evidence: { a: true, b: true, x: false },
+      spanOutOfRange: true, claimSpanOk: true, overlapsEarlier: false, evidence: { a: true, b: true, x: false },
     });
     expect(out.placed.map((e) => e.id)).toEqual(["a", "b"]);
     expect(out.unplaceable.map((e) => e.id)).toEqual(["x"]);
+  });
+});
+
+describe("review fixes", () => {
+  it("handles an evidence id of __proto__", () => {
+    const r = res();
+    r.claims[0].evidence[0].id = "__proto__";
+    const a = analyzeResponse(req(), r);
+    expect(a.checks[r.claims[0].id].evidence["__proto__"]).toBe(true);
+    expect(a.checks[r.claims[0].id].spanOutOfRange).toBe(false);
+  });
+  it("flags a claim overlapping an earlier one", () => {
+    const r = res();
+    const [first, second] = r.claims;
+    second.span = structuredClone(first.span);
+    second.span.start.char += 1;
+    const a = analyzeResponse(req(), r);
+    expect(a.checks[first.id].overlapsEarlier).toBe(false);
+    expect(a.checks[second.id]).toMatchObject({ overlapsEarlier: true, claimSpanOk: true });
   });
 });

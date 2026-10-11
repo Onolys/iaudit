@@ -1,12 +1,14 @@
-import type { Claim } from "../contract";
+import type { Claim, ClaimCheck } from "../contract";
 import { VERDICT_STYLE, selectedClaimBackground } from "../tokens";
 
 export function UnplacedClaims({
   claims,
+  checks,
   selectedClaimId,
   onSelect,
 }: {
   claims: Claim[];
+  checks: Record<string, ClaimCheck>;
   selectedClaimId: string | null;
   onSelect: (id: string) => void;
 }) {
@@ -27,7 +29,9 @@ export function UnplacedClaims({
             onClick={() => onSelect(c.id)}
           >
             <span aria-hidden="true">{style.icon}</span> {style.label} · {c.id}
-            <span className="claim-chip-warning"> ⚠ position doesn't fit the supplied text</span>
+            <span className="claim-chip-warning">
+              {checks[c.id]?.claimSpanOk ? " ⚠ overlaps another claim, so it can't be highlighted" : " ⚠ position doesn't fit the supplied text"}
+            </span>
           </button>
         );
       })}

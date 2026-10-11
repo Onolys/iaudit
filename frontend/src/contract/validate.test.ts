@@ -79,4 +79,13 @@ describe("validateResponse", () => {
       error: { kind: "duplicate_claim_id", id: "c-supported" },
     });
   });
+  it("rejects duplicate evidence ids within a claim", () => {
+    const bad = res();
+    const ev = bad.claims[0].evidence;
+    ev.push({ ...ev[0] });
+    expect(validateResponse(bad, req())).toEqual({
+      ok: false,
+      error: { kind: "duplicate_evidence_id", claimId: bad.claims[0].id, id: ev[0].id },
+    });
+  });
 });
