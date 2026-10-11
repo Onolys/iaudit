@@ -59,8 +59,10 @@ class Quantity(_M):
 
     @model_validator(mode="after")
     def _bucket_matches_kind(self) -> "Quantity":
+        # The schema leaves `bucket` free text. A wrong-scale guess is dropped, not an error:
+        # scales.resolve_quantity works the bucket out from `raw`.
         if self.bucket is not None and self.bucket not in _BUCKETS[self.kind].__members__:
-            raise ValueError(f"bucket '{self.bucket}' is not on the {self.kind} scale")
+            self.bucket = None
         return self
 
 
@@ -93,12 +95,6 @@ class _ClaimFields(_M):
             raise ValueError("segments must be non-blank")
         return v
 
-    @model_validator(mode="after")
-    def _category_iff_out_of_scope(self):
-        if (self.scope == "out_of_scope") != (self.oos_category is not None):
-            raise ValueError("oos_category is set iff scope is out_of_scope")
-        return self
-
 
 class RawClaim(_ClaimFields):
     """One claim as the LLM writes it. `ref` is a local label that links point at."""
@@ -116,6 +112,12 @@ class AtomicClaim(_ClaimFields):
     section_index: int
     span_hint: tuple[int, int] | None = None  # code points in the section, set by 03
     span_quality: Literal["covering", "anchor_only"] | None = None  # 03-internal
+
+    @model_validator(mode="after")
+    def _category_iff_out_of_scope(self):
+        if (self.scope == "out_of_scope") != (self.oos_category is not None):
+            raise ValueError("oos_category is set iff scope is out_of_scope")
+        return self
 
     @computed_field
     @property

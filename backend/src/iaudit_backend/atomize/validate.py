@@ -89,6 +89,10 @@ def check_output(out: AtomizerOutput, text: str, roster: list[Speaker], cfg: Set
             res.dropped += 1
             continue
         seen_refs.add(c.ref)
+        if (c.scope == "out_of_scope") != (c.oos_category is not None):
+            res.errors.append((c.ref, "bad_category"))  # checked per claim, not at parse time
+            res.dropped += 1
+            continue
         if len(res.valid) >= cfg.atomize_max_claims:
             res.dropped += 1  # over the cap: counted, not retried
             continue

@@ -89,10 +89,10 @@ def test_quantities_at_most_two():
 def test_quantity_bucket_names_validated_per_kind():
     Quantity(kind="frequency", raw="x", bucket="often")
     Quantity(kind="severity", raw="x", bucket="severe")
-    with pytest.raises(ValidationError):
-        Quantity(kind="frequency", raw="x", bucket="severe")
-    with pytest.raises(ValidationError):
-        Quantity(kind="severity", raw="x", bucket="often")
+    # a bucket from the wrong scale (or unknown) is nulled, not an error: code resolves it
+    assert Quantity(kind="frequency", raw="x", bucket="severe").bucket is None
+    assert Quantity(kind="severity", raw="x", bucket="often").bucket is None
+    assert Quantity(kind="severity", raw="x", bucket="bogus").bucket is None
     assert Quantity(kind="frequency", raw="x").bucket is None
 
 
@@ -133,3 +133,14 @@ def test_llm_output_schema_has_no_code_owned_fields():
 def test_config_keys():
     s = Settings()
     assert (s.atomize_max_claims, s.atomize_max_tokens, s.atomize_retry) == (30, 4000, True)
+
+
+def test_raw_claim_parses_with_inconsistent_scope_and_category():
+    base = claim().model_dump(
+        exclude={"id", "section_index", "span_hint", "span_quality", "oos_reason"}
+    )
+    base["ref"] = "a"
+    assert RawClaim.model_validate({**base, "scope": "out_of_scope"}).oos_category is None
+    assert RawClaim.model_validate({**base, "oos_category": "recommendation"}).scope == "in_scope"
+    with pytest.raises(ValidationError):  # the final model still enforces it
+        claim(scope="out_of_scope")

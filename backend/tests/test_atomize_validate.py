@@ -375,3 +375,68 @@ def test_atomize_has_no_matcher_of_its_own():
     pkg = Path(val.__file__).parent
     src = "\n".join(p.read_text() for p in pkg.glob("*.py"))
     assert "rapidfuzz" not in src and "def locate" not in src and "difflib" not in src
+
+
+async def test_one_bad_category_claim_is_retried_then_dropped_rest_survive(make_ctx):
+    bad = out(
+        rc("a", "Jordan misplaces receipts"),
+        rc("b", "Jordan double-books clients", scope="out_of_scope"),  # no category
+        rc("c", "skips lunch every day"),
+    )
+    client = Script(bad, bad)
+    res, _ = await run(client, make_ctx=make_ctx)
+    assert res.status == "ok" and res.failure is None
+    assert len(client.requests) == 2 and res.retries == 1
+    assert "b: bad_category" in client.requests[1].user
+    assert res.dropped == 1 and [c.segments for c in res.claims] == [
+        ["Jordan misplaces receipts"],
+        ["skips lunch every day"],
+    ]
+
+
+async def test_category_on_in_scope_claim_is_also_a_per_claim_error(make_ctx):
+    bad = out(
+        rc("a", "Jordan misplaces receipts", oos_category="recommendation"),
+        rc("b", "Jordan double-books clients"),
+        rc("c", "skips lunch every day"),
+    )
+    res, _ = await run(Script(bad, bad), make_ctx=make_ctx)
+    assert res.status == "ok" and res.dropped == 1 and len(res.claims) == 2
+
+
+async def test_retry_fixes_the_bad_claim(make_ctx):
+    bad = out(
+        rc("a", "Jordan misplaces receipts"),
+        rc("b", "Jordan double-books clients", scope="out_of_scope"),
+        rc("c", "skips lunch every day"),
+    )
+    res, _ = await run(Script(bad, GOOD), make_ctx=make_ctx)
+    assert res.status == "ok" and res.dropped == 0 and len(res.claims) == 3
+
+
+async def test_mismatched_quantity_bucket_does_not_fail_the_section(make_ctx):
+    q = [
+        {"kind": "severity", "raw": "poor", "bucket": "often"},
+        {"kind": "frequency", "raw": "every day", "bucket": "severe"},
+    ]
+    o = out(
+        rc("a", "Jordan misplaces receipts", quantities=q),
+        rc("b", "Jordan double-books clients"),
+        rc("c", "skips lunch every day"),
+    )
+    client = Script(o)
+    res, _ = await run(client, make_ctx=make_ctx)
+    assert res.status == "ok" and len(client.requests) == 1
+    sev, freq = res.claims[0].quantities
+    assert (sev.bucket, freq.bucket, freq.rate_per_week) == ("severe", "always", 7.0)
+
+
+async def test_unresolvable_mismatched_bucket_becomes_none(make_ctx):
+    q = [{"kind": "frequency", "raw": "off and on", "bucket": "severe"}]
+    o = out(
+        rc("a", "Jordan misplaces receipts", quantities=q),
+        rc("b", "Jordan double-books clients"),
+        rc("c", "skips lunch every day"),
+    )
+    res, _ = await run(Script(o), make_ctx=make_ctx)
+    assert res.status == "ok" and res.claims[0].quantities[0].bucket is None
