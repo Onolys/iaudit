@@ -62,6 +62,10 @@ Set as `IAUDIT_<NAME>` environment variables. `Settings` in `config.py` also rea
 | `IAUDIT_LLM_TIMEOUT_S`, `IAUDIT_LLM_MAX_RETRIES`, `IAUDIT_LLM_MAX_CONCURRENCY` | `30`, `1`, `20` | Per-call timeout, retries, and parallel calls. |
 | `IAUDIT_MAX_BODY_BYTES`, `IAUDIT_MAX_TURNS`, `IAUDIT_MAX_SECTIONS` | `2000000`, `2000`, `50` | Request limits. |
 | `IAUDIT_PREP_LLM` | `false` | When `true`, a cheap-tier model tags the few transcript turns the rules could not decide (question, correction, hypothetical). A failed or invalid chunk keeps the rule result. `IAUDIT_PREP_CHUNK_TURNS` (30) and `IAUDIT_PREP_CONTEXT_TURNS` (3) size the calls. If prep runs past `IAUDIT_PREP_SOFT_TIMEOUT_S` (10), the rules-only result is used. |
+| `IAUDIT_LINK_PER_SPEAKER_FLOOR`, `IAUDIT_LINK_MAX_SPEAKER_ADDS` | `2`, `4` | Evidence search adds the best turns of a speaker who has matches but fewer than the floor in the top results, up to the add cap in total. `0` turns it off. |
+| `IAUDIT_LINK_LATER_CORRECTION_CAP` | `3` | Pulls in later turns where the same speaker corrects themselves on the claim's topic. `0` turns it off. |
+| `IAUDIT_LINK_FUSION`, `IAUDIT_LINK_RRF_K` | `false`, `60` | Fuse the keyword ranking with a fuzzy-match ranking by reciprocal rank. |
+| `IAUDIT_LINK_CACHE_BREAKPOINTS` | `1` | `2` caches the transcript and the instruction block separately in whole-transcript mode. |
 | `IAUDIT_PIPELINE_MAX_CLAIMS` | `80` | Claims audited per request. More are dropped and `input_truncated` is emitted. |
 | `IAUDIT_SERVER_TIMING` | `false` | When `true`, a 200 reply carries a `Server-Timing` header with durations only: `total`, then `prep`, `atomize`, `link`, `check`, `assemble` in milliseconds. |
 | `IAUDIT_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins. |

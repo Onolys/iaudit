@@ -3,6 +3,7 @@
 from .context import LinkContext, build_link_context
 from .linker import link_claims, link_one, to_evidence_drafts
 from .models import LinkedEvidence, LinkResult
+from .shortlist import shortlist_only
 
 __all__ = [
     "LinkContext",
@@ -11,5 +12,6 @@ __all__ = [
     "build_link_context",
     "link_claims",
     "link_one",
+    "shortlist_only",
     "to_evidence_drafts",
 ]

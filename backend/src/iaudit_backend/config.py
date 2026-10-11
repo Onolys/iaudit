@@ -52,6 +52,12 @@ class Settings(BaseSettings):
     link_concurrency: int = 20
     link_retry: bool = True
     link_widen_on_empty: bool = False
+    link_per_speaker_floor: int = 2  # 0 turns the speaker floor off
+    link_max_speaker_adds: int = 4
+    link_later_correction_cap: int = 3  # 0 turns the later-correction pull off
+    link_fusion: bool = False  # fuse BM25 with rapidfuzz by reciprocal rank
+    link_rrf_k: int = 60
+    link_cache_breakpoints: Literal[1, 2] = 1  # 2: transcript and stage block cached separately
     # Check (SP05)
     check_concurrency: int = 20
     check_max_tokens: int = 1500

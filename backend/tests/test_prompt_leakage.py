@@ -76,3 +76,11 @@ def test_leak_check_catches_a_seeded_copy():
     longest = max(eval_texts(), key=len)
     assert len(_WORD.findall(longest)) >= N
     assert shared(prompt_texts() + [longest], eval_texts()) != set()
+
+
+def test_link_and_check_fewshot_files_are_scanned_and_clean():
+    names = {p.name for p in PROMPTS.glob("*_fewshot.json")}
+    assert {"atomize_fewshot.json", "link_fewshot.json", "check_fewshot.json"} <= names
+    for name in ("link_fewshot.json", "check_fewshot.json"):
+        texts = list(strings(json.loads((PROMPTS / name).read_text(encoding="utf-8"))))
+        assert shared(texts, eval_texts()) == set(), name

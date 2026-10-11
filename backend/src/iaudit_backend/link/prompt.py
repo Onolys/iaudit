@@ -16,7 +16,7 @@ from .models import LinkerOutput
 PROMPTS = Path(__file__).resolve().parents[1] / "prompts"
 SYSTEM_PATH = PROMPTS / "link_system.md"
 FEWSHOT_PATH = PROMPTS / "link_fewshot.json"
-_FALLBACK_SYSTEM = "Return the JSON object only."
+FALLBACK_SYSTEM = "Return the JSON object only."
 
 
 @lru_cache(maxsize=1)
@@ -136,4 +136,4 @@ def build_prompt(
         return prefix, stage_block(), user
     prefix = f"{common_system()}\n\n{stage_block()}"
     user = f"{block}\n\nTurns you may cite:\n{render_turns(turns, indices)}"
-    return prefix, _FALLBACK_SYSTEM, user
+    return prefix, FALLBACK_SYSTEM, user

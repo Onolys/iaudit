@@ -8,7 +8,7 @@ from iaudit_backend.atomize.models import AtomicClaim
 from iaudit_backend.models import Turn
 from iaudit_backend.prep import PrepResult
 
-from .shortlist import Shortlist, TurnIndex
+from .shortlist import FusedRetriever, Shortlist, TurnIndex
 
 
 def estimate_tokens(turns: list[Turn]) -> int:
@@ -49,7 +49,7 @@ def build_link_context(turns: list[Turn], prep: PrepResult, ctx) -> LinkContext:
     return LinkContext(
         turns=turns,
         prep=prep,
-        index=TurnIndex(prep),
+        index=TurnIndex(prep, FusedRetriever(prep, cfg.link_rrf_k) if cfg.link_fusion else None),
         mode=mode,
         est_tokens=est,
         ctx=ctx,
