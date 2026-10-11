@@ -9,15 +9,15 @@ Source of truth: [PRD.md](PRD.md). For each linked claim, decide verdict, concer
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Entry points, stalled and out-of-scope pass-through | 04 | todo |
-| 2 | Group A code checks and missing-role skip | 1 | todo |
-| 3 | Verifier call: observations and P1 flags, fixed floors | 1 | todo |
-| 4 | Polarity, ordinal compare both ways, minimal at-least cues | 3 | todo |
-| 5 | Timeframe check (core) | 3 | todo |
-| 6 | Certainty, conflicting accounts, causal, context gaps, inference | 3 | todo |
-| 7 | Evidence roles, decision table D0-D9, dedup | 4, 5, 6 | todo |
-| 8 | Explanation templates and `suggested_revision` | 7 | todo |
-| 9 | Failure handling, logging, config, variant-map test | 8 | todo |
+| 1 | Entry points, stalled and out-of-scope pass-through | 04 | done |
+| 2 | Group A code checks and missing-role skip | 1 | done |
+| 3 | Verifier call: observations and P1 flags, fixed floors | 1 | done |
+| 4 | Polarity, ordinal compare both ways, minimal at-least cues | 3 | done |
+| 5 | Timeframe check (core) | 3 | done |
+| 6 | Certainty, conflicting accounts, causal, context gaps, inference | 3 | done |
+| 7 | Evidence roles, decision table D0-D9, dedup | 4, 5, 6 | done |
+| 8 | Explanation templates and `suggested_revision` | 7 | done |
+| 9 | Failure handling, logging, config, variant-map test | 8 | done |
 | 10 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
 
 ## Task 1 — Entry points

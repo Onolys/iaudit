@@ -33,7 +33,9 @@ def claim(proposition: str, *, cid="c0.1", subject="Alex", quantities=(), segmen
         "subject_text": subject,
         "reported_by": [{"source": "unspecified", "speaker": None}],
         "polarity": "affirmed",
-        "quantities": [{"kind": "frequency", "raw": r} for r in quantities],
+        "quantities": [
+            r if isinstance(r, dict) else {"kind": "frequency", "raw": r} for r in quantities
+        ],
         "timeframe": "current",
         "timeframe_explicit": False,
         "hedged": False,

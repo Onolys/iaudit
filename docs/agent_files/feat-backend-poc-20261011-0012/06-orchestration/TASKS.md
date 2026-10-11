@@ -9,13 +9,13 @@ Source of truth: [PRD.md](PRD.md). The async `FullPipeline` that runs prep ‖ a
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Time-budget helpers and sibling R8 entry points | 05 | todo |
-| 2 | `RunState`, supervisor, per-claim fan-out | 1 | todo |
-| 3 | Deadline, assemble reserve, per-call timeouts, prep soft timeout | 2 | todo |
-| 4 | Degradation map, 503/504 guard, claim cap | 3 | todo |
-| 5 | Basic metrics and `audit_done` log line | 2 | todo |
-| 6 | Default pipeline flipped to `full`; `DeadlineExceeded` | 4 | todo |
-| 7 | ADHD faithful + 8 variants replay through `FullPipeline` | 6, 07a/T3 | todo |
+| 1 | Time-budget helpers and sibling R8 entry points | 05 | done |
+| 2 | `RunState`, supervisor, per-claim fan-out | 1 | done |
+| 3 | Deadline, assemble reserve, per-call timeouts, prep soft timeout | 2 | done |
+| 4 | Degradation map, 503/504 guard, claim cap | 3 | done |
+| 5 | Basic metrics and `audit_done` log line | 2 | done |
+| 6 | Default pipeline flipped to `full`; `DeadlineExceeded` | 4 | done |
+| 7 | ADHD faithful + 8 variants replay through `FullPipeline` | 6, 07a/T3 | done |
 | 8 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
 
 ## Task 1 — Budget helpers and entry points

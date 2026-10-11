@@ -15,6 +15,7 @@ from iaudit_backend.pipeline import (
     make_pipeline,
     run_with_backstop,
 )
+from iaudit_backend.pipeline.full import FullPipeline
 
 
 def make_ctx(settings=None, deadline_in=60.0, request_id="r1") -> RequestContext:
@@ -45,13 +46,13 @@ async def test_stub_pipeline_omits_request_id_when_absent(example_request):
 
 def test_factory():
     assert isinstance(make_pipeline(Settings(pipeline="stub")), StubPipeline)
-    with pytest.raises(NotImplementedError):
-        make_pipeline(Settings(pipeline="full"))
+    assert isinstance(make_pipeline(Settings(pipeline="full")), FullPipeline)
+    assert isinstance(make_pipeline(Settings()), FullPipeline)  # full is the default
 
 
 def test_context_budget():
     ctx = make_ctx(Settings(llm_timeout_s=30), deadline_in=100)
-    assert ctx.call_timeout("link") == 30
+    assert ctx.call_timeout("link") == 20  # stage cap below the LLM_TIMEOUT_S ceiling
     ctx = make_ctx(Settings(llm_timeout_s=30), deadline_in=10)
     assert 9 < ctx.call_timeout("link") <= 10
     ctx = make_ctx(deadline_in=MIN_CALL_S / 2)

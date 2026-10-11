@@ -1,0 +1,359 @@
+{
+ "split": "prompt",
+ "note": "Fictional 'Jordan' cases. Excluded from every eval set; never reuse eval sentences.",
+ "examples": [
+  {
+   "claim": {
+    "proposition": "Jordan regularly skips lunch.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": [
+     "regularly"
+    ]
+   },
+   "turns": [
+    {
+     "i": 4,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "How are your lunches?"
+    },
+    {
+     "i": 5,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Most days I skip it. Maybe five days a week."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      5
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Most days I skip it. Maybe five days a week."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [
+       {
+        "raw": "Most days",
+        "rate_per_week": null,
+        "bucket_guess": "most",
+        "basis": "relative"
+       },
+       {
+        "raw": "five days a week",
+        "rate_per_week": 5,
+        "bucket_guess": "most",
+        "basis": "numeric"
+       }
+      ],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan misses deadlines.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 8,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Do you miss deadlines?"
+    },
+    {
+     "i": 9,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "No, never. My teammate Riley misses them all the time."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      9
+     ],
+     "linker_role": "contradicting",
+     "answer_status": "endorsed",
+     "text": "No, never. My teammate Riley misses them all the time."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "contradicts",
+      "polarity": "negated",
+      "frequency": [
+       {
+        "raw": "never",
+        "rate_per_week": null,
+        "bucket_guess": "never",
+        "basis": "relative"
+       }
+      ],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan currently bites their nails.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": true,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 14,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Any habits as a kid?"
+    },
+    {
+     "i": 15,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I bit my nails until I was ten. I stopped after that."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      15
+     ],
+     "linker_role": "qualifying",
+     "answer_status": "endorsed",
+     "text": "I bit my nails until I was ten. I stopped after that."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "childhood",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "timeframe_mismatch",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": "Jordan bit their nails as a child."
+   }
+  },
+  {
+   "claim": {
+    "proposition": "The garden shows Jordan's trouble finishing projects.",
+    "reported_by": [
+     "unspecified"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 20,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "What about the garden?"
+    },
+    {
+     "i": 21,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "It is half dug. The shed collapsed, so I had to stop until it is rebuilt."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      21
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "It is half dug. The shed collapsed, so I had to stop until it is rebuilt."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "medium"
+     }
+    ],
+    "flags": [
+     {
+      "type": "context_stripping",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": "The garden is unfinished because the shed collapsed."
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan works at night.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 30,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "My shift starts at ten."
+    },
+    {
+     "i": 32,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I am home by six in the morning."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      30
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "My shift starts at ten."
+    },
+    {
+     "key": "c0.1:e2",
+     "turns": [
+      32
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I am home by six in the morning."
+    },
+    {
+     "key": "c0.1:e3",
+     "inference": true,
+     "premises": [
+      "c0.1:e1",
+      "c0.1:e2"
+     ],
+     "step": "A shift from ten until six runs overnight."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "medium"
+     },
+     {
+      "key": "c0.1:e2",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "medium"
+     }
+    ],
+    "flags": [],
+    "inferences": [
+     {
+      "key": "c0.1:e3",
+      "step_acceptable": true,
+      "conf": "high"
+     }
+    ],
+    "suggested_revision": null
+   }
+  }
+ ]
+}

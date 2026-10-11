@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -33,6 +34,8 @@ from iaudit_backend.safe_log import log_event, setup_logging
 
 log = logging.getLogger("iaudit")
 SUPPORTED_VERSION = "1.0.0"
+MAX_SAFE_DEADLINE_S = 100
+_KEY_VARS = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "LITELLM_API_KEY")  # presence only
 
 
 class ContractCORSMiddleware(CORSMiddleware):
@@ -68,6 +71,15 @@ def create_app(
         app.state.llm = llm or make_client(settings)
         app.state.pipeline = pipeline or make_pipeline(settings)
         log.info("startup config=%s", json.dumps(settings.safe_summary(), sort_keys=True))
+        if settings.audit_deadline_s > MAX_SAFE_DEADLINE_S:
+            log.warning(
+                "audit_deadline_s=%s exceeds %s: the cap plus grace and network time may pass "
+                "the 120 s client timeout",
+                settings.audit_deadline_s,
+                MAX_SAFE_DEADLINE_S,
+            )
+        if settings.llm_mode == "live" and not any(k in os.environ for k in _KEY_VARS):
+            log.warning("no provider API key is present; audits will fail with 503 unavailable")
         yield
 
     app = FastAPI(title="Interview Evidence Auditor", lifespan=lifespan)
