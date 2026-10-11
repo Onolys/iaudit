@@ -24,8 +24,8 @@ Each excerpt starts at its turn range. Expansion grows it by 3 turns per click (
 
 - `runAudit.ts`: `readRequestFile` (strips BOM, rejects empty/non-JSON/schema) and `auditRequest` (config check, POST or mock, reply checks, `analyzeResponse`). Dependencies (`fetch`, config, mock registry) are injectable for tests.
 - `client.ts`: `postAudit`. Two abort reasons, `timeout` and `cancelled`, are kept apart. Never throws.
-- `errors.ts`: `LoadError` union and `isRetryable` (network, timeout, cancelled, 5xx, 408, 429).
-- `ErrorScreen.tsx`: maps each error to a title and buttons. Retry-only kinds: network, timeout, cancelled, 5xx.
+- `errors.ts`: `LoadError` union and `isRetryable`.
+- `ErrorScreen.tsx`: maps each error to a title and buttons. Which errors offer Retry: see the [error table](../reference/review-ui.md#error-screens).
 - `mock/registry.ts`: builds pairs from `import.meta.glob` (lazy, so real-service sessions never fetch them). Lookup matches on `request_id`.
 - `useAuditLoader.ts`: state machine `idle → loading → ok | error`.
   - Each attempt gets a generation number and an `AbortController`. A new upload, retry or reset aborts the old one; late replies from old generations are dropped.
@@ -46,7 +46,7 @@ The shell scrolls the left pane only after navigation or stepping, not after a d
 
 ## `claim-detail/`
 
-`ClaimDetail` remounts per claim, so the active concern and expansion reset. `orderEvidence` splits evidence into placed and unplaceable; duplicate evidence ids keep only the first. `partsForTurn` cuts a turn at every highlight edge: one excerpt = highlight, several = overlap, uncovered text in an excerpt row = dim. A concern is clickable only if it cites at least one placed excerpt. `out_of_scope` claims show the reason instead of concerns and excerpts.
+`ClaimDetail` remounts per claim, so the active concern and expansion reset. `orderEvidence` splits evidence into placed and unplaceable; `firstPerId` (in `ClaimDetail.tsx`) keeps only the first of duplicate evidence ids. `partsForTurn` cuts a turn at every highlight edge: one excerpt = highlight, several = overlap, uncovered text in an excerpt row = dim. A concern is clickable only if it cites at least one placed excerpt. `out_of_scope` claims show the reason instead of concerns and excerpts.
 
 ## Edge rules
 
