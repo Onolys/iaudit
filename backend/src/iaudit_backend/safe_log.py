@@ -65,6 +65,16 @@ ALLOWED_FIELDS = frozenset(
         "retries",
         "failure",
         "exc_class",
+        "called",
+        "verdict",
+        "row",
+        "flags_seen",
+        "flags_below_floor",
+        "flags_suppressed",
+        "items_below_floor",
+        "items_dropped",
+        "role_skipped",
+        "role_disagreements",
         "frames",
     }
 )
