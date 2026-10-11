@@ -24,7 +24,7 @@ def test_log_event_drops_text_like_and_unknown_fields(caplog):
             error_message=SENTINEL,
             surprise=SENTINEL,
         )
-    assert "request_id=r1" in caplog.text and "turns=3" in caplog.text
+    assert 'request_id="r1"' in caplog.text and "turns=3" in caplog.text
     assert SENTINEL not in caplog.text
 
 
@@ -37,7 +37,7 @@ def test_one_info_line_per_request(caplog, example_request):
     assert len(lines) == 1
     line = lines[0]
     for key in (
-        "request_id=example-001",
+        'request_id="example-001"',
         "audit_uuid=",
         "turns=",
         "sections=",
@@ -107,3 +107,22 @@ def test_setup_logging_is_idempotent():
     setup_logging("INFO")
     handlers = [h for h in logging.getLogger("iaudit").handlers if getattr(h, "_iaudit", False)]
     assert len(handlers) == 1
+
+
+def test_log_values_are_escaped_and_capped(caplog):
+    forged = "x status=200 outcome=ok\naudit_request status=500 forged=1\r\n"
+    with caplog.at_level(logging.INFO, logger="iaudit"):
+        log_event("audit_request", request_id=forged, models="a" * 5000)
+    assert len(caplog.records) == 1
+    msg = caplog.records[0].getMessage()
+    assert "\n" not in msg and "\r" not in msg
+    assert msg.startswith("audit_request ")  # forged text stays inside a quoted value
+    assert len(msg) < 600
+
+
+def test_forged_request_id_over_http_yields_one_line(capsys, example_request):
+    example_request["request_id"] = "x status=200\naudit_request status=500 forged=1"
+    with TestClient(create_app(Settings(pipeline="stub", llm_mode="stub"))) as c:
+        c.post("/v1/audit", content=json.dumps(example_request))
+    lines = [ln for ln in capsys.readouterr().err.splitlines() if "audit_request" in ln]
+    assert len(lines) == 1

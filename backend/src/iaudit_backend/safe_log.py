@@ -1,5 +1,6 @@
 """PHI-safe logging: an allowlist of field names; text-like names are always dropped."""
 
+import json
 import logging
 import sys
 
@@ -62,7 +63,17 @@ def _blocked(name: str) -> bool:
     return name != "body_bytes" and any(p in name for p in _BLOCKED_PARTS)
 
 
+MAX_VALUE_CHARS = 200
+
+
+def _fmt(value) -> str:
+    """Numbers bare; everything else a capped, JSON-escaped string (no CR/LF, no forged fields)."""
+    if isinstance(value, bool | int | float):
+        return str(value)
+    return json.dumps(str(value)[:MAX_VALUE_CHARS])
+
+
 def log_event(event: str, level: int = logging.INFO, **fields) -> None:
     kept = {k: v for k, v in fields.items() if k in ALLOWED_FIELDS and not _blocked(k)}
-    pairs = " ".join(f"{k}={v}" for k, v in sorted(kept.items()))
+    pairs = " ".join(f"{k}={_fmt(v)}" for k, v in sorted(kept.items()))
     log.log(level, "%s %s", event, pairs)
