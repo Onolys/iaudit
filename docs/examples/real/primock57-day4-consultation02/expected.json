@@ -1,0 +1,300 @@
+{
+  "request_id": "primock57-day4-consultation02",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day4_consultation02",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 0,
+    "incorrect_statements_total": 12,
+    "incorrect_statements_mapped": 10,
+    "incorrect_statements_not_mapped": 2,
+    "omissions_excluded": 32
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 117
+        },
+        "end": {
+          "index": 2,
+          "char": 163
+        }
+      },
+      "claim_text": "maintains motor and sense, no loss of function",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "Strength, sensation beyond the tingling, and function were never asked about or examined.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "No turn establishes preserved strength, sensation or function.",
+          "evidence_ids": []
+        }
+      ],
+      "evidence": [],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! maintains motor and sense, no loss of function"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "non_critical",
+          "verbatim": "- maintains motor and sense, no loss of function"
+        }
+      ],
+      "agreement": "2 of 5 evaluators with data"
+    },
+    {
+      "id": "k2",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 164
+        },
+        "end": {
+          "index": 2,
+          "char": 185
+        }
+      },
+      "claim_text": "Fevers with headaches",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "Asked about feeling hot, the patient talked about shortness of breath instead. Fevers are never reported.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "No turn reports fevers, with headaches or otherwise.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 97,
+              "char": 0
+            },
+            "end": {
+              "index": 102,
+              "char": 54
+            }
+          },
+          "note": "The clinician raises feeling hot; the patient redirects to breathlessness."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! Fevers with"
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "non_critical",
+          "verbatim": "- Fevers with headaches"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! Fevers with headaches"
+        }
+      ],
+      "agreement": "3 of 5 evaluators with data"
+    },
+    {
+      "id": "k3",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 187
+        },
+        "end": {
+          "index": 2,
+          "char": 226
+        }
+      },
+      "claim_text": "Palpitations with mild SOBOE and SOBAR.",
+      "expected_verdict": "contradicted",
+      "explanation": "The patient reported breathlessness while sitting at the desk and denied it when exercising. The note records breathlessness on exertion too.",
+      "concerns": [
+        {
+          "type": "negation_reversal",
+          "explanation": "A denial of breathlessness on exercise becomes breathlessness on exertion.",
+          "evidence_ids": [
+            "e2"
+          ]
+        },
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The patient's answer about exercise conflicts with the claim.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 103,
+              "char": 0
+            },
+            "end": {
+              "index": 104,
+              "char": 27
+            }
+          },
+          "note": "The patient confirms breathlessness while sitting at their desk."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 105,
+              "char": 0
+            },
+            "end": {
+              "index": 106,
+              "char": 3
+            }
+          },
+          "note": "The patient denies breathlessness when exercising."
+        },
+        {
+          "id": "e3",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 108,
+              "char": 0
+            },
+            "end": {
+              "index": 111,
+              "char": 61
+            }
+          },
+          "note": "The patient notices their heartbeat about once a day."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! with mild SOBOE and SOBAR."
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! with mild SOBOE and SOBAR."
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! with mild SOBOE and"
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "critical",
+          "verbatim": "! mild SOBOE"
+        }
+      ],
+      "agreement": "4 of 5 evaluators with data"
+    },
+    {
+      "id": "k4",
+      "span": {
+        "start": {
+          "index": 3,
+          "char": 0
+        },
+        "end": {
+          "index": 3,
+          "char": 122
+        }
+      },
+      "claim_text": "Symptoms occur at random times of the day while at work, with no pre-symptoms, sometimes together, sometimes individually.",
+      "expected_verdict": "partially_supported",
+      "explanation": "Random timing, mostly at work, is supported. Asked whether the symptoms come together, the patient said one at a time.",
+      "concerns": [
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The patient said the symptoms come one at a time, not sometimes together.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 25,
+              "char": 0
+            },
+            "end": {
+              "index": 26,
+              "char": 66
+            }
+          },
+          "note": "The patient says the symptoms come almost at random."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 27,
+              "char": 0
+            },
+            "end": {
+              "index": 28,
+              "char": 32
+            }
+          },
+          "note": "Asked if they come together, the patient says one thing at a time."
+        },
+        {
+          "id": "e3",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 29,
+              "char": 0
+            },
+            "end": {
+              "index": 32,
+              "char": 47
+            }
+          },
+          "note": "The headaches come mostly at work."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! at random times of the day while at work, with no pre-symptoms, sometimes together, sometimes"
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data"
+    }
+  ]
+}

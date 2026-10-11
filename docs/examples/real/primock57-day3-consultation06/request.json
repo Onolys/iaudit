@@ -1,0 +1,355 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "primock57-day3-consultation06",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hello, hi, I'm Doctor Jacob and welcome to Babylon.",
+      "timestamp": "00:00:01"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I have been",
+      "timestamp": "00:00:05"
+    },
+    {
+      "id": "t2",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You're right.",
+      "timestamp": "00:00:07"
+    },
+    {
+      "id": "t3",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So just before we start, is it alright if you could confirm your name for me, please?",
+      "timestamp": "00:00:08"
+    },
+    {
+      "id": "t4",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, not really.",
+      "timestamp": "00:00:08"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "My name is Jonathan Irving.",
+      "timestamp": "00:00:17"
+    },
+    {
+      "id": "t6",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And your date of birth?",
+      "timestamp": "00:00:20"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, six, twelve, uh, eighty.",
+      "timestamp": "00:00:22"
+    },
+    {
+      "id": "t8",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And your address for me, please.",
+      "timestamp": "00:00:26"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, sixty two Lewin Road Streatham SW sixteen six JT.",
+      "timestamp": "00:00:30"
+    },
+    {
+      "id": "t10",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "correct, and just to confirm that you're in a secure location and we can have a confidential conversation.",
+      "timestamp": "00:00:36"
+    },
+    {
+      "id": "t11",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:00:41"
+    },
+    {
+      "id": "t12",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah. You've mentioned you had some breathing difficulties in the, the notes. How can I help you?",
+      "timestamp": "00:00:42"
+    },
+    {
+      "id": "t13",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, about fifteen minutes ago, I was gardening and, um, I was stung by wasp. Um, ran inside.",
+      "timestamp": "00:00:49"
+    },
+    {
+      "id": "t14",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Mm-hmm.",
+      "timestamp": "00:00:57"
+    },
+    {
+      "id": "t15",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And now I'm, um, just starting to notice a few things. Yeah, I'm having quite shallow breath.",
+      "timestamp": "00:00:57"
+    },
+    {
+      "id": "t16",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You're having difficulties breathing since then, yeah?",
+      "timestamp": "00:01:04"
+    },
+    {
+      "id": "t17",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, is there any swelling of your lips, you feel your throat is closing up?",
+      "timestamp": "00:01:07"
+    },
+    {
+      "id": "t18",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Not throat, but I can , yeah, I can I can definitely feel something in the lips, yeah.",
+      "timestamp": "00:01:14"
+    },
+    {
+      "id": "t19",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, like a tingling kind of feeling?",
+      "timestamp": "00:01:18"
+    },
+    {
+      "id": "t20",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, yeah.",
+      "timestamp": "00:01:20"
+    },
+    {
+      "id": "t21",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, but no swelling, yeah?",
+      "timestamp": "00:01:21"
+    },
+    {
+      "id": "t22",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Alright. I mean, you know, to be honest, I'm just doing this to establish whether I should go to the hospital.",
+      "timestamp": "00:01:23"
+    },
+    {
+      "id": "t23",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Right, OK. Have you had anything like this before?",
+      "timestamp": "00:01:28"
+    },
+    {
+      "id": "t24",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no.",
+      "timestamp": "00:01:32"
+    },
+    {
+      "id": "t25",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "No. OK. So, um, do you feel wheezy in your chest, or just tightness?",
+      "timestamp": "00:01:33"
+    },
+    {
+      "id": "t26",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah. Um, a bit of tightness. Yeah, a bit of tightness, yeah.",
+      "timestamp": "00:01:39"
+    },
+    {
+      "id": "t27",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Bit of tightness, OK, OK. So, I, unfortunately, I don't have much of your past medical history. Do you have any significant past medical or surgical history you'd like to share?",
+      "timestamp": "00:01:46"
+    },
+    {
+      "id": "t28",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no, not really. Uh, a bit of eczema and I'm allergic to penicillin.",
+      "timestamp": "00:01:56"
+    },
+    {
+      "id": "t29",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Are you on any regular medication at all?",
+      "timestamp": "00:02:02"
+    },
+    {
+      "id": "t30",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:02:08"
+    },
+    {
+      "id": "t31",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Righty-ho.",
+      "timestamp": "00:02:09"
+    },
+    {
+      "id": "t32",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Are you having any rash on your body at the moment?",
+      "timestamp": "00:02:12"
+    },
+    {
+      "id": "t33",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes there's a bit of blotching .",
+      "timestamp": "00:02:15"
+    },
+    {
+      "id": "t34",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Well, have you taken anything at all for the blotching?",
+      "timestamp": "00:02:17"
+    },
+    {
+      "id": "t35",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I wouldn't even know what to take then.",
+      "timestamp": "00:02:22"
+    },
+    {
+      "id": "t36",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK so you've, OK. That's fine. So from what you're saying, you do need to have medical attention straight away. OK? Um, do you have any antihistamines in your house at all?",
+      "timestamp": "00:02:24"
+    },
+    {
+      "id": "t37",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, yes, I've used them for flying. I have aerosinusitis, so yes, I do",
+      "timestamp": "00:02:38"
+    },
+    {
+      "id": "t38",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, why, why, and I'm, because your your breathing problem can get worse very quickly, I would like you to call. Is there someone else at home with you?",
+      "timestamp": "00:02:44"
+    },
+    {
+      "id": "t39",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, my wife can take me to the emergency room, yeah.",
+      "timestamp": "00:02:54"
+    },
+    {
+      "id": "t40",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Uh, no, I wouldn't want your wife to take you, I would like, I'd like her to call the ambulance because that might take a bit longer, and, you know, we need to deal with it quickly. So, what we are worried about is, you know, in case you develop an anaphylactic reaction.",
+      "timestamp": "00:02:56"
+    },
+    {
+      "id": "t41",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK. She's listening. I'll get her to call now, yeah",
+      "timestamp": "00:03:11"
+    },
+    {
+      "id": "t42",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah so, I'll ask her to give you the, um, antihistamine, in the meantime while the ambulance is coming. And take yourself to hospital.",
+      "timestamp": "00:03:13"
+    },
+    {
+      "id": "t43",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, it might just be an articularly reaction, but because you're complaining of breathing difficulties, it is quite important that you go to hospital straight away.",
+      "timestamp": "00:03:22"
+    },
+    {
+      "id": "t44",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "But I'd like you to call the ambulance because, you know, so that you will be sorted out quickly.",
+      "timestamp": "00:03:31"
+    },
+    {
+      "id": "t45",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK.",
+      "timestamp": "00:03:31"
+    },
+    {
+      "id": "t46",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah. Alright, thank you. She's on it now. Yeah, she's on the phone.",
+      "timestamp": "00:03:37"
+    },
+    {
+      "id": "t47",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Alright then, you take care.",
+      "timestamp": "00:03:41"
+    },
+    {
+      "id": "t48",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Alright, thank you for the advice .",
+      "timestamp": "00:03:43"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "s0",
+      "text": "History : breathing difficulty for past 20 minutes after being bitten by wasp \nThere is some blotching rash seen \ntingling feeling around your lips \nno closing of the throat feeling \nno previous similar history \nPast medical history:\nEczema \nAllergic to penicillin\nPlan : advised to start on antihistamines straight away. It might be just urticaria ( Hives)Call the ambulance to r/o possible anaphylactic reaction"
+    }
+  ]
+}

@@ -1,0 +1,267 @@
+{
+  "request_id": "primock57-day1-consultation06",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day1_consultation06",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 0,
+    "incorrect_statements_total": 10,
+    "incorrect_statements_mapped": 10,
+    "incorrect_statements_not_mapped": 0,
+    "omissions_excluded": 14
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 43
+        }
+      },
+      "claim_text": "2/5 hx of SOB, worsening over the past 2/7.",
+      "expected_verdict": "partially_supported",
+      "explanation": "Breathlessness getting worse over the last few days is supported. The patient described it building over a couple of weeks, which the written duration does not match.",
+      "concerns": [
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "The duration as written does not match the couple of weeks the patient described.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 8,
+              "char": 0
+            },
+            "end": {
+              "index": 9,
+              "char": 61
+            }
+          },
+          "note": "The patient describes slow worsening over a couple of weeks and a sharper change in the last few days."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! 2/5 SOB, worsening\nover the past 2/7.\nFeeling more SOB on minimal exertion,"
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! 2/5 hx of SOB,"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! 2/5 hx of SOB"
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "non_critical",
+          "verbatim": "- 2/5"
+        }
+      ],
+      "agreement": "4 of 5 evaluators with data",
+      "mapping_note": "\"2/5\" is probably a typo for 2/52 (two weeks). It is mapped as written. Evaluator 1's item runs on into the next sentence, about exertion, which the interview supports."
+    },
+    {
+      "id": "k2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 82
+        },
+        "end": {
+          "index": 0,
+          "char": 98
+        }
+      },
+      "claim_text": "nil SOB at rest.",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "Breathlessness at rest was never asked about. The patient said they now get breathless just moving about the house.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "No question or answer establishes the absence of breathlessness at rest.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 10,
+              "char": 0
+            },
+            "end": {
+              "index": 10,
+              "char": 198
+            }
+          },
+          "note": "The patient describes breathlessness on very light activity at home, not at rest."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! nil SOB at rest."
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data"
+    },
+    {
+      "id": "k3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 164
+        },
+        "end": {
+          "index": 0,
+          "char": 243
+        }
+      },
+      "claim_text": "Has also noticed ankle odema bilaterally over past few days extending to shins.",
+      "expected_verdict": "partially_supported",
+      "explanation": "Swelling of both ankles over the last few days is supported. The interview never says that the swelling reaches the shins.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "No turn describes swelling above the ankles.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 29,
+              "char": 0
+            },
+            "end": {
+              "index": 36,
+              "char": 43
+            }
+          },
+          "note": "The patient reports both ankles swelling over the past few days."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! extending to shins"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! extending to shins."
+        }
+      ],
+      "agreement": "2 of 5 evaluators with data"
+    },
+    {
+      "id": "k4",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 20
+        },
+        "end": {
+          "index": 1,
+          "char": 36
+        }
+      },
+      "claim_text": "?unstable angina",
+      "expected_verdict": "contradicted",
+      "explanation": "The patient described a past small heart attack and said they were told it was more than angina.",
+      "concerns": [
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The patient explicitly said the event was more than angina.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 57,
+              "char": 0
+            },
+            "end": {
+              "index": 59,
+              "char": 77
+            }
+          },
+          "note": "Asked if it was angina, the patient says they were told it was more than that."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 50,
+              "char": 0
+            },
+            "end": {
+              "index": 51,
+              "char": 102
+            }
+          },
+          "note": "The patient calls it a small heart attack about five years ago."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! ?unstable angina"
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "critical",
+          "verbatim": "! ?unstable angina"
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! ?unstable angina"
+        }
+      ],
+      "agreement": "3 of 5 evaluators with data"
+    }
+  ]
+}

@@ -1,0 +1,1123 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "primock57-day1-consultation06",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hello?",
+      "timestamp": "00:00:01"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Hello there.",
+      "timestamp": "00:00:05"
+    },
+    {
+      "id": "t2",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Uh, hello. Can you hear me OK?",
+      "timestamp": "00:00:06"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, I can hear you.",
+      "timestamp": "00:00:09"
+    },
+    {
+      "id": "t4",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, great. . I am, yes. Nice to see you here, Oscar. Um, how can I help you this afternoon?",
+      "timestamp": "00:00:11"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Are you the doctor?",
+      "timestamp": "00:00:12"
+    },
+    {
+      "id": "t6",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, I'm, contacting you because I've been, quite short of breath lately.",
+      "timestamp": "00:00:20"
+    },
+    {
+      "id": "t7",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Do you want to tell me a bit more about it? When did it all start?",
+      "timestamp": "00:00:25"
+    },
+    {
+      "id": "t8",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, well it seems to have been, slowly getting worse over the last couple of weeks.",
+      "timestamp": "00:00:30"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, now it's, become quite troublesome, in the last few days.",
+      "timestamp": "00:00:34"
+    },
+    {
+      "id": "t10",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I kind of, normally I can walk to the shops, without a problem but, now I'm having to sort of sit down and catch my breath. And I'm really starting to get a bit breathless, just about the house.",
+      "timestamp": "00:00:39"
+    },
+    {
+      "id": "t11",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And uh, it's got me kind of worried, don't really know what's going on.",
+      "timestamp": "00:00:51"
+    },
+    {
+      "id": "t12",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:00:51"
+    },
+    {
+      "id": "t13",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. OK. Is there anything you're particularly worried about?",
+      "timestamp": "00:00:55"
+    },
+    {
+      "id": "t14",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, well, I've, I've uh, I've got um, heart failure.",
+      "timestamp": "00:01:00"
+    },
+    {
+      "id": "t15",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:01:06"
+    },
+    {
+      "id": "t16",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I was told that, uh, a while ago.",
+      "timestamp": "00:01:07"
+    },
+    {
+      "id": "t17",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, and I got a bit breathless when I was first diagnosed, and put on some medicine that, that um, that helped, but I'm a bit worried it's just getting worse.",
+      "timestamp": "00:01:12"
+    },
+    {
+      "id": "t18",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:01:12"
+    },
+    {
+      "id": "t19",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right.",
+      "timestamp": "00:01:15"
+    },
+    {
+      "id": "t20",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK. So you mentioned you're feeling, uh, short of breath for the last couple of weeks, but mainly the last couple of days it's got a bit worse.",
+      "timestamp": "00:01:21"
+    },
+    {
+      "id": "t21",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, uh, and you're now feeling more breathless on kind of minimal, minimal exertion you mentioned. Um, have you noticed any other symptoms at all, uh, uh, with your breath? So, for example, any pain in your chest?",
+      "timestamp": "00:01:27"
+    },
+    {
+      "id": "t22",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No pain in my chest.",
+      "timestamp": "00:01:40"
+    },
+    {
+      "id": "t23",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And have you found yourself coughing, coughing at all?",
+      "timestamp": "00:01:42"
+    },
+    {
+      "id": "t24",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um.",
+      "timestamp": "00:01:44"
+    },
+    {
+      "id": "t25",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I've got a bit of a dry cough, but it's not too troublesome.",
+      "timestamp": "00:01:47"
+    },
+    {
+      "id": "t26",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. OK. And how's your general health otherwise? Are you feeling uh, weak, lethargic?",
+      "timestamp": "00:01:50"
+    },
+    {
+      "id": "t27",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, I'm feeling a little run-down, um, but otherwise, otherwise pretty normal.",
+      "timestamp": "00:01:59"
+    },
+    {
+      "id": "t28",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:02:04"
+    },
+    {
+      "id": "t29",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I've noticed my ankles have got a bit bigger.",
+      "timestamp": "00:02:05"
+    },
+    {
+      "id": "t30",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And what do you mean by that?",
+      "timestamp": "00:02:07"
+    },
+    {
+      "id": "t31",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, it's just like, it's sort of swollen up a bit.",
+      "timestamp": "00:02:10"
+    },
+    {
+      "id": "t32",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Um, is that, is that both ?",
+      "timestamp": "00:02:15"
+    },
+    {
+      "id": "t33",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Kind of . Um, yeah, both ankles. Yeah, it's a bit embarrassing.",
+      "timestamp": "00:02:17"
+    },
+    {
+      "id": "t34",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Both ankles?",
+      "timestamp": "00:02:18"
+    },
+    {
+      "id": "t35",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Uh, I can imagine, yeah. Um, and again, over how long has this, have you noticed this for?",
+      "timestamp": "00:02:23"
+    },
+    {
+      "id": "t36",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, I kind of noticed it the last few days.",
+      "timestamp": "00:02:30"
+    },
+    {
+      "id": "t37",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Past few days, OK. And is this something that you've had before, in the past?",
+      "timestamp": "00:02:33"
+    },
+    {
+      "id": "t38",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I think my ankles did swell up a bit last time, the heart failure was a problem.",
+      "timestamp": "00:02:38"
+    },
+    {
+      "id": "t39",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. OK. Um, fine. OK. So, um, just to really recap, uh, so you're really, in the last couple of weeks, uh, you've been feeling breathless, uh, but worse in the last couple of days. You mentioned you had a bit of a dry cough.",
+      "timestamp": "00:02:44"
+    },
+    {
+      "id": "t40",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, and some swelling in your ankles. Um, reporting no chest pain. Um, and, and have you had any, have you any, have you noticed your heartbeat racing at all? So, palpitations or skipped heartbeat?",
+      "timestamp": "00:02:57"
+    },
+    {
+      "id": "t41",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, not really.",
+      "timestamp": "00:03:09"
+    },
+    {
+      "id": "t42",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And any temperatures or fevers?",
+      "timestamp": "00:03:10"
+    },
+    {
+      "id": "t43",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no.",
+      "timestamp": "00:03:14"
+    },
+    {
+      "id": "t44",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And how about your appetite? Are you eating and drinking OK?",
+      "timestamp": "00:03:15"
+    },
+    {
+      "id": "t45",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, I, , I'm, that's fine.",
+      "timestamp": "00:03:19"
+    },
+    {
+      "id": "t46",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And your waterworks? Are you passing urine OK?",
+      "timestamp": "00:03:21"
+    },
+    {
+      "id": "t47",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah, but yeah. I usually pee a lot, , ever since the drugs .",
+      "timestamp": "00:03:26"
+    },
+    {
+      "id": "t48",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah.",
+      "timestamp": "00:03:29"
+    },
+    {
+      "id": "t49",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Sure, OK. Alright. Um, fine. So, your uh, your past medical history. You mentioned heart failure. Any, any other medical history I should be aware of?",
+      "timestamp": "00:03:32"
+    },
+    {
+      "id": "t50",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, well I was told I had like a, they called it like a small heart attack.",
+      "timestamp": "00:03:43"
+    },
+    {
+      "id": "t51",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "About, five years ago. Um, I uh, I had, I, I had like some chest pain and, they took me into hospital.",
+      "timestamp": "00:03:48"
+    },
+    {
+      "id": "t52",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:03:56"
+    },
+    {
+      "id": "t53",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And um, they, uh, but then I just got better.",
+      "timestamp": "00:03:56"
+    },
+    {
+      "id": "t54",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And when, when you say a small heart attack, did they give you a name, for what happened, a, a name of a diagnosis?",
+      "timestamp": "00:04:00"
+    },
+    {
+      "id": "t55",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um.",
+      "timestamp": "00:04:01"
+    },
+    {
+      "id": "t56",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I can't remember. They just called it something a , uh, something like that, a small heart attack.",
+      "timestamp": "00:04:08"
+    },
+    {
+      "id": "t57",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "It's more hard to say. OK. Was it like angina or, um,",
+      "timestamp": "00:04:14"
+    },
+    {
+      "id": "t58",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um.",
+      "timestamp": "00:04:19"
+    },
+    {
+      "id": "t59",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no they, they said that it, uh, it seemed, it was like, more than angina.",
+      "timestamp": "00:04:22"
+    },
+    {
+      "id": "t60",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:04:25"
+    },
+    {
+      "id": "t61",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, uh, but um, I didn't, but I only had to stay in hospital for a few days, and, uh.",
+      "timestamp": "00:04:26"
+    },
+    {
+      "id": "t62",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:04:34"
+    },
+    {
+      "id": "t63",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:04:37"
+    },
+    {
+      "id": "t64",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And yeah, I've been OK since then.",
+      "timestamp": "00:04:37"
+    },
+    {
+      "id": "t65",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You've been OK since then. OK, alright. So, apart from the uh, the heart, the heart problems, the heart failure, any other problems I should be aware of?",
+      "timestamp": "00:04:39"
+    },
+    {
+      "id": "t66",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no, I think I'm otherwise, I'm OK.",
+      "timestamp": "00:04:46"
+    },
+    {
+      "id": "t67",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Um, do you take any regular medications, apart from your diuretics that you're taking? And do you know which ones?",
+      "timestamp": "00:04:49"
+    },
+    {
+      "id": "t68",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah, I take something called Furosemide.",
+      "timestamp": "00:04:56"
+    },
+    {
+      "id": "t69",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ". Do you know which dose you're taking?",
+      "timestamp": "00:04:59"
+    },
+    {
+      "id": "t70",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I can't remember, I'm sorry doctor. I have to check.",
+      "timestamp": "00:05:01"
+    },
+    {
+      "id": "t71",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "That's OK.",
+      "timestamp": "00:05:04"
+    },
+    {
+      "id": "t72",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "No problems. Um,",
+      "timestamp": "00:05:06"
+    },
+    {
+      "id": "t73",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Any other medications?",
+      "timestamp": "00:05:08"
+    },
+    {
+      "id": "t74",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah. I take Aspirin.",
+      "timestamp": "00:05:11"
+    },
+    {
+      "id": "t75",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:05:14"
+    },
+    {
+      "id": "t76",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And uh, Bisoprolol.",
+      "timestamp": "00:05:15"
+    },
+    {
+      "id": "t77",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "The Metoprolol, was it?",
+      "timestamp": "00:05:19"
+    },
+    {
+      "id": "t78",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Or?",
+      "timestamp": "00:05:21"
+    },
+    {
+      "id": "t79",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, Bisoprolol.",
+      "timestamp": "00:05:21"
+    },
+    {
+      "id": "t80",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Sorry, the connection's not very good. OK. Thank you, yeah.",
+      "timestamp": "00:05:23"
+    },
+    {
+      "id": "t81",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, .",
+      "timestamp": "00:05:27"
+    },
+    {
+      "id": "t82",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And a thousand, OK. Alright. Any allergies at all? Any medications?",
+      "timestamp": "00:05:30"
+    },
+    {
+      "id": "t83",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no, no allergies.",
+      "timestamp": "00:05:34"
+    },
+    {
+      "id": "t84",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "No.",
+      "timestamp": "00:05:35"
+    },
+    {
+      "id": "t85",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And is there anything in the family that's, uh, that, that's uh, that's important for me to know? Any family history of medical problems, heart problems, lung problems?",
+      "timestamp": "00:05:37"
+    },
+    {
+      "id": "t86",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh , my, my father died of a, uh, of a heart attack.",
+      "timestamp": "00:05:47"
+    },
+    {
+      "id": "t87",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "I'm sorry to hear that. And, um, how old was your father when he passed away?",
+      "timestamp": "00:05:51"
+    },
+    {
+      "id": "t88",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, he was, um, early sixties.",
+      "timestamp": "00:05:57"
+    },
+    {
+      "id": "t89",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Early sixties, OK. Alright. Anything else I should be aware of?",
+      "timestamp": "00:06:00"
+    },
+    {
+      "id": "t90",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, my mother had osteoporosis.",
+      "timestamp": "00:06:05"
+    },
+    {
+      "id": "t91",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:06:09"
+    },
+    {
+      "id": "t92",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Is your mother still with us?",
+      "timestamp": "00:06:11"
+    },
+    {
+      "id": "t93",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah, she's still living.",
+      "timestamp": "00:06:13"
+    },
+    {
+      "id": "t94",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, alright. Um, and socially, sir, just tell me a bit more about your situation at home. Who lives at home with you?",
+      "timestamp": "00:06:15"
+    },
+    {
+      "id": "t95",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I live on my own. Well, I got two cats.",
+      "timestamp": "00:06:23"
+    },
+    {
+      "id": "t96",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You've got two cats. OK, great. Do they have names?",
+      "timestamp": "00:06:27"
+    },
+    {
+      "id": "t97",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "They're my family. Uh, they're, they're called, um, they're called, Polly and Tim.",
+      "timestamp": "00:06:31"
+    },
+    {
+      "id": "t98",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:06:39"
+    },
+    {
+      "id": "t99",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, so it's just you and your cats. And um, in terms of day to day, are you working at the moment?",
+      "timestamp": "00:06:41"
+    },
+    {
+      "id": "t100",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I work part-time as, a, uh, lorry driver.",
+      "timestamp": "00:06:49"
+    },
+    {
+      "id": "t101",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And how is that? Is that quite stressful, long hours?",
+      "timestamp": "00:06:55"
+    },
+    {
+      "id": "t102",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, it's OK. Um, I uh, yeah , when I'm working it's pretty exhausting.",
+      "timestamp": "00:06:59"
+    },
+    {
+      "id": "t103",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Mm.",
+      "timestamp": "00:07:07"
+    },
+    {
+      "id": "t104",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, I guess I'm a bit worried, that if I get sick I won't, if I get more sick then, I won't be able to work properly.",
+      "timestamp": "00:07:07"
+    },
+    {
+      "id": "t105",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah, that's certainly a consideration, isn't it? So let's, let's try and get you better soon, so it doesn't have any um, impact on your, on your job.",
+      "timestamp": "00:07:14"
+    },
+    {
+      "id": "t106",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No.",
+      "timestamp": "00:07:20"
+    },
+    {
+      "id": "t107",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Uh, and do you find yourself doing a lot of anti-social hours? Do you , do you do a lot of night driving, weekend driving?",
+      "timestamp": "00:07:22"
+    },
+    {
+      "id": "t108",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Ohh no, I , I , I, I only take shifts during the day, I don't like working at night.",
+      "timestamp": "00:07:29"
+    },
+    {
+      "id": "t109",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:07:33"
+    },
+    {
+      "id": "t110",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, alright. And what about smoking and alcohol? So, 'cause that can sometimes be very important when it comes to heart problems. Do you, do you smoke at all?",
+      "timestamp": "00:07:34"
+    },
+    {
+      "id": "t111",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Not any more.",
+      "timestamp": "00:07:43"
+    },
+    {
+      "id": "t112",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, you used to smoke?",
+      "timestamp": "00:07:44"
+    },
+    {
+      "id": "t113",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:07:47"
+    },
+    {
+      "id": "t114",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And how many did you smoke a day, on average?",
+      "timestamp": "00:07:47"
+    },
+    {
+      "id": "t115",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Ooh it was about, about a pack a day, back in the day.",
+      "timestamp": "00:07:52"
+    },
+    {
+      "id": "t116",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, and how many, how many years was that for?",
+      "timestamp": "00:07:56"
+    },
+    {
+      "id": "t117",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Ohh that was, oof, good twenty five years.",
+      "timestamp": "00:08:01"
+    },
+    {
+      "id": "t118",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And what about the stopping? That must have been difficult for you. stopping. Um, and what, what about alcohol?",
+      "timestamp": "00:08:05"
+    },
+    {
+      "id": "t119",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I don't drink alcohol.",
+      "timestamp": "00:08:13"
+    },
+    {
+      "id": "t120",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Do you do much in the way of exercise, sir?",
+      "timestamp": "00:08:14"
+    },
+    {
+      "id": "t121",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I try and walk to the shops, at least once a day.",
+      "timestamp": "00:08:19"
+    },
+    {
+      "id": "t122",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:08:22"
+    },
+    {
+      "id": "t123",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, but uh, that's about it, I've. Yeah, I don't, I don't go running like I used to when i was young.",
+      "timestamp": "00:08:23"
+    },
+    {
+      "id": "t124",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:08:24"
+    },
+    {
+      "id": "t125",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK. And certainly now your symptoms, you, you're, you said you're feeling more breathless even walking to the uh, to the shop, she said.",
+      "timestamp": "00:08:31"
+    },
+    {
+      "id": "t126",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, right. Ohh um, based on your, based on you history, and having listened to your story, I, I wonder whether you've had a flare-up of your heart failure, sir. Um,",
+      "timestamp": "00:08:37"
+    },
+    {
+      "id": "t127",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Which can sometimes happen. Um, um, and uh,",
+      "timestamp": "00:08:48"
+    },
+    {
+      "id": "t128",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mmm.",
+      "timestamp": "00:08:50"
+    },
+    {
+      "id": "t129",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "That.",
+      "timestamp": "00:08:52"
+    },
+    {
+      "id": "t130",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "It's . So, it seems like your heart's not pumping as well as it should be. Um, and obviously having diagnosed with heart failure, there's obviously",
+      "timestamp": "00:08:52"
+    },
+    {
+      "id": "t131",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "What's going on.",
+      "timestamp": "00:08:53"
+    },
+    {
+      "id": "t132",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, that's the first thing that comes to my mind. Um, now there's a couple of options move forward. Um,",
+      "timestamp": "00:09:01"
+    },
+    {
+      "id": "t133",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mmm.",
+      "timestamp": "00:09:05"
+    },
+    {
+      "id": "t134",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Given that you're otherwise well at the moment, and having examined you, your chest, and your saturations and blood pressure are all OK,",
+      "timestamp": "00:09:07"
+    },
+    {
+      "id": "t135",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "I'm quite happy to increase your dose of Furosemide. Maybe, rather than one tablet a day, we can do two tablets a day, for the first few days.",
+      "timestamp": "00:09:14"
+    },
+    {
+      "id": "t136",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, and see, and see how you're getting on.",
+      "timestamp": "00:09:22"
+    },
+    {
+      "id": "t137",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK. If you think that'll be better.",
+      "timestamp": "00:09:26"
+    },
+    {
+      "id": "t138",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Uh,",
+      "timestamp": "00:09:26"
+    },
+    {
+      "id": "t139",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "I think, I think, it's, it's, it's definitely worth treating your symptoms. But what we should also think about is maybe doing a couple of other tests, like a blood test, and maybe an echocardiogram of your heart, to see how well your heart's pumping.",
+      "timestamp": "00:09:28"
+    },
+    {
+      "id": "t140",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK.",
+      "timestamp": "00:09:41"
+    },
+    {
+      "id": "t141",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Is that something you've had before? Yeah, so um, an , it's a, it's a general scan of your heart. You might have had this done before, when you were diagnosed. And it's just to get a good",
+      "timestamp": "00:09:42"
+    },
+    {
+      "id": "t142",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "What does that?",
+      "timestamp": "00:09:42"
+    },
+    {
+      "id": "t143",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Ohh yes, I remember now.",
+      "timestamp": "00:09:50"
+    },
+    {
+      "id": "t144",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Sorry?",
+      "timestamp": "00:09:53"
+    },
+    {
+      "id": "t145",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah, I remember now. .",
+      "timestamp": "00:09:54"
+    },
+    {
+      "id": "t146",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You remember that. OK, fine. That's something I can organize for you today. And, and that might take a week or two weeks for that to be organized. But, I think certainly in the meantime, let's, um,",
+      "timestamp": "00:09:55"
+    },
+    {
+      "id": "t147",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Let's, let's get a blood test done. We can check your um, you know your full blood count, look for signs of anemia. We can have a check of your kidney function.",
+      "timestamp": "00:10:04"
+    },
+    {
+      "id": "t148",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, and we can definitely increase your um, your Furosemide, uh, to you know, one tablet twice a day.",
+      "timestamp": "00:10:12"
+    },
+    {
+      "id": "t149",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "But I really like, would like you to come back and see me in about a week's time, see how you're getting on. That sound reasonable?",
+      "timestamp": "00:10:20"
+    },
+    {
+      "id": "t150",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I think that sounds like a good plan.",
+      "timestamp": "00:10:26"
+    },
+    {
+      "id": "t151",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And of course, in the meantime if you are getting more unwell, feel like you're getting more breathless, or you're having any other symptoms like chest pain, or palpitations or dizziness, then, uh, you know I want you to give me a call sooner than that, and we can have a chat on the phone as well.",
+      "timestamp": "00:10:28"
+    },
+    {
+      "id": "t152",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK. I'll see how I get on.",
+      "timestamp": "00:10:43"
+    },
+    {
+      "id": "t153",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK? Do you have any questions for me?",
+      "timestamp": "00:10:45"
+    },
+    {
+      "id": "t154",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I think that's all pretty clear. Thank you very much Doctor.",
+      "timestamp": "00:10:48"
+    },
+    {
+      "id": "t155",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Great, and then well I wish you all the best! Have a good day. OK. Thank you.",
+      "timestamp": "00:10:51"
+    },
+    {
+      "id": "t156",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK. See you soon.",
+      "timestamp": "00:10:54"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "s0",
+      "text": "2/5 hx of SOB, worsening over the past 2/7. Feeling more SOB on minimal exertion, nil SOB at rest. No chest pain/palpitations. Assoc cough - mainly dry. No fevers. Has also noticed ankle odema bilaterally over past few days extending to shins. \nDiagnosed with heart failure previously and currently on diuretics. \nUrinary - Polyuria, nil else"
+    },
+    {
+      "id": "s1",
+      "text": "PMH: Heart failure, ?unstable angina \nDH: furosemide, aspirin, bisoprolol, simvastatin\nNKDA\nFH - father died of MI early 60s , mother - osteoporosis \nSH: lives alone, 2 cats , works part time as a lorry driver. Ex-smoker - a pack/d for 25 years. No etOH"
+    },
+    {
+      "id": "s2",
+      "text": "Imp: exacerbation of heart failure"
+    },
+    {
+      "id": "s3",
+      "text": "Plan:\n1.\tIncrease furosemide BD\n2.\tBlood tests, inc U+Es, FBC, BNP\n3.\tArrange echo \n4.\tReview in 7d, or earlier if worsening sx (chest pain, SOB, dizziness, etc)"
+    }
+  ]
+}

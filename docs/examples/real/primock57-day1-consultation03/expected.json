@@ -1,0 +1,257 @@
+{
+  "request_id": "primock57-day1-consultation03",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day1_consultation03",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 0,
+    "incorrect_statements_total": 9,
+    "incorrect_statements_mapped": 9,
+    "incorrect_statements_not_mapped": 0,
+    "omissions_excluded": 19
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 46
+        },
+        "end": {
+          "index": 0,
+          "char": 60
+        }
+      },
+      "claim_text": "gradual onset.",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "The clinician offered sudden or gradual onset. The patient did not pick either option, so the interview does not establish a gradual onset.",
+      "concerns": [
+        {
+          "type": "question_as_answer",
+          "explanation": "One option from the clinician's either-or question is recorded as the patient's answer.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "unsupported_claim",
+          "explanation": "The patient gave no description of how the headache began.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 14,
+              "char": 0
+            },
+            "end": {
+              "index": 15,
+              "char": 37
+            }
+          },
+          "note": "The clinician offers two kinds of onset; the patient says they do not know."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "non_critical",
+          "verbatim": "- gradual onset"
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "critical",
+          "verbatim": "! gradual onset."
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! gradual onset."
+        }
+      ],
+      "agreement": "3 of 5 evaluators with data"
+    },
+    {
+      "id": "k2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 267
+        },
+        "end": {
+          "index": 0,
+          "char": 295
+        }
+      },
+      "claim_text": "Also reports some neck pain.",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "The patient said the headache gets worse when moving the head or neck. They did not report pain in the neck itself.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "Movement making the headache worse is recorded as a separate neck pain complaint.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 18,
+              "char": 0
+            },
+            "end": {
+              "index": 21,
+              "char": 86
+            }
+          },
+          "note": "The patient links movement of the head or neck to a worse headache, not to neck pain."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! Also reports some neck pain."
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! Also reports some neck pain."
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "non_critical",
+          "verbatim": "- Also reports some neck pain.\nNil neck stiffness."
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "critical",
+          "verbatim": "! some neck pain."
+        }
+      ],
+      "agreement": "4 of 5 evaluators with data",
+      "mapping_note": "Evaluator 4's item continues onto a second line about neck stiffness; that line is mapped to the next claim."
+    },
+    {
+      "id": "k3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 296
+        },
+        "end": {
+          "index": 0,
+          "char": 315
+        }
+      },
+      "claim_text": "Nil neck stiffness.",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "Neck stiffness is not asked about or mentioned anywhere in the interview.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "The interview contains no question or answer about neck stiffness.",
+          "evidence_ids": []
+        }
+      ],
+      "evidence": [],
+      "labels": [
+        {
+          "evaluator": "evaluator_4",
+          "severity": "non_critical",
+          "verbatim": "- Also reports some neck pain.\nNil neck stiffness."
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data",
+      "mapping_note": "Second line of evaluator 4's neck pain item. The line has no severity marker of its own."
+    },
+    {
+      "id": "k4",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 0
+        },
+        "end": {
+          "index": 1,
+          "char": 51
+        }
+      },
+      "claim_text": "Similar episode 2/52 ago - resolved with analgesia.",
+      "expected_verdict": "partially_supported",
+      "explanation": "A similar headache that settled with painkillers is supported. The patient placed it only a few weeks ago; the note makes that exactly two weeks.",
+      "concerns": [
+        {
+          "type": "certainty_inflation",
+          "explanation": "A vague estimate of a few weeks becomes a precise two weeks.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 44,
+              "char": 0
+            },
+            "end": {
+              "index": 45,
+              "char": 98
+            }
+          },
+          "note": "The patient dates the earlier headache only loosely, as some weeks back."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 48,
+              "char": 0
+            },
+            "end": {
+              "index": 51,
+              "char": 71
+            }
+          },
+          "note": "The earlier headache lasted a couple of days and was eased with painkillers and rest."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "non_critical",
+          "verbatim": "- 2/52"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "non_critical",
+          "verbatim": "- 2/52"
+        }
+      ],
+      "agreement": "2 of 5 evaluators with data"
+    }
+  ]
+}

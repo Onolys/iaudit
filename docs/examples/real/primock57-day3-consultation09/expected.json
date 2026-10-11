@@ -1,0 +1,269 @@
+{
+  "request_id": "primock57-day3-consultation09",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day3_consultation09",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 0,
+    "incorrect_statements_total": 9,
+    "incorrect_statements_mapped": 9,
+    "incorrect_statements_not_mapped": 0,
+    "omissions_excluded": 49
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 38
+        },
+        "end": {
+          "index": 0,
+          "char": 91
+        }
+      },
+      "claim_text": "Mild weakness on holding things and playing the piano",
+      "expected_verdict": "partially_supported",
+      "explanation": "Difficulty playing the piano is supported. The patient first agreed about dropping things, then corrected it: they can grip a glass.",
+      "concerns": [
+        {
+          "type": "correction_ignored",
+          "explanation": "A yes that the patient later narrowed to the piano is kept as trouble holding things.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 38,
+              "char": 0
+            },
+            "end": {
+              "index": 42,
+              "char": 154
+            }
+          },
+          "note": "The patient says yes, then says gripping a glass is fine and only the piano is harder."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! on holding things and"
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data"
+    },
+    {
+      "id": "k2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 107
+        },
+        "end": {
+          "index": 0,
+          "char": 184
+        }
+      },
+      "claim_text": "Visual disturbace in the left peripheral field lasting 20 minutes 2 weeks ago",
+      "expected_verdict": "partially_supported",
+      "explanation": "A twenty-minute loss of part of the vision in the left eye is supported. \"Peripheral\" first appears in the clinician's question, and the patient dated the episode only to a few weeks ago.",
+      "concerns": [
+        {
+          "type": "question_as_answer",
+          "explanation": "The peripheral location comes from the clinician's wording, not the patient's answer.",
+          "evidence_ids": [
+            "e2"
+          ]
+        },
+        {
+          "type": "certainty_inflation",
+          "explanation": "A loose estimate of a few weeks becomes exactly two weeks.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 58,
+              "char": 0
+            },
+            "end": {
+              "index": 59,
+              "char": 124
+            }
+          },
+          "note": "The patient describes losing part of the left eye's vision a few weeks ago, for about twenty minutes."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 79,
+              "char": 0
+            },
+            "end": {
+              "index": 80,
+              "char": 280
+            }
+          },
+          "note": "The clinician introduces the peripheral wording; the patient answers only about how long it lasted."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! peripheral field"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! 2 weeks ago"
+        }
+      ],
+      "agreement": "2 of 5 evaluators with data"
+    },
+    {
+      "id": "k3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 228
+        },
+        "end": {
+          "index": 0,
+          "char": 293
+        }
+      },
+      "claim_text": "had vomiting over a month ago for 2 weeks , started after a party",
+      "expected_verdict": "partially_supported",
+      "explanation": "Two weeks of illness starting after a night out about a month ago is supported. The patient described a bad cold or flu and never mentioned vomiting.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "Being ill for two weeks is recorded as vomiting.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 52,
+              "char": 0
+            },
+            "end": {
+              "index": 55,
+              "char": 271
+            }
+          },
+          "note": "The patient describes a heavy night out followed by two weeks of being ill, which they think was flu."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! vomiting"
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "non_critical",
+          "verbatim": "- vomiting"
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! had vomiting over a month ago for 2 weeks , started after a party"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! had vomiting over a month ago for 2 weeks ,"
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "non_critical",
+          "verbatim": "- had vomiting over a month ago"
+        }
+      ],
+      "agreement": "5 of 5 evaluators with data",
+      "mapping_note": "The patient said she was \"sick\", which in British English can mean ill rather than vomiting. Evaluators read it as ill."
+    },
+    {
+      "id": "k4",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 398
+        },
+        "end": {
+          "index": 0,
+          "char": 457
+        }
+      },
+      "claim_text": "Medication: ibuprofen, Vitamin D , iron tablets , melatonin",
+      "expected_verdict": "partially_supported",
+      "explanation": "All four are mentioned. The patient said their GP wants them on iron but they mostly forget to take it.",
+      "concerns": [
+        {
+          "type": "context_stripping",
+          "explanation": "Iron that the patient mostly does not take is listed as a current medication without that limit.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 82,
+              "char": 0
+            },
+            "end": {
+              "index": 84,
+              "char": 77
+            }
+          },
+          "note": "The patient lists occasional ibuprofen, vitamin D, iron they usually forget, and occasional melatonin."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_2",
+          "severity": "non_critical",
+          "verbatim": "- iron tablets"
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data"
+    }
+  ]
+}

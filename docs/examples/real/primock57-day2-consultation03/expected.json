@@ -1,0 +1,182 @@
+{
+  "request_id": "primock57-day2-consultation03",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day2_consultation03",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 0,
+    "incorrect_statements_total": 9,
+    "incorrect_statements_mapped": 8,
+    "incorrect_statements_not_mapped": 1,
+    "omissions_excluded": 23
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 70
+        }
+      },
+      "claim_text": "Hx: 1 week history of left side difficulty hearing and facial numbness",
+      "expected_verdict": "partially_supported",
+      "explanation": "Left-sided hearing difficulty and facial numbness are supported. The patient put the start at about three weeks, not one.",
+      "concerns": [
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "A duration of about three weeks is recorded as one week.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 10,
+              "char": 0
+            },
+            "end": {
+              "index": 10,
+              "char": 159
+            }
+          },
+          "note": "The patient reports reduced hearing and a numb face."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 11,
+              "char": 0
+            },
+            "end": {
+              "index": 12,
+              "char": 82
+            }
+          },
+          "note": "Asked how long, the patient says a few weeks, about three."
+        },
+        {
+          "id": "e3",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 13,
+              "char": 0
+            },
+            "end": {
+              "index": 16,
+              "char": 159
+            }
+          },
+          "note": "Both symptoms are on the left side."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! 1 week"
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "non_critical",
+          "verbatim": "- 13 week history"
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! 1 week"
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "non_critical",
+          "verbatim": "- 1 week history"
+        }
+      ],
+      "agreement": "4 of 5 evaluators with data",
+      "mapping_note": "Evaluator 2's \"13 week\" is read as a typo for \"1 week\", since the note says 1 week."
+    },
+    {
+      "id": "k2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 473
+        },
+        "end": {
+          "index": 0,
+          "char": 486
+        }
+      },
+      "claim_text": "No FH of note",
+      "expected_verdict": "contradicted",
+      "explanation": "Asked about family illness, the patient said their brother had neurofibromatosis.",
+      "concerns": [
+        {
+          "type": "contradictory_evidence",
+          "explanation": "A reported family condition conflicts with \"no family history of note\".",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 55,
+              "char": 0
+            },
+            "end": {
+              "index": 56,
+              "char": 90
+            }
+          },
+          "note": "The patient reports a sibling's neurological condition."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! No FH of note"
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "non_critical",
+          "verbatim": "- No FH of note"
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! No FH of note"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! No FH of note"
+        }
+      ],
+      "agreement": "4 of 5 evaluators with data"
+    }
+  ]
+}

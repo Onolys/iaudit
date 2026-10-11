@@ -1,0 +1,859 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "primock57-day4-consultation03",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hi.",
+      "timestamp": "00:00:01"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Hey.",
+      "timestamp": "00:00:01"
+    },
+    {
+      "id": "t2",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hi. Can you hear me?",
+      "timestamp": "00:00:06"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah. I can hear you.",
+      "timestamp": "00:00:07"
+    },
+    {
+      "id": "t4",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Good. Um, my name is Doctor Gohil. I'm one of the physicians that works here at Babylon.",
+      "timestamp": "00:00:08"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK.",
+      "timestamp": "00:00:14"
+    },
+    {
+      "id": "t6",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "May I confirm your name and date of birth, please?",
+      "timestamp": "00:00:14"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, uh, my name is Sarah Smith. And, my date of birth is the twentieth of April nineteen eighty.",
+      "timestamp": "00:00:17"
+    },
+    {
+      "id": "t8",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Great.",
+      "timestamp": "00:00:26"
+    },
+    {
+      "id": "t9",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Nineteen eighty three. And, are you in a space that's private and quiet, and you can talk?",
+      "timestamp": "00:00:27"
+    },
+    {
+      "id": "t10",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:00:28"
+    },
+    {
+      "id": "t11",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:00:32"
+    },
+    {
+      "id": "t12",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Good. So, it says, erm, I've got a note to say, it says you're feeling short of breath. Is that correct?",
+      "timestamp": "00:00:33"
+    },
+    {
+      "id": "t13",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, yeah.",
+      "timestamp": "00:00:39"
+    },
+    {
+      "id": "t14",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Are you able to tell me a little bit more about that?",
+      "timestamp": "00:00:41"
+    },
+    {
+      "id": "t15",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah. I was watching TV and, um, just like over the last hour, I've started to feel, like, a bit short of breath.",
+      "timestamp": "00:00:44"
+    },
+    {
+      "id": "t16",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "That is, while you're sitting watching TV?",
+      "timestamp": "00:00:53"
+    },
+    {
+      "id": "t17",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:00:55"
+    },
+    {
+      "id": "t18",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, have you noticed anything like this before?",
+      "timestamp": "00:00:57"
+    },
+    {
+      "id": "t19",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, no.",
+      "timestamp": "00:01:00"
+    },
+    {
+      "id": "t20",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, apart from the shortness of breath, have you noticed anything else?",
+      "timestamp": "00:01:04"
+    },
+    {
+      "id": "t21",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, so, I , I started with a cough yesterday.",
+      "timestamp": "00:01:08"
+    },
+    {
+      "id": "t22",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:01:12"
+    },
+    {
+      "id": "t23",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um.",
+      "timestamp": "00:01:15"
+    },
+    {
+      "id": "t24",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah. I, I don't know if it's, um, relevant, but I had a C-section a few weeks ago.",
+      "timestamp": "00:01:17"
+    },
+    {
+      "id": "t25",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, how long ago was that? Just a few weeks?",
+      "timestamp": "00:01:23"
+    },
+    {
+      "id": "t26",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, four weeks.",
+      "timestamp": "00:01:26"
+    },
+    {
+      "id": "t27",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, are you with baby at the moment?",
+      "timestamp": "00:01:27"
+    },
+    {
+      "id": "t28",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, I am.",
+      "timestamp": "00:01:29"
+    },
+    {
+      "id": "t29",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, how is baby doing?",
+      "timestamp": "00:01:31"
+    },
+    {
+      "id": "t30",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah. .",
+      "timestamp": "00:01:33"
+    },
+    {
+      "id": "t31",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Any coughs or colds with, uh, them?",
+      "timestamp": "00:01:35"
+    },
+    {
+      "id": "t32",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, no. He's fine.",
+      "timestamp": "00:01:38"
+    },
+    {
+      "id": "t33",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, you've noticed shortness of breath for just an hour, while sitting and watching TV?",
+      "timestamp": "00:01:40"
+    },
+    {
+      "id": "t34",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yep.",
+      "timestamp": "00:01:43"
+    },
+    {
+      "id": "t35",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mm-hmm.",
+      "timestamp": "00:01:45"
+    },
+    {
+      "id": "t36",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, you had your C-section a couple of weeks ago?",
+      "timestamp": "00:01:45"
+    },
+    {
+      "id": "t37",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:01:49"
+    },
+    {
+      "id": "t38",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, yesterday you noticed a cough?",
+      "timestamp": "00:01:49"
+    },
+    {
+      "id": "t39",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:01:52"
+    },
+    {
+      "id": "t40",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, talk to me about the cough. Have you bought anything up?",
+      "timestamp": "00:01:53"
+    },
+    {
+      "id": "t41",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no, I haven't, no.",
+      "timestamp": "00:01:56"
+    },
+    {
+      "id": "t42",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, when was the last time you were ill with the flu, or symptoms like this?",
+      "timestamp": "00:01:58"
+    },
+    {
+      "id": "t43",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, you know, I get coughs and colds quite a lot, but probably.",
+      "timestamp": "00:02:03"
+    },
+    {
+      "id": "t44",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Good few months ago.",
+      "timestamp": "00:02:09"
+    },
+    {
+      "id": "t45",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, this shortness of breath you're having, is it getting worse?",
+      "timestamp": "00:02:11"
+    },
+    {
+      "id": "t46",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um.",
+      "timestamp": "00:02:17"
+    },
+    {
+      "id": "t47",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No. I mean, I don't know. I feel like I'm getting really stressed out because, like, my heart, it's really going.",
+      "timestamp": "00:02:19"
+    },
+    {
+      "id": "t48",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, you're feeling your heart more than normal?",
+      "timestamp": "00:02:25"
+    },
+    {
+      "id": "t49",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:02:28"
+    },
+    {
+      "id": "t50",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, the shortness of breath, does it cause any pain in your chest?",
+      "timestamp": "00:02:30"
+    },
+    {
+      "id": "t51",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, no.",
+      "timestamp": "00:02:35"
+    },
+    {
+      "id": "t52",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "How about when you take a very deep breath in?",
+      "timestamp": "00:02:37"
+    },
+    {
+      "id": "t53",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, I mean, yeah. My chest feels sore, but so does my C-section scar. You know, it's, it's all tender.",
+      "timestamp": "00:02:42"
+    },
+    {
+      "id": "t54",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:02:48"
+    },
+    {
+      "id": "t55",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, since your C-section, did you have to take any medications?",
+      "timestamp": "00:02:50"
+    },
+    {
+      "id": "t56",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, no. Just some painkillers.",
+      "timestamp": "00:02:54"
+    },
+    {
+      "id": "t57",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "All right. And, can you remember what the name of those were?",
+      "timestamp": "00:02:59"
+    },
+    {
+      "id": "t58",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, they gave me some, uh, Codeine.",
+      "timestamp": "00:03:02"
+    },
+    {
+      "id": "t59",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, have you had to use that regularly?",
+      "timestamp": "00:03:07"
+    },
+    {
+      "id": "t60",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah. I, I've been taking that fairly, fairly regularly. But, probably haven't taken it for a week.",
+      "timestamp": "00:03:09"
+    },
+    {
+      "id": "t61",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, apart from the C-section and the shortness of breath, have you got any other medical problems I should know about?",
+      "timestamp": "00:03:15"
+    },
+    {
+      "id": "t62",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:03:19"
+    },
+    {
+      "id": "t63",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, no.",
+      "timestamp": "00:03:22"
+    },
+    {
+      "id": "t64",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, you were .",
+      "timestamp": "00:03:25"
+    },
+    {
+      "id": "t65",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "tell you, I'm allergic to Ibuprofen, though.",
+      "timestamp": "00:03:25"
+    },
+    {
+      "id": "t66",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:03:28"
+    },
+    {
+      "id": "t67",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, what happens when you take Ibuprofen?",
+      "timestamp": "00:03:30"
+    },
+    {
+      "id": "t68",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um.",
+      "timestamp": "00:03:32"
+    },
+    {
+      "id": "t69",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I don't know. Sorry.",
+      "timestamp": "00:03:34"
+    },
+    {
+      "id": "t70",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, I need you to do something for me. Have you measured the rate of your heart before?",
+      "timestamp": "00:03:38"
+    },
+    {
+      "id": "t71",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yes.",
+      "timestamp": "00:03:43"
+    },
+    {
+      "id": "t72",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Have you measured it recently, either with an iWatch or something similar?",
+      "timestamp": "00:03:44"
+    },
+    {
+      "id": "t73",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, I haven't, no.",
+      "timestamp": "00:03:48"
+    },
+    {
+      "id": "t74",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. We might need to do that over the phone. So, are you able to put your right hand on your left wrist, just underneath your thumb? And, see if you can feel your heartbeat.",
+      "timestamp": "00:03:49"
+    },
+    {
+      "id": "t75",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yep.",
+      "timestamp": "00:03:58"
+    },
+    {
+      "id": "t76",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yep.",
+      "timestamp": "00:04:01"
+    },
+    {
+      "id": "t77",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, uh, what I need you to do is, when I count to three, count down from three, just count the number of beats you've noticed. And, I'll tell you when to stop. Is that OK?",
+      "timestamp": "00:04:02"
+    },
+    {
+      "id": "t78",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mm-hmm.",
+      "timestamp": "00:04:08"
+    },
+    {
+      "id": "t79",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yep.",
+      "timestamp": "00:04:10"
+    },
+    {
+      "id": "t80",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, we'll start in three, two, one. Go.",
+      "timestamp": "00:04:10"
+    },
+    {
+      "id": "t81",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Great. That should be enough. How many did you count?",
+      "timestamp": "00:04:23"
+    },
+    {
+      "id": "t82",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I counted thirty.",
+      "timestamp": "00:04:26"
+    },
+    {
+      "id": "t83",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Good.",
+      "timestamp": "00:04:31"
+    },
+    {
+      "id": "t84",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, your heart is running slightly fast at the moment, which is probably because of the shortness of breath and some of the pain that you're under.",
+      "timestamp": "00:04:33"
+    },
+    {
+      "id": "t85",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mm-hmm.",
+      "timestamp": "00:04:36"
+    },
+    {
+      "id": "t86",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK.",
+      "timestamp": "00:04:40"
+    },
+    {
+      "id": "t87",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Given that you've had a C-section, and you're short of breath, which has come on quite recently and quite quickly",
+      "timestamp": "00:04:42"
+    },
+    {
+      "id": "t88",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "It might be worth you going into the hospital to get checked out the bit further.",
+      "timestamp": "00:04:48"
+    },
+    {
+      "id": "t89",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK.",
+      "timestamp": "00:04:53"
+    },
+    {
+      "id": "t90",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, there's two ways of us doing this. The first is, I can call an ambulance. Or, you can take yourself to the hospital with baby.",
+      "timestamp": "00:04:54"
+    },
+    {
+      "id": "t91",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mm-hmm.",
+      "timestamp": "00:05:02"
+    },
+    {
+      "id": "t92",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Which one would you prefer?",
+      "timestamp": "00:05:03"
+    },
+    {
+      "id": "t93",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, it feels a bit dramatic to call an ambulance. Um, I, I will, I will go. I will, I will take myself.",
+      "timestamp": "00:05:05"
+    },
+    {
+      "id": "t94",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Sure. And, what I would suggest is, go fairly quickly and take some bits for baby at the same time.",
+      "timestamp": "00:05:11"
+    },
+    {
+      "id": "t95",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK.",
+      "timestamp": "00:05:17"
+    },
+    {
+      "id": "t96",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, if you're taking any medications like Codeine, don't, don't take them for the time being.",
+      "timestamp": "00:05:18"
+    },
+    {
+      "id": "t97",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mm-hmm, OK.",
+      "timestamp": "00:05:23"
+    },
+    {
+      "id": "t98",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Is anyone else with you at home?",
+      "timestamp": "00:05:24"
+    },
+    {
+      "id": "t99",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no. My partner's at work.",
+      "timestamp": "00:05:26"
+    },
+    {
+      "id": "t100",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:05:28"
+    },
+    {
+      "id": "t101",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, I think that's the best thing to do, for the time being.",
+      "timestamp": "00:05:30"
+    },
+    {
+      "id": "t102",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mm-hmm.",
+      "timestamp": "00:05:33"
+    },
+    {
+      "id": "t103",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, what I'm worried about at the moment is, given that you've had a C-section",
+      "timestamp": "00:05:34"
+    },
+    {
+      "id": "t104",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Some people can suffer with clots. And, those can either be found in the legs or your chest, so in your lungs.",
+      "timestamp": "00:05:38"
+    },
+    {
+      "id": "t105",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:05:45"
+    },
+    {
+      "id": "t106",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "It's quite a common thing to happen. And, it's not something to worry about. But, needs to be checked out in the hospital first.",
+      "timestamp": "00:05:45"
+    },
+    {
+      "id": "t107",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK.",
+      "timestamp": "00:05:51"
+    },
+    {
+      "id": "t108",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, if it, if that does become the case, they can give you something to reduce the clot.",
+      "timestamp": "00:05:51"
+    },
+    {
+      "id": "t109",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "All right, OK. That makes sense.",
+      "timestamp": "00:05:56"
+    },
+    {
+      "id": "t110",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Fairly quick process.",
+      "timestamp": "00:05:57"
+    },
+    {
+      "id": "t111",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK. Yeah. I mean, my mum's had, uh, clots in her legs before. So, I guess, you know.",
+      "timestamp": "00:05:59"
+    },
+    {
+      "id": "t112",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, that makes sense. I know, I know what they are.",
+      "timestamp": "00:06:05"
+    },
+    {
+      "id": "t113",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Good. Are you, uh, are you particularly worried about anything, or do you want to ask me anything, before we go?",
+      "timestamp": "00:06:09"
+    },
+    {
+      "id": "t114",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, no. I'm fine. I'll, uh, I'll just take myself to the hospital.",
+      "timestamp": "00:06:13"
+    },
+    {
+      "id": "t115",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Great. Thank you so much.",
+      "timestamp": "00:06:17"
+    },
+    {
+      "id": "t116",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "All right. Thank you. Bye.",
+      "timestamp": "00:06:18"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "s0",
+      "text": "PC SOBAR, c section 2-3 weeks ago"
+    },
+    {
+      "id": "s1",
+      "text": "HPC;\nSOBAR while watching tv, acute onset.  Cough 1/7 previously, unproductive.\nNo fever, no chills, non positional.\nNo chest pain, no pain on inspiration"
+    },
+    {
+      "id": "s2",
+      "text": "C section 2-3 weeks ago. No complications, baby well.  No symptoms.\nNo of blood thinners."
+    },
+    {
+      "id": "s3",
+      "text": "PMHx nill\nDhx. allergies to ibuprofen"
+    },
+    {
+      "id": "s4",
+      "text": "Oex HR via telephone roughly 120bpm . tachy, regular"
+    },
+    {
+      "id": "s5",
+      "text": "FHx,\nMother hx of clots on legs."
+    },
+    {
+      "id": "s6",
+      "text": "DDx: PE"
+    },
+    {
+      "id": "s7",
+      "text": "Plan : Further examination and investigation in acute setting."
+    }
+  ]
+}

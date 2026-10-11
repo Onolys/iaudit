@@ -1,0 +1,1143 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "primock57-day4-consultation02",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You have to do it, part of your training as a doctor.",
+      "timestamp": "00:00:00"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Hello.",
+      "timestamp": "00:00:02"
+    },
+    {
+      "id": "t2",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hi.",
+      "timestamp": "00:00:03"
+    },
+    {
+      "id": "t3",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hi. Can you hear me?",
+      "timestamp": "00:00:05"
+    },
+    {
+      "id": "t4",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ". Yes, I can hear fine.",
+      "timestamp": "00:00:06"
+    },
+    {
+      "id": "t5",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hi. My name's Doctor Gohill, I'm one of the general practitioners, that works here. Can I check your name and date of birth please?",
+      "timestamp": "00:00:08"
+    },
+    {
+      "id": "t6",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I am, uh, Patrick Smith.",
+      "timestamp": "00:00:16"
+    },
+    {
+      "id": "t7",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hi.",
+      "timestamp": "00:00:20"
+    },
+    {
+      "id": "t8",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, thirty five years old.",
+      "timestamp": "00:00:21"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, October, seventh. Uh.",
+      "timestamp": "00:00:25"
+    },
+    {
+      "id": "t10",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "ninety , three something.",
+      "timestamp": "00:00:28"
+    },
+    {
+      "id": "t11",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Great.",
+      "timestamp": "00:00:31"
+    },
+    {
+      "id": "t12",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And Patrick, are you in a, space, that's private and quiet?",
+      "timestamp": "00:00:33"
+    },
+    {
+      "id": "t13",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:00:37"
+    },
+    {
+      "id": "t14",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Great, and so, we're OK to chat?",
+      "timestamp": "00:00:38"
+    },
+    {
+      "id": "t15",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, we are.",
+      "timestamp": "00:00:40"
+    },
+    {
+      "id": "t16",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So it says here, um, you are feeling hot, and have had severe headaches. Is that correct?",
+      "timestamp": "00:00:41"
+    },
+    {
+      "id": "t17",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah. It's, it's really affecting my work. Uh, uh, it comes and goes. Uh.",
+      "timestamp": "00:00:49"
+    },
+    {
+      "id": "t18",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I kind of, feel like, uh, it's, it's hard 'cause I, I , kinda lose my appetite.",
+      "timestamp": "00:00:55"
+    },
+    {
+      "id": "t19",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Also. Uh, one thing that's kinda weird is, I just sometimes also get like some, tingling in my arms.",
+      "timestamp": "00:01:02"
+    },
+    {
+      "id": "t20",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:01:10"
+    },
+    {
+      "id": "t21",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ". And, like, especially if, for example when I, come into the elevator, in the morning.",
+      "timestamp": "00:01:10"
+    },
+    {
+      "id": "t22",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:01:18"
+    },
+    {
+      "id": "t23",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I, I can uh, of have, my heart is beating, kinda fast.",
+      "timestamp": "00:01:19"
+    },
+    {
+      "id": "t24",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:01:23"
+    },
+    {
+      "id": "t25",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, those are lots of things. Are they all happening at the same time?",
+      "timestamp": "00:01:24"
+    },
+    {
+      "id": "t26",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Almost randomly like. Yeah, it's, it's, it's at different , times.",
+      "timestamp": "00:01:28"
+    },
+    {
+      "id": "t27",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, do they all happen at the same time? Or is it one thing one time, and one ?",
+      "timestamp": "00:01:33"
+    },
+    {
+      "id": "t28",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", one time, one thing at a time.",
+      "timestamp": "00:01:37"
+    },
+    {
+      "id": "t29",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, let's start with the headaches. When they do come, do you have any idea the headache is going to come?",
+      "timestamp": "00:01:39"
+    },
+    {
+      "id": "t30",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, not really but, generally during, work times.",
+      "timestamp": "00:01:48"
+    },
+    {
+      "id": "t31",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, it's normally at work?",
+      "timestamp": "00:01:53"
+    },
+    {
+      "id": "t32",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I'm at work, I'm in a meeting, or on my laptop.",
+      "timestamp": "00:01:56"
+    },
+    {
+      "id": "t33",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, where does the headache sit in your head? Is it the front, or the back?",
+      "timestamp": "00:01:57"
+    },
+    {
+      "id": "t34",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, I can't say, so like, kind of over.",
+      "timestamp": "00:02:04"
+    },
+    {
+      "id": "t35",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ". OK. And, does it else?",
+      "timestamp": "00:02:08"
+    },
+    {
+      "id": "t36",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Does it go anywhere else?",
+      "timestamp": "00:02:14"
+    },
+    {
+      "id": "t37",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", the headache? No, it's mostly in the front, and then yeah, it just kind of stays there.",
+      "timestamp": "00:02:15"
+    },
+    {
+      "id": "t38",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, when you have the headaches, specifically, do you feel sick?",
+      "timestamp": "00:02:21"
+    },
+    {
+      "id": "t39",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:02:25"
+    },
+    {
+      "id": "t40",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", not, not, not really, but it's like, making it hard. I, yeah, I kind of feel a little bit nauseous maybe. Um.",
+      "timestamp": "00:02:30"
+    },
+    {
+      "id": "t41",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:02:35"
+    },
+    {
+      "id": "t42",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And sometimes I also feel like.",
+      "timestamp": "00:02:38"
+    },
+    {
+      "id": "t43",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah. It's like uh, maybe, probably, breathing or something.",
+      "timestamp": "00:02:41"
+    },
+    {
+      "id": "t44",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:02:48"
+    },
+    {
+      "id": "t45",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No.",
+      "timestamp": "00:02:49"
+    },
+    {
+      "id": "t46",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, do you normally get headaches, before all of this started?",
+      "timestamp": "00:02:49"
+    },
+    {
+      "id": "t47",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, so.",
+      "timestamp": "00:02:55"
+    },
+    {
+      "id": "t48",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, I, I feel like my, like, health situation was mostly under control.",
+      "timestamp": "00:02:57"
+    },
+    {
+      "id": "t49",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:03:00"
+    },
+    {
+      "id": "t50",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:03:01"
+    },
+    {
+      "id": "t51",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And then let's.",
+      "timestamp": "00:03:03"
+    },
+    {
+      "id": "t52",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "But it , it started roughly when I changed jobs.",
+      "timestamp": "00:03:03"
+    },
+    {
+      "id": "t53",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, talk to me about your job, what do you do?",
+      "timestamp": "00:03:06"
+    },
+    {
+      "id": "t54",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I'm a lawyer.",
+      "timestamp": "00:03:09"
+    },
+    {
+      "id": "t55",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, do you work in London at the moment?",
+      "timestamp": "00:03:11"
+    },
+    {
+      "id": "t56",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:03:15"
+    },
+    {
+      "id": "t57",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, do you get these headaches on your commute in to work?",
+      "timestamp": "00:03:16"
+    },
+    {
+      "id": "t58",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Not really. I get it, mostly when I'm, at work.",
+      "timestamp": "00:03:21"
+    },
+    {
+      "id": "t59",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, and tell me about what you do. Do you sit in front of a computer most of the time? Or do you speak to people?",
+      "timestamp": "00:03:24"
+    },
+    {
+      "id": "t60",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Like fifty-fifty. I go to meetings and then uh, sit in front of a computer.",
+      "timestamp": "00:03:30"
+    },
+    {
+      "id": "t61",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:03:34"
+    },
+    {
+      "id": "t62",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "There's a lot of reading.",
+      "timestamp": "00:03:35"
+    },
+    {
+      "id": "t63",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, these things have happened mostly when you're sitting at your computer?",
+      "timestamp": "00:03:36"
+    },
+    {
+      "id": "t64",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um.",
+      "timestamp": "00:03:43"
+    },
+    {
+      "id": "t65",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", yeah, it happens then, yeah.",
+      "timestamp": "00:03:46"
+    },
+    {
+      "id": "t66",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, and tell me, what did you do, before being a lawyer?",
+      "timestamp": "00:03:49"
+    },
+    {
+      "id": "t67",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no, I was a lawyer at previous job as well.",
+      "timestamp": "00:03:54"
+    },
+    {
+      "id": "t68",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:03:56"
+    },
+    {
+      "id": "t69",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, talk to me about the stress that you're under at the moment. If, uh, ten out of ten is, extremely stressful, and one out of ten is being on vacation. Where would moment?",
+      "timestamp": "00:03:58"
+    },
+    {
+      "id": "t70",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Think it's, seven, or eight.",
+      "timestamp": "00:04:09"
+    },
+    {
+      "id": "t71",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, is that normal for you?",
+      "timestamp": "00:04:11"
+    },
+    {
+      "id": "t72",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, it's like, a law firm, like, there's always pressure.",
+      "timestamp": "00:04:15"
+    },
+    {
+      "id": "t73",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:04:18"
+    },
+    {
+      "id": "t74",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, you mentioned your headaches. You also mentioned your reduced appetite. So, you don't want to eat as much.",
+      "timestamp": "00:04:20"
+    },
+    {
+      "id": "t75",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:04:26"
+    },
+    {
+      "id": "t76",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Have you lost weight?",
+      "timestamp": "00:04:26"
+    },
+    {
+      "id": "t77",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:04:29"
+    },
+    {
+      "id": "t78",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Can you remember how much you've lost?",
+      "timestamp": "00:04:30"
+    },
+    {
+      "id": "t79",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Five pounds.",
+      "timestamp": "00:04:33"
+    },
+    {
+      "id": "t80",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, is that because you're going to the gym? Or is that unintentional?",
+      "timestamp": "00:04:35"
+    },
+    {
+      "id": "t81",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "It's not intentional, no.",
+      "timestamp": "00:04:39"
+    },
+    {
+      "id": "t82",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, have you noticed your clothes feeling looser?",
+      "timestamp": "00:04:40"
+    },
+    {
+      "id": "t83",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", not really, ah, no.",
+      "timestamp": "00:04:45"
+    },
+    {
+      "id": "t84",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, have people said, or commented that you've lost weight?",
+      "timestamp": "00:04:49"
+    },
+    {
+      "id": "t85",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No.",
+      "timestamp": "00:04:52"
+    },
+    {
+      "id": "t86",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Great. And, another thing that you also mentioned. Is that you noticed tingling in your hand.",
+      "timestamp": "00:04:54"
+    },
+    {
+      "id": "t87",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:05:00"
+    },
+    {
+      "id": "t88",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, talk to me about that. Is it in one hand? Or both hands?",
+      "timestamp": "00:05:01"
+    },
+    {
+      "id": "t89",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Both.",
+      "timestamp": "00:05:05"
+    },
+    {
+      "id": "t90",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, do you get that in your legs as well?",
+      "timestamp": "00:05:06"
+    },
+    {
+      "id": "t91",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No.",
+      "timestamp": "00:05:08"
+    },
+    {
+      "id": "t92",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, what does it feel like, the tingling?",
+      "timestamp": "00:05:11"
+    },
+    {
+      "id": "t93",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Quick picking, yeah.",
+      "timestamp": "00:05:14"
+    },
+    {
+      "id": "t94",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And again, is this the first time you've noticed this?",
+      "timestamp": "00:05:18"
+    },
+    {
+      "id": "t95",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:05:22"
+    },
+    {
+      "id": "t96",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:05:23"
+    },
+    {
+      "id": "t97",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And the other two things that I've just, jotted down. Is, you're feeling hot, but you didn't mention that.",
+      "timestamp": "00:05:25"
+    },
+    {
+      "id": "t98",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Is that correct?",
+      "timestamp": "00:05:31"
+    },
+    {
+      "id": "t99",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, but like.",
+      "timestamp": "00:05:34"
+    },
+    {
+      "id": "t100",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I would say like, I get this like, feeling of, short, like, , short of breath, sometimes.",
+      "timestamp": "00:05:36"
+    },
+    {
+      "id": "t101",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:05:41"
+    },
+    {
+      "id": "t102",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "So, like, that could be what, you we're, referring to.",
+      "timestamp": "00:05:43"
+    },
+    {
+      "id": "t103",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yes. So, do you feel short of breath while you're sitting at your desk?",
+      "timestamp": "00:05:46"
+    },
+    {
+      "id": "t104",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, no. Yes. Sorry, yeah.",
+      "timestamp": "00:05:50"
+    },
+    {
+      "id": "t105",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ". OK. And, how about when you're exercising?",
+      "timestamp": "00:05:52"
+    },
+    {
+      "id": "t106",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No.",
+      "timestamp": "00:05:58"
+    },
+    {
+      "id": "t107",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:05:59"
+    },
+    {
+      "id": "t108",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And the last thing is. You mentioned that you noticed your heart beating?",
+      "timestamp": "00:06:00"
+    },
+    {
+      "id": "t109",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:06:05"
+    },
+    {
+      "id": "t110",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Again, how often do you get that?",
+      "timestamp": "00:06:06"
+    },
+    {
+      "id": "t111",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I, I, when I like, it's maybe once a day, uh, maybe more. Uh.",
+      "timestamp": "00:06:10"
+    },
+    {
+      "id": "t112",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "There's one more thing that I, I think I should mention, like, I do have like, some loss of libido at home.",
+      "timestamp": "00:06:17"
+    },
+    {
+      "id": "t113",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. How long has that been happening for?",
+      "timestamp": "00:06:22"
+    },
+    {
+      "id": "t114",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Same amount of time really, like, since I changed my job.",
+      "timestamp": "00:06:27"
+    },
+    {
+      "id": "t115",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Fine. And, apart from all of these things that you've told me. Do you have any other medical problems?",
+      "timestamp": "00:06:32"
+    },
+    {
+      "id": "t116",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, well I have, hyperthyroidism.",
+      "timestamp": "00:06:38"
+    },
+    {
+      "id": "t117",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, do you take medications for that?",
+      "timestamp": "00:06:42"
+    },
+    {
+      "id": "t118",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Thyroxine.",
+      "timestamp": "00:06:45"
+    },
+    {
+      "id": "t119",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, are you remembering to take your medications?",
+      "timestamp": "00:06:47"
+    },
+    {
+      "id": "t120",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:06:50"
+    },
+    {
+      "id": "t121",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, do you drink or smoke?",
+      "timestamp": "00:06:51"
+    },
+    {
+      "id": "t122",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:06:54"
+    },
+    {
+      "id": "t123",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "How much do you drink?",
+      "timestamp": "00:06:55"
+    },
+    {
+      "id": "t124",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Like, once a week, couple of glasses, of wine.",
+      "timestamp": "00:06:58"
+    },
+    {
+      "id": "t125",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, how about smoking?",
+      "timestamp": "00:07:00"
+    },
+    {
+      "id": "t126",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No.",
+      "timestamp": "00:07:02"
+    },
+    {
+      "id": "t127",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And, uh, I need to ask this to all of my patients, but do you do anything else recreational, in terms of drugs?",
+      "timestamp": "00:07:04"
+    },
+    {
+      "id": "t128",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No.",
+      "timestamp": "00:07:13"
+    },
+    {
+      "id": "t129",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, you've never taken cocaine, or marijuana?",
+      "timestamp": "00:07:15"
+    },
+    {
+      "id": "t130",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ". No.",
+      "timestamp": "00:07:17"
+    },
+    {
+      "id": "t131",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, thank you. And, are you allergic to anything?",
+      "timestamp": "00:07:20"
+    },
+    {
+      "id": "t132",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Good. So, you've told me lots of things happening to you at the moment, and I can understand, they probably feel quite strange and unusual.",
+      "timestamp": "00:07:26"
+    },
+    {
+      "id": "t133",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:07:33"
+    },
+    {
+      "id": "t134",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, I think the best course of action is, you come and see, one of our doctors, in the clinic.",
+      "timestamp": "00:07:34"
+    },
+    {
+      "id": "t135",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:07:39"
+    },
+    {
+      "id": "t136",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "We can give you an examination, and what that means is, we check your heart and your breathing.",
+      "timestamp": "00:07:40"
+    },
+    {
+      "id": "t137",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:07:45"
+    },
+    {
+      "id": "t138",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Make sure that those things are functioning correctly.",
+      "timestamp": "00:07:45"
+    },
+    {
+      "id": "t139",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:07:48"
+    },
+    {
+      "id": "t140",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And probably do some blood tests, for your thyroxine.",
+      "timestamp": "00:07:48"
+    },
+    {
+      "id": "t141",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yep.",
+      "timestamp": "00:07:52"
+    },
+    {
+      "id": "t142",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And take it from there. How does that sound?",
+      "timestamp": "00:07:52"
+    },
+    {
+      "id": "t143",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "That sounds, uh, very good. Thank you.",
+      "timestamp": "00:07:55"
+    },
+    {
+      "id": "t144",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "I think before we give you any medications, we should see you in person.",
+      "timestamp": "00:07:57"
+    },
+    {
+      "id": "t145",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK. .",
+      "timestamp": "00:08:01"
+    },
+    {
+      "id": "t146",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So, what we're going to do is book an appointment. Or I think you can book an appointment through the app, to come and see us clinic, and see one of my colleagues.",
+      "timestamp": "00:08:02"
+    },
+    {
+      "id": "t147",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yep.",
+      "timestamp": "00:08:07"
+    },
+    {
+      "id": "t148",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yep.",
+      "timestamp": "00:08:08"
+    },
+    {
+      "id": "t149",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yep.",
+      "timestamp": "00:08:10"
+    },
+    {
+      "id": "t150",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "I'll let them know what you've told me today, so you won't have to repeat exactly what you've said.",
+      "timestamp": "00:08:11"
+    },
+    {
+      "id": "t151",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Thank you.",
+      "timestamp": "00:08:15"
+    },
+    {
+      "id": "t152",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Great. Do you have any questions?",
+      "timestamp": "00:08:16"
+    },
+    {
+      "id": "t153",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Right.",
+      "timestamp": "00:08:17"
+    },
+    {
+      "id": "t154",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, that was it. Thank you very much.",
+      "timestamp": "00:08:19"
+    },
+    {
+      "id": "t155",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Thank you very much.",
+      "timestamp": "00:08:20"
+    },
+    {
+      "id": "t156",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yep, bye.",
+      "timestamp": "00:08:21"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "s0",
+      "text": "PC. Headaches, loss of appetite, tingling, feel hot, palpitations,  acute onset, at random times of the day while at work (lawyer)"
+    },
+    {
+      "id": "s1",
+      "text": "HPC: \nPC started when started new job (lawer, high stress, works in front of a computer)\nHeadaches:\n-\tNo pre aura, \n-\tFrontal\n-\tNo radiation\n-\tSome nausea  no vomiting,\n-\tNo pmhx of headache."
+    },
+    {
+      "id": "s2",
+      "text": "Reduced appetite, with unintentional weight loss, loss of 5lbs \nPins and needles in both arms, no radiation to legs, maintains motor and sense, no loss of function\nFevers with headaches \nPalpitations with mild SOBOE and SOBAR."
+    },
+    {
+      "id": "s3",
+      "text": "Symptoms occur at random times of the day while at work, with no pre-symptoms, sometimes together, sometimes individually."
+    },
+    {
+      "id": "s4",
+      "text": "PMHx , hypothyroid."
+    },
+    {
+      "id": "s5",
+      "text": "DHx allergies - nil\nThyroxine."
+    },
+    {
+      "id": "s6",
+      "text": "SHx lawer , stressful job."
+    },
+    {
+      "id": "s7",
+      "text": "DDx ??hypothyroid?"
+    },
+    {
+      "id": "s8",
+      "text": "Plans : requires further examination and blood tests."
+    }
+  ]
+}

@@ -1,0 +1,1179 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "primock57-day1-consultation07",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hello?",
+      "timestamp": "00:00:02"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Hello?",
+      "timestamp": "00:00:03"
+    },
+    {
+      "id": "t2",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hello? Uh, can you hear me OK?",
+      "timestamp": "00:00:05"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, yeah I can, I can, cheers.",
+      "timestamp": "00:00:07"
+    },
+    {
+      "id": "t4",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ". Great. Right, how can I help you this afternoon sir?",
+      "timestamp": "00:00:08"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I am not feeling, very well.",
+      "timestamp": "00:00:12"
+    },
+    {
+      "id": "t6",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "I'm sorry to.",
+      "timestamp": "00:00:17"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And I haven't been feeling well, for, a good few days, now, and, I'm really hoping you can do something about it, because it's been, bugging me, for a while now.",
+      "timestamp": "00:00:17"
+    },
+    {
+      "id": "t8",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Well I will certainly try my best, for you. Um, can you tell me a bit more about what's been going on?",
+      "timestamp": "00:00:27"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I just feel a bit, run-down, you know I've got, a cough, a cold.",
+      "timestamp": "00:00:34"
+    },
+    {
+      "id": "t10",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ". Mm-hmm.",
+      "timestamp": "00:00:40"
+    },
+    {
+      "id": "t11",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "You know, my wife's been nagging me. I just, it's just all, yeah, it's just, that, that, that's it, that's it.",
+      "timestamp": "00:00:41"
+    },
+    {
+      "id": "t12",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Mmm. OK, well let's start with your cough first. Tell me a bit more about your cough. Is it, for example are you, coughing up anything at all, or is it mainly dry?",
+      "timestamp": "00:00:46"
+    },
+    {
+      "id": "t13",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah, yeah, mean, mostly, dry it's a , you know it's a wee bit in the morning it's a bit worse uh, but , and you know it's, it's fairly, fairly dry, aye.",
+      "timestamp": "00:00:56"
+    },
+    {
+      "id": "t14",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So you're not bringing up any mucky, flem?",
+      "timestamp": "00:01:07"
+    },
+    {
+      "id": "t15",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, yeah, yeah, yeah, yeah, yeah. I don't like to admit that it's, you know it's talk about but, yeah it's , aye, aye. It's a wee bit, wee bit uh, yeah.",
+      "timestamp": "00:01:12"
+    },
+    {
+      "id": "t16",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, all right.",
+      "timestamp": "00:01:14"
+    },
+    {
+      "id": "t17",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah, I can certainly hear you've got the sniffles. So, bit of a runny, bit of a runny nose, you mentioned.",
+      "timestamp": "00:01:22"
+    },
+    {
+      "id": "t18",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, yeah, yeah, aye, aye you're right. Is that, is that coming through loud and clear on the phone yeah the, the sniffling, yeah, .",
+      "timestamp": "00:01:27"
+    },
+    {
+      "id": "t19",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ". Yeah, sorry to hear that, yeah no . Um, and uh, any other symptoms, so for example have you any, uh, any sore throats, any ear pain?",
+      "timestamp": "00:01:31"
+    },
+    {
+      "id": "t20",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, ugh, yeah, yeah. I've, I've had a bit of a sore throat. I mean, I, you know, , I'm doing a lot of uh, you know I'm, , watching the, watching the football as well. So I do a lot of shouting at that, but uh, uh, uh, I'm not sure if that's related or not.",
+      "timestamp": "00:01:44"
+    },
+    {
+      "id": "t21",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Ah OK. Who do you support?",
+      "timestamp": "00:01:58"
+    },
+    {
+      "id": "t22",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, well it's a team, called, Partick Thistle.",
+      "timestamp": "00:02:01"
+    },
+    {
+      "id": "t23",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And they're in the, they're not even in the top division, uh, of the Scottish, league. They're actually in the, the, the championship, which is the league below that, and they're, bottom of the table.",
+      "timestamp": "00:02:05"
+    },
+    {
+      "id": "t24",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right.",
+      "timestamp": "00:02:17"
+    },
+    {
+      "id": "t25",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "So I've been, shouting myself a wee bit hoarse, 'cause their performance has been, uh, pretty shite, if I'm being honest with you. .",
+      "timestamp": "00:02:17"
+    },
+    {
+      "id": "t26",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Well, all sounds fascinating, well I wish them all the best. nothing table. Um, so, so you mentioned sore throat. Um, and have you had a chance to look in the, in the mirror? Have you had a look at the back of your throat?",
+      "timestamp": "00:02:24"
+    },
+    {
+      "id": "t27",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", yeah, yeah, yeah.",
+      "timestamp": "00:02:28"
+    },
+    {
+      "id": "t28",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", aye, I mean aye, I, I shave, every day so I'm, I'm looking at myself, it's not, not, not a pretty sight to be honest at the best of times but it's been a, wee bit, a wee bit rough, uh, the last few days for sure.",
+      "timestamp": "00:02:37"
+    },
+    {
+      "id": "t29",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah, now, I mean have you any, have you noticed any kind of, white spots on the back of your, back of your throat, or redness?",
+      "timestamp": "00:02:49"
+    },
+    {
+      "id": "t30",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Ohh right, right aye. , sorry you mean I'm looking ah right yeah uh. , no I, I don't, I don't really like to look, you know to look at it so I, I, I haven't, haven't tried to do any of that.",
+      "timestamp": "00:02:56"
+    },
+    {
+      "id": "t31",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:02:57"
+    },
+    {
+      "id": "t32",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:03:04"
+    },
+    {
+      "id": "t33",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ". I understand it's not pretty but as I say it's not, it's not something we, we always um, uh, recommend but um, moving on. In terms of your ears , any dullness or blocked ears, pain in your ears.",
+      "timestamp": "00:03:06"
+    },
+    {
+      "id": "t34",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah, , a, a wee bit I mean . You know, I'm fit, I'm , I'm fifty years old now and my, my hearing's, you know it's not as good as it used to be but, you know I , I, I think, I think it's all right, it's all right.",
+      "timestamp": "00:03:20"
+    },
+    {
+      "id": "t35",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, OK. Fine. Um, moving down to your chest. Um, how's your breathing been?",
+      "timestamp": "00:03:33"
+    },
+    {
+      "id": "t36",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So do, you feel more breathless or tight in your chest?",
+      "timestamp": "00:03:41"
+    },
+    {
+      "id": "t37",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh.",
+      "timestamp": "00:03:41"
+    },
+    {
+      "id": "t38",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no. No, no it's, it's not. No, no, no, .",
+      "timestamp": "00:03:47"
+    },
+    {
+      "id": "t39",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:03:49"
+    },
+    {
+      "id": "t40",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So your breathing is ?",
+      "timestamp": "00:03:51"
+    },
+    {
+      "id": "t41",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", sorry, what was that?",
+      "timestamp": "00:03:55"
+    },
+    {
+      "id": "t42",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Uh, your, your breathing is fine is it? your, it's not laboured, or?",
+      "timestamp": "00:03:55"
+    },
+    {
+      "id": "t43",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No it's, it's, it's, it's not, it's not good. It's not good.",
+      "timestamp": "00:04:02"
+    },
+    {
+      "id": "t44",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. It's not good?",
+      "timestamp": "00:04:04"
+    },
+    {
+      "id": "t45",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No. No, no.",
+      "timestamp": "00:04:08"
+    },
+    {
+      "id": "t46",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "No, OK, OK. So you're , you're, you're feeling more short of breath?",
+      "timestamp": "00:04:08"
+    },
+    {
+      "id": "t47",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, yeah.",
+      "timestamp": "00:04:13"
+    },
+    {
+      "id": "t48",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, OK, , OK. Um, any pain in your chest at all?",
+      "timestamp": "00:04:14"
+    },
+    {
+      "id": "t49",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, no it's, it's, it's weird, it's, it's just, you know it's just a wee bit, it's just a wee bit shortness of breath, but it's not, , it's, it's not, it's not pain, you know, as such.",
+      "timestamp": "00:04:20"
+    },
+    {
+      "id": "t50",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "No pain, OK, OK. Have you noticed yourself, any, any, any temperatures or fevers? Um, feeling hot and cold? Sweaty?",
+      "timestamp": "00:04:27"
+    },
+    {
+      "id": "t51",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, yeah that's, that's, that's, that's definitely something I've noticed. Like, you know in, in bed with the wife and having to, you know get out and, get the blanket off, and put it back on again it's, it's not, it's not pleasant. I mean, I'm keeping her up at night as well, which is a, bloody nightmare but, I mean, you know how these things are.",
+      "timestamp": "00:04:36"
+    },
+    {
+      "id": "t52",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:04:43"
+    },
+    {
+      "id": "t53",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:04:45"
+    },
+    {
+      "id": "t54",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah, .",
+      "timestamp": "00:04:50"
+    },
+    {
+      "id": "t55",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Seems, seems very difficult at the moment. Um, , have you measured your temperature at all? Have you, got a ?",
+      "timestamp": "00:04:53"
+    },
+    {
+      "id": "t56",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "But uh, no I mean, no you know, you know, I can, I just feel it in my forehead but, I mean, I haven't, haven't, you know, used a thermometer or anything.",
+      "timestamp": "00:05:00"
+    },
+    {
+      "id": "t57",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Mmm, OK.",
+      "timestamp": "00:05:05"
+    },
+    {
+      "id": "t58",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Sure, OK. Um, and just moving on, just very quickly. Um, any other symptoms? Any nausea? Any vomiting? Any tummy pain?",
+      "timestamp": "00:05:08"
+    },
+    {
+      "id": "t59",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, the, the first, the first day I had, you know a wee bit, of uh, , you know uh, you know the rot like, a wee bit of diarrhoea.",
+      "timestamp": "00:05:18"
+    },
+    {
+      "id": "t60",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:05:29"
+    },
+    {
+      "id": "t61",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "You know but, but that, that's, that's fine, now. Um, and, , yeah but, but apart from that, , no.",
+      "timestamp": "00:05:29"
+    },
+    {
+      "id": "t62",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:05:32"
+    },
+    {
+      "id": "t63",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And how's your appetite? Are you eating and drinking OK?",
+      "timestamp": "00:05:37"
+    },
+    {
+      "id": "t64",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yeah I mean I'm, I'm, I'm trying to and I think what, what is you , you starve, a cold and you, feed the. I, can't remember what it is, but I think I've, uh, my appetite's been, been all right yeah, yeah. I'm trying to, trying to keep, keep the fluids up as well you know, I hear that's what you should do.",
+      "timestamp": "00:05:41"
+    },
+    {
+      "id": "t65",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:05:53"
+    },
+    {
+      "id": "t66",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah, absolutely, , completely uh, recommend that, so keep, keep doing what you're doing. Um, and just lastly, you know any, any, any kind of muscle pain, joint pains?",
+      "timestamp": "00:05:58"
+    },
+    {
+      "id": "t67",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:06:04"
+    },
+    {
+      "id": "t68",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah it's, it's, it's just been a wee. I mean again, you know I'm , I'm getting a just a wee bit older now so it, it's, it's not something that I, I was thinking about but, I have, I have noticed like when I, you know, when I'm bending down and.",
+      "timestamp": "00:06:09"
+    },
+    {
+      "id": "t69",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Know moving about, it's just, a wee, a wee bit stiffer than, than normal. , you know and I'm, I think that might be to do with whatever this.",
+      "timestamp": "00:06:22"
+    },
+    {
+      "id": "t70",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Mmm.",
+      "timestamp": "00:06:25"
+    },
+    {
+      "id": "t71",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Thing is, but, again it's, you know, I'm just getting on.",
+      "timestamp": "00:06:29"
+    },
+    {
+      "id": "t72",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And where do you, where do you feel the stiffness?",
+      "timestamp": "00:06:32"
+    },
+    {
+      "id": "t73",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "It it's, just kinda, like you know when you're, when you're bending like, elbows and knees and just, just a wee bit, kinda stiff, you know?",
+      "timestamp": "00:06:35"
+    },
+    {
+      "id": "t74",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ", all over, OK. And just remind me sir, when did your symptoms all start? , you say a few days ago?",
+      "timestamp": "00:06:42"
+    },
+    {
+      "id": "t75",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:06:44"
+    },
+    {
+      "id": "t76",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah I would say what day is it today? It's uh, , Wednesday, so it would have been, what is it Saturday, 'cause I was out.",
+      "timestamp": "00:06:48"
+    },
+    {
+      "id": "t77",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "It's Wednesday.",
+      "timestamp": "00:06:51"
+    },
+    {
+      "id": "t78",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:06:57"
+    },
+    {
+      "id": "t79",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah I was out having dinner, and then, yeah I, I came, yeah, yeah, yeah it would have been that. 'Cause I was out, for my wife's, uh she's, she was, doing this wee thing, we had a wee bit of a celebration, so we were out for that.",
+      "timestamp": "00:06:57"
+    },
+    {
+      "id": "t80",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:07:10"
+    },
+    {
+      "id": "t81",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And I remember saying to her, it was like you know what? I'm, I'm, I'm not feeling, great. You know I , I stuck it out with her but, aye, it would have been that, Saturday. So, what's that about five, five days ago? Yeah, yeah, yeah, yeah.",
+      "timestamp": "00:07:10"
+    },
+    {
+      "id": "t82",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Four, five days ago, yeah. OK. Are you aware of anything that might have set your symptoms off/",
+      "timestamp": "00:07:19"
+    },
+    {
+      "id": "t83",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No I haven't been, haven't been , I mean, as I said, I was out with my wife. I don't know whether it's like, you know, the restaurant we went to was like, it was like, pretty good, so I wouldn't have expected them to be serving me anything.",
+      "timestamp": "00:07:30"
+    },
+    {
+      "id": "t84",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Dodgy or anything like that but, I , I, I, I don't know, you know. So, , nothing that I can see.",
+      "timestamp": "00:07:41"
+    },
+    {
+      "id": "t85",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ", OK.",
+      "timestamp": "00:07:45"
+    },
+    {
+      "id": "t86",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And , without prying too much, what were you celebrating?",
+      "timestamp": "00:07:49"
+    },
+    {
+      "id": "t87",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Well, my wife, has just been, uh, promoted. So, she's now going to be, uh, a head teacher, of, of primary school. So, just took her out.",
+      "timestamp": "00:07:54"
+    },
+    {
+      "id": "t88",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:08:00"
+    },
+    {
+      "id": "t89",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:08:03"
+    },
+    {
+      "id": "t90",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ". Yeah, wee, a wee night on the tiles, for that, so uh, it was good, . Yeah, yeah.",
+      "timestamp": "00:08:04"
+    },
+    {
+      "id": "t91",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ", very nice.",
+      "timestamp": "00:08:07"
+    },
+    {
+      "id": "t92",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ", good, excellent. So just moving on sir. Uh, regarding your, um, what we say, past medical history. Are you, do you have any other medical problems I should be aware of? So anything to do with your heart, lungs?",
+      "timestamp": "00:08:11"
+    },
+    {
+      "id": "t93",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I mean, I'm a , I'm a wee bit, on the chunky side.",
+      "timestamp": "00:08:20"
+    },
+    {
+      "id": "t94",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "You know, uh, you know I've, I've got a wee bit, a wee bit round the midriff, the spare tyre's, definitely there. Uh, and I've, I've got the uh, I've got the diabetes.",
+      "timestamp": "00:08:26"
+    },
+    {
+      "id": "t95",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Diabetes, right. What type of , is it type one or type two?",
+      "timestamp": "00:08:36"
+    },
+    {
+      "id": "t96",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, it's, it's uh, type, two, two. Aye, type one, , aye, aye. 'Cause he said, the doctor I spoke to, he was sort of saying like, you know, as a bigger guy, it's, it's kinda, it's kinda like, yeah, and.",
+      "timestamp": "00:08:40"
+    },
+    {
+      "id": "t97",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, OK.",
+      "timestamp": "00:08:43"
+    },
+    {
+      "id": "t98",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And what.",
+      "timestamp": "00:08:47"
+    },
+    {
+      "id": "t99",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:08:54"
+    },
+    {
+      "id": "t100",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah, OK. .",
+      "timestamp": "00:08:57"
+    },
+    {
+      "id": "t101",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And uh, aye, when I was speaking to uh, it was this, it was other, another doctor I spoke to a while ago but. Aye when he, took the, when he was telling me this as well he, took my blood pressure and that said that was, that was high, uh, high, higher than it should be.",
+      "timestamp": "00:08:58"
+    },
+    {
+      "id": "t102",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:09:04"
+    },
+    {
+      "id": "t103",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:09:13"
+    },
+    {
+      "id": "t104",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You've been diagnosed with high blood pressure, uh, or . OK, all right. So um, moving on. Come to your medications, , which medications do you take on a regular basis?",
+      "timestamp": "00:09:15"
+    },
+    {
+      "id": "t105",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ". Yeah, yeah.",
+      "timestamp": "00:09:18"
+    },
+    {
+      "id": "t106",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, give me, I'm just gonna check. It's, it's, let me know if I'm pronouncing this correctly 'cause I haven't got, I haven't got my glasses with me. So, it's , Metformin?",
+      "timestamp": "00:09:26"
+    },
+    {
+      "id": "t107",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ", that's correct, OK.",
+      "timestamp": "00:09:35"
+    },
+    {
+      "id": "t108",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "and, and there's another one, , Lisinopril? Is that? Yeah, . I mean that's those two, I had, I've got them written down a wee bit of paper so.",
+      "timestamp": "00:09:37"
+    },
+    {
+      "id": "t109",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Lisinopril, yeah. That sounds like.",
+      "timestamp": "00:09:41"
+    },
+    {
+      "id": "t110",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "No problems, no problem, that's fine. Anything else sir?",
+      "timestamp": "00:09:49"
+    },
+    {
+      "id": "t111",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no, no, just, just, just those two. Yeah, I mean a wee bit of like , a wee bit of Aspirin or whatever every now and again, but you know nothing long-term.",
+      "timestamp": "00:09:53"
+    },
+    {
+      "id": "t112",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right.",
+      "timestamp": "00:10:00"
+    },
+    {
+      "id": "t113",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, all right. And just moving on swiftly sir. Do you have any allergies at all?",
+      "timestamp": "00:10:02"
+    },
+    {
+      "id": "t114",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, not that I'm, not that I'm aware of. You know, I mean, what, what are the, what are the allergies you get? Just, you know, nah, not.",
+      "timestamp": "00:10:08"
+    },
+    {
+      "id": "t115",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Just allergies to , medications really, I'm, I'm asking not, as opposed to um, other things.",
+      "timestamp": "00:10:15"
+    },
+    {
+      "id": "t116",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Right ah, yeah. No, nothing, nothing that, nothing that I'm aware of, doctor's never said nothing to me, so.",
+      "timestamp": "00:10:21"
+    },
+    {
+      "id": "t117",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ".",
+      "timestamp": "00:10:25"
+    },
+    {
+      "id": "t118",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And just very briefly, socially sir, just it's very important to ask. Uh, you said you live, with your wife. Anyone else at home with you?",
+      "timestamp": "00:10:27"
+    },
+    {
+      "id": "t119",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, no, no, kids, the kids have uh, they've flown the nest. So uh, now it's just me and the missus, you know, good life.",
+      "timestamp": "00:10:35"
+    },
+    {
+      "id": "t120",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:10:38"
+    },
+    {
+      "id": "t121",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, OK. And are you, yep, and are you working at the moment? Uh, yourself?",
+      "timestamp": "00:10:40"
+    },
+    {
+      "id": "t122",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I am. Yep, yeah, yeah um, .",
+      "timestamp": "00:10:45"
+    },
+    {
+      "id": "t123",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "What, what do you do at work?",
+      "timestamp": "00:10:47"
+    },
+    {
+      "id": "t124",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, well I'm, it's one of the, there's a wee factory, just uh, down the road, um, so we just you know, we just manufacture like uh.",
+      "timestamp": "00:10:50"
+    },
+    {
+      "id": "t125",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, it's like, kind of steel, steel parts, uh, things like that. You know, so it's a, good wee job, you know, keeps us, a roof over the, over us.",
+      "timestamp": "00:10:58"
+    },
+    {
+      "id": "t126",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ". Pays the bills, really. Um.",
+      "timestamp": "00:11:08"
+    },
+    {
+      "id": "t127",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, yeah, aye, exact, exactly.",
+      "timestamp": "00:11:10"
+    },
+    {
+      "id": "t128",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "What, what about smoking and alcohol, sir?",
+      "timestamp": "00:11:12"
+    },
+    {
+      "id": "t129",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Do you, you do either?",
+      "timestamp": "00:11:16"
+    },
+    {
+      "id": "t130",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh.",
+      "timestamp": "00:11:16"
+    },
+    {
+      "id": "t131",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I, I do, I do like a wee drink.",
+      "timestamp": "00:11:19"
+    },
+    {
+      "id": "t132",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, aye the doc, the old, doctor I had, he, he, he did say I was drinking just a wee, a wee bit too much. I mean I'm not like, you know I'm not, not an alky or anything, but just, just uh, yeah, do like a few, a few pints every now and again.",
+      "timestamp": "00:11:22"
+    },
+    {
+      "id": "t133",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "roughly on average, how many you would drink a week?",
+      "timestamp": "00:11:33"
+    },
+    {
+      "id": "t134",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, pints?",
+      "timestamp": "00:11:39"
+    },
+    {
+      "id": "t135",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Well, whatever you drink. Is it , beer, lager, wine, spirits?",
+      "timestamp": "00:11:41"
+    },
+    {
+      "id": "t136",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ". You know, maybe, maybe what like four, four pints on like Saturday and then, you know on, Sunday as well, , maybe like.",
+      "timestamp": "00:11:45"
+    },
+    {
+      "id": "t137",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Nine, nine pints in a week, I would say.",
+      "timestamp": "00:11:57"
+    },
+    {
+      "id": "t138",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, OK. And what about smoking, sir?",
+      "timestamp": "00:11:59"
+    },
+    {
+      "id": "t139",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, ugh, , a wee, every now and again, but I'm, I, I am trying to cut that down. I've got a wee uh, what are those wee things called? The wee vaporisers.",
+      "timestamp": "00:12:03"
+    },
+    {
+      "id": "t140",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Ohh OK, OK.",
+      "timestamp": "00:12:13"
+    },
+    {
+      "id": "t141",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah I've got, I got, I got myself one of those, so I've been, I've been cutting down on the cigarettes. Uh, and I just got this wee, this wee thing, it's great, it is, it's actually like amazing, by the way.",
+      "timestamp": "00:12:13"
+    },
+    {
+      "id": "t142",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Well, I wish you , all the best on your journey to quit, I , I highly recommend it. Um, if you can, it'll certainly help your health as well. Um, so just to , just to summarise, I think you know, uh, based on your story.",
+      "timestamp": "00:12:24"
+    },
+    {
+      "id": "t143",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Thank you.",
+      "timestamp": "00:12:32"
+    },
+    {
+      "id": "t144",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, yeah I'm not, worry. I think you know what you essentially have is a bit of a, a bit of a viral illness perhaps, a bit of a, maybe early signs of a flu, um.",
+      "timestamp": "00:12:35"
+    },
+    {
+      "id": "t145",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Mm-hmm.",
+      "timestamp": "00:12:36"
+    },
+    {
+      "id": "t146",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Which I think should, settle down, um, really on it's own, uh, over time. Um, things to you know, you, you can do, help yourself you know, , stay rested, drink plenty of fluids.",
+      "timestamp": "00:12:44"
+    },
+    {
+      "id": "t147",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Right.",
+      "timestamp": "00:12:45"
+    },
+    {
+      "id": "t148",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, aye.",
+      "timestamp": "00:12:56"
+    },
+    {
+      "id": "t149",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, if you are, if you are feeling hot and cold and sweaty, taking regular Paracetamol would be beneficial. Um, you mentioned feeling a bit short of breath. Um, I'm a little bit on the edge about giving you antibiotics. I don't think you've got a chest infection, but what we could think about is giving you a.",
+      "timestamp": "00:12:57"
+    },
+    {
+      "id": "t150",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Aye.",
+      "timestamp": "00:13:03"
+    },
+    {
+      "id": "t151",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "A script for antibiotics, which maybe use in next, twenty four to forty eight hours, if your symptoms don't get better.",
+      "timestamp": "00:13:12"
+    },
+    {
+      "id": "t152",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Right, so , so if, so if I'm, I just , just lie down and take it easy. If I'm still, feeling a bit rubbish then, I go in, I .",
+      "timestamp": "00:13:19"
+    },
+    {
+      "id": "t153",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah.",
+      "timestamp": "00:13:25"
+    },
+    {
+      "id": "t154",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yeah, , I will, yeah, I'll, I'll give you a script today, give it about twenty four to forty eight hours. If you feel like you're still feeling breathless and, run-down, I think there's no harm in starting a course of antibiotics, something like Amoxicillin.",
+      "timestamp": "00:13:28"
+    },
+    {
+      "id": "t155",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "One tablet, three times a day. Um, uh, and , if you're still not better by next week, come back and see me, we can have another look.",
+      "timestamp": "00:13:40"
+    },
+    {
+      "id": "t156",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "All right, OK. OK, so I just, plenty of rest, lots of water, hopefully this thing pass.",
+      "timestamp": "00:13:48"
+    },
+    {
+      "id": "t157",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Exactly.",
+      "timestamp": "00:13:52"
+    },
+    {
+      "id": "t158",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Yes, absolutely.",
+      "timestamp": "00:13:55"
+    },
+    {
+      "id": "t159",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Right, that is, that's perfect, that's just what, , what I wanted to hear.",
+      "timestamp": "00:13:57"
+    },
+    {
+      "id": "t160",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Great, well, I'm, glad I could help.",
+      "timestamp": "00:14:00"
+    },
+    {
+      "id": "t161",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And um, I wish you and your football team all the best.",
+      "timestamp": "00:14:03"
+    },
+    {
+      "id": "t162",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Cheers.",
+      "timestamp": "00:14:03"
+    },
+    {
+      "id": "t163",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Aye, I hope so, I hope so. It's not, not looking too good, but uh, aye. Right, cheers, cheers, .",
+      "timestamp": "00:14:06"
+    },
+    {
+      "id": "t164",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. , all the best. Bye bye.",
+      "timestamp": "00:14:11"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "s0",
+      "text": "5/7 hx of generally unwell with cough and cold sx. Mainly dry cough. No chest pain. Feeling more SOB. \nFeeling hot/cold and sweaty. No fevers. \nSore throat and blocked ears. Also myalgia and arthralgia - mainly stiffness in joints. \nNo unwell contacts\nNo nausea/vomiting\nNo bowel symptoms"
+    },
+    {
+      "id": "s1",
+      "text": "PMH: obesity, diabetes - type 2 , hypertension\nDH: metformin, lisinopril , aspirin, \nNKDA\nSH: lives with wife, works in factory/manufacturing, smoking socially, etOH - >14 units/week"
+    },
+    {
+      "id": "s2",
+      "text": "Imp: viral URTI/? LRTI"
+    },
+    {
+      "id": "s3",
+      "text": "Plan:\n1.\tConservative mx - rest, fluids, regular paracetamol \n2.\tDelayed script for amoxicillin abx - to start in 24-48 hours if sx not improving\n3.\tReview in 1/52 INB, or earlier if worsening sx (chest pain, SOB, fevers)"
+    }
+  ]
+}

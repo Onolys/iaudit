@@ -1,0 +1,272 @@
+{
+  "request_id": "primock57-day2-consultation05",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day2_consultation05",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 0,
+    "incorrect_statements_total": 11,
+    "incorrect_statements_mapped": 8,
+    "incorrect_statements_not_mapped": 3,
+    "omissions_excluded": 27
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 148
+        },
+        "end": {
+          "index": 0,
+          "char": 176
+        }
+      },
+      "claim_text": "with some right leg weakness",
+      "expected_verdict": "partially_supported",
+      "explanation": "Leg weakness during the episodes is supported. The patient never said which leg.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "The side of the leg weakness is not established by the interview.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 44,
+              "char": 0
+            },
+            "end": {
+              "index": 45,
+              "char": 70
+            }
+          },
+          "note": "The patient says their leg feels weaker during the arm episodes, without naming a side."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! some right leg weakness"
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "critical",
+          "verbatim": "! right leg weakness"
+        }
+      ],
+      "agreement": "2 of 5 evaluators with data"
+    },
+    {
+      "id": "k2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 352
+        },
+        "end": {
+          "index": 0,
+          "char": 378
+        }
+      },
+      "claim_text": "no dysphagia, no dysphasia",
+      "expected_verdict": "partially_supported",
+      "explanation": "No speech difficulty is supported. On swallowing, the patient said not currently, but described something in the throat and trouble drinking during episodes.",
+      "concerns": [
+        {
+          "type": "context_stripping",
+          "explanation": "A denial limited to the present is recorded as unrestricted, dropping the swallowing complaint during episodes.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 57,
+              "char": 0
+            },
+            "end": {
+              "index": 61,
+              "char": 25
+            }
+          },
+          "note": "Drinking coffee has become harder, only during the episodes."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 63,
+              "char": 0
+            },
+            "end": {
+              "index": 66,
+              "char": 49
+            }
+          },
+          "note": "No swallowing trouble now, but during episodes something feels stuck in the throat."
+        },
+        {
+          "id": "e3",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 67,
+              "char": 0
+            },
+            "end": {
+              "index": 68,
+              "char": 21
+            }
+          },
+          "note": "The patient can speak normally during the episodes."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! no dysphagia, no dysphasia"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! no dysphagia,"
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "critical",
+          "verbatim": "! no dysphagia,"
+        }
+      ],
+      "agreement": "3 of 5 evaluators with data"
+    },
+    {
+      "id": "k3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 398
+        },
+        "end": {
+          "index": 0,
+          "char": 412
+        }
+      },
+      "claim_text": "Father had CVA",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "The patient described their father having neck surgery to reduce the risk of stroke. No stroke is described.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "A preventive operation is recorded as a stroke that happened.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 71,
+              "char": 0
+            },
+            "end": {
+              "index": 72,
+              "char": 95
+            }
+          },
+          "note": "Asked about family stroke, the patient describes preventive neck surgery for the father."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! Father had CVA"
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "non_critical",
+          "verbatim": "- Father had CVA"
+        }
+      ],
+      "agreement": "2 of 5 evaluators with data"
+    },
+    {
+      "id": "k4",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 469
+        },
+        "end": {
+          "index": 0,
+          "char": 542
+        }
+      },
+      "claim_text": "normal blood tests for diabetes/ cholesterol when checked a few years ago",
+      "expected_verdict": "partially_supported",
+      "explanation": "Normal checks for cholesterol and diabetes are supported. The patient tied the timing only to the father's operation and gave no number of years.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "The timing of the checks is not stated in the interview.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 75,
+              "char": 0
+            },
+            "end": {
+              "index": 78,
+              "char": 99
+            }
+          },
+          "note": "The patient was checked after the father's operation and told the results were fine."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! a few years ago"
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data"
+    }
+  ]
+}
