@@ -9,10 +9,10 @@ Source of truth: [PRD.md](PRD.md). Documents the landed backend, last. Docs desc
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | `backend/README.md` quickstart including the smoke run | 06, 07a | todo |
+| 1 | `backend/README.md` quickstart including the smoke run | 06, 07a | done |
 | 2 | `docs/reference/backend-api.md` | 06 | done |
 | 3 | Architecture blurb, index links, mission check 7 wording | 2 | done |
-| 4 | Link check and no-transcript-text check | 1, 3 | todo |
+| 4 | Link check and no-transcript-text check | 1, 3 | done |
 | 5 | [OPTIONAL, gated] Optional docs | all core in every SP | todo |
 
 ## Task 1 — Backend README
