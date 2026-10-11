@@ -50,7 +50,7 @@ Only the origins in `IAUDIT_CORS_ORIGINS` (default `http://localhost:5173`) may 
 
 ## Settings
 
-Set as `IAUDIT_<NAME>` environment variables (or in `backend/.env`). Defaults come from `Settings` in `config.py`.
+Set as `IAUDIT_<NAME>` environment variables. `Settings` in `config.py` also reads a `.env` file in the directory the server starts in (normally `backend/`). Defaults come from `Settings`.
 
 | Variable | Default | Meaning |
 |---|---|---|
@@ -63,7 +63,7 @@ Set as `IAUDIT_<NAME>` environment variables (or in `backend/.env`). Defaults co
 | `IAUDIT_MAX_BODY_BYTES`, `IAUDIT_MAX_TURNS`, `IAUDIT_MAX_SECTIONS` | `2000000`, `2000`, `50` | Request limits. |
 | `IAUDIT_PIPELINE_MAX_CLAIMS` | `80` | Claims audited per request. More are dropped and `input_truncated` is emitted. |
 | `IAUDIT_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins. |
-| `IAUDIT_CONTRACTS_DIR` | `docs/contracts` of the repo | Where the schemas are read. |
+| `IAUDIT_CONTRACTS_DIR` | `docs/contracts` of the repo | Where the schemas are read. Environment only: not a `Settings` field, so `.env` does not set it. |
 | `IAUDIT_LOG_LEVEL` | `INFO` | Logging level. Logs carry counts and ids only, never text. |
 
 Stage tuning knobs (`IAUDIT_ATOMIZE_*`, `IAUDIT_LINK_*`, `IAUDIT_CHECK_*`, per-stage `*_CALL_TIMEOUT_S`, `IAUDIT_ASSEMBLE_RESERVE_S`, `IAUDIT_MIN_CALL_S`, and similar) are listed in `Settings` and are not needed to run the service.

@@ -158,7 +158,7 @@ def _line(o: Outcome) -> str:
     text = (
         f"{'PASS' if o.passed else 'FAIL'}  {o.fixture}: expected [{o.expected}] actual [{actual}]"
     )
-    if o.detail:
+    if o.detail and not o.actual_verdict.startswith("HTTP"):
         text += f" ({o.detail})"
     if o.collateral:
         text += f" collateral: {','.join(o.collateral)}"
