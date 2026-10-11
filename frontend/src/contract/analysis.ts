@@ -25,7 +25,7 @@ export function analyzeResponse(request: AuditRequest, response: AuditResponse):
   for (const claim of response.claims) {
     const claimSpanOk = isSpanValid(claim.span, sectionLengths, true);
     const evidence: Record<string, boolean> = {};
-    for (const ev of claim.evidence) evidence[ev.id] = isSpanValid(ev.span, turnLengths, false);
+    for (const ev of claim.evidence) evidence[ev.id] = (evidence[ev.id] ?? true) && isSpanValid(ev.span, turnLengths, false);
     checks[claim.id] = {
       claimSpanOk,
       evidence,

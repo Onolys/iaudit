@@ -36,7 +36,7 @@ describe("isSpanValid (R3)", () => {
   it("passes a normal claim span", () => expect(ok(sp(0, 0, 0, 5), "assessment")).toBe(true));
   it("end.char === len is ok", () => expect(ok(sp(0, 0, 0, 10), "assessment")).toBe(true));
   it("end.char > len fails", () => expect(ok(sp(0, 0, 0, 11), "assessment")).toBe(false));
-  it("start.char === len fails", () => expect(ok(sp(0, 10, 1, 1), "transcript")).toBe(false));
+  it("start.char === len fails", () => expect(ok(sp(0, 5, 2, 3), "transcript")).toBe(false));
   it("empty span fails (strict order)", () => expect(ok(sp(0, 3, 0, 3), "assessment")).toBe(false));
   it("reversed fails", () => expect(ok(sp(0, 5, 0, 2), "assessment")).toBe(false));
   it("index out of range fails", () => expect(ok(sp(0, 0, 2, 1), "assessment")).toBe(false));

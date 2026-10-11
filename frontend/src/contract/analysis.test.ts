@@ -61,6 +61,21 @@ describe("flags", () => {
   });
 });
 
+describe("duplicate evidence ids", () => {
+  const dup = (firstBad: boolean) => {
+    const r = res();
+    const bad = { id: "e-caregiver", role: "supporting" as const, span: sp(5, 0, 5, 9999) };
+    const good = { id: "e-caregiver", role: "supporting" as const, span: sp(4, 0, 4, 10) };
+    r.claims[0].evidence = firstBad ? [bad, good] : [good, bad];
+    return analyzeResponse(req(), r).checks["c-supported"];
+  };
+  it.each([true, false])("a bad entry flags the claim (bad first: %s)", (firstBad) => {
+    const c = dup(firstBad);
+    expect(c.evidence["e-caregiver"]).toBe(false);
+    expect(c.spanOutOfRange).toBe(true);
+  });
+});
+
 describe("ordering", () => {
   it("sorts out-of-order claims; invalid last in response order", () => {
     const r = res();
