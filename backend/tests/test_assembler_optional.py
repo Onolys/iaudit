@@ -181,3 +181,45 @@ def test_trimmed_claim_gets_a_warning_with_its_claim_id():
     id_of = {c.key: c.id for c in res.claims}
     w = event_warning(res.events[0], id_of)
     assert w["code"] == "other" and w["claim_id"] == id_of["b"] and "trimmed" in w["message"]
+
+
+# -- copied run that crosses a sentence boundary ---------------------------------------------
+
+CROSS_TURN = "I misplace the car keys most mornings. After that I am late for the bus."
+
+
+def cross_request(example_request):
+    req = copy.deepcopy(example_request)
+    req["transcript"][3]["text"] = CROSS_TURN
+    return req
+
+
+def test_cross_sentence_run_in_explanation_uses_fallback(example_request):
+    text = "Overall note. I misplace the car keys most mornings. After that I am late."
+    c = claim(explanation=text)
+    notes, r = scrubbed(cross_request(example_request), c)
+    assert c["explanation"] == "The cited excerpts conflict with this claim."
+    assert notes and r.repairs["copy_explanation"] == 1
+
+
+def test_cross_sentence_run_in_concern_explanation_uses_fallback(example_request):
+    c = claim()
+    c["concerns"][0]["explanation"] = (
+        "Overall note. I misplace the car keys most mornings. After that I am late."
+    )
+    notes, r = scrubbed(cross_request(example_request), c)
+    assert "keys" not in c["concerns"][0]["explanation"] and notes
+    assert r.repairs["copy_concern"] == 1
+
+
+def test_cross_sentence_run_in_out_of_scope_reason_uses_fallback(example_request):
+    c = claim(
+        verdict="out_of_scope",
+        out_of_scope_reason=(
+            "Overall note. I misplace the car keys most mornings. After that I am late."
+        ),
+    )
+    c["concerns"], c["evidence"] = [], []
+    notes, r = scrubbed(cross_request(example_request), c)
+    assert "keys" not in c["out_of_scope_reason"] and c["out_of_scope_reason"] and notes
+    assert r.repairs["copy_reason"] == 1

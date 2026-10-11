@@ -88,7 +88,9 @@ def _clean(text: str, ctx: CopyContext) -> str | None:
     if not violates(text, ctx):
         return text
     kept = [s for s in _sentences(text) if not violates(s, ctx)]
-    return " ".join(kept) if kept else None
+    rejoined = " ".join(kept)
+    # a copied run can cross a sentence boundary: no single sentence violates, the whole does
+    return rejoined if kept and not violates(rejoined, ctx) else None
 
 
 def _is_turn_substring(note: str, ctx: CopyContext) -> bool:
