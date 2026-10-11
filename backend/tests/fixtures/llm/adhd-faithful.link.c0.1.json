@@ -1,0 +1,18 @@
+{
+ "items": [
+  {
+   "key": "e1",
+   "role": "supporting",
+   "link_type": "quote",
+   "segments": [
+    {
+     "turn": 3,
+     "text": "Most meetings. So three or four times a week."
+    }
+   ],
+   "premises": [],
+   "inference_step": null,
+   "note": "The respondent gives both a relative and a numeric frequency."
+  }
+ ]
+}
