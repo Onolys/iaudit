@@ -31,3 +31,4 @@ body { font-family: system-ui, sans-serif; color: #111827; }
 .claim-chip { font: inherit; border: 1px solid currentColor; border-radius: 6px; background: #fff; padding: 4px 8px; cursor: pointer; text-align: left; scroll-margin-top: var(--sticky-header-h); }
 .claim-chip-warning { color: #b45309; }
 .nav-stepper { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.section-card.menu-open .section-header { z-index: 3; }

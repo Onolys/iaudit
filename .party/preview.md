@@ -40,3 +40,4 @@ local-setup work. Do not invent repository-specific values.
 - Install: `cd frontend && npm ci`.
 - Start: `cd frontend && VITE_MOCK=true npm run dev -- --host 0.0.0.0 --port 5173` (mock mode needs no backend; upload `docs/contracts/examples/request.json`).
 - Tests: `npm test` and `npm run typecheck` in `frontend/`.
+- Read-only workspaces: `npm test` can fail writing `node_modules/.vite-temp`; use `npx vitest run --configLoader runner`.

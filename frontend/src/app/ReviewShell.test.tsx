@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { analyzeResponse } from "../contract";
 import type { AuditRequest, AuditResponse, Claim } from "../contract";
 import type { LoadResult } from "../transport";
@@ -209,5 +209,34 @@ describe("unplaced claims", () => {
     expect(cards).toHaveLength(4);
     expect(cards[3].textContent).toContain("Claims outside the supplied assessment");
     expect(within(cards[3] as HTMLElement).getByText(/lost/)).toBeTruthy();
+  });
+});
+
+describe("scrolling", () => {
+  it("scrolls on navigation and stepping, not on direct clicks", () => {
+    const spy = vi.fn();
+    Element.prototype.scrollIntoView = spy;
+    const r = multi([claim("a", "supported", 0, 0, 3), claim("b", "supported", 0, 4, 7), claim("c", "contradicted", 1, 0, 4)]);
+    const { container } = mount(r);
+    fireEvent.click(claimEl(container, "c"));
+    expect(spy).not.toHaveBeenCalled();
+    fireEvent.click(within(container.querySelector("header")!).getByRole("button", { name: /Supported/ }));
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.contexts[0]).toBe(claimEl(container, "a"));
+    fireEvent.click(screen.getByRole("button", { name: "Next claim" }));
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy.mock.contexts[1]).toBe(claimEl(container, "b"));
+    fireEvent.click(claimEl(container, "c"));
+    expect(spy).toHaveBeenCalledTimes(2);
+    delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+  });
+});
+
+describe("menu stacking", () => {
+  it("raises the owning card while its menu is open", () => {
+    const { container } = mount(multi([claim("a", "supported", 0, 0, 3)]));
+    const card = container.querySelector(".section-card")!;
+    fireEvent.click(within(card as HTMLElement).getByRole("button", { name: "Section menu" }));
+    expect(card.classList.contains("menu-open")).toBe(true);
   });
 });

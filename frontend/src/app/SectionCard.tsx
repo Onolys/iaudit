@@ -36,7 +36,7 @@ export function SectionCard({ label, score, notProcessed, counts, activeVerdict 
   }, [open]);
 
   return (
-    <section className={notProcessed ? "section-card not-processed" : "section-card"}>
+    <section className={["section-card", notProcessed && "not-processed", open && "menu-open"].filter(Boolean).join(" ")}>
       <div className="section-header">
         <h3>{label}</h3>
         {score !== undefined ? (
