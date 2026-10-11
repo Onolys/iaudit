@@ -5,13 +5,20 @@ import asyncio
 from iaudit_backend.assembler.models import ClaimDraft, ConcernDraft, Outcome
 from iaudit_backend.atomize.models import AtomicClaim
 from iaudit_backend.link.models import LinkResult
-from iaudit_backend.models import ConcernType, Verdict
+from iaudit_backend.models import ConcernType, EvidenceRole, Verdict
 from iaudit_backend.prep import IndexedTurn, PrepResult
+
+from .group_a import GroupA, run_group_a
 
 STALLED_TEXT = "This claim could not be checked in this run."
 NO_EVIDENCE_TEXT = (
     "This claim is not substantiated by the supplied interview: no supporting evidence was found."
 )
+QUESTION_TEXT = (
+    "This claim is not substantiated by the supplied interview: the only related passage is a "
+    "question that was not answered."
+)
+QUESTION_CONCERN = "The related passage is an interviewer question without an answer."
 NO_EVIDENCE_CONCERN = "No evidence in the supplied interview was found for this claim."
 
 
@@ -56,6 +63,33 @@ def no_evidence_draft(claim: AtomicClaim, ambiguous: list[int]) -> ClaimDraft:
     )
 
 
+def _no_call_draft(claim: AtomicClaim, link: LinkResult, ga: GroupA) -> ClaimDraft:
+    """D3 / D7: every item is a question or non-answer, so no verifier call is made."""
+    evidence = [
+        e.draft.model_copy(update={"role": EvidenceRole.qualifying})
+        for e in link.evidence
+        if e.link_type != "inference"
+    ]
+    if ga.question_as_answer:
+        concern = ConcernDraft(
+            type=ConcernType.question_as_answer,
+            explanation=QUESTION_CONCERN,
+            evidence_keys=list(ga.question_as_answer),
+        )
+        text = QUESTION_TEXT
+    else:
+        concern = ConcernDraft(type=ConcernType.unsupported_claim, explanation=NO_EVIDENCE_CONCERN)
+        text = NO_EVIDENCE_TEXT
+    return _base(
+        claim,
+        verdict=Verdict.insufficient_evidence,
+        explanation=text,
+        concerns=[concern],
+        evidence=evidence,
+        ambiguous_turns=ga.ambiguous,
+    )
+
+
 async def check_one(
     claim: AtomicClaim,
     link: LinkResult | None,
@@ -72,7 +106,10 @@ async def check_one(
         return stalled_draft(claim, link.reason or "unavailable")
     if not link.evidence:
         return no_evidence_draft(claim, link.ambiguous_turns)
-    return stalled_draft(claim, "unavailable")  # filled in by the group A / verifier tasks
+    ga = run_group_a(claim, link, turns)
+    if ga.no_call:
+        return _no_call_draft(claim, link, ga)
+    return stalled_draft(claim, "unavailable")  # the verifier path is added by the next tasks
 
 
 async def check_claims(

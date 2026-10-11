@@ -1,4 +1,4 @@
-from check_helpers import adhd_prep, claim, link
+from check_helpers import adhd_prep, claim, ev, link
 
 from iaudit_backend.check import check_claims, check_one, passthrough_oos, stalled_draft
 from iaudit_backend.llm import FailingClient, LLMUnavailable
@@ -46,3 +46,24 @@ async def test_missing_link_stalls_that_claim(make_ctx):
     prep = adhd_prep()
     d = await check_one(claim("Alex naps."), None, prep, prep.turns, ctx)
     assert d.outcome == "stalled"
+
+
+async def test_question_only_claims_make_zero_calls(make_ctx):
+    ctx = make_ctx(llm=FailingClient(LLMUnavailable("x")))
+    prep = adhd_prep(roles=True)
+    c = claim("He is easily distracted.")
+    lk = link(ev(turns=[12, 13], status="non_answer", role="qualifying"))
+    d = await check_one(c, lk, prep, prep.turns, ctx)
+    assert d.verdict == Verdict.insufficient_evidence and d.outcome == "ok"
+    assert [x.type for x in d.concerns] == [ConcernType.question_as_answer]
+    assert d.concerns[0].evidence_keys == ["c0.1:e1"]
+    assert [e.role for e in d.evidence] == ["qualifying"] and ctx.metrics.records == []
+
+
+async def test_missing_role_falls_back_to_unsupported_with_ambiguous_turns(make_ctx):
+    ctx = make_ctx()
+    prep = adhd_prep(roles=False)
+    lk = link(ev(turns=[12, 13], status="non_answer", role="qualifying"))
+    d = await check_one(claim("He is easily distracted."), lk, prep, prep.turns, ctx)
+    assert [x.type for x in d.concerns] == [ConcernType.unsupported_claim]
+    assert d.ambiguous_turns == [12]
