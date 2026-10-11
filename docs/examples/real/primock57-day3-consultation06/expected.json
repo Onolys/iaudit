@@ -1,0 +1,92 @@
+{
+  "request_id": "primock57-day3-consultation06",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day3_consultation06",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 0,
+    "incorrect_statements_total": 5,
+    "incorrect_statements_mapped": 5,
+    "incorrect_statements_not_mapped": 0,
+    "omissions_excluded": 21
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 10
+        },
+        "end": {
+          "index": 0,
+          "char": 50
+        }
+      },
+      "claim_text": "breathing difficulty for past 20 minutes",
+      "expected_verdict": "partially_supported",
+      "explanation": "Breathing difficulty after a wasp sting is supported. The patient said the sting was about fifteen minutes ago, so twenty minutes lengthens it.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "The duration is longer than the patient reported.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 13,
+              "char": 0
+            },
+            "end": {
+              "index": 15,
+              "char": 93
+            }
+          },
+          "note": "The patient gives the time since the sting and describes shallow breathing."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! 20"
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "non_critical",
+          "verbatim": "- for past 2015 minutes"
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! 20"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "non_critical",
+          "verbatim": "- 20 minutes"
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "non_critical",
+          "verbatim": "- breathing difficulty for past 20 minutes"
+        }
+      ],
+      "agreement": "5 of 5 evaluators with data",
+      "mapping_note": "Evaluator 2's item is a post-edit artifact: \"20\" deleted and \"15\" inserted."
+    }
+  ]
+}

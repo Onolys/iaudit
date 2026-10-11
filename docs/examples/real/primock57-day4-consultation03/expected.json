@@ -1,0 +1,378 @@
+{
+  "request_id": "primock57-day4-consultation03",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day4_consultation03",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 0,
+    "incorrect_statements_total": 19,
+    "incorrect_statements_mapped": 12,
+    "incorrect_statements_not_mapped": 7,
+    "omissions_excluded": 21
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 10
+        },
+        "end": {
+          "index": 0,
+          "char": 33
+        }
+      },
+      "claim_text": "c section 2-3 weeks ago",
+      "expected_verdict": "partially_supported",
+      "explanation": "A recent caesarean section is supported. The patient said four weeks; only the clinician's later restatement says a couple of weeks.",
+      "concerns": [
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "The patient's four weeks is recorded as two to three weeks.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "question_as_answer",
+          "explanation": "The shorter figure comes from the clinician's restatement, not the patient's answer.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 24,
+              "char": 0
+            },
+            "end": {
+              "index": 26,
+              "char": 17
+            }
+          },
+          "note": "Asked how long ago, the patient says four weeks."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 36,
+              "char": 0
+            },
+            "end": {
+              "index": 37,
+              "char": 5
+            }
+          },
+          "note": "The clinician restates it as a couple of weeks and the patient gives a bare yes."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! 2-3"
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "non_critical",
+          "verbatim": "- c section 2-34 weeks ago"
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! 2-3"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! 2-3"
+        }
+      ],
+      "agreement": "4 of 5 evaluators with data",
+      "mapping_note": "All four evaluators edited \"2-3\" to \"4\" here. Evaluators 1 and 3 listed \"2-3\" once for both occurrences, so their item is mapped to both claims. Evaluator 2's \"2-34\" is a post-edit artifact."
+    },
+    {
+      "id": "k2",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 80
+        },
+        "end": {
+          "index": 1,
+          "char": 116
+        }
+      },
+      "claim_text": "No fever, no chills, non positional.",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "Fever, chills and whether position changes the breathlessness are never asked about.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "No question or answer covers fever, chills or position.",
+          "evidence_ids": []
+        }
+      ],
+      "evidence": [],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! No fever, no chills, non positional."
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! No fever, no chills, non positional.\nNo chest pain, no pain on inspiration"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! No fever, no chills, non positional."
+        }
+      ],
+      "agreement": "3 of 5 evaluators with data",
+      "mapping_note": "Evaluator 3's item continues onto the next line, which is mapped to the next claim."
+    },
+    {
+      "id": "k3",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 132
+        },
+        "end": {
+          "index": 1,
+          "char": 154
+        }
+      },
+      "claim_text": "no pain on inspiration",
+      "expected_verdict": "contradicted",
+      "explanation": "Asked about a deep breath in, the patient said the chest feels sore, as does the scar.",
+      "concerns": [
+        {
+          "type": "negation_reversal",
+          "explanation": "Soreness on breathing in is recorded as no pain on inspiration.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The patient's answer conflicts with the stated absence.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 52,
+              "char": 0
+            },
+            "end": {
+              "index": 53,
+              "char": 102
+            }
+          },
+          "note": "The patient reports chest soreness on a deep breath."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! No fever, no chills, non positional.\nNo chest pain, no pain on inspiration"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! no pain on inspiration"
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "critical",
+          "verbatim": "! no pain on inspiration"
+        }
+      ],
+      "agreement": "3 of 5 evaluators with data",
+      "mapping_note": "Evaluator 3's item is a two-line item. Its second line covers this sentence, and that evaluator's post-edit replaces it with soreness on inspiration. \"No chest pain\" in the same line is supported."
+    },
+    {
+      "id": "k4",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 0
+        },
+        "end": {
+          "index": 2,
+          "char": 24
+        }
+      },
+      "claim_text": "C section 2-3 weeks ago.",
+      "expected_verdict": "partially_supported",
+      "explanation": "The second time the note gives the caesarean timing. The patient said four weeks.",
+      "concerns": [
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "The patient's four weeks is recorded as two to three weeks.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 24,
+              "char": 0
+            },
+            "end": {
+              "index": 26,
+              "char": 17
+            }
+          },
+          "note": "Asked how long ago, the patient says four weeks."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 36,
+              "char": 0
+            },
+            "end": {
+              "index": 37,
+              "char": 5
+            }
+          },
+          "note": "The clinician restates it as a couple of weeks and the patient gives a bare yes."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! 2-3"
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! 2-3"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! 2-3"
+        }
+      ],
+      "agreement": "3 of 5 evaluators with data",
+      "mapping_note": "Evaluator 4 listed \"2-3\" twice, once for each place it appears."
+    },
+    {
+      "id": "k5",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 25
+        },
+        "end": {
+          "index": 2,
+          "char": 41
+        }
+      },
+      "claim_text": "No complications",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "Complications of the caesarean section are never asked about.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "No turn covers complications of the operation.",
+          "evidence_ids": []
+        }
+      ],
+      "evidence": [],
+      "labels": [
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! No complications,"
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data"
+    },
+    {
+      "id": "k6",
+      "span": {
+        "start": {
+          "index": 4,
+          "char": 45
+        },
+        "end": {
+          "index": 4,
+          "char": 52
+        }
+      },
+      "claim_text": "regular",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "The patient counted beats for the clinician. Nothing in the interview describes the rhythm.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "The heart rhythm is not established by a beat count over the phone.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 74,
+              "char": 0
+            },
+            "end": {
+              "index": 82,
+              "char": 21
+            }
+          },
+          "note": "The patient counts their pulse for a short period; only a number is given."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! regular"
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data"
+    }
+  ]
+}

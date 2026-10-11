@@ -1,0 +1,396 @@
+{
+  "request_id": "primock57-day1-consultation07",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day1_consultation07",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 0,
+    "incorrect_statements_total": 16,
+    "incorrect_statements_mapped": 14,
+    "incorrect_statements_not_mapped": 2,
+    "omissions_excluded": 33
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 132
+        },
+        "end": {
+          "index": 0,
+          "char": 142
+        }
+      },
+      "claim_text": "No fevers.",
+      "expected_verdict": "contradicted",
+      "explanation": "Asked about temperatures, fevers and feeling hot and cold, the patient clearly said yes. They had not measured a temperature.",
+      "concerns": [
+        {
+          "type": "negation_reversal",
+          "explanation": "An affirmative answer about feeling feverish is recorded as an absence of fevers.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The patient's answer conflicts with the stated absence.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 50,
+              "char": 0
+            },
+            "end": {
+              "index": 51,
+              "char": 352
+            }
+          },
+          "note": "The clinician asks about temperatures and fevers, and the patient affirms feeling hot and cold at night."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 55,
+              "char": 0
+            },
+            "end": {
+              "index": 56,
+              "char": 153
+            }
+          },
+          "note": "The patient has not used a thermometer and judges it by touch."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! Feeling hot/cold and sweaty.\nNo fevers."
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! No fevers."
+        }
+      ],
+      "agreement": "2 of 5 evaluators with data",
+      "mapping_note": "Evaluator 1's item spans two sentences. The hot, cold and sweaty part is supported; the \"No fevers\" part is the error."
+    },
+    {
+      "id": "k2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 144
+        },
+        "end": {
+          "index": 0,
+          "char": 173
+        }
+      },
+      "claim_text": "Sore throat and blocked ears.",
+      "expected_verdict": "partially_supported",
+      "explanation": "A sore throat is supported. Blocked ears came from the clinician's question; the patient only mentioned age-related hearing and said it was all right.",
+      "concerns": [
+        {
+          "type": "question_as_answer",
+          "explanation": "A symptom suggested in the clinician's question is recorded without a clear affirmative answer.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 19,
+              "char": 0
+            },
+            "end": {
+              "index": 20,
+              "char": 258
+            }
+          },
+          "note": "The patient reports a sore throat."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 33,
+              "char": 0
+            },
+            "end": {
+              "index": 34,
+              "char": 217
+            }
+          },
+          "note": "The clinician asks about blocked ears; the patient talks about hearing getting worse with age and says it is fine."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! and blocked ears."
+        },
+        {
+          "evaluator": "evaluator_2",
+          "severity": "non_critical",
+          "verbatim": "- blocked ears."
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! Sore throat and blocked ears."
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "non_critical",
+          "verbatim": "- blocked ears."
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "critical",
+          "verbatim": "! blocked ears."
+        }
+      ],
+      "agreement": "5 of 5 evaluators with data"
+    },
+    {
+      "id": "k3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 174
+        },
+        "end": {
+          "index": 0,
+          "char": 231
+        }
+      },
+      "claim_text": "Also myalgia and arthralgia - mainly stiffness in joints.",
+      "expected_verdict": "partially_supported",
+      "explanation": "The patient agreed to the question and then described stiffness when bending, not pain. Muscle and joint pain overstates what was described.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "Stiffness is recorded as muscle and joint pain.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 66,
+              "char": 0
+            },
+            "end": {
+              "index": 73,
+              "char": 139
+            }
+          },
+          "note": "After a yes to the question, the patient describes stiffness in the elbows and knees when bending."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! Also myalgia and arthralgia -"
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data"
+    },
+    {
+      "id": "k4",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 233
+        },
+        "end": {
+          "index": 0,
+          "char": 251
+        }
+      },
+      "claim_text": "No unwell contacts",
+      "expected_verdict": "insufficient_evidence",
+      "explanation": "The interview never asks whether anyone around the patient is unwell.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "No question or answer covers unwell contacts.",
+          "evidence_ids": []
+        }
+      ],
+      "evidence": [],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! No unwell contacts"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! No unwell contacts"
+        }
+      ],
+      "agreement": "2 of 5 evaluators with data"
+    },
+    {
+      "id": "k5",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 271
+        },
+        "end": {
+          "index": 0,
+          "char": 288
+        }
+      },
+      "claim_text": "No bowel symptoms",
+      "expected_verdict": "contradicted",
+      "explanation": "The patient reported diarrhoea on the first day of the illness. It has since settled.",
+      "concerns": [
+        {
+          "type": "contradictory_evidence",
+          "explanation": "A bowel symptom reported within this illness conflicts with its stated absence.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 58,
+              "char": 0
+            },
+            "end": {
+              "index": 59,
+              "char": 129
+            }
+          },
+          "note": "Asked about other symptoms, the patient reports diarrhoea on the first day."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 61,
+              "char": 0
+            },
+            "end": {
+              "index": 61,
+              "char": 97
+            }
+          },
+          "note": "The patient says that has now settled."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! No bowel symptoms"
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! No bowel symptoms"
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "critical",
+          "verbatim": "! No bowel symptoms"
+        }
+      ],
+      "agreement": "3 of 5 evaluators with data"
+    },
+    {
+      "id": "k6",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 143
+        },
+        "end": {
+          "index": 1,
+          "char": 159
+        }
+      },
+      "claim_text": "smoking socially",
+      "expected_verdict": "partially_supported",
+      "explanation": "Occasional smoking while cutting down with a vaporiser is supported. Nothing ties the smoking to social settings.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "The social pattern is not stated in the interview.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 138,
+              "char": 0
+            },
+            "end": {
+              "index": 141,
+              "char": 208
+            }
+          },
+          "note": "The patient smokes now and then and is cutting down with a vaporiser."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! socially"
+        }
+      ],
+      "agreement": "1 of 5 evaluators with data"
+    }
+  ]
+}

@@ -1,0 +1,971 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "primock57-day2-consultation05",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Hi there. Good morning. I'm Doctor from GP at Hand. Nice to see you.",
+      "timestamp": "00:00:01"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Hi.",
+      "timestamp": "00:00:05"
+    },
+    {
+      "id": "t2",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, um, before we start your appointment. Could I confirm your full name and date of birth please?",
+      "timestamp": "00:00:06"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, it's John Smith, and I am thirty two years old.",
+      "timestamp": "00:00:11"
+    },
+    {
+      "id": "t4",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Sorry, I didn't catch your date of birth.",
+      "timestamp": "00:00:15"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I'm thirty two years old.",
+      "timestamp": "00:00:18"
+    },
+    {
+      "id": "t6",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Thirty two years old, OK. Could you tell me the first line of your address, and your postcode please?",
+      "timestamp": "00:00:19"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "It's four Park Avenue, and it's AB one CB two.",
+      "timestamp": "00:00:25"
+    },
+    {
+      "id": "t8",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "That's great, thank you so much for that. Are you in a private place where you're OK to speak at the moment?",
+      "timestamp": "00:00:29"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:00:33"
+    },
+    {
+      "id": "t10",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So how can I help you today? You've been having some problems with your asthma. Is that right?",
+      "timestamp": "00:00:34"
+    },
+    {
+      "id": "t11",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Sorry, say that .",
+      "timestamp": "00:00:39"
+    },
+    {
+      "id": "t12",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "How can I help you today?",
+      "timestamp": "00:00:40"
+    },
+    {
+      "id": "t13",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "So, um, I've been experiencing very weird symptoms, over the past month or so.",
+      "timestamp": "00:00:43"
+    },
+    {
+      "id": "t14",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And I don't know what's causing them. I have googled it and, um, nothing's coming up, so I thought I'd come and speak to you about it.",
+      "timestamp": "00:00:48"
+    },
+    {
+      "id": "t15",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:00:49"
+    },
+    {
+      "id": "t16",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, tell me a bit more about these weird symptoms you've been having.",
+      "timestamp": "00:00:56"
+    },
+    {
+      "id": "t17",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "So, it started with, feeling very tired, but for a couple of days, and then I get back to normal.",
+      "timestamp": "00:01:01"
+    },
+    {
+      "id": "t18",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And then I started losing feeling, in my hands and arms. I get a weird sensation like, uh, I guess, pins and needles.",
+      "timestamp": "00:01:07"
+    },
+    {
+      "id": "t19",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right again, the connection's not so great. You've been getting pins and needles in the hand. Is that right?",
+      "timestamp": "00:01:16"
+    },
+    {
+      "id": "t20",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And.",
+      "timestamp": "00:01:17"
+    },
+    {
+      "id": "t21",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, that's correct.",
+      "timestamp": "00:01:24"
+    },
+    {
+      "id": "t22",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Is that the right or left hand?",
+      "timestamp": "00:01:25"
+    },
+    {
+      "id": "t23",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "My right hand.",
+      "timestamp": "00:01:27"
+    },
+    {
+      "id": "t24",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Is it always the right?",
+      "timestamp": "00:01:29"
+    },
+    {
+      "id": "t25",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:01:29"
+    },
+    {
+      "id": "t26",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Um, we've lost video now, maybe is there a, a, a button you can press?",
+      "timestamp": "00:01:32"
+    },
+    {
+      "id": "t27",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:01:40"
+    },
+    {
+      "id": "t28",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Are you happy for us to carry on without the video? I can't see you at the moment.",
+      "timestamp": "00:01:42"
+    },
+    {
+      "id": "t29",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, that's fine.",
+      "timestamp": "00:01:45"
+    },
+    {
+      "id": "t30",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "All right. Um, so, you've been having these pins and needles, and episodes of numbness, in the right hand. Is it just the hand, or does it go up the arm as well?",
+      "timestamp": "00:01:46"
+    },
+    {
+      "id": "t31",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, the pins and needles are in the hand, but I feel like my arm is getting weaker, but it only lasts few days and then goes back to normal. So, it's very weird.",
+      "timestamp": "00:01:57"
+    },
+    {
+      "id": "t32",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK. Um, is there any involvement of your leg at all?",
+      "timestamp": "00:02:07"
+    },
+    {
+      "id": "t33",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, my, colleague said, I'm walking slightly differently to normal.",
+      "timestamp": "00:02:11"
+    },
+    {
+      "id": "t34",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And again, it's only for three days, or three or four days.",
+      "timestamp": "00:02:17"
+    },
+    {
+      "id": "t35",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. You, you said you've been having weird symptoms for about a month.",
+      "timestamp": "00:02:20"
+    },
+    {
+      "id": "t36",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:02:25"
+    },
+    {
+      "id": "t37",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ", so, what has been happening from the beginning of the month? What else has been happening?",
+      "timestamp": "00:02:26"
+    },
+    {
+      "id": "t38",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Um, I generally feel tired, and weak.",
+      "timestamp": "00:02:30"
+    },
+    {
+      "id": "t39",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And, sometimes I feel nauseous, and I don't feel like I want to do anything.",
+      "timestamp": "00:02:34"
+    },
+    {
+      "id": "t40",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK.",
+      "timestamp": "00:02:39"
+    },
+    {
+      "id": "t41",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, and, um.",
+      "timestamp": "00:02:41"
+    },
+    {
+      "id": "t42",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You know, , your colleague said you've, you've not been walking normally.",
+      "timestamp": "00:02:45"
+    },
+    {
+      "id": "t43",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:02:49"
+    },
+    {
+      "id": "t44",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Do you feel anything different, on either side, in terms of your legs? Can , have you noticed anything different?",
+      "timestamp": "00:02:50"
+    },
+    {
+      "id": "t45",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah, so, at the same time I get my arm symptoms, my leg feels weaker.",
+      "timestamp": "00:02:56"
+    },
+    {
+      "id": "t46",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK.",
+      "timestamp": "00:03:02"
+    },
+    {
+      "id": "t47",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And.",
+      "timestamp": "00:03:04"
+    },
+    {
+      "id": "t48",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You know you, the abnormal gait. Has that been present, outside of these episodes?",
+      "timestamp": "00:03:06"
+    },
+    {
+      "id": "t49",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, it has not. So normally, I'm, fit and well actually.",
+      "timestamp": "00:03:11"
+    },
+    {
+      "id": "t50",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, .",
+      "timestamp": "00:03:13"
+    },
+    {
+      "id": "t51",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "All right, OK. Um, and, these, these episodes. How often have they been happening?",
+      "timestamp": "00:03:16"
+    },
+    {
+      "id": "t52",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "They have been getting more regular. So at the start, it would be maybe once a week, uh, to every once , once a month, but now it's getting uh, uh, a couple of times a day.",
+      "timestamp": "00:03:24"
+    },
+    {
+      "id": "t53",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK. And, how long have these episodes been going on for? When, when did it all start? Was it a month ago?",
+      "timestamp": "00:03:36"
+    },
+    {
+      "id": "t54",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", probably a month and a half, maybe two months.",
+      "timestamp": "00:03:40"
+    },
+    {
+      "id": "t55",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK.",
+      "timestamp": "00:03:43"
+    },
+    {
+      "id": "t56",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, along with these symptoms, of the weakness and numbness. Do you have any other symptoms at the same time? Like swallowing, or difficulty speaking, or vision problems?",
+      "timestamp": "00:03:45"
+    },
+    {
+      "id": "t57",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "So, recently I've noticed, I can't hold my cup of coffee.",
+      "timestamp": "00:03:56"
+    },
+    {
+      "id": "t58",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And when I, do drink coffee, it's slightly harder to drink.",
+      "timestamp": "00:04:02"
+    },
+    {
+      "id": "t59",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "And that's only been in the last couple of days, I guess.",
+      "timestamp": "00:04:06"
+    },
+    {
+      "id": "t60",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right. Is that during these episodes, or outside of these episodes?",
+      "timestamp": "00:04:10"
+    },
+    {
+      "id": "t61",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Only during the episodes.",
+      "timestamp": "00:04:14"
+    },
+    {
+      "id": "t62",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK.",
+      "timestamp": "00:04:16"
+    },
+    {
+      "id": "t63",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Do you have any difficulty swallowing at all?",
+      "timestamp": "00:04:17"
+    },
+    {
+      "id": "t64",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Not currently, no.",
+      "timestamp": "00:04:20"
+    },
+    {
+      "id": "t65",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ". During the episodes, do you have any difficulty swallowing?",
+      "timestamp": "00:04:21"
+    },
+    {
+      "id": "t66",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I, I, I feel like there's something in my throat.",
+      "timestamp": "00:04:24"
+    },
+    {
+      "id": "t67",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. What about, um, difficulty speaking during these episodes? Any, any issues with that at all?",
+      "timestamp": "00:04:27"
+    },
+    {
+      "id": "t68",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, I can speak fine.",
+      "timestamp": "00:04:33"
+    },
+    {
+      "id": "t69",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And any visual problems during these episodes?",
+      "timestamp": "00:04:35"
+    },
+    {
+      "id": "t70",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I, I don't think so, but I wear glasses.",
+      "timestamp": "00:04:38"
+    },
+    {
+      "id": "t71",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, all right. Now um, can I just ask? , has, uh, is there any history of stroke, or mini-strokes in your family?",
+      "timestamp": "00:04:41"
+    },
+    {
+      "id": "t72",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, yes. My, father has had a, operation to the side of his neck, to reduce the risk of stroke.",
+      "timestamp": "00:04:49"
+    },
+    {
+      "id": "t73",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK.",
+      "timestamp": "00:04:59"
+    },
+    {
+      "id": "t74",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, and, uh, how about yourself? Have you had any history of, mini-strokes or anything like that, along those lines? I know you're quite young.",
+      "timestamp": "00:05:01"
+    },
+    {
+      "id": "t75",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, so after my, dad had his operation, I was required to be checked, and my cholesterol , was fine.",
+      "timestamp": "00:05:10"
+    },
+    {
+      "id": "t76",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Good, excellent. So you had a, a blood test done. And did they check for diabetes as well?",
+      "timestamp": "00:05:18"
+    },
+    {
+      "id": "t77",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah.",
+      "timestamp": "00:05:22"
+    },
+    {
+      "id": "t78",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "They checked my diabetes, my blood pressure and my, cholesterol, and the doctor said it was all OK.",
+      "timestamp": "00:05:24"
+    },
+    {
+      "id": "t79",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Fantastic, OK. Now, do you have any other illnesses at all?",
+      "timestamp": "00:05:31"
+    },
+    {
+      "id": "t80",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No.",
+      "timestamp": "00:05:35"
+    },
+    {
+      "id": "t81",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "No. Are you on any medication?",
+      "timestamp": "00:05:36"
+    },
+    {
+      "id": "t82",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I take an aspirin, seventy five milligrams, once a day, but that's, because of something I read on the internet.",
+      "timestamp": "00:05:39"
+    },
+    {
+      "id": "t83",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, so, why is that? Why do you take that?",
+      "timestamp": "00:05:45"
+    },
+    {
+      "id": "t84",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I think it's, meant to reduce your risk of stroke and heart attack.",
+      "timestamp": "00:05:49"
+    },
+    {
+      "id": "t85",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Do, have you ever told a doctor before, your GP, that you're on Aspirin?",
+      "timestamp": "00:05:54"
+    },
+    {
+      "id": "t86",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes I took, I started to , taking it after my, father had his operation, but that wasn't the doctor telling me.",
+      "timestamp": "00:05:58"
+    },
+    {
+      "id": "t87",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Uh, and, has any GP ever spoken to you about, the risks of Aspirin, and whether you should be on it? Or have you not , told the , the GP in the past?",
+      "timestamp": "00:06:04"
+    },
+    {
+      "id": "t88",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, I haven't.",
+      "timestamp": "00:06:12"
+    },
+    {
+      "id": "t89",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You haven't, OK. Um, all right. Um. Now, um, in terms of your uh, your kind of social situation. Um, are you working at the moment?",
+      "timestamp": "00:06:13"
+    },
+    {
+      "id": "t90",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, I am.",
+      "timestamp": "00:06:25"
+    },
+    {
+      "id": "t91",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ", what do you work as?",
+      "timestamp": "00:06:26"
+    },
+    {
+      "id": "t92",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I'm, uh, I'm actually a doctor.",
+      "timestamp": "00:06:28"
+    },
+    {
+      "id": "t93",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You're a , a, a medical doctor?",
+      "timestamp": "00:06:30"
+    },
+    {
+      "id": "t94",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes.",
+      "timestamp": "00:06:31"
+    },
+    {
+      "id": "t95",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. Uh, which, specialty are you in?",
+      "timestamp": "00:06:32"
+    },
+    {
+      "id": "t96",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I work in, uh, plastic surgery.",
+      "timestamp": "00:06:36"
+    },
+    {
+      "id": "t97",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Plastic surgery, OK, great. And, um, do you, have any, um, allergies to any medication at all?",
+      "timestamp": "00:06:38"
+    },
+    {
+      "id": "t98",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I'm allergic to penicillin only.",
+      "timestamp": "00:06:45"
+    },
+    {
+      "id": "t99",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. And, um, are you, um, living alone?",
+      "timestamp": "00:06:48"
+    },
+    {
+      "id": "t100",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, I live with my wife.",
+      "timestamp": "00:06:53"
+    },
+    {
+      "id": "t101",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK. Um, fantastic. Uh , do you smoke at all?",
+      "timestamp": "00:06:54"
+    },
+    {
+      "id": "t102",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, I don't.",
+      "timestamp": "00:07:00"
+    },
+    {
+      "id": "t103",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK. Um, that's fine. Now, obviously you're a, you're a medic yourself. Did you have any thoughts as to what might be going on?",
+      "timestamp": "00:07:02"
+    },
+    {
+      "id": "t104",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Uh, I've actually, got no idea.",
+      "timestamp": "00:07:11"
+    },
+    {
+      "id": "t105",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Right, OK. Um, well the, the way you're describing these episodes. They make me concerned about, mini-strokes or TIAs, , transient ischemic attacks. Um.",
+      "timestamp": "00:07:14"
+    },
+    {
+      "id": "t106",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK.",
+      "timestamp": "00:07:26"
+    },
+    {
+      "id": "t107",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And so, that's something quite urgent. And given that you've got a family history of um, stroke.",
+      "timestamp": "00:07:26"
+    },
+    {
+      "id": "t108",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, even though you're quite young, I think um, it's something that we need to exclude. So, what I'm probably going to do, uh, in fact what I am going to do, is I'm going to, refer you to a stroke, a TIA clinic.",
+      "timestamp": "00:07:32"
+    },
+    {
+      "id": "t109",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, now just to double-check. Do you have the symptoms right now?",
+      "timestamp": "00:07:44"
+    },
+    {
+      "id": "t110",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, I'm perfectly fine at the moment.",
+      "timestamp": "00:07:48"
+    },
+    {
+      "id": "t111",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, so, what I'm gonna do, is I'm uh, I'm gonna refer you to a, a mini-stroke clinic, or a TIA clinic.",
+      "timestamp": "00:07:50"
+    },
+    {
+      "id": "t112",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Um, I send that referral off now, and then you can attend them, they, they'll usually, call you in within the next one to two days, OK.",
+      "timestamp": "00:07:55"
+    },
+    {
+      "id": "t113",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Because it's something relatively urgent. Now, today it's Wednesday, so we've got a few days , before the weekend. So, um, uh, basically the deadline should be, Thursday, Friday.",
+      "timestamp": "00:08:03"
+    },
+    {
+      "id": "t114",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "We're expecting you to be seen by the time, that's the kind of turnaround we're, we're looking at.",
+      "timestamp": "00:08:13"
+    },
+    {
+      "id": "t115",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And in that clinic, they'll be doing a number of things. Um, they'll be checking, they'll be doing a ultrasound of the, carotid arteries, like your, your father had. Um, and, they'll be doing a, maybe a, they might do a scan of your brain as well, to check if there's any signs of a bleed there.",
+      "timestamp": "00:08:16"
+    },
+    {
+      "id": "t116",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "But, um, they'll be doing a range of tests in a short time frame, in order to exclude whether, you have um, any illness. OK, whether you have got any kind of stroke or, mini-stroke.",
+      "timestamp": "00:08:31"
+    },
+    {
+      "id": "t117",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Sure.",
+      "timestamp": "00:08:39"
+    },
+    {
+      "id": "t118",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Now, if your symptoms return and they persist, they're prolonged. Then um, you may need to attend A and E.",
+      "timestamp": "00:08:42"
+    },
+    {
+      "id": "t119",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, because um, our presumptive, working diagnosis is, mini-stroke or TIA, OK.",
+      "timestamp": "00:08:50"
+    },
+    {
+      "id": "t120",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And if, a mini-stroke is prolonged then uh, then we end up thinking that this might be a stroke and in that case, that becomes even more of an emergency. So, we're not talking about waiting one or two days, we want you to go to hospital in that instance, as soon as possible, OK.",
+      "timestamp": "00:08:56"
+    },
+    {
+      "id": "t121",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Sure.",
+      "timestamp": "00:09:10"
+    },
+    {
+      "id": "t122",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "Now if , things happen again, feel free to contact us, we can assess you over the phone, we can give you direction and guidance over the phone. That's, that's, that's not a problem, you know, you, you've got easy access to us.",
+      "timestamp": "00:09:11"
+    },
+    {
+      "id": "t123",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK. So, um, this is the plan going forward. Um, I'm going to, um, do that referral.",
+      "timestamp": "00:09:20"
+    },
+    {
+      "id": "t124",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "You should hear back from the hospital, relatively soon.",
+      "timestamp": "00:09:28"
+    },
+    {
+      "id": "t125",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "The hospital, you can actually ring them, on um, uh, the PALS number, and then there's also the TIA clinic number.",
+      "timestamp": "00:09:31"
+    },
+    {
+      "id": "t126",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "I'm going to leave that number in the notes for this consultation, OK. So you'll have all the information you need, to chase this appointment.",
+      "timestamp": "00:09:38"
+    },
+    {
+      "id": "t127",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "OK.",
+      "timestamp": "00:09:38"
+    },
+    {
+      "id": "t128",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "And um, if you want, you can ring them, either today or tomorrow morning.",
+      "timestamp": "00:09:44"
+    },
+    {
+      "id": "t129",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ", today in the afternoon, wait uh, one or two hours. Or tomorrow morning just to find out when they got time to slot you in. And, just to make sure they've got you in the system, that they've got in the books, and they're going to be calling you in, OK.",
+      "timestamp": "00:09:49"
+    },
+    {
+      "id": "t130",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": ", this isn't, a, an immediate emergency that you need to rush down to A and E. But it's something quite urgent we need to, deal with in a short space of time, OK.",
+      "timestamp": "00:09:58"
+    },
+    {
+      "id": "t131",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "So if there's, if there's any delay that, transpires for example, you can't make the appointment or, you know, they, you don't get called. , you, you get, get in contact back, back with us, OK.",
+      "timestamp": "00:10:06"
+    },
+    {
+      "id": "t132",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "All right. Did you have any questions at all?",
+      "timestamp": "00:10:18"
+    },
+    {
+      "id": "t133",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, I think that covers, most of it.",
+      "timestamp": "00:10:20"
+    },
+    {
+      "id": "t134",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "OK, great. So just bear with me a few minutes, and then I'll send that uh, all through and then you should, um, you should be able to help, you should have the information at your hands to, in order to take things further, OK.",
+      "timestamp": "00:10:23"
+    },
+    {
+      "id": "t135",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": ", thank you.",
+      "timestamp": "00:10:31"
+    },
+    {
+      "id": "t136",
+      "speaker": "doctor1",
+      "role": "interviewer",
+      "text": "All the best. Take care now. Bye bye.",
+      "timestamp": "00:10:32"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "s0",
+      "text": "(the above consultation reason doesn't correlate with the patient's presentation)\nHx: episodes of unilateral right hand numbness/ pins and needles, with some right leg weakness and noticeable gait disturbances, ongoing for 1.5 months\noccurring with increasing frequency- initially once a week, now more often, occurring daily\n symptoms not present now\nno dysphagia, no dysphasia\nno Pmhx of CVA/TIA\nFather had CVA- appears to have had carotid endarterectomy\nNon smoker, normal blood tests for diabetes/ cholesterol when checked a few years ago\nPMHx and FH: otherwise nil of note\nDH PT IS TAKING Aspirin daily on his own accord due to his FH\nSH: pt is a medical doctor, plastic surgeon, lives with wife\nImp: TIAs- despite young age (need to exclude any systemic disease, eg antiphospholipid syndrome, that could be cause)\nPlan: needs to be seen urgently in TIA clinic- will fax referral now. Pt to contact them via PALS/ clinic no to ensure f/u\nIf any prolonged symptoms occur- to attend A/E"
+    }
+  ]
+}
