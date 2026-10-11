@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Pure-Python final stage that resolves verbatim excerpts/claim text to code-point spans, drops what it cannot find, repairs contract-rule violations, and schema-validates the AuditResponse.
 date: 2026-10-11
 ---
@@ -124,13 +124,13 @@ Modules: `models.py`, `normalize.py` + `locate.py`, `claims.py`, `evidence.py`, 
 
 ## Risks / Open Questions
 - O-8 [RESOLVED: `ClaimDraft` uses SP03 `segments` + `span_hint`; `locate()` is the only matcher; SP03 passes hints located via `locate()`, 02 re-verifies and falls back] Alignment with SP03 O-1 / SP07 O-14.
-- O-1 [OPEN] Fuzzy threshold (90), `fuzzy_min_len` (12) and window ratio are guesses. Tune on the ADHD fixtures plus recorded linker output: report per-tier hit rate and false-match rate; pick the lowest threshold with zero wrong-turn/wrong-text matches.
-- O-2 [OPEN] `cross_turn_slack` default 0: may split Q+"yes" evidence too often when the linker trims trailing punctuation. Check split rate in linked-mode runs.
-- O-3 [OPEN] [OPTIONAL] Rule 9 n-gram size 8 and quote length 4: tune against false positives on short transcripts (idiomatic phrases) and misses on paraphrase-lite explanations.
+- O-1 [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] Fuzzy threshold (90), `fuzzy_min_len` (12) and window ratio are guesses. Tune on the ADHD fixtures plus recorded linker output: report per-tier hit rate and false-match rate; pick the lowest threshold with zero wrong-turn/wrong-text matches.
+- O-2 [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] `cross_turn_slack` default 0: may split Q+"yes" evidence too often when the linker trims trailing punctuation. Check split rate in linked-mode runs.
+- O-3 [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] [OPTIONAL] Rule 9 n-gram size 8 and quote length 4: tune against false positives on short transcripts (idiomatic phrases) and misses on paraphrase-lite explanations.
 - O-4 [RESOLVED: 05 never emits `supported` with a contradicting item; mixed support+contradiction = `partially_supported` + specific concern, per 05 decision table D5/D8, matching this repair] Repair for rule 2 violation (supported plus contradicting) is `partially_supported`; SP05 should never emit it, so confirm with SP05 whether to prefer `contradicted`.
 - O-5 [DEFERRED] LLM rewrite of rule-9 violators and relocating evidence outside the cited turn: only if drop-rate in benchmark justifies.
 - O-6 [DEFERRED] Lone surrogates / grapheme clusters in request text; NFKC per char differs from whole-string NFKC for combining sequences (match-only impact).
-- O-7 [OPEN] `no_claims_located` marking a section `section_not_processed`: confirm the frontend renders this acceptably; alternative is an `other` warning with `complete`.
+- O-7 [RESOLVED: keep `section_not_processed` + `partial` for a section with no located claims (user-approved with 06 O-1)] `no_claims_located` marking a section `section_not_processed`: confirm the frontend renders this acceptably; alternative is an `other` warning with `complete`.
 - R-1 [RESOLVED: code-point offsets] Python `str` indexes by code point, same as the contract; no conversion needed.
 - R-2 [RESOLVED: dropped, not guessed] Unmatched evidence is never kept with an approximate span.
 

@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Stage 0 prep (indexed, dialogue-act-tagged transcript with question-answer pairing) and Stage 1 atomizer (per-section claims with slots, verbatim segments, ordinal frequency/severity scales, out_of_scope marking) with validation, one retry, and per-section failure reporting.
 date: 2026-10-11
 ---
@@ -151,11 +151,11 @@ Uses 01's `LLMClient.complete_json(LLMRequest)`, `LLMResult`, `Settings`, `Reque
 
 ## Risks / Open Questions
 - [RESOLVED: 02 `locate()` is the single locator, called by 03 per segment; `ClaimDraft` adopts `segments` + `span_hint`; 02 re-verifies the hint and falls back to `locate()`; field names are 03's] O-1 Align output model with 02.
-- [OPEN] O-2 Corrections without a marker (ADHD turn 23 "I think it's less than that") are tagged `answer`, not `correction`; relies on 04/05 and check 11. Measure recall in eval.
-- [OPEN] O-3 Is every assessor observation `unobservable`? Borderline: "he seemed distracted" vs report text. Benchmark with reviewers.
-- [OPEN] O-4 Whether to surface coverage gaps / dropped claims as an `other` warning; default is logs only.
-- [OPEN] O-5 Scale bucket boundaries (4/wk, monthly) and mixed numeric/relative handling are judgment calls; tune on dev split.
-- [OPEN] O-6 Retry fits the 5-10 s atomize budget only on fast tiers; verify with live latency.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-2 Corrections without a marker (ADHD turn 23 "I think it's less than that") are tagged `answer`, not `correction`; relies on 04/05 and check 11. Measure recall in eval.
+- [RESOLVED: yes, every assessor observation is `unobservable` in the POC] O-3 Is every assessor observation `unobservable`? Borderline: "he seemed distracted" vs report text. Benchmark with reviewers.
+- [RESOLVED: logs only (counts), no warning] O-4 Whether to surface coverage gaps / dropped claims as an `other` warning; default is logs only.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-5 Scale bucket boundaries (4/wk, monthly) and mixed numeric/relative handling are judgment calls; tune on dev split.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-6 Retry fits the 5-10 s atomize budget only on fast tiers; verify with live latency.
 - [DEFERRED] Duration, certainty beyond `hedged`, other link types (contrast, parallel accounts), sentence-level acts, cross-speaker correction detection by rules.
 
 ## Acceptance Criteria

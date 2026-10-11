@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Runnable FastAPI backend/ with POST /v1/audit + /healthz, contract-schema validation, contract-valid errors, env config, async LiteLLM client with fixture/stub mode, PHI-safe logging, and a stub pipeline seam returning an empty-claims response.
 date: 2026-10-11
 ---
@@ -45,12 +45,12 @@ Stages 02-06 need a shared home: app, validation, errors, config, one LLM interf
 - Compiled validators cached at import; a missing/invalid schema fails startup, not first request.
 
 **R3 Request pipeline in the endpoint** (order matters):
-1. Body size check (Content-Length when present, else read the body and check its length) > `MAX_BODY_BYTES` → 413 `payload_too_large`. [OPTIONAL: streaming cap that aborts mid-read instead of reading the full body; see O-4.]
+1. Body size check (Content-Length when present, else read the body and check its length) > `MAX_BODY_BYTES` → 413 `payload_too_large`. [OPTIONAL: streaming cap that aborts mid-read instead of reading the full body; O-4 deferred.]
 2. Parse JSON myself from raw bytes (route takes `Request`, not a Pydantic body model, so FastAPI's own 422 never fires for the body). Not JSON / not an object → 400 `invalid_request`.
 3. `schema_version` present and != `"1.0.0"` → 400 `unsupported_version` (checked BEFORE schema validation, because the schema uses `const`, which would otherwise surface as a generic invalid_request). Missing `schema_version` → `invalid_request`.
 4. Turn count > `MAX_TURNS` or section count > `MAX_SECTIONS` → 413 `payload_too_large` (checked before full schema walk, on the parsed lists, so a 5k-turn body fails cheap).
 5. JSON-Schema validation; any error → 400 `invalid_request`. Message = first N issues as `path: message` (paths and schema messages only; never echo instance values, which may be transcript text).
-6. Extra checks: unique turn `id`s; unique section `id`s → 400 `invalid_request` (names the duplicate id? ids are "log only", non-PHI by contract; message names the count and the first duplicated id) [see O-3].
+6. Extra checks: unique turn `id`s; unique section `id`s → 400 `invalid_request` (message names the duplicate count only, never the ids) [RESOLVED: O-3].
 7. Parse into internal Pydantic models; call the pipeline; validate the result with R2 `validate_response`; failure → 500 `internal_error` (never ship an invalid audit). Status 200. [OPTIONAL] On success, when `IAUDIT_SERVER_TIMING=true`, adds a `Server-Timing` header (durations only, no PHI; values come from 06's metrics snapshot; per 06 R5/R8).
 
 `request_id` is echoed on errors whenever the parsed object has a string `request_id` (even if the rest is invalid); otherwise omitted. Response success echo is the pipeline's job but the seam asserts it (rule 10).
@@ -73,7 +73,7 @@ The contract lists 400 and 422 as typical for `invalid_request`; we use 400 for 
 |---|---|
 | Limits | `MAX_BODY_BYTES` 2_000_000, `MAX_TURNS` 2000, `MAX_SECTIONS` 50 |
 | CORS | `CORS_ORIGINS` comma list (default `http://localhost:5173`); no `*` with credentials; methods POST/GET/OPTIONS |
-| Models | `MODEL_CHEAP` `claude-haiku-4-5`, `MODEL_MID` `claude-sonnet-5-5`, `MODEL_STRONG` `claude-opus-5-5` (LiteLLM ids, e.g. `anthropic/...` form decided at wiring; provider switch = change string only) |
+| Models | `MODEL_CHEAP` `anthropic/claude-haiku-4-5-20251001`, `MODEL_MID` `anthropic/claude-sonnet-5-5`, `MODEL_STRONG` `anthropic/claude-opus-5-5` (LiteLLM ids, per O-1; provider switch = change string only) |
 | Timeouts | `LLM_TIMEOUT_S` per call (default 30), `AUDIT_DEADLINE_S` 60 (hard cap; 06 consumes), `LLM_MAX_RETRIES` 1 |
 | Concurrency | `LLM_MAX_CONCURRENCY` 20 (global semaphore in the client; 06 may sub-limit) |
 | Mode | `LLM_MODE` = `live` \| `fixture` \| `stub` (default `live`); `FIXTURE_DIR` |
@@ -145,11 +145,11 @@ Async design for 06: everything awaits; the client holds one global semaphore (c
 - Confirm LiteLLM model id strings against the account's available models before first live run.
 
 ## Risks / Open Questions
-- [OPEN] O-1 LiteLLM id form for Claude (`anthropic/claude-sonnet-5-5` vs bare) and whether `response_format` json_schema is honored for each tier; verify with one live call at wiring; fallback is tool-use/JSON-in-prompt inside the client only.
-- [OPEN] O-2 Prompt-cache hint through LiteLLM: `cache_control` on a content block should pass through to Anthropic; verify token-usage fields (`cache_read_input_tokens`) surface in `usage`. Owner: 06 benchmark.
-- [OPEN] O-3 Duplicate-id message naming an id: ids are non-PHI by contract intent but could be derived from names; safer default is count-only. Choose count-only unless reviewers want ids.
+- [RESOLVED: cheap `anthropic/claude-haiku-4-5-20251001`, mid `anthropic/claude-sonnet-5-5` (strong `anthropic/claude-opus-5-5`); one live call in task 01.10 confirms the id form and json_schema output; key from `ANTHROPIC_API_KEY`] O-1 LiteLLM id form for Claude (`anthropic/claude-sonnet-5-5` vs bare) and whether `response_format` json_schema is honored for each tier; verify with one live call at wiring; fallback is tool-use/JSON-in-prompt inside the client only.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-2 Prompt-cache hint through LiteLLM: `cache_control` on a content block should pass through to Anthropic; verify token-usage fields (`cache_read_input_tokens`) surface in `usage`. Owner: 06 benchmark.
+- [RESOLVED: count-only; the message never names ids] O-3 Duplicate-id message naming an id: ids are non-PHI by contract intent but could be derived from names; safer default is count-only. Choose count-only unless reviewers want ids.
 - [RESOLVED: SP01 default `stub`; SP06 flips to `full`; tests/fixtures always set `IAUDIT_PIPELINE=stub` and never rely on the default] O-5.
-- [OPEN] [OPTIONAL] O-4 Streaming body size cap: ASGI servers may buffer; enforce cap while reading chunks. Acceptable for POC.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] [OPTIONAL] O-4 Streaming body size cap: ASGI servers may buffer; enforce cap while reading chunks. Acceptable for POC.
 - [RESOLVED: yes] Schema validation cost on 2 MB bodies: jsonschema runs in a worker thread (`run_in_threadpool`) to avoid blocking the loop; no further optimization.
 - [RESOLVED: contract shows no request-level `role` need] Missing `role` is valid input; this SP does no role handling (05).
 - [DEFERRED] `rate_limited` emission, auth, request-id generation when absent, multi-worker deployment.

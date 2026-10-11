@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Stage 3 Check - group A code checks (attribution, question-as-answer, missing-role handling), one mid-tier verifier call per claim (meaning, amounts, P1 flags, inference premises), and a pure-code verdict/concern synthesis with templated neutral explanations, producing 02's ClaimDraft.
 date: 2026-10-11
 ---
@@ -15,7 +15,7 @@ Link output says what evidence exists; nothing yet says whether it faithfully su
 
 ## Goals / Non-Goals
 **Goals**
-- Buckets 1, 2, 3, 5, 7, 9 done well (P0); 4 as stretch; 6, 8, 10, 11, 12 as a confidence-gated quick pass.
+- Buckets 1, 2, 3, 4, 5, 7, 9 done well (P0; 4 moved from stretch per 07 O-3); 6, 8, 10, 11, 12 as a confidence-gated quick pass.
 - Understated and inflated amounts both flagged, direction in the explanation.
 - Output that passes 02's rule checks without repair on the normal path.
 - Each ADHD variant maps to an explicit signal path (see Variant map).
@@ -32,12 +32,11 @@ Hackathon build: **Core** is the critical path and ships first. **Optional** ite
 - R1 entry points (`check_claims`, `check_one`, `stalled_draft`, `passthrough_oos`, `decide`).
 - R2 group A: A3 reporter attribution, A9 question-as-answer, missing-role rule (skip check, keep `ambiguous_turns`, 02 emits `ambiguous_speaker`), zero-call short-circuits.
 - R3 verifier call (buckets 1, 2, 5, 7 relation/amount observations), plus the P1 flags (4/6/8/10/11/12) as extra output fields, accepted at one fixed confidence floor (`CHECK_MIN_CONF_P1` = 0.6, P0 floor 0.5; no calibration).
-- R4 items 1-3 (fixed floors, polarity, ordinal both directions with "inflates"/"understates"), 5, 6 (verifier flag only), 7, 8 (certainty, conflicting accounts, causal, correction/context/element gap via verifier flags), 9 inference rule. Item 4 (timeframe) is Optional. At-least cues: a **minimal** fixed list (repeatedly, frequently, regularly, often, several, many, multiple) so faithful S5 is not flagged.
+- R4 items 1-3 (fixed floors, polarity, ordinal both directions with "inflates"/"understates"), 5, 6 (verifier flag only), 7, 8 (certainty, conflicting accounts, causal, correction/context/element gap via verifier flags), 9 inference rule. Item 4 (timeframe) is **Core** (moved from Optional per 07 O-3): code demotion plus row D6 `timeframe_mismatch` and decision D9. At-least cues: a **minimal** fixed list (repeatedly, frequently, regularly, often, several, many, multiple) so faithful S5 is not flagged.
 - R5 roles, R6 decision table D0-D9 + dedup, R7 explanation templates, R8 failure/logging/config.
 - Acceptance criteria 1-2, 4-5, 7-9 and the core part of 3 and 6.
 
 **Optional (gated: after all core work in every SP)**
-- Timeframe bucket 4 in code (R4 item 4, row D6 `timeframe_mismatch`, Variant 5 path, D9 decision). Core fallback: no timeframe demotion; V5's turn 17 arrives as `qualifying` from 04, so no support remains and the claim lands on D7 `insufficient_evidence` + `unsupported_claim`.
 - P1 confidence calibration / precision-based suppression (O-5) beyond the fixed floor.
 - Code rate-ratio check for conflicting accounts (R4 item 6 code path, `CHECK_RATE_RATIO`). Core fallback: rely on the verifier flag 11 alone.
 - At-least cue list refinements beyond the minimal list (O-2, `bound` on `Quantity`).
@@ -78,16 +77,16 @@ Inputs: `AtomicClaim.reported_by`, `subject_speaker`, `IndexedTurn.speaker/role`
 1. **Confidence floor.** Core: fixed floors only. `conf` maps low/medium/high = 0.3/0.6/0.9. P0 observations (relation, experiencer, polarity) need >= `CHECK_MIN_CONF_P0` (default 0.5); P1 flags need >= `CHECK_MIN_CONF_P1` (default 0.6, i.e. medium). Below floor: dropped (counted, logged). Eval-driven suppression tuning / calibration is **[OPTIONAL]** and deferred (O-5).
 2. **Polarity.** Claim `polarity` vs item `polarity` on items with relation `contradicts` and `experiencer = claim_subject`: both known and different -> `negation_reversal`.
 3. **Ordinal amounts, both directions.** Per kind (frequency, severity), claim `quantities` (03 buckets) vs verifier value mapped in code (`rate_per_week` -> `bucket_from_rate`, else `lexicon_bucket(raw)`, else `bucket_guess` flagged `basis=model`). Only `entails` items from the claim's accounts are compared. Pairs are same-basis first (numeric-numeric, relative-relative); take the pair with the smallest `|d|` (benefit of the doubt), `d = step_diff(claim, evidence)`, positive = claim stronger. Mixed-basis only if no same-basis pair.
-   - **Material** iff `|d| >= CHECK_STEP_MATERIAL` (default 1) and not *adjacent-ambiguous*; adjacent-ambiguous = `|d| == 1` and (basis is mixed or the evidence rate sits within 15 percent of the bucket boundary). [OPEN O-1]
+   - **Material** iff `|d| >= CHECK_STEP_MATERIAL` (default 1) and not *adjacent-ambiguous*; adjacent-ambiguous = `|d| == 1` and (basis is mixed or the evidence rate sits within 15 percent of the bucket boundary). [DEFERRED O-1]
    - **At-least cues.** If the claim `raw` carries a lower-bound cue (repeatedly, frequently, regularly, often, several, many, multiple) and `d < 0`, it is not an understatement (vague quantifiers are compatible with a higher rate). Small list in `amounts.py` (core: minimal list as in Scope tiers; **[OPTIONAL]** refinements beyond it). "Some", "mild", "a little" are level words, not at-least cues.
    - **Stronger (d > 0):** concern `frequency_severity_inflation`, verdict `partially_supported`, explanation says "inflates". Escalates to `contradicted` when evidence bucket is `0` (never/none) and claim >= 1, or `d >= CHECK_CONTRADICT_GAP` (default 3); the compared item is then relabelled `contradicting` so rule 3 holds.
    - **Weaker (d < 0):** same concern type, `partially_supported`, explanation says "understates", never `contradicted`.
    - **Tie / immaterial / no same-kind value on either side:** no concern.
-4. **[OPTIONAL] Timeframe (bucket 4, stretch).** Core fallback: no code timeframe check; demoted/childhood items come from 04 as `qualifying` and the claim falls to D7. Claim `timeframe` vs item `timeframe` (or a flag). Mismatch = claim current/future vs item past/childhood/hypothetical, claim childhood/past vs item current, or any claim vs hypothetical. Implicit-current claims (`timeframe_explicit=false`) fire only at `conf = high`. Mismatched items are **demoted** to `qualifying` (they no longer count as support); the concern is emitted only if no supporting item remains (R6 row D6).
+4. **Timeframe (bucket 4, core).** Claim `timeframe` vs item `timeframe` (or a flag). Mismatch = claim current/future vs item past/childhood/hypothetical, claim childhood/past vs item current, or any claim vs hypothetical. Implicit-current claims (`timeframe_explicit=false`) fire only at `conf = high`. Mismatched items are **demoted** to `qualifying` (they no longer count as support); the concern is emitted only if no supporting item remains (R6 row D6).
 5. **Certainty (6).** Fires only for claim `hedged=false` vs item `hedged_strong`; `hedged_light` ("probably every day") is ignored.
 6. **Conflicting accounts (11).** Core: fires on the verifier flag. **[OPTIONAL] code path:** also fires in code when the claim has >=2 `reported_by` accounts and numeric `rate_per_week` of different accounts differ by ratio >= `CHECK_RATE_RATIO` (default 1.5). Needed because "twice a month" (0.46/wk) and "once a month" (0.23/wk) fall in one ordinal bucket, so amounts alone cannot see it.
 7. **Causal (12).** Considered only when the claim has a causal cue (lexicon: because, caused, due to, led to, resulted in, so, therefore; or an assessor-sourced 03 `link` naming it); otherwise the flag is ignored. Reported/believed links (`source=reported`) are not flagged.
-8. **Correction (10), context (8), element gap:** verifier flags above the floor. Items cited by an accepted 8/10/12 flag count as partial support (they are the source the claim drew from), so a flagged claim lands on `partially_supported`, not `insufficient_evidence` [OPEN O-9].
+8. **Correction (10), context (8), element gap:** verifier flags above the floor. Items cited by an accepted 8/10/12 flag count as partial support (they are the source the claim drew from), so a flagged claim lands on `partially_supported`, not `insufficient_evidence` [DEFERRED O-9].
 9. **Inference rule.** An inference group is *supported* iff every premise item has relation `entails` and `step_acceptable` at/above the floor. A failed group: premises relabelled `qualifying`, and they supply no support. Supported group: premises are `supporting` evidence like any other.
 
 ### R5 Evidence roles out
@@ -102,7 +101,7 @@ Inputs: `AtomicClaim.reported_by`, `subject_speaker`, `IndexedTurn.speaker/role`
 | D3 | A9 fires | `insufficient_evidence` | `question_as_answer` on the question/non-answer item(s) (no call) |
 | D4 | contradicting >= 1, supporting = 0 | `contradicted` | most specific of: `wrong_attribution` > `negation_reversal` > `frequency_severity_inflation` (zero/gap escalation) > `contradictory_evidence` |
 | D5 | contradicting >= 1, supporting >= 1 | `partially_supported` (never `supported`; matches 02 R4) | `conflicting_accounts_flattened` > `correction_ignored` > `contradictory_evidence`, plus any independent concern |
-| D6 | no support, no contradiction, demoted items exist | `insufficient_evidence` | `timeframe_mismatch` **[OPTIONAL]** (timeframe demotion; core falls to D7) or `unsupported_claim` (failed inference) |
+| D6 | no support, no contradiction, demoted items exist | `insufficient_evidence` | `timeframe_mismatch` (timeframe demotion) or `unsupported_claim` (failed inference) |
 | D7 | no support, nothing else | `insufficient_evidence` | `unsupported_claim` |
 | D8 | supporting >= 1, no contradicting, >= 1 surviving concern | `partially_supported` | reporter `wrong_attribution`, `frequency_severity_inflation` (inflates/understates), `certainty_inflation`, `context_stripping`, `unsupported_causal_link`, `conflicting_accounts_flattened`, `unsupported_claim` for `element_gap` |
 | D9 | supporting >= 1, no contradicting, no concern | `supported` | none |
@@ -138,7 +137,7 @@ Uses 01 `LLMClient`, `RequestContext`, `Settings`, tier `mid`, Stub/FixtureClien
 | 2 | turn 5 "Not really" | relation `contradicts`, evidence `negated` vs claim `affirmed`, experiencer = subject -> `negation_reversal` (suppresses generic `contradictory_evidence`) | D4 `contradicted` + `negation_reversal` |
 | 3 | turn 21 (sam1), `contradicting` | `contradicts`, `experiencer=other_person` (Sam is the forgetful one) -> `wrong_attribution`, which suppresses `negation_reversal` ("He's good with appointments" is also negated) | D4 `contradicted` + `wrong_attribution` |
 | 4 | question 12 + "Hm." 13 as one `qualifying` item, `answer_status=non_answer` | A9: no endorsed item, question turn role `interviewer` -> `question_as_answer`; zero verifier calls | D3 `insufficient_evidence` + `question_as_answer`; evidence `qualifying` (12-13) |
-| 5 **[OPTIONAL]** | turn 17, `qualifying` | item `entails` the behaviour, `timeframe=childhood/past` vs claim current explicit -> mismatch, item demoted, no support left (or claim flag `timeframe_mismatch`) | D6 `insufficient_evidence` + `timeframe_mismatch` |
+| 5 | turn 17, `qualifying` | item `entails` the behaviour, `timeframe=childhood/past` vs claim current explicit -> mismatch, item demoted, no support left (or claim flag `timeframe_mismatch`) | D6 `insufficient_evidence` + `timeframe_mismatch` |
 | 6 | 19 (supporting), 23 (contradicting or qualifying) | claim has 2 `reported_by` accounts; Sam 0.46/wk vs Alex 0.23/wk: ratio 2.0 >= 1.5 (+ verifier flag 11); same ordinal bucket so no amount concern | D8 (or D5 if 23 is `contradicting`) `partially_supported` + `conflicting_accounts_flattened` (core: via verifier flag 11; ratio check is **[OPTIONAL]**) |
 | 7 | turn 11 | `entails` with flag `context_stripping` citing 11 (qualifier "ran out of paint" dropped); cited item counts as partial support | D8 `partially_supported` + `context_stripping` |
 | 8 | turn 25 | causal cue "caused"; flag `unsupported_causal_link` citing 25; cited item counts as partial support | D8 `partially_supported` + `unsupported_causal_link` |
@@ -158,7 +157,7 @@ Impact of 07 open items:
 | D6 | Zero-call paths | No evidence, or only question/non-answer evidence | Always call | Saves latency/cost; deterministic |
 | D7 | Understated | Same concern type, `partially_supported`, "understates"; never `contradicted` | New type | Locked brainstorm decision |
 | D8 | Mixed support/contradiction | `partially_supported` + specific concern | `contradicted` | Contradiction of part only; matches 02 R4 |
-| D9 [OPTIONAL] | Timeframe | Demote mismatched evidence, concern only if no support left | Concern alongside `supported` | Evidence from another period does not substantiate the claim |
+| D9 | Timeframe | Demote mismatched evidence, concern only if no support left | Concern alongside `supported` | Evidence from another period does not substantiate the claim |
 | D10 | Verifier context | Same turns 04 showed | Cited items only | Flags 8/10/11 need surrounding turns; cache reuse |
 | D11 | Generic vs specific concern | Specific suppresses generic | Emit all | Contract wants no repetitive findings; avoids FP on gold |
 | D12 | Quote existence | Rely on 04 dry-run + 02 | Re-match in 05 | One matcher (02 `locate`) |
@@ -167,25 +166,25 @@ Impact of 07 open items:
 - Verifier benchmark and few-shot validation need a provider API key (owner step in 01); thresholds in O-1/O-5 are set from live runs on the ADHD set only.
 
 ## Risks / Open Questions
-- [OPEN] O-1 Materiality: `|d| >= 1`, adjacent-ambiguous band (mixed basis, 15 percent of boundary), `CHECK_CONTRADICT_GAP=3`, rate ratio 1.5 are guesses. Tune per bucket on dev; report false-alarm rate on faithful claims.
-- [OPEN] O-2 At-least cue list and treatment of vague quantifiers (S5 faithful depends on it); 03 could instead expose `bound: exact|at_least` on `Quantity`.
-- [OPEN] O-3 Claims with no quantity of a kind never get an amount check, even if the evidence is extreme; depends on 03 extracting quantities.
-- [OPEN] O-4 Faithful sensitivity: strict verifiers may flag S7 ("Not really" -> "denies"), S3 ("Sometimes" -> "some difficulty"), S2 ("probably every day"); user-approved text, so failures are checker findings (07 O-12).
-- [OPEN] O-5 Confidence floors (0.5 / 0.6) and enum mapping are proposals; P1 precision-based suppression (<0.6) is deferred to eval on the dev split.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-1 Materiality: `|d| >= 1`, adjacent-ambiguous band (mixed basis, 15 percent of boundary), `CHECK_CONTRADICT_GAP=3`, rate ratio 1.5 are guesses. Tune per bucket on dev; report false-alarm rate on faithful claims.
+- [RESOLVED: ship the minimal at-least cue list; add `Quantity.bound` in 03 only if faithful S5 fails] O-2 At-least cue list and treatment of vague quantifiers (S5 faithful depends on it); 03 could instead expose `bound: exact|at_least` on `Quantity`.
+- [RESOLVED: accepted as a known limitation] O-3 Claims with no quantity of a kind never get an amount check, even if the evidence is extreme; depends on 03 extracting quantities.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-4 Faithful sensitivity: strict verifiers may flag S7 ("Not really" -> "denies"), S3 ("Sometimes" -> "some difficulty"), S2 ("probably every day"); user-approved text, so failures are checker findings (07 O-12).
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-5 Confidence floors (0.5 / 0.6) and enum mapping are proposals; P1 precision-based suppression (<0.6) is deferred to eval on the dev split.
 - [RESOLVED: per 06] O-6 Shared cache prefix with 04: common system + transcript first, stage block after (whole mode only; shortlist mode per-stage). Live cache_read numbers still depend on 01 O-2.
-- [OPEN] O-7 A9 and A3 skip entirely when roles are missing even though 04's `answer_status` uses speaker strings; locked rule kept. Relax only on user decision; effect today is a safe `insufficient_evidence`.
-- [OPEN] O-8 V3: turn 21 mixes "Sam forgets" and "Alex is good"; precedence `wrong_attribution` over `negation_reversal` is a rule, not measured.
-- [OPEN] O-9 "Flag-cited items count as partial support" (V7, V8) assumes 04 returns those turns; if the verifier calls them `not_addresses` without the flag firing, the claim becomes `insufficient_evidence` instead.
-- [OPEN] O-10 Verifier sees 04's shortlist, not the whole transcript, in shortlist mode; flag 10/11 recall is bounded by 04's shortlist.
-- [OPEN] O-11 `suggested_revision` quality and default-on; copycheck (02 R5) may null many.
-- [OPEN] O-12 `ClaimDraft` for out-of-scope claims is built here; needs 03 to expose the fixed reason string on `AtomicClaim` (assumed `claim.oos_reason`).
-- [OPEN] O-13 No isolated bucket-2 (generic contradiction) or bucket-10 negative in the ADHD set (07 O-8); need user-approved variants before those buckets are measurable.
+- [RESOLVED: keep the locked missing-role rule] O-7 A9 and A3 skip entirely when roles are missing even though 04's `answer_status` uses speaker strings; locked rule kept. Relax only on user decision; effect today is a safe `insufficient_evidence`.
+- [RESOLVED: `wrong_attribution` takes precedence over `negation_reversal`] O-8 V3: turn 21 mixes "Sam forgets" and "Alex is good"; precedence `wrong_attribution` over `negation_reversal` is a rule, not measured.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-9 "Flag-cited items count as partial support" (V7, V8) assumes 04 returns those turns; if the verifier calls them `not_addresses` without the flag firing, the claim becomes `insufficient_evidence` instead.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-10 Verifier sees 04's shortlist, not the whole transcript, in shortlist mode; flag 10/11 recall is bounded by 04's shortlist.
+- [RESOLVED: `suggested_revision` on by default; nulls from copycheck are acceptable] O-11 `suggested_revision` quality and default-on; copycheck (02 R5) may null many.
+- [RESOLVED: 03 exposes `claim.oos_reason` on `AtomicClaim`] O-12 `ClaimDraft` for out-of-scope claims is built here; needs 03 to expose the fixed reason string on `AtomicClaim` (assumed `claim.oos_reason`).
+- [DEFERRED: to 07b; needs user-approved new variants] O-13 No isolated bucket-2 (generic contradiction) or bucket-10 negative in the ADHD set (07 O-8); need user-approved variants before those buckets are measurable.
 - [RESOLVED: 05 never emits `supported` with a contradicting item; mixed case = `partially_supported` + concern, same as 02 repair] 02 O-4.
 - [RESOLVED: `qualifying` is the role for non-answer pairs; rule 5 only forbids `contradicting` under `insufficient_evidence`] 04 O-6.
 - [DEFERRED] Per-account value comparison beyond speaker/role match; self-consistency; contract rename to `frequency_severity_mismatch`; counterevidence for out-of-scope claims; LLM rewriting of explanations.
 
 ## Acceptance Criteria
-1. Variant map (V5 **[OPTIONAL]**; core expects D7 for it; V6 core via verifier flag 11): with a stub verifier returning the observations in the Variant map (no network), each of the 8 variants plus the faithful claims yields the listed verdict, concern(s) and evidence roles; V1 explanation contains "inflates"; a fictional severity pair "mild" vs "severe" yields `partially_supported` + `frequency_severity_inflation` with "understates".
+1. Variant map (V5 expects D6 `insufficient_evidence` + `timeframe_mismatch`; V6 core via verifier flag 11): with a stub verifier returning the observations in the Variant map (no network), each of the 8 variants plus the faithful claims yields the listed verdict, concern(s) and evidence roles; V1 explanation contains "inflates"; a fictional severity pair "mild" vs "severe" yields `partially_supported` + `frequency_severity_inflation` with "understates".
 2. Decision-table tests: one per row D0-D9, each output passes 02 `check_rules` and the response schema; property test over random signal combinations never yields `supported` with a contradicting item, `contradicted` without one, `partially_supported` without a concern, or a contradicting item under `insufficient_evidence`.
 3. Ordinal tests, both directions: stronger/weaker/tie/adjacent-mixed-basis/at-least cue (minimal list)/bucket-0 escalation/gap-3 escalation; same-basis-first pairing; vague quantifier not flagged as understatement. **[OPTIONAL]** rate ratio catches twice vs once a month.
 4. Group A: reporter mismatch via speaker string and via role; role `None` turn skips A3/A9 and lands in `ambiguous_turns`; bucket 9 fires only for interviewer question turns; zero verifier calls for no-evidence and question-only claims (call counter).

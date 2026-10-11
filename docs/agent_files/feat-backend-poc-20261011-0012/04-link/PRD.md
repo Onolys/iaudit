@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Stage 2 Link - per-request BM25+rapidfuzz turn shortlist with question/answer/correction/other-speaker neighbors (or whole transcript under a benchmarked size), one mid-tier call per checkable claim returning verbatim excerpts with role, link type and inference premises, validated against the shortlist and handed to the assembler.
 date: 2026-10-11
 ---
@@ -54,7 +54,7 @@ Built once per request: a `TurnIndex` over all turns; per-claim `shortlist(claim
 7. Empty/zero-score result: fall back to whole transcript if under `LINK_FALLBACK_MAX_TOKENS` (3x the whole-mode threshold), else `items: []` with status `ok` (counted `empty_shortlist`). [OPTIONAL: instead use the top-k by rapidfuzz alone plus neighbors.]
 
 ### R2 Whole-transcript mode
-`LINK_MODE=auto|whole|shortlist` (default `auto`). `auto`: estimated tokens (`ceil(total_chars/4)`, no tokenizer dependency) `< LINK_WHOLE_MAX_TOKENS` -> all turns, no retrieval; else R1. Proposed default 8,000 tokens [OPEN O-2, set by benchmark]. Tests force `shortlist` on the ADHD fixtures so retrieval is exercised although the example is far below the threshold (est. under 1k tokens).
+`LINK_MODE=auto|whole|shortlist` (default `auto`). `auto`: estimated tokens (`ceil(total_chars/4)`, no tokenizer dependency) `< LINK_WHOLE_MAX_TOKENS` -> all turns, no retrieval; else R1. Default 8,000 tokens [DEFERRED O-2: benchmark later]. Tests force `shortlist` on the ADHD fixtures so retrieval is exercised although the example is far below the threshold (est. under 1k tokens).
 
 ### R3 Linker call (`linker.py`, `prompt.py`)
 - Eligible claims: `scope == in_scope` only. One mid-tier call per claim (`call_tag="link"`, `temperature=0`, `response_model=LinkerOutput`, `max_tokens=LINK_MAX_TOKENS` 1200), `asyncio.gather` under a local `Semaphore(LINK_CONCURRENCY=20)` on top of 01's global client semaphore; `timeout_s=min(LLM_TIMEOUT_S, remaining deadline)`.
@@ -133,16 +133,16 @@ Uses 01 `LLMClient.complete_json`, `RequestContext`, `Settings`, tier `mid`, Stu
 - Threshold benchmark (O-2) needs a provider API key (owner step in 01) and, for the real long-transcript timing, the CDR file (test-only; never invented).
 
 ## Risks / Open Questions
-- O-1 Model mismatches: (a) [RESOLVED: 02 `ClaimDraft` uses 03 `segments` + `span_hint`; 02 `locate()` is the single matcher] (was `claim_text`+`char_hint`); (b) [RESOLVED: `LinkedEvidence` wrapper adds link_type/premises/inference_step, internal to 04/05, not sent to 02; 02 unchanged]; (c) [RESOLVED: 02 path is `backend/src/iaudit_backend/assembler/`]; (d) [RESOLVED: 04 now declares dependency on 02]; (e) 03 says 02 finishes `unresolved` segments, 02 R3 re-locates everything (consistent, confirm); (f) [OPEN] `ambiguous_turns` is filled by 04 for evidence turns only; 06/05 merge other sources.
-- [OPEN] O-2 `LINK_WHOLE_MAX_TOKENS` 8,000 is a proposal. Benchmark whole vs shortlist at 4k/8k/16k on dev + 3x synthetic transcript: evidence-span recall, p50/p95 latency of the Link stage (budget 8-12 s), tokens. Cost shape (estimate): 30 claims x 8k tokens = 240k input tokens, about $0.48 uncached at $2/M vs about 60k tokens in shortlist mode.
-- [OPEN] [OPTIONAL tuning] O-3 Shortlist defaults (k=8, floor 2, window 4, cap 30) and the stemmer are guesses; tune on retrieval recall@shortlist; `LINK_WIDEN_ON_EMPTY` on/off by eval.
-- [OPEN] O-4 Embedding retriever: only if linked-mode recall gain >= 0.05 F1 [DEFERRED until then].
+- O-1 Model mismatches: (a) [RESOLVED: 02 `ClaimDraft` uses 03 `segments` + `span_hint`; 02 `locate()` is the single matcher] (was `claim_text`+`char_hint`); (b) [RESOLVED: `LinkedEvidence` wrapper adds link_type/premises/inference_step, internal to 04/05, not sent to 02; 02 unchanged]; (c) [RESOLVED: 02 path is `backend/src/iaudit_backend/assembler/`]; (d) [RESOLVED: 04 now declares dependency on 02]; (e) 03 says 02 finishes `unresolved` segments, 02 R3 re-locates everything (consistent, confirm); (f) [RESOLVED: yes] `ambiguous_turns` is filled by 04 for evidence turns only; 06/05 merge other sources.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-2 `LINK_WHOLE_MAX_TOKENS` 8,000 is a proposal. Benchmark whole vs shortlist at 4k/8k/16k on dev + 3x synthetic transcript: evidence-span recall, p50/p95 latency of the Link stage (budget 8-12 s), tokens. Cost shape (estimate): 30 claims x 8k tokens = 240k input tokens, about $0.48 uncached at $2/M vs about 60k tokens in shortlist mode.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] [OPTIONAL tuning] O-3 Shortlist defaults (k=8, floor 2, window 4, cap 30) and the stemmer are guesses; tune on retrieval recall@shortlist; `LINK_WIDEN_ON_EMPTY` on/off by eval.
+- [DEFERRED: only if linked-mode recall gain >= 0.05 F1] O-4 Embedding retriever.
 - [RESOLVED: per 06] O-5 Warm-up and shared prefix: 06 warms the cache at t=0 (not serialized in Link) and 04/05 share a transcript-first layout in whole mode (06 R6).
 - [RESOLVED: per 06] O-10 D9, AC 7 and R3 now follow 06's layout (system -> transcript -> stage -> claim); no warm-up in 04; act hints in the claim block.
 - [RESOLVED: per 05, `qualifying` is the role for non-answer pairs; rule 5 only forbids `contradicting` under `insufficient_evidence`] O-6 Role of near-miss/non-answer pairs: `qualifying` is a convention for 05 (rule 5 forbids `contradicting` on `insufficient_evidence`); confirm with 05 and with how 02's repair treats it.
-- [OPEN] O-7 BM25Okapi idf can be zero/negative on tiny corpora (epsilon floor); BM25Plus or `snowballstemmer` are swaps if tests show noise.
-- [OPEN] O-8 Question snapping edits what the highlight covers (full question turn); check reviewer value vs over-highlighting.
-- [OPEN] O-9 Variant 6 (one claim, two `reported_by`): linker labels turn 23 `contradicting` or `qualifying`? Test both against 05's expected `partially_supported` + `conflicting_accounts_flattened`.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-7 BM25Okapi idf can be zero/negative on tiny corpora (epsilon floor); BM25Plus or `snowballstemmer` are swaps if tests show noise.
+- [RESOLVED: keep question snapping] O-8 Question snapping edits what the highlight covers (full question turn); check reviewer value vs over-highlighting.
+- [RESOLVED: accept either `contradicting` or `qualifying` for turn 23; tests cover both] O-9 Variant 6 (one claim, two `reported_by`): linker labels turn 23 `contradicting` or `qualifying`? Test both against 05's expected `partially_supported` + `conflicting_accounts_flattened`.
 - [RESOLVED: 03 R4 pairing by speaker string] Missing roles do not block pairing/neighbors; prompt shows `role=unknown`.
 - [DEFERRED] Distant denial search for conclusions, multilingual tokenization, cross-interview retrieval, per-claim batching of shared shortlists.
 

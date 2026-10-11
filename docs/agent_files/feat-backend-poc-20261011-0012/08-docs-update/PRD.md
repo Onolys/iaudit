@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Final docs pass after code lands - architecture.md backend section, implementation/reference/concepts/decisions/testing/examples content following the AGENTS.md placement table, backend/README quickstart, link fixes, and an optional env-var drift test; one owner-of-truth per fact.
 date: 2026-10-11
 ---
@@ -20,7 +20,7 @@ Main has placeholder READMEs in `docs/{concepts,implementation,reference,decisio
 - Honest limits stated: low-fidelity P1 checks, "no concern is not correct", POC acceptance only.
 
 **Non-Goals**
-- Contract edits (stays 1.0.0), `mission.md` edits (see [OPEN] O-1), new features, API docs generated from OpenAPI, copying PRD text wholesale, real CDR content.
+- Contract edits (stays 1.0.0), `mission.md` edits beyond the approved check-7 wording (O-1), new features, API docs generated from OpenAPI, copying PRD text wholesale, real CDR content.
 - Rewriting `agent_files/` PRDs (history stays as is).
 
 ## Scope tiers
@@ -32,6 +32,7 @@ Hackathon build: **Core** is the critical path and ships first. **Optional** ite
 - Short `docs/architecture.md` backend blurb (R2, a few lines plus link to `reference/backend-api.md`).
 - Root `README.md`: Backend link (and Contract link).
 - `docs/reference/README.md`: one index line for `backend-api.md`.
+- `docs/mission.md` check 7: "exaggerates" becomes "exaggerates or understates" (user-approved, O-1; wording only).
 - Acceptance 1 (core files only), 3 (core links), 4 (no contract edit), 5 (with `backend/README.md` only; curl line may live in the README), 7.
 
 **Optional (gated: after all core work in every SP)**
@@ -71,7 +72,7 @@ New files, plus README index:
 
 ### R4 [OPTIONAL] `docs/concepts/` (users + contributors; plain language)
 - `how-an-audit-decides.md`: claim -> evidence -> verdict -> concerns in user terms; what each verdict means; LLM observes, code decides; every highlight is a position, never a copied quote.
-- `severity-and-frequency.md`: ordinal compare in both directions; claim weaker than interview -> `partially_supported` + `frequency_severity_inflation` with explanation saying "understates"; stronger -> "inflates"; ties/immaterial -> no concern. States plainly this reuses the existing concern type (contract has no new value) [OPEN O-1 on mission wording].
+- `severity-and-frequency.md`: ordinal compare in both directions; claim weaker than interview -> `partially_supported` + `frequency_severity_inflation` with explanation saying "understates"; stronger -> "inflates"; ties/immaterial -> no concern. States plainly this reuses the existing concern type (contract has no new value) [RESOLVED O-1].
 - `limits-of-an-audit.md`: **no concern does not mean correct**; omitted concern = not found, not "skipped" (no coverage field in 1.0.0); P1 checks (4, 6, 8, 10, 11, 12) are quick-pass, low fidelity, may miss or over-flag; `insufficient_evidence` is not "wrong"; fidelity is to the supplied interview only; wording is a prompt for human review, not an allegation (rule 12).
 - `missing-role.md` (or section above): `role` optional; never guessed; checks 3 and 9 skipped for that turn; `ambiguous_speaker` warning; often yields `insufficient_evidence`.
 - Each concept page cites the mission check numbers, not copies.
@@ -95,7 +96,7 @@ Numbering `0001-slug.md`, `README.md` index table. Initial set:
 7. `role` optional: skip role checks, warn, never guess
 8. Failure policy: claim stall -> `insufficient_evidence`; section failure -> omitted + partial; nothing usable -> 503/504 (pending O-2)
 9. Fixtures replay in CI; live eval opt-in
-Open items stay [OPEN] inside the ADR with status `proposed` until confirmed.
+Unconfirmed items stay open inside the ADR with status `proposed` until confirmed.
 
 ### R7 [OPTIONAL] `docs/testing/`
 - `README.md` index; `running-tests.md`: `uv run pytest`, `uv run ruff check`, no network/keys; markers if any; what fixtures replay means.
@@ -133,20 +134,20 @@ Docs only, plus one optional test. Process: after 07, a sub-agent per doc group 
 | D2 | Spec doc | None; table in `implementation/check.md` | `specs/verdicts.md` | Contract holds normative rules; thresholds are tunable internals |
 | D3 | ADRs | `NNNN-slug.md`, short | One long decisions file | Matches placement table, individually linkable |
 | D4 | Reference form | Hand-written from `Settings` + drift test | OpenAPI export | FastAPI OpenAPI would not carry contract rules or env vars |
-| D5 | Mission wording | Document extension in concepts, flag [OPEN] | Edit mission check 7 now | Scope text is user-owned (AGENTS.md) |
+| D5 | Mission wording | Edit mission check 7 to "exaggerates or understates" (user-approved, O-1); contract stays 1.0.0 | Leave mission unchanged | User approved the wording change |
 | D6 | Numbers | Name constants, not values | Copy every threshold | Values change with tuning; one owner |
 | D7 | Machine index | Add row, orchestrator step | Skip | Global README is the machine index |
 
 ## Manual steps
-- Approve or reject the mission check 7 wording change (O-1).
+- ~~Approve or reject the mission check 7 wording change (O-1).~~ Approved.
 - Supply API keys to record live fixtures and measure real latency numbers before docs quote any.
 
 ## Risks / Open Questions
-- [OPEN] O-1 Mission check 7 says "exaggerates"; behavior also flags "understates". Docs say "reuses `frequency_severity_inflation`" and cite the ADR. Edit `mission.md` and contract descriptions only with user approval; a contract text change is a wording-only same-version change but both schemas and README must move together.
-- [OPEN] O-2 Nothing-usable policy (503/504 vs 200 partial) is open in 06 O-1; `backend-api.md` and ADR 8 document the landed behavior, not the proposal.
-- [OPEN] O-3 Numbers (latency, token cost, thresholds, F1) are unknown until live runs; docs state "not yet measured" rather than estimates.
-- [OPEN] O-4 Final module/file names may differ from PRDs; R2/R5 pointers must be re-verified against the tree.
-- [OPEN] O-5 Whether the frontend README/docs should link back to the backend (other branch); owner of `feat/review-ui`.
+- [RESOLVED: user approved "exaggerates or understates"; edit `mission.md` check 7 (wording only, contract stays 1.0.0)] O-1 Mission check 7 says "exaggerates"; behavior also flags "understates". Docs say "reuses `frequency_severity_inflation`" and cite the ADR. Edit `mission.md` and contract descriptions only with user approval; a contract text change is a wording-only same-version change but both schemas and README must move together.
+- [RESOLVED: 503/504 per 06 O-1] O-2 Nothing-usable policy (503/504 vs 200 partial) is resolved in 06 O-1; `backend-api.md` and ADR 8 document the landed behavior, not the proposal.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-3 Numbers (latency, token cost, thresholds, F1) are unknown until live runs; docs state "not yet measured" rather than estimates.
+- [RESOLVED: re-verify file names in the docs task] O-4 Final module/file names may differ from PRDs; R2/R5 pointers must be re-verified against the tree.
+- [RESOLVED: no back-link for now; frontend owner's call] O-5 Whether the frontend README/docs should link back to the backend (other branch); owner of `feat/review-ui`.
 - [DEFERRED] Generated API docs, documentation site, changelog/versioning of backend docs.
 - [RESOLVED: `grep -n iaudit /root/projects/README.md` shows no row; add one].
 

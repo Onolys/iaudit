@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: The real async Pipeline replacing StubPipeline - streaming prep/atomize/link/check DAG with a 60 s deadline budget, loss-free cancellation, graceful degradation rules, one shared transcript-first prompt-cache layout with t=0 warm-up, per-request metrics, and a scaled-time latency test plan.
 date: 2026-10-11
 ---
@@ -59,10 +59,10 @@ t0 -> prep task (rules-only `prep()`; [OPTIONAL] soft timeout) ---------------+
 supervisor: wait until all done or llm_deadline -> cancel -> collect -> guards -> assemble
 ```
 - Claim flow starts when its section finishes; it waits only for `prep_ready` (an `asyncio.Event`, never `await prep_task`, see R4). Prep is usually done first (rules instant, LLM only for unsure turns), so the wait is normally free.
-- Caps: global LLM semaphore 20 (01) is the real limit; stage semaphores (`LINK_CONCURRENCY` 20, `CHECK_CONCURRENCY` 20) stay as 04/05 defined. Per-request claim cap `PIPELINE_MAX_CLAIMS` (default 80, ~20 typical, 3x synthetic = about 60): admission counter; a claim over the cap is not processed, `internal.truncated=true` (02 emits `input_truncated`), status stays `complete` [OPEN O-4].
+- Caps: global LLM semaphore 20 (01) is the real limit; stage semaphores (`LINK_CONCURRENCY` 20, `CHECK_CONCURRENCY` 20) stay as 04/05 defined. Per-request claim cap `PIPELINE_MAX_CLAIMS` (default 80, ~20 typical, 3x synthetic = about 60): admission counter; a claim over the cap is not processed, `internal.truncated=true` (02 emits `input_truncated`), status stays `complete` [RESOLVED O-4].
 - Per-claim and per-section tasks are plain `asyncio.create_task`s tracked in `RunState`; no `TaskGroup` (one bug-induced exception would cancel siblings and lose finished work).
 - CPU-bound pieces (turn-index build, `assemble`, schema validation) run via `asyncio.to_thread` when > about 50 ms so the loop keeps serving timers and other requests.
-- **[OPTIONAL]** Pending-priority: FIFO on the global semaphore means late-stage calls queue behind new link calls. Accepted for POC; measure in S3 [OPEN O-5].
+- **[OPTIONAL]** Pending-priority: FIFO on the global semaphore means late-stage calls queue behind new link calls. Accepted for POC [RESOLVED O-5: FIFO].
 
 ### R2 Deadline budget
 All times from `t0` = request receipt (`ctx.deadline` set by 01 = `t0 + AUDIT_DEADLINE_S`, so body parse and validation count).
@@ -93,14 +93,14 @@ Retries: client retry and 03/04/05 semantic retries are allowed only if `remaini
 - any unit failed with `unavailable` (provider down/auth, `LLMUnavailable`) -> raise `LLMUnavailable` -> 503 `unavailable`;
 - else if any unit failed with an unexpected exception -> `internal_error` (500);
 - else (timeouts/deadline/bad output) -> raise `DeadlineExceeded` -> 504 `unavailable`.
-Rationale: an all-`insufficient_evidence` or empty audit reads like "nothing wrong"; a retryable error is more honest. Not triggered by a transcript whose claims are all `out_of_scope` (valid). [OPEN O-1 on the 200-partial alternative.] Escalating a section whose in-scope claims all stalled into `section_not_processed` is off by default [OPEN O-2].
+Rationale: an all-`insufficient_evidence` or empty audit reads like "nothing wrong"; a retryable error is more honest. Not triggered by a transcript whose claims are all `out_of_scope` (valid). [RESOLVED O-1: 503/504, not a 200 partial.] Escalating a section whose in-scope claims all stalled into `section_not_processed` is off [RESOLVED O-2].
 
 ### R4 Cancellation and partial-result semantics
 1. **Results are written, not returned.** Each flow stores its output in `RunState` (write-once dicts) as soon as it completes; the supervisor never depends on `gather` return values, so cancelling the rest loses nothing already finished.
 2. **Supervisor**: `RunState.outstanding` counts live tasks; a section flow registers its claim flows before it exits, so the counter reaches 0 only when everything is done. Supervisor `await asyncio.wait_for(idle.wait(), remaining_to_llm_deadline)`; on timeout cancel every live task, then `asyncio.wait(tasks, timeout=CANCEL_GRACE_S)`. After that, any admitted claim with no draft becomes a stalled draft (`deadline`); any section with no atoms becomes a section failure (`deadline`).
 3. **Never catch `CancelledError`.** Stage/flow code uses `except Exception` only; `finally` for cleanup. Retry loops and the LLM client re-raise cancellation. Only the client's own `asyncio.timeout` converts to `LLMTimeout`; an outer cancel passes through as `CancelledError`.
 4. **Shared-task trap.** Cancelling a task that directly awaits another task cancels the awaited task. Flows therefore wait on `prep_ready` / `warm_ready` events (or `asyncio.shield`), never on `await prep_task`, so one cancelled claim cannot kill prep for the rest.
-5. **LiteLLM.** `acompletion` is httpx-async: cancel closes the connection, the provider may still finish and bill the partial generation [OPEN O-3]. Client must set LiteLLM `num_retries=0` and no fallbacks, because hidden internal retries bypass our budget. Post-call logging callbacks may outlive the task; harmless, verified by the leaked-task test. Semaphore waiters cancel cleanly; test asserts the semaphore value returns to its limit.
+5. **LiteLLM.** `acompletion` is httpx-async: cancel closes the connection, the provider may still finish and bill the partial generation [DEFERRED O-3]. Client must set LiteLLM `num_retries=0` and no fallbacks, because hidden internal retries bypass our budget. Post-call logging callbacks may outlive the task; harmless, verified by the leaked-task test. Semaphore waiters cancel cleanly; test asserts the semaphore value returns to its limit.
 6. **Client disconnect.** Starlette does not cancel the handler; the run continues to its deadline. [DEFERRED] disconnect watcher (`request.is_disconnected()` poll that triggers the same cancel path).
 7. **Late race.** Results are read from `RunState` after the cancel wait; a claim that finished at the buzzer counts.
 
@@ -122,7 +122,7 @@ user     = per-claim block          (act-hint line for relevant turns, shortlist
 - **Shortlist mode**: no transcript prefix (shortlists differ per claim); prefix 1 is the stage block; the claim block carries the shortlist. 05 reuses the exact shortlist rendering 04 used for that claim.
 - **Atomize** keeps its own prefix (system + taxonomy + few-shot); it never sees the transcript.
 - Requires 01: `LLMRequest.cache_prefixes: list[str]` (up to 2 breakpoints, each becomes an `cache_control: ephemeral` block boundary); `cache_prefix` stays as the 1-item case.
-- **Warm-up at t=0** (`warmup.py`): live mode only, whole mode, estimated prefix >= `CACHE_MIN_PREFIX_TOKENS` (1024; provider minimum varies by model [OPEN O-6]). Step 1: one `max_tokens=1` mid-tier call with [system][transcript]. Step 2 (after step 1): two parallel tiny calls with [system][transcript][link stage] and [..][check stage]. Shortlist mode: parallel tiny calls for the two stage blocks. All run during atomize (5-10 s), so Link never waits on a serialized first call; 04's `LINK_WARMUP` is superseded (default off). Link/check flows wait for `warm_ready` at most `WARMUP_MAX_WAIT_S` (2) if warm-up is still running; warm-up failure or timeout is ignored. Tag `call_tag="warmup"`; skipped in fixture/stub mode (no `FixtureMiss`). Short transcripts (the ADHD example, under 1k tokens) skip warm-up entirely.
+- **Warm-up at t=0** (`warmup.py`): live mode only, whole mode, estimated prefix >= `CACHE_MIN_PREFIX_TOKENS` (1024; provider minimum varies by model [DEFERRED O-6]). Step 1: one `max_tokens=1` mid-tier call with [system][transcript]. Step 2 (after step 1): two parallel tiny calls with [system][transcript][link stage] and [..][check stage]. Shortlist mode: parallel tiny calls for the two stage blocks. All run during atomize (5-10 s), so Link never waits on a serialized first call; 04's `LINK_WARMUP` is superseded (default off). Link/check flows wait for `warm_ready` at most `WARMUP_MAX_WAIT_S` (2) if warm-up is still running; warm-up failure or timeout is ignored. Tag `call_tag="warmup"`; skipped in fixture/stub mode (no `FixtureMiss`). Short transcripts (the ADHD example, under 1k tokens) skip warm-up entirely.
 - Cache hit ratio is reported per request; the live smoke test asserts `cache_read > 0` on a transcript above the minimum (depends on 01 O-2).
 
 ### R7 Wiring and config
@@ -139,7 +139,7 @@ user     = per-claim block          (act-hint line for relevant turns, shortlist
 | 05 | `check_one(claim, link, prep, turns, ctx) -> ClaimDraft`, `stalled_draft(claim, reason)`, `passthrough_oos(claim)`; use `layout.py` [OPTIONAL] |
 | 02 | none; 06 supplies `InternalAudit(claims, section_failures, truncated)` |
 | 07 | e2e adapter = `FullPipeline.run` + `ctx.metrics.snapshot()` |
-[Applied 2026-10-11: R8 asks written into 01, 03, 04, 05 PRDs; 02/07 need none. Conflicts noted as [OPEN] in 01 (O-5) and 04 (O-10).]
+[Applied 2026-10-11: R8 asks written into 01, 03, 04, 05 PRDs; 02/07 need none. The conflicts in 01 (O-5) and 04 (O-10) are resolved in those PRDs.]
 If 04/05 keep only batch APIs, 06 calls them with one-element lists; the cost is that their intra-batch logic (warm-up, local semaphores) is per call, which is why the single-claim functions are requested.
 
 ## Architecture
@@ -160,12 +160,12 @@ Typical ADHD timeline [estimate, live mid-tier]: atomize 4-7 s; links from about
 | D3 | Results store | Write-once `RunState`, supervisor cancels | `gather` + `wait_for` | Preserves partial results; no loss at cancel |
 | D4 | Task supervision | Own tracking, no `TaskGroup` | TaskGroup | Sibling cancel on first exception loses work |
 | D5 | Shared waits | Events, not `await task` | Await prep task | Awaiter cancel would cancel prep for everyone |
-| D6 | Nothing usable | 503/504 `unavailable` (guard) | 200 partial, all sections not processed | Empty audit looks clean; error is retryable [OPEN O-1] |
+| D6 | Nothing usable | 503/504 `unavailable` (guard) | 200 partial, all sections not processed | Empty audit looks clean; error is retryable [RESOLVED O-1] |
 | D7 | Claim stall status | Stays `complete` with `other` warnings | Escalate to partial | Rule 11 ties partial to `section_not_processed`; locked rule |
 | D8 [OPTIONAL] | Cache layout | Common system -> transcript -> stage -> claim, acts out of the prefix | Per-stage prefixes (04/05 default) | One transcript write shared by both stages; prefix known at t=0 |
 | D9 [OPTIONAL] | Warm-up | t=0 tiny calls during atomize | Serialize first link call (04) | Zero added latency; Link budget untouched |
 | D10 | Prep gating | Soft timeout to rules-only | Wait for LLM refinement | Prep is a hint source, never a blocker |
-| D11 | Over-cap claims | Omit + `input_truncated` | Stall them | Fabricating `insufficient_evidence` for unprocessed claims misleads [OPEN O-4] |
+| D11 | Over-cap claims | Omit + `input_truncated` | Stall them | Fabricating `insufficient_evidence` for unprocessed claims misleads [RESOLVED O-4] |
 | D12 [OPTIONAL] | Timing header | `Server-Timing`, default on | Debug body field; none | No contract change, no PHI, visible in devtools |
 | D13 | Hedged duplicate calls | Not in POC | Hedge slowest calls | Cost and cap pressure; revisit with p95 data |
 | D14 | Cap vs client timeout | Keep 60 s | Raise to about 90 s | Locked product target; configurable, startup guard < 100 |
@@ -174,14 +174,14 @@ Typical ADHD timeline [estimate, live mid-tier]: atomize 4-7 s; links from about
 - Live latency/cache runs and CDR timing need a provider key (01 owner step). The real CDR transcript (344 turns) does not exist in the repo; its timing run is deferred and never uses invented turns.
 
 ## Risks / Open Questions
-- [OPEN] O-1 Nothing-usable policy: 503/504 vs 200 partial-all-sections. Confirm with the frontend owner; the contract allows both.
-- [OPEN] O-2 Escalate a section to `section_not_processed` when all (or >= 50 percent of) its in-scope claims stalled. Default off (locked claim-level rule); decide after S5 looks.
-- [OPEN] O-3 Does a cancelled non-streaming Anthropic call stop billing at disconnect? Measure tokens billed vs received on a forced cancel (live, owner key).
-- [OPEN] O-4 Over-cap claim policy and a cap value (80) are guesses; admission order is first-come, so truncation is non-deterministic only in extreme inputs.
-- [OPEN] O-5 FIFO semaphore may starve check calls behind a link wave; alternative is a `priority` field in 01's client. Decide from S3 stage overlap numbers.
-- [OPEN] O-6 Provider minimum cacheable prefix and whether LiteLLM surfaces `cache_read_input_tokens` (01 O-2); until verified the warm-up is a no-risk no-op.
-- [OPEN] O-7 Stage call timeouts (10/25/20/20) and `ASSEMBLE_RESERVE_S` 3 are estimates; tune on p95 from live runs.
-- [OPEN] O-8 Event-loop sharing: one slow audit and a second concurrent one share the global semaphore and loop; POC is single-user. Add an in-flight audit cap only if needed.
+- [RESOLVED: 503 `unavailable` when nothing completes, 504 when the deadline is hit; user-approved] O-1 Nothing-usable policy: 503/504 vs 200 partial-all-sections. Confirm with the frontend owner; the contract allows both.
+- [RESOLVED: off; keep the claim-level stall rule] O-2 Escalate a section to `section_not_processed` when all (or >= 50 percent of) its in-scope claims stalled. Default off (locked claim-level rule); decide after S5 looks.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-3 Does a cancelled non-streaming Anthropic call stop billing at disconnect? Measure tokens billed vs received on a forced cancel (live, owner key).
+- [RESOLVED: cap 80, first come first served, `input_truncated`] O-4 Over-cap claim policy and a cap value (80) are guesses; admission order is first-come, so truncation is non-deterministic only in extreme inputs.
+- [RESOLVED: FIFO semaphore, no priority field] O-5 FIFO semaphore may starve check calls behind a link wave; alternative is a `priority` field in 01's client. Decide from S3 stage overlap numbers.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-6 Provider minimum cacheable prefix and whether LiteLLM surfaces `cache_read_input_tokens` (01 O-2); until verified the warm-up is a no-risk no-op.
+- [DEFERRED: needs live runs or the optional 07b harness; ship the stated default] O-7 Stage call timeouts (10/25/20/20) and `ASSEMBLE_RESERVE_S` 3 are estimates; tune on p95 from live runs.
+- [RESOLVED: no in-flight audit cap for the POC] O-8 Event-loop sharing: one slow audit and a second concurrent one share the global semaphore and loop; POC is single-user. Add an in-flight audit cap only if needed.
 - [DEFERRED] Client-disconnect cancel, hedged calls, priority semaphore, per-section escalation, queueing.
 - [RESOLVED: sharing via common system + transcript-first, whole mode only; shortlist mode per-stage] 04 O-5 / 05 O-6.
 - [RESOLVED: 06 unions ambiguous turns] 04 O-1(f).
