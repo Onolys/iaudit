@@ -1,0 +1,170 @@
+{
+  "request_id": "primock57-day1-consultation01",
+  "source": {
+    "dataset": "PriMock57",
+    "consultation": "day1_consultation01",
+    "upstream_commit": "cd2ac707ad03cb4d2531f4ec6b90c659bf4357c5",
+    "label_file": "human_eval_data/results.csv",
+    "label_rows": "Model = doctor"
+  },
+  "scope": "Answer key for the incorrect statements PriMock57 evaluators marked in the clinician's own note, limited to those that map to one of the 12 checks in docs/mission.md. Claims not listed were not marked by any evaluator, or their labels did not map to a check. Being absent here does not mean a claim is supported.",
+  "label_counts": {
+    "evaluator_rows": 5,
+    "evaluator_rows_without_data": 1,
+    "incorrect_statements_total": 8,
+    "incorrect_statements_mapped": 7,
+    "incorrect_statements_not_mapped": 1,
+    "omissions_excluded": 18
+  },
+  "claims": [
+    {
+      "id": "k1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 137
+        },
+        "end": {
+          "index": 0,
+          "char": 167
+        }
+      },
+      "claim_text": "Also vomiting - mainly bilous.",
+      "expected_verdict": "contradicted",
+      "explanation": "The clinician asked whether the vomit looked like ordinary food and the patient agreed it was normal vomit. Nothing in the interview describes bile.",
+      "concerns": [
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The patient described ordinary vomit, which conflicts with a bilious description.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 28,
+              "char": 0
+            },
+            "end": {
+              "index": 29,
+              "char": 59
+            }
+          },
+          "note": "The clinician suggests ordinary food colour and the patient confirms the vomit was normal."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 27,
+              "char": 0
+            },
+            "end": {
+              "index": 27,
+              "char": 85
+            }
+          },
+          "note": "The patient says vomiting happened at the start and has since stopped."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! bilous."
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! Also vomiting - mainly bilous."
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! mainly bilous."
+        },
+        {
+          "evaluator": "evaluator_5",
+          "severity": "critical",
+          "verbatim": "! mainly bilous"
+        }
+      ],
+      "agreement": "4 of 4 evaluators with data",
+      "mapping_note": "All four items delete the bile description. Evaluator 5 also listed a bare \"vomiting\" item that cannot be tied to one claim, so it is not mapped."
+    },
+    {
+      "id": "k2",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 39
+        },
+        "end": {
+          "index": 1,
+          "char": 100
+        }
+      },
+      "claim_text": "Wife and children also unwell with vomiting, but no diarrhea.",
+      "expected_verdict": "contradicted",
+      "explanation": "The patient said nobody else in the family has the same symptoms and that one child had vomited. The note extends the vomiting to the wife and both children.",
+      "concerns": [
+        {
+          "type": "wrong_attribution",
+          "explanation": "A symptom reported for one child is attributed to the wife and both children.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The patient said no one else in the family was unwell in the same way.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 41,
+              "char": 0
+            },
+            "end": {
+              "index": 42,
+              "char": 159
+            }
+          },
+          "note": "Asked about unwell contacts, the patient limits the vomiting to one of the two children."
+        }
+      ],
+      "labels": [
+        {
+          "evaluator": "evaluator_1",
+          "severity": "critical",
+          "verbatim": "! Wife and ren also unwell with"
+        },
+        {
+          "evaluator": "evaluator_3",
+          "severity": "critical",
+          "verbatim": "! Wife and children also unwell with vomiting, but no diarrhea."
+        },
+        {
+          "evaluator": "evaluator_4",
+          "severity": "critical",
+          "verbatim": "! Wife and children also unwell with vomiting"
+        }
+      ],
+      "agreement": "3 of 4 evaluators with data",
+      "mapping_note": "Evaluator 1's post-edit rewrites this sentence to one child, so the clipped item belongs to this claim."
+    }
+  ]
+}

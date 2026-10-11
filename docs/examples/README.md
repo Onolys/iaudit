@@ -6,4 +6,6 @@ Runnable public-API usage examples.
 
 Contract fixtures, not runnable calls, live in [../contracts/examples/](../contracts/examples/).
 
-Placeholder beyond that pointer.
+Real interviews with evaluator-derived answer keys, for testing the auditor, live in [real/](real/).
+
+Placeholder beyond those pointers.
