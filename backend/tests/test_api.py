@@ -232,3 +232,7 @@ def test_startup_fails_without_contracts(tmp_path, monkeypatch):
     finally:
         monkeypatch.delenv("IAUDIT_CONTRACTS_DIR")
         c.get_contracts.cache_clear()
+
+
+def test_deeply_nested_json_is_400(client):
+    assert_error(post(client, b"[" * 200_000), 400, "invalid_request")

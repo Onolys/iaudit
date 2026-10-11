@@ -127,7 +127,7 @@ def create_app(
             # 2. parse
             try:
                 raw = json.loads(body)
-            except (ValueError, UnicodeDecodeError):
+            except (ValueError, UnicodeDecodeError, RecursionError):
                 raise ApiError("invalid_request", "Body is not valid JSON.", 400) from None
             if not isinstance(raw, dict):
                 raise ApiError("invalid_request", "Body must be a JSON object.", 400)
