@@ -18,7 +18,7 @@ interface LeftPaneProps {
 export function LeftPane({ request, response, analysis, state, onSelect, onNavigate }: LeftPaneProps) {
   const notProcessed = notProcessedSections(response);
   const sectionCount = request.assessment.length;
-  const unplaced = analysis.orderedClaims.filter((c) => !analysis.checks[c.id].claimSpanOk);
+  const unplaced = analysis.orderedClaims.filter((c) => !analysis.checks[c.id].claimSpanOk || analysis.checks[c.id].overlapsEarlier);
   const inSection = (i: number) => unplaced.filter((c) => c.span.start.index === i);
   const outside: Claim[] = unplaced.filter((c) => !Number.isInteger(c.span.start.index) || c.span.start.index < 0 || c.span.start.index >= sectionCount);
   const selectedClaimId = state.selectedClaimId;
