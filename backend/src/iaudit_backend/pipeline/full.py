@@ -11,6 +11,7 @@ from iaudit_backend.models import AuditRequest, AuditResponse
 
 from .flow import prep_flow, section_flow
 from .guards import assess
+from .metrics import log_audit_done, summarize
 from .state import RunState
 
 
@@ -23,6 +24,7 @@ class FullPipeline:
         cfg = ctx.settings
         llm_deadline = ctx.deadline - cfg.assemble_reserve_s
         sctx = dataclasses.replace(ctx, deadline=llm_deadline)  # stages see the LLM deadline
+        t0 = time.monotonic()
         st = RunState()
         ctx.extras["run_state"] = st
         try:
@@ -42,7 +44,12 @@ class FullPipeline:
                 t.cancel()
         internal = self._collect(st, len(req.assessment), ctx)
         self._guard(st, req, internal, ctx)
+        a0 = time.monotonic()
         outcome = await asyncio.to_thread(assemble, req, internal, cfg)
+        now = time.monotonic()
+        summary = summarize(st, internal, round((now - a0) * 1000), round((now - t0) * 1000))
+        ctx.extras["pipeline_metrics"] = summary
+        log_audit_done(ctx, summary)
         return AuditResponse.model_validate(outcome.response)
 
     @staticmethod
