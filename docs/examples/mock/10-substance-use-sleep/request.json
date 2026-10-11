@@ -1,0 +1,438 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-10",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Thanks for coming in. Your GP's letter mentions sleep problems and some questions about drinking. Where would you like to start?",
+      "timestamp": "00:00:03"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Sleep, I suppose. That's the main thing. I'm exhausted.",
+      "timestamp": "00:00:13"
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Okay, and we'll come to the drinking too. Tell me about a typical night.",
+      "timestamp": "00:00:18"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I get into bed around midnight. It takes me ages to drop off, an hour, sometimes two. Then I'm awake again at three or so.",
+      "timestamp": "00:00:25"
+    },
+    {
+      "id": "t4",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How long has it been like this?",
+      "timestamp": "00:00:37"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Since about May. That's when I started on the night-shift rota, three nights a fortnight.",
+      "timestamp": "00:00:42"
+    },
+    {
+      "id": "t6",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "And on nights when you're not on shift?",
+      "timestamp": "00:00:50"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Still bad, but not as bad. Maybe I'll get five hours.",
+      "timestamp": "00:00:55"
+    },
+    {
+      "id": "t8",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you snore, or has anyone said you stop breathing at night?",
+      "timestamp": "00:01:01"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "My ex used to say I snored. I live alone now, so I couldn't tell you.",
+      "timestamp": "00:01:08"
+    },
+    {
+      "id": "t10",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What about daytime sleepiness? Do you ever nod off?",
+      "timestamp": "00:01:16"
+    },
+    {
+      "id": "t11",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Once I nodded off at a red light. That scared me. Only the once, though.",
+      "timestamp": "00:01:21"
+    },
+    {
+      "id": "t12",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "When was that?",
+      "timestamp": "00:01:29"
+    },
+    {
+      "id": "t13",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Last month, driving home after a night shift.",
+      "timestamp": "00:01:34"
+    },
+    {
+      "id": "t14",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Let's talk about alcohol. How much do you drink in a typical week?",
+      "timestamp": "00:01:39"
+    },
+    {
+      "id": "t15",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Not a lot. A few beers.",
+      "timestamp": "00:01:46"
+    },
+    {
+      "id": "t16",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Can you give me a number?",
+      "timestamp": "00:01:51"
+    },
+    {
+      "id": "t17",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Three or four cans on a weeknight, maybe. More at the weekend.",
+      "timestamp": "00:01:56"
+    },
+    {
+      "id": "t18",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How many at the weekend?",
+      "timestamp": "00:02:03"
+    },
+    {
+      "id": "t19",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Friday and Saturday, probably eight each night. Actually, no, that's an exaggeration. Six, maybe.",
+      "timestamp": "00:02:08"
+    },
+    {
+      "id": "t20",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What strength are the cans?",
+      "timestamp": "00:02:15"
+    },
+    {
+      "id": "t21",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Normal lager, four percent or so. The big 500 ml cans.",
+      "timestamp": "00:02:20"
+    },
+    {
+      "id": "t22",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you drink to help you sleep?",
+      "timestamp": "00:02:26"
+    },
+    {
+      "id": "t23",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "That's how it started. A couple of cans to knock me out after a night shift. Now it's more of a habit.",
+      "timestamp": "00:02:31"
+    },
+    {
+      "id": "t24",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Has your drinking changed over the last year?",
+      "timestamp": "00:02:41"
+    },
+    {
+      "id": "t25",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Gone up since May, definitely. Before that it was mostly weekends.",
+      "timestamp": "00:02:46"
+    },
+    {
+      "id": "t26",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you ever felt you ought to cut down?",
+      "timestamp": "00:02:52"
+    },
+    {
+      "id": "t27",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah. I've thought about it.",
+      "timestamp": "00:02:57"
+    },
+    {
+      "id": "t28",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have people annoyed you by criticising your drinking?",
+      "timestamp": "00:03:02"
+    },
+    {
+      "id": "t29",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "My sister has said something. It didn't annoy me exactly, but I didn't like it.",
+      "timestamp": "00:03:07"
+    },
+    {
+      "id": "t30",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you felt guilty about your drinking?",
+      "timestamp": "00:03:15"
+    },
+    {
+      "id": "t31",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Sometimes, on a Sunday.",
+      "timestamp": "00:03:20"
+    },
+    {
+      "id": "t32",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you ever had a drink first thing in the morning, to steady your nerves or get rid of a hangover?",
+      "timestamp": "00:03:25"
+    },
+    {
+      "id": "t33",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "A drink in the morning? No. Never. Coffee, that's it.",
+      "timestamp": "00:03:35"
+    },
+    {
+      "id": "t34",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Any shakes or sweats if you go a day without?",
+      "timestamp": "00:03:41"
+    },
+    {
+      "id": "t35",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No. I went without for a week in August when I had flu, and I was fine.",
+      "timestamp": "00:03:47"
+    },
+    {
+      "id": "t36",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What about cannabis or other drugs?",
+      "timestamp": "00:03:56"
+    },
+    {
+      "id": "t37",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I smoke a bit of weed at the weekend. It used to be more.",
+      "timestamp": "00:04:01"
+    },
+    {
+      "id": "t38",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How much is a bit?",
+      "timestamp": "00:04:08"
+    },
+    {
+      "id": "t39",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "One joint on a Saturday night, to wind down.",
+      "timestamp": "00:04:13"
+    },
+    {
+      "id": "t40",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "When you say it used to be more, when was that?",
+      "timestamp": "00:04:18"
+    },
+    {
+      "id": "t41",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "In my twenties I was smoking every day. I stopped that about ten years ago.",
+      "timestamp": "00:04:24"
+    },
+    {
+      "id": "t42",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Anything else, like cocaine or pills?",
+      "timestamp": "00:04:32"
+    },
+    {
+      "id": "t43",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Cocaine a couple of times at a friend's wedding last year. Nothing regular.",
+      "timestamp": "00:04:37"
+    },
+    {
+      "id": "t44",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you use anything to stay awake on night shifts?",
+      "timestamp": "00:04:44"
+    },
+    {
+      "id": "t45",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Energy drinks. Two or three a shift.",
+      "timestamp": "00:04:50"
+    },
+    {
+      "id": "t46",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you had any prescribed medicine for sleep?",
+      "timestamp": "00:04:55"
+    },
+    {
+      "id": "t47",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "The GP gave me zopiclone for two weeks in the summer. It helped, but I didn't want to get hooked.",
+      "timestamp": "00:05:00"
+    },
+    {
+      "id": "t48",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How is the sleep affecting work?",
+      "timestamp": "00:05:10"
+    },
+    {
+      "id": "t49",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I'm a warehouse supervisor. I've been late twice this month. My boss is understanding, so far.",
+      "timestamp": "00:05:15"
+    },
+    {
+      "id": "t50",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Has the drinking affected work?",
+      "timestamp": "00:05:23"
+    },
+    {
+      "id": "t51",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I don't think so. I've never gone in drunk.",
+      "timestamp": "00:05:28"
+    },
+    {
+      "id": "t52",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you ever gone in hungover?",
+      "timestamp": "00:05:33"
+    },
+    {
+      "id": "t53",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I'd rather not answer that one.",
+      "timestamp": "00:05:38"
+    },
+    {
+      "id": "t54",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "That's fine. How's your mood?",
+      "timestamp": "00:05:43"
+    },
+    {
+      "id": "t55",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Okay. Bit lonely since the breakup in the spring.",
+      "timestamp": "00:05:48"
+    },
+    {
+      "id": "t56",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What would you most like help with first?",
+      "timestamp": "00:05:53"
+    },
+    {
+      "id": "t57",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Sleep. If I could sleep properly I think the rest would sort itself out.",
+      "timestamp": "00:05:58"
+    },
+    {
+      "id": "t58",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Okay. Let's put a plan together.",
+      "timestamp": "00:06:05"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-alcohol",
+      "label": "Alcohol use",
+      "score": "high risk",
+      "text": "Drinks three to four 500 ml cans of lager on weeknights. Drinks around eight cans per night at weekends. Has never considered cutting down. No morning drinking, and no withdrawal symptoms during a week without alcohol in August. Denies attending work hungover."
+    },
+    {
+      "id": "sec-substances",
+      "label": "Cannabis and other substances",
+      "text": "Uses cannabis daily to manage insomnia. Used cocaine on a couple of occasions at a wedding last year, with no regular use."
+    },
+    {
+      "id": "sec-sleep",
+      "label": "Sleep",
+      "score": 19,
+      "text": "Sleep onset takes one to two hours, with waking at around three. Insomnia began in May, when he started a night-shift rota. The relationship breakup in the spring is the primary cause of the insomnia. Has repeatedly fallen asleep at the wheel after night shifts. Alcohol is currently used each night as a sleep aid. Pattern meets criteria for an alcohol use disorder."
+    }
+  ]
+}

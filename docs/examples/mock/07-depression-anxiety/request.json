@@ -1,0 +1,418 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-07",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How have things been since we spoke on the phone?",
+      "timestamp": "00:00:03"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Up and down. More down, if I'm honest. It's been about two months now of feeling flat.",
+      "timestamp": "00:00:09"
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Flat in what way?",
+      "timestamp": "00:00:18"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Like the colour's gone out of things. I used to love my pottery class and I've skipped the last four.",
+      "timestamp": "00:00:23"
+    },
+    {
+      "id": "t4",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Is that because you don't enjoy it any more, or for another reason?",
+      "timestamp": "00:00:33"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Partly I don't enjoy it. Partly the class moved to Thursday evenings and that clashes with my shift. So it's a bit of both.",
+      "timestamp": "00:00:40"
+    },
+    {
+      "id": "t6",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How would you rate your mood from zero to ten, where ten is the best you've felt?",
+      "timestamp": "00:00:51"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Today maybe a four. On a bad day a two. I had one good weekend last month where it was a seven.",
+      "timestamp": "00:01:00"
+    },
+    {
+      "id": "t8",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How many bad days in a typical week?",
+      "timestamp": "00:01:10"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Two, maybe three. The rest are just sort of grey.",
+      "timestamp": "00:01:15"
+    },
+    {
+      "id": "t10",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you find yourself crying more than usual?",
+      "timestamp": "00:01:21"
+    },
+    {
+      "id": "t11",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "A little. Mostly in the car on the way home.",
+      "timestamp": "00:01:26"
+    },
+    {
+      "id": "t12",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you had any thoughts that life isn't worth living, or of harming yourself?",
+      "timestamp": "00:01:32"
+    },
+    {
+      "id": "t13",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No. Nothing like that. I've got my kids, and I wouldn't.",
+      "timestamp": "00:01:39"
+    },
+    {
+      "id": "t14",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Any feelings of guilt, or of being worthless?",
+      "timestamp": "00:01:45"
+    },
+    {
+      "id": "t15",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Guilt, yes. I feel like I'm letting the kids down when I'm too tired to play with them. Worthless, no, I wouldn't say that.",
+      "timestamp": "00:01:50"
+    },
+    {
+      "id": "t16",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How's your concentration?",
+      "timestamp": "00:02:01"
+    },
+    {
+      "id": "t17",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Worse. I reread the same paragraph at work. My supervisor hasn't said anything, though.",
+      "timestamp": "00:02:06"
+    },
+    {
+      "id": "t18",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Let's talk about worry. Do you find yourself worrying a lot?",
+      "timestamp": "00:02:13"
+    },
+    {
+      "id": "t19",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "All the time. Money, the kids, whether I'm doing my job right. It's like a constant hum in the background.",
+      "timestamp": "00:02:19"
+    },
+    {
+      "id": "t20",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Is it hard to stop once it starts?",
+      "timestamp": "00:02:29"
+    },
+    {
+      "id": "t21",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Very. Especially at night.",
+      "timestamp": "00:02:34"
+    },
+    {
+      "id": "t22",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How long has the worry been like this?",
+      "timestamp": "00:02:39"
+    },
+    {
+      "id": "t23",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Honestly, years. I've always been a worrier, my mum was the same. It just feels louder since the mood dipped.",
+      "timestamp": "00:02:44"
+    },
+    {
+      "id": "t24",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you ever had a panic attack, where your heart races and you feel you can't breathe?",
+      "timestamp": "00:02:54"
+    },
+    {
+      "id": "t25",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Not a full one, no. My chest has gone tight in the supermarket queue, but it passed after a minute and I didn't feel like I was dying or anything.",
+      "timestamp": "00:03:03"
+    },
+    {
+      "id": "t26",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How often does the chest tightness happen?",
+      "timestamp": "00:03:17"
+    },
+    {
+      "id": "t27",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Maybe twice in the last month.",
+      "timestamp": "00:03:22"
+    },
+    {
+      "id": "t28",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you avoid places because of it?",
+      "timestamp": "00:03:27"
+    },
+    {
+      "id": "t29",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Avoid them? I don't know. I still do the shopping.",
+      "timestamp": "00:03:32"
+    },
+    {
+      "id": "t30",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you go at different times, or to a different shop?",
+      "timestamp": "00:03:38"
+    },
+    {
+      "id": "t31",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I go early on a Sunday now, when it's quieter. I suppose that's a kind of avoiding.",
+      "timestamp": "00:03:44"
+    },
+    {
+      "id": "t32",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Any physical symptoms with the worry, like muscle tension or stomach upsets?",
+      "timestamp": "00:03:53"
+    },
+    {
+      "id": "t33",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "My shoulders are always up by my ears. And headaches, a few a week.",
+      "timestamp": "00:04:00"
+    },
+    {
+      "id": "t34",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you seen your GP about the headaches?",
+      "timestamp": "00:04:07"
+    },
+    {
+      "id": "t35",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Not yet. I've been meaning to.",
+      "timestamp": "00:04:12"
+    },
+    {
+      "id": "t36",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Now, sleep. How are you sleeping?",
+      "timestamp": "00:04:17"
+    },
+    {
+      "id": "t37",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Badly. I fall asleep fine around eleven, but I wake at four and can't get back off.",
+      "timestamp": "00:04:22"
+    },
+    {
+      "id": "t38",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How many nights a week?",
+      "timestamp": "00:04:31"
+    },
+    {
+      "id": "t39",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Most nights. Five, maybe.",
+      "timestamp": "00:04:36"
+    },
+    {
+      "id": "t40",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you nap during the day to make up for it?",
+      "timestamp": "00:04:41"
+    },
+    {
+      "id": "t41",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Do I nap? Hmm, it depends what you call a nap.",
+      "timestamp": "00:04:47"
+    },
+    {
+      "id": "t42",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "And what about your appetite?",
+      "timestamp": "00:04:53"
+    },
+    {
+      "id": "t43",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Down. I skip breakfast and I'm picking at dinner.",
+      "timestamp": "00:04:58"
+    },
+    {
+      "id": "t44",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Has your weight changed?",
+      "timestamp": "00:05:03"
+    },
+    {
+      "id": "t45",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "My jeans are looser. I haven't weighed myself, though.",
+      "timestamp": "00:05:08"
+    },
+    {
+      "id": "t46",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What about alcohol?",
+      "timestamp": "00:05:13"
+    },
+    {
+      "id": "t47",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "A glass of wine most evenings, to take the edge off. Two on a Friday.",
+      "timestamp": "00:05:18"
+    },
+    {
+      "id": "t48",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Has that increased recently?",
+      "timestamp": "00:05:26"
+    },
+    {
+      "id": "t49",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "A bit. It used to be just weekends.",
+      "timestamp": "00:05:31"
+    },
+    {
+      "id": "t50",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What has helped, if anything?",
+      "timestamp": "00:05:36"
+    },
+    {
+      "id": "t51",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Walking the dog. When I actually get out, I feel a bit better for an hour or so.",
+      "timestamp": "00:05:41"
+    },
+    {
+      "id": "t52",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you had a period like this before?",
+      "timestamp": "00:05:50"
+    },
+    {
+      "id": "t53",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "After my second child was born I had a few months like this. I saw a counsellor then and it helped.",
+      "timestamp": "00:05:55"
+    },
+    {
+      "id": "t54",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Would you be open to talking therapy again?",
+      "timestamp": "00:06:05"
+    },
+    {
+      "id": "t55",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, I think I would. I just need it to fit around my shifts.",
+      "timestamp": "00:06:10"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-mood",
+      "label": "Mood",
+      "score": 16,
+      "text": "Reports approximately two months of persistently low mood, rating it four out of ten today, with two to three bad days per week. Has stopped attending a pottery class due to loss of enjoyment. Endorses feelings of guilt and worthlessness. Denies suicidal thoughts or thoughts of self-harm. A similar episode followed the birth of her second child and responded to counselling."
+    },
+    {
+      "id": "sec-anxiety",
+      "label": "Anxiety",
+      "score": 14,
+      "text": "Describes long-standing, pervasive worry about finances, her children and work, which has intensified alongside the low mood. Experiences panic attacks in the supermarket several times a week. Avoids shopping entirely. Reports daily headaches."
+    },
+    {
+      "id": "sec-sleep-appetite",
+      "label": "Sleep and appetite",
+      "score": "moderate",
+      "text": "Early-morning waking around four on most nights, with no difficulty falling asleep. Compensates for lost sleep with daytime naps. Reduced appetite with documented weight loss. Drinks two glasses of wine every night."
+    }
+  ]
+}

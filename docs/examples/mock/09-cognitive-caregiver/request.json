@@ -1,0 +1,438 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-09",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mr Okafor, thank you for coming in with your daughter. How have you been keeping?",
+      "timestamp": "00:00:03"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Oh, not bad for an old man. My daughter thinks I'm forgetting things. I'm not so sure.",
+      "timestamp": "00:00:11"
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What sort of things? I'll ask you first, and then Grace.",
+      "timestamp": "00:00:20"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Names, mostly. The neighbours' grandchildren. But I've never been good with names.",
+      "timestamp": "00:00:26"
+    },
+    {
+      "id": "t4",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Grace, what have you noticed?",
+      "timestamp": "00:00:33"
+    },
+    {
+      "id": "t5",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "It's more than names. He's asked me the same question three or four times in one phone call. That started maybe a year ago, and it's got noticeably worse since Christmas.",
+      "timestamp": "00:00:38"
+    },
+    {
+      "id": "t6",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mr Okafor, do you remember that happening?",
+      "timestamp": "00:00:52"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No. I don't think I repeat myself. She might be exaggerating a little.",
+      "timestamp": "00:00:57"
+    },
+    {
+      "id": "t8",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you ever forget appointments?",
+      "timestamp": "00:01:04"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Not that I know of. I write them on the calendar in the kitchen.",
+      "timestamp": "00:01:09"
+    },
+    {
+      "id": "t10",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "He does write them down, that's true. But he missed his dentist appointment in February because he didn't look at the calendar that day.",
+      "timestamp": "00:01:16"
+    },
+    {
+      "id": "t11",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Can you tell me what you did yesterday?",
+      "timestamp": "00:01:27"
+    },
+    {
+      "id": "t12",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yesterday... Grace came round. We talked about her son's football. I think.",
+      "timestamp": "00:01:32"
+    },
+    {
+      "id": "t13",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "That was Sunday, Dad. Yesterday was the man about the boiler.",
+      "timestamp": "00:01:39"
+    },
+    {
+      "id": "t14",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Ah. Yes, the boiler man. You're right.",
+      "timestamp": "00:01:45"
+    },
+    {
+      "id": "t15",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What about older memories, your working life for instance?",
+      "timestamp": "00:01:50"
+    },
+    {
+      "id": "t16",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Thirty-eight years on the railway. I could tell you every station on the line from here to the coast.",
+      "timestamp": "00:01:55"
+    },
+    {
+      "id": "t17",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Now, day to day. Who does the cooking?",
+      "timestamp": "00:02:04"
+    },
+    {
+      "id": "t18",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I do. I've cooked for myself since my wife passed.",
+      "timestamp": "00:02:09"
+    },
+    {
+      "id": "t19",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "He does cook, but he's left the gas on twice that I know of. Once in March and once a few weeks ago. I've had a cut-off valve fitted since.",
+      "timestamp": "00:02:15"
+    },
+    {
+      "id": "t20",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mr Okafor, were you aware of that?",
+      "timestamp": "00:02:29"
+    },
+    {
+      "id": "t21",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "She told me about it. I don't remember doing it, to be honest.",
+      "timestamp": "00:02:34"
+    },
+    {
+      "id": "t22",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How about money, paying bills, banking?",
+      "timestamp": "00:02:41"
+    },
+    {
+      "id": "t23",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I do all that myself.",
+      "timestamp": "00:02:46"
+    },
+    {
+      "id": "t24",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "He did until last summer. I took over the bills in August after a couple were paid twice. He still does his own shopping with cash.",
+      "timestamp": "00:02:51"
+    },
+    {
+      "id": "t25",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Are you still driving, Mr Okafor?",
+      "timestamp": "00:03:03"
+    },
+    {
+      "id": "t26",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes, to the shops and to church. Short trips.",
+      "timestamp": "00:03:08"
+    },
+    {
+      "id": "t27",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Any scrapes, or times you got lost?",
+      "timestamp": "00:03:13"
+    },
+    {
+      "id": "t28",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, never lost.",
+      "timestamp": "00:03:18"
+    },
+    {
+      "id": "t29",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "There was one time in the spring when he rang me from a petrol station because he wasn't sure which way to go home. It's a route he's driven for years.",
+      "timestamp": "00:03:23"
+    },
+    {
+      "id": "t30",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "That was the roadworks. They'd changed everything around.",
+      "timestamp": "00:03:37"
+    },
+    {
+      "id": "t31",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Grace, were there roadworks?",
+      "timestamp": "00:03:42"
+    },
+    {
+      "id": "t32",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "There were some, yes. I'm honestly not sure that was all of it.",
+      "timestamp": "00:03:47"
+    },
+    {
+      "id": "t33",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How about washing and dressing?",
+      "timestamp": "00:03:54"
+    },
+    {
+      "id": "t34",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I manage fine.",
+      "timestamp": "00:03:59"
+    },
+    {
+      "id": "t35",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "He does. I've got no concerns there.",
+      "timestamp": "00:04:04"
+    },
+    {
+      "id": "t36",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mr Okafor, can you tell me today's date?",
+      "timestamp": "00:04:09"
+    },
+    {
+      "id": "t37",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "It's... Tuesday. The fourteenth? No, sorry, the fifteenth. October.",
+      "timestamp": "00:04:14"
+    },
+    {
+      "id": "t38",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "And the year?",
+      "timestamp": "00:04:19"
+    },
+    {
+      "id": "t39",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Twenty twenty-six.",
+      "timestamp": "00:04:24"
+    },
+    {
+      "id": "t40",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you know where we are today?",
+      "timestamp": "00:04:29"
+    },
+    {
+      "id": "t41",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "The memory clinic at the general hospital. Second floor.",
+      "timestamp": "00:04:34"
+    },
+    {
+      "id": "t42",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you noticed any trouble finding words?",
+      "timestamp": "00:04:39"
+    },
+    {
+      "id": "t43",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Sometimes a word is on the tip of my tongue. Everybody gets that.",
+      "timestamp": "00:04:44"
+    },
+    {
+      "id": "t44",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "I've noticed he says the thing a lot more. Like, pass me the thing, when he means the remote.",
+      "timestamp": "00:04:51"
+    },
+    {
+      "id": "t45",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How's your mood, Mr Okafor?",
+      "timestamp": "00:05:00"
+    },
+    {
+      "id": "t46",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I'm fine. I miss my wife, it's been four years. But I'm not low.",
+      "timestamp": "00:05:05"
+    },
+    {
+      "id": "t47",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Are you sleeping well?",
+      "timestamp": "00:05:12"
+    },
+    {
+      "id": "t48",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Like a log. Always have.",
+      "timestamp": "00:05:17"
+    },
+    {
+      "id": "t49",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "He does nap in the afternoon now, which he never used to.",
+      "timestamp": "00:05:22"
+    },
+    {
+      "id": "t50",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Grace, has anything changed in his personality?",
+      "timestamp": "00:05:29"
+    },
+    {
+      "id": "t51",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "Not really. Maybe a bit more irritable when he gets things wrong. But he's still Dad.",
+      "timestamp": "00:05:34"
+    },
+    {
+      "id": "t52",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Any falls?",
+      "timestamp": "00:05:42"
+    },
+    {
+      "id": "t53",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No falls.",
+      "timestamp": "00:05:47"
+    },
+    {
+      "id": "t54",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "No, none.",
+      "timestamp": "00:05:52"
+    },
+    {
+      "id": "t55",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What medicines do you take?",
+      "timestamp": "00:05:57"
+    },
+    {
+      "id": "t56",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Blood pressure tablets, one in the morning. And a statin.",
+      "timestamp": "00:06:02"
+    },
+    {
+      "id": "t57",
+      "speaker": "daughter1",
+      "role": "informant",
+      "text": "He uses a dosette box that I fill on Sundays. He's been good with it.",
+      "timestamp": "00:06:08"
+    },
+    {
+      "id": "t58",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Thank you both. Next I'd like to do some formal memory testing.",
+      "timestamp": "00:06:16"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-memory",
+      "label": "Memory",
+      "score": "testing pending",
+      "text": "Daughter reports repetitive questioning within single phone calls, beginning about a year ago and worsening since Christmas. Mr Okafor acknowledges repeating himself. Recalled the previous day's events accurately. Remote memory for his working life appears preserved."
+    },
+    {
+      "id": "sec-function",
+      "label": "Daily functioning",
+      "score": "mild impairment",
+      "text": "Continues to cook; his daughter reports two episodes of leaving the gas on, and a cut-off valve has been fitted. Manages his own finances and pays his bills independently. Became lost on a familiar driving route in the spring. Independent in washing and dressing, which both he and his daughter confirm."
+    },
+    {
+      "id": "sec-orientation",
+      "label": "Orientation, language and behaviour",
+      "text": "When asked the date, gave it as the fourteenth of October. Correctly named the year and the clinic location. Reports increasingly using vague placeholder words in place of specific nouns. Has begun wandering at night. Findings suggest a mild neurocognitive disorder."
+    }
+  ]
+}
