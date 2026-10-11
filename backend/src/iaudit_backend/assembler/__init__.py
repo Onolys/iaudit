@@ -21,6 +21,7 @@ from .models import (
     SectionFailure,
 )
 from .repair import repair_claim
+from .validate import check_rules, finalize
 
 __all__ = [
     "AssembleOutcome",
@@ -34,6 +35,8 @@ __all__ = [
     "Match",
     "SectionFailure",
     "assemble",
+    "check_rules",
+    "finalize",
     "locate",
 ]
 
@@ -95,4 +98,5 @@ def assemble(request: AuditRequest, internal: InternalAudit, cfg: Settings) -> A
     }
     if request.request_id is not None:
         response["request_id"] = request.request_id
+    response = finalize(request, response, report)
     return AssembleOutcome(response=response, report=report)
