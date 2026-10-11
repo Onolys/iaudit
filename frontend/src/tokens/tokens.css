@@ -1,0 +1,11 @@
+:root {
+  --verdict-supported: #1a7f37;
+  --verdict-partially-supported: #b45309;
+  --verdict-contradicted: #c62828;
+  --verdict-insufficient-evidence: #6b7280;
+  --verdict-out-of-scope: #9ca3af;
+  --role-supporting: #1a7f37;
+  --role-contradicting: #c62828;
+  --role-qualifying: #b45309;
+  --selected-claim-bg: #e5e7eb;
+}
