@@ -143,7 +143,7 @@ async def _check(
         counts["failure"] = res.stall
         return _stall(claim, res.stall, ctx), counts
     vout, floor_counts = apply_floors(res.output, cfg)
-    judged, sig = judge(claim, link, ga, turns, vout, floor_counts)
+    judged, sig = judge(claim, link, ga, turns, vout, floor_counts, cfg)
     dec = decide(claim, judged, sig, cfg)
     for k, n in {**sig.counts, **dec.counts}.items():
         counts[k] = counts.get(k, 0) + n

@@ -2,7 +2,7 @@
 
 from typing import Annotated, Literal
 
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
@@ -66,6 +66,10 @@ class Settings(BaseSettings):
     check_step_material: int = 1
     check_contradict_gap: int = 3
     check_rate_ratio: float = 1.5
+    # confidence calibration: what low / medium / high are worth against the floors
+    check_conf_low: float = 0.3
+    check_conf_medium: float = 0.6
+    check_conf_high: float = 0.9
     check_suggest_revision: bool = True
     check_retry: bool = True
     # Orchestration (SP06)
@@ -85,6 +89,20 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     server_timing: bool = False
     pipeline: Literal["stub", "full"] = "full"
+
+    @model_validator(mode="after")
+    def _conf_values_ordered(self):
+        if not self.check_conf_low <= self.check_conf_medium <= self.check_conf_high:
+            raise ValueError("check_conf_low <= check_conf_medium <= check_conf_high is required")
+        return self
+
+    @property
+    def check_conf_values(self) -> dict[str, float]:
+        return {
+            "low": self.check_conf_low,
+            "medium": self.check_conf_medium,
+            "high": self.check_conf_high,
+        }
 
     @field_validator("cors_origins", mode="before")
     @classmethod

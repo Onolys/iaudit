@@ -19,9 +19,17 @@ from iaudit_backend.scales import (
 
 from .models import JudgedEvidence, QuantityObs
 
-# Minimal lower-bound cues: vague quantifiers compatible with a higher rate (core list only).
-AT_LEAST_CUES = ("repeatedly", "frequently", "regularly", "often", "several", "many", "multiple")
+# Lower-bound cues: vague quantifiers compatible with a higher rate. "some", "mild" and
+# "a little" are level words, not cues. A negator just before a cue ("not often") cancels it.
+AT_LEAST_CUES = (
+    "repeatedly", "frequently", "regularly", "often", "several", "many", "multiple",
+    "at least", "more than", "a number of", "numerous", "a lot", "lots of", "again and again",
+    "over and over", "time and again",
+)  # fmt: skip
 _CUE = re.compile(r"\b(?:" + "|".join(AT_LEAST_CUES) + r")\b", re.IGNORECASE)
+_NEGATED = re.compile(
+    r"\b(?:not|never|no|hardly|rarely|barely|seldom|scarcely)\b(?:\W+\w+){0,2}\W*$", re.IGNORECASE
+)
 _BOUNDS = (0.2, 1.0, 4.0, 7.0)  # weekly rates where frequency buckets change
 _NEAR = 0.15
 _BUCKETS: dict[str, type[IntEnum]] = {"frequency": FrequencyBucket, "severity": SeverityBucket}
@@ -46,7 +54,7 @@ class AmountFinding:
 
 
 def has_at_least_cue(raw: str) -> bool:
-    return bool(_CUE.search(raw))
+    return any(not _NEGATED.search(raw[: m.start()]) for m in _CUE.finditer(raw))
 
 
 def claim_values(claim: AtomicClaim, kind: Kind) -> list[Value]:

@@ -66,6 +66,8 @@ Set as `IAUDIT_<NAME>` environment variables. `Settings` in `config.py` also rea
 | `IAUDIT_LINK_LATER_CORRECTION_CAP` | `3` | Pulls in later turns where the same speaker corrects themselves on the claim's topic. `0` turns it off. |
 | `IAUDIT_LINK_FUSION`, `IAUDIT_LINK_RRF_K` | `false`, `60` | Fuse the keyword ranking with a fuzzy-match ranking by reciprocal rank. |
 | `IAUDIT_LINK_CACHE_BREAKPOINTS` | `1` | `2` caches the transcript and the instruction block separately in whole-transcript mode. |
+| `IAUDIT_CHECK_RATE_RATIO` | `1.5` | When a claim names two or more accounts and two speakers give weekly rates that differ by at least this ratio, the claim is flagged for conflicting accounts even if both fall in one frequency bucket. |
+| `IAUDIT_CHECK_CONF_LOW`, `_MEDIUM`, `_HIGH` | `0.3`, `0.6`, `0.9` | What the verifier's low, medium and high confidence are worth against the floors `IAUDIT_CHECK_MIN_CONF_P0` (0.5) and `IAUDIT_CHECK_MIN_CONF_P1` (0.6). Must be in increasing order. |
 | `IAUDIT_PIPELINE_MAX_CLAIMS` | `80` | Claims audited per request. More are dropped and `input_truncated` is emitted. |
 | `IAUDIT_SERVER_TIMING` | `false` | When `true`, a 200 reply carries a `Server-Timing` header with durations only: `total`, then `prep`, `atomize`, `link`, `check`, `assemble` in milliseconds. |
 | `IAUDIT_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins. |
