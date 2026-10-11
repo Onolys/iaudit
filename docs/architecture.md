@@ -8,6 +8,10 @@ v1 is one synchronous JSON exchange. The frontend owns the contract in [contract
 
 `label` and `score` are display-only. The response locates claims and excerpts by index and character offset. It does not copy transcript text or timestamps.
 
+## Backend
+
+The backend ([../backend/](../backend/)) serves `POST /v1/audit` and calls model providers through LiteLLM. It reads the schemas in [contracts/](contracts/) in place. For each claim in the assessment, a model proposes evidence and a verdict, and code decides what is reported. The model never returns positions. Code computes them. Endpoint, errors, settings and warnings: [reference/backend-api.md](reference/backend-api.md).
+
 ## Review UI
 
 The frontend is a browser app (React + TypeScript, in [../frontend/](../frontend/)). It never edits the assessment. Flow:
