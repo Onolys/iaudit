@@ -9,6 +9,7 @@ from .normalize import normalize
 from .repair import EXPLANATIONS, GENERIC_OUT_OF_SCOPE
 
 _QUOTED = re.compile(r""""([^"]+)"|“([^”]+)”|‘([^’]+)’|(?<!\w)'(.+?)'(?!\w)""")
+_WORDS = re.compile(r"[^\W_]+")
 _TIME = re.compile(r"\b\d\d:\d\d\b")
 _END = ".!?"
 _MIN_QUOTE_WORDS = 4
@@ -25,12 +26,27 @@ class CopyContext:
     turns_norm: str  # all turns, normalized, joined by newline
     turn_texts: list[str]  # normalized, one per turn
     timestamps: list[str]
+    ngram: int = 0  # word n-gram size; 0 disables the n-gram check
+    turn_grams: frozenset[tuple[str, ...]] = frozenset()  # built once per request
+    own_grams: frozenset[tuple[str, ...]] = frozenset()  # the assessor's own wording is allowed
 
     @classmethod
-    def from_request(cls, req: AuditRequest) -> "CopyContext":
+    def from_request(cls, req: AuditRequest, ngram: int = 8) -> "CopyContext":
         norms = [normalize(t.text)[0] for t in req.transcript]
         ts = [t.timestamp for t in req.transcript if t.timestamp]
-        return cls("\n".join(norms), norms, ts)
+        turn_grams: set[tuple[str, ...]] = set()
+        own_grams: set[tuple[str, ...]] = set()
+        if ngram > 0:
+            for n in norms:
+                turn_grams |= _grams(n, ngram)
+            for s in req.assessment:
+                own_grams |= _grams(normalize(s.text)[0], ngram)
+        return cls("\n".join(norms), norms, ts, ngram, frozenset(turn_grams), frozenset(own_grams))
+
+
+def _grams(normalized: str, n: int) -> set[tuple[str, ...]]:
+    words = _WORDS.findall(normalized)
+    return {tuple(words[i : i + n]) for i in range(len(words) - n + 1)}
 
 
 def violates(text: str, ctx: CopyContext) -> bool:
@@ -42,6 +58,10 @@ def violates(text: str, ctx: CopyContext) -> bool:
             n = normalize(span)[0].strip()
             if n and n in ctx.turns_norm:
                 return True
+    if ctx.ngram > 0:
+        found = _grams(normalize(text)[0], ctx.ngram)
+        if any(g in ctx.turn_grams and g not in ctx.own_grams for g in found):
+            return True
     return False
 
 

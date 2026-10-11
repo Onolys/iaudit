@@ -45,7 +45,7 @@ def assemble(request: AuditRequest, internal: InternalAudit, cfg: Settings) -> A
     report = AssembleReport()
     turn_lens = [len(t.text) for t in request.transcript]
     sec_lens = [len(s.text) for s in request.assessment]
-    copy_ctx = CopyContext.from_request(request)
+    copy_ctx = CopyContext.from_request(request, cfg.copy_ngram)
 
     res = resolve_claims(
         internal.claims, request.assessment, internal.section_failures, cfg, report

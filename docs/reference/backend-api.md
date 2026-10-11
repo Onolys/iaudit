@@ -81,6 +81,6 @@ Stage tuning knobs (`IAUDIT_ATOMIZE_*`, `IAUDIT_LINK_*`, `IAUDIT_CHECK_*`, per-s
 | `ambiguous_speaker` | A claim relies on a turn with no `role`. No speaker is assumed. Carries `claim_id`. |
 | `input_truncated` | More claims were found than `IAUDIT_PIPELINE_MAX_CLAIMS`; the extra claims were not audited. |
 | `span_out_of_range` | A claim or evidence span did not fit the input and was omitted. A safety net; not expected in normal runs. |
-| `other` | A claim was adjusted or omitted: its verdict changed because cited evidence could not be verified or conflicts with it; wording was changed to avoid reproducing transcript text; the claim was not audited in time; it failed final validation; it overlapped another claim; or it could not be located in the text. |
+| `other` | A claim was adjusted or omitted: its verdict changed because cited evidence could not be verified or conflicts with it; wording was changed to avoid reproducing transcript text; the claim was not audited in time; it failed final validation; it overlapped another claim and was omitted, or was trimmed to remove the overlap (`IAUDIT_OVERLAP_TRIM`, default `true`); wording matched eight or more consecutive words of the transcript that the assessment does not itself contain (`IAUDIT_COPY_NGRAM`, default `8`, `0` turns it off); or it could not be located in the text. |
 
 A claim that stalls on a model failure or the deadline is returned with verdict `insufficient_evidence`, not dropped.

@@ -33,7 +33,8 @@ class Settings(BaseSettings):
     fuzzy_threshold: float = 90
     claim_fuzzy_threshold: float = 90
     fuzzy_min_len: int = 12
-    copy_ngram: int = 8
+    copy_ngram: int = 8  # 0 turns the n-gram copy check off
+    overlap_trim: bool = True  # trim the less severe of two partly overlapping claims
     cross_turn_slack: int = 0
     # Atomizer (SP03)
     atomize_max_claims: int = 30
