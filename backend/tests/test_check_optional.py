@@ -46,7 +46,15 @@ def v6(rate_a=0.46, rate_b=0.23, reported_by=TWO_ACCOUNTS, turns=(19, 23)):
             }
         ],
     )
-    lk = link(ev(n=1, turn=turns[0], role="supporting"), ev(n=2, turn=turns[1], role="supporting"))
+    lk = link(
+        ev(
+            n=1,
+            turns=list(turns[0]) if isinstance(turns[0], tuple) else None,
+            turn=turns[0] if not isinstance(turns[0], tuple) else 0,
+            role="supporting",
+        ),
+        ev(n=2, turn=turns[1], role="supporting"),
+    )
     out = {
         "items": [
             obs("c0.1:e1", frequency=[q("twice a month", rate_a)]),
@@ -97,6 +105,19 @@ def test_rate_ratio_not_added_twice_when_the_verifier_already_flagged_it():
 
 def test_rate_ratio_ignores_zero_and_missing_rates():
     _, sig, _ = run(*v6(0.46, 0))
+    assert sig.flags == []
+
+
+def test_a_question_turn_does_not_make_the_askers_item_a_second_account():
+    # item 1 = clinician's question (16) + Alex's answer (17); item 2 = Alex alone (23)
+    _, sig, dec = run(*v6(0.46, 0.23, turns=((16, 17), 23)))
+    assert sig.flags == [] and "ratio_conflicts" not in sig.counts
+    assert ConcernType.conflicting_accounts_flattened not in [c.type for c in dec.concerns]
+
+
+def test_partly_overlapping_speaker_sets_are_one_account():
+    # both items include Alex: not two independent accounts
+    _, sig, _ = run(*v6(0.46, 0.23, turns=((19, 23), 23)))
     assert sig.flags == []
 
 

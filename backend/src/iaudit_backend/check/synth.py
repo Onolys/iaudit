@@ -6,6 +6,7 @@ from iaudit_backend.atomize.models import AtomicClaim
 from iaudit_backend.config import Settings
 from iaudit_backend.link.models import LinkResult
 from iaudit_backend.models import ConcernType, EvidenceRole, Verdict
+from iaudit_backend.prep import Act
 
 from .amounts import compare_amounts, polarity_reversals
 from .group_a import GroupA
@@ -72,6 +73,14 @@ def apply_timeframe(claim: AtomicClaim, items: list[JudgedEvidence], flags: list
 # --- certainty, flags, causal cue, inference --------------------------------------------------
 
 
+def _reply_speakers(e, turns: list) -> list[str]:
+    """Who said the item's reply turns. A question turn only frames the answer, so its asker is
+    left out (unless every turn is a question)."""
+    idx = [s.turn_index for s in e.draft.segments if 0 <= s.turn_index < len(turns)]
+    replies = [i for i in idx if Act.question not in turns[i].acts] or idx
+    return sorted({turns[i].speaker for i in replies})
+
+
 def _rate_ratio_conflict(
     claim: AtomicClaim, items: list[JudgedEvidence], sig: Signals, ratio: float
 ) -> None:
@@ -94,7 +103,7 @@ def _rate_ratio_conflict(
             rated.append((it, rates[0]))
     for n, (a, ra) in enumerate(rated):
         for b, rb in rated[n + 1 :]:
-            if a.speakers and b.speakers and set(a.speakers) != set(b.speakers):
+            if a.speakers and b.speakers and set(a.speakers).isdisjoint(b.speakers):
                 if max(ra, rb) / min(ra, rb) >= ratio:
                     sig.flags.append(
                         FlagObs(
@@ -198,13 +207,7 @@ def judge(
             linked=e,
             obs=obs.get(e.draft.key),
             turns=[s.turn_index for s in e.draft.segments if 0 <= s.turn_index < len(turns)],
-            speakers=sorted(
-                {
-                    turns[s.turn_index].speaker
-                    for s in e.draft.segments
-                    if 0 <= s.turn_index < len(turns)
-                }
-            ),
+            speakers=_reply_speakers(e, turns),
             endorsed=e.answer_status not in _NON_ENDORSED,
             attribution=ga.attribution.get(e.draft.key, "ok"),
         )
