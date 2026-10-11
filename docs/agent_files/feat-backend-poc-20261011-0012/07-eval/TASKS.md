@@ -9,7 +9,7 @@ Source of truth: [PRD.md](PRD.md). 07a builds the ADHD faithful fixture plus 8 s
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | ADHD 26-turn faithful fixture with sha256 pin | 01 | todo |
+| 1 | ADHD 26-turn faithful fixture with sha256 pin | 01 | done |
 | 2 | `spec.json` and `build_adhd.py` generating the 8 variants | 1 | todo |
 | 3 | Expected JSON per fixture | 2 | todo |
 | 4 | Core self-tests: schema-valid requests, byte-identical rebuild | 3 | todo |
