@@ -1,0 +1,234 @@
+{
+  "split": "prompt",
+  "note": "Fictional 'Jordan' examples. Excluded from every eval set. Never reuse eval sentences here.",
+  "examples": [
+    {
+      "roster": [
+        {"speaker": "jordan1", "role": "respondent"},
+        {"speaker": "dr_vale", "role": "interviewer"}
+      ],
+      "text": "Jordan is disorganized because Jordan misplaces receipts and double-books clients.",
+      "output": {
+        "claims": [
+          {
+            "ref": "a",
+            "segments": ["Jordan is disorganized"],
+            "proposition": "Jordan is disorganized.",
+            "scope": "out_of_scope",
+            "oos_category": "diagnostic_conclusion",
+            "subject_text": "Jordan",
+            "subject_speaker": "jordan1",
+            "reported_by": [{"source": "assessor", "speaker": null}],
+            "polarity": "affirmed",
+            "quantities": [],
+            "timeframe": "current",
+            "timeframe_explicit": false,
+            "hedged": false
+          },
+          {
+            "ref": "b",
+            "segments": ["Jordan misplaces receipts"],
+            "proposition": "Jordan misplaces receipts.",
+            "scope": "in_scope",
+            "oos_category": null,
+            "subject_text": "Jordan",
+            "subject_speaker": "jordan1",
+            "reported_by": [{"source": "unspecified", "speaker": null}],
+            "polarity": "affirmed",
+            "quantities": [],
+            "timeframe": "current",
+            "timeframe_explicit": false,
+            "hedged": false
+          },
+          {
+            "ref": "c",
+            "segments": ["double-books clients"],
+            "proposition": "Jordan double-books clients.",
+            "scope": "in_scope",
+            "oos_category": null,
+            "subject_text": "Jordan",
+            "subject_speaker": "jordan1",
+            "reported_by": [{"source": "unspecified", "speaker": null}],
+            "polarity": "affirmed",
+            "quantities": [],
+            "timeframe": "current",
+            "timeframe_explicit": false,
+            "hedged": false
+          }
+        ],
+        "links": [
+          {
+            "type": "causal",
+            "cause_ids": ["b", "c"],
+            "effect_id": "a",
+            "connector": "because",
+            "source": "assessor"
+          }
+        ]
+      }
+    },
+    {
+      "roster": [
+        {"speaker": "jordan1", "role": "respondent"},
+        {"speaker": "riley1", "role": "informant"},
+        {"speaker": "dr_vale", "role": "interviewer"}
+      ],
+      "text": "Jordan estimates arriving late about once a week. Jordan's sister reports it happens most mornings.",
+      "output": {
+        "claims": [
+          {
+            "ref": "a",
+            "segments": ["Jordan estimates arriving late about once a week"],
+            "proposition": "Jordan arrives late about once a week, by Jordan's own estimate.",
+            "scope": "in_scope",
+            "oos_category": null,
+            "subject_text": "Jordan",
+            "subject_speaker": "jordan1",
+            "reported_by": [{"source": "self", "speaker": "jordan1"}],
+            "polarity": "affirmed",
+            "quantities": [
+              {"kind": "frequency", "raw": "about once a week", "bucket": "often", "rate_per_week": 1.0}
+            ],
+            "timeframe": "current",
+            "timeframe_explicit": false,
+            "hedged": true
+          },
+          {
+            "ref": "b",
+            "segments": ["Jordan's sister reports it happens most mornings"],
+            "proposition": "Jordan arrives late most mornings, according to Jordan's sister.",
+            "scope": "in_scope",
+            "oos_category": null,
+            "subject_text": "Jordan",
+            "subject_speaker": "jordan1",
+            "reported_by": [{"source": "informant", "speaker": "riley1"}],
+            "polarity": "affirmed",
+            "quantities": [
+              {"kind": "frequency", "raw": "most mornings", "bucket": "most", "rate_per_week": null}
+            ],
+            "timeframe": "current",
+            "timeframe_explicit": false,
+            "hedged": false
+          }
+        ],
+        "links": []
+      }
+    },
+    {
+      "roster": [
+        {"speaker": "jordan1", "role": "respondent"},
+        {"speaker": "dr_vale", "role": "interviewer"}
+      ],
+      "text": "Jordan denies missing deadlines. In childhood Jordan lost a lunchbox roughly twice a month.",
+      "output": {
+        "claims": [
+          {
+            "ref": "a",
+            "segments": ["Jordan denies missing deadlines"],
+            "proposition": "Jordan does not miss deadlines.",
+            "scope": "in_scope",
+            "oos_category": null,
+            "subject_text": "Jordan",
+            "subject_speaker": "jordan1",
+            "reported_by": [{"source": "self", "speaker": "jordan1"}],
+            "polarity": "negated",
+            "quantities": [],
+            "timeframe": "current",
+            "timeframe_explicit": false,
+            "hedged": false
+          },
+          {
+            "ref": "b",
+            "segments": ["In childhood Jordan lost a lunchbox roughly twice a month"],
+            "proposition": "As a child, Jordan lost a lunchbox about twice a month.",
+            "scope": "in_scope",
+            "oos_category": null,
+            "subject_text": "Jordan",
+            "subject_speaker": "jordan1",
+            "reported_by": [{"source": "unspecified", "speaker": null}],
+            "polarity": "affirmed",
+            "quantities": [
+              {"kind": "frequency", "raw": "roughly twice a month", "bucket": "sometimes", "rate_per_week": 0.46}
+            ],
+            "timeframe": "childhood",
+            "timeframe_explicit": true,
+            "hedged": true
+          }
+        ],
+        "links": []
+      }
+    },
+    {
+      "roster": [
+        {"speaker": "jordan1", "role": "respondent"},
+        {"speaker": "dr_vale", "role": "interviewer"}
+      ],
+      "text": "Jordan, who works nights, struggles to sleep during the day. A score of 3 applies when symptoms occur weekly. Consider a follow-up visit.",
+      "output": {
+        "claims": [
+          {
+            "ref": "a",
+            "segments": ["Jordan", "struggles to sleep during the day"],
+            "proposition": "Jordan struggles to sleep during the day.",
+            "scope": "in_scope",
+            "oos_category": null,
+            "subject_text": "Jordan",
+            "subject_speaker": "jordan1",
+            "reported_by": [{"source": "unspecified", "speaker": null}],
+            "polarity": "affirmed",
+            "quantities": [],
+            "timeframe": "current",
+            "timeframe_explicit": false,
+            "hedged": false
+          },
+          {
+            "ref": "b",
+            "segments": ["who works nights"],
+            "proposition": "Jordan works nights.",
+            "scope": "in_scope",
+            "oos_category": null,
+            "subject_text": "Jordan",
+            "subject_speaker": "jordan1",
+            "reported_by": [{"source": "unspecified", "speaker": null}],
+            "polarity": "affirmed",
+            "quantities": [],
+            "timeframe": "current",
+            "timeframe_explicit": false,
+            "hedged": false
+          },
+          {
+            "ref": "c",
+            "segments": ["A score of 3 applies when symptoms occur weekly."],
+            "proposition": "A score of 3 applies when symptoms occur weekly.",
+            "scope": "out_of_scope",
+            "oos_category": "scoring_rule",
+            "subject_text": "A score of 3",
+            "subject_speaker": null,
+            "reported_by": [{"source": "assessor", "speaker": null}],
+            "polarity": "affirmed",
+            "quantities": [],
+            "timeframe": "unspecified",
+            "timeframe_explicit": false,
+            "hedged": false
+          },
+          {
+            "ref": "d",
+            "segments": ["Consider a follow-up visit."],
+            "proposition": "A follow-up visit is recommended.",
+            "scope": "out_of_scope",
+            "oos_category": "recommendation",
+            "subject_text": "a follow-up visit",
+            "subject_speaker": null,
+            "reported_by": [{"source": "assessor", "speaker": null}],
+            "polarity": "affirmed",
+            "quantities": [],
+            "timeframe": "future",
+            "timeframe_explicit": false,
+            "hedged": false
+          }
+        ],
+        "links": []
+      }
+    }
+  ]
+}
