@@ -5,6 +5,7 @@ import re
 
 from iaudit_backend.llm import LLMBadOutput, LLMError, LLMRequest, LLMTimeout
 from iaudit_backend.models import Section, Turn
+from iaudit_backend.safe_log import log_event
 from iaudit_backend.scales import FrequencyBucket, SeverityBucket, resolve_quantity
 
 from .models import AtomicClaim, AtomizerOutput, Quantity, SectionAtoms
@@ -80,6 +81,21 @@ def _score(c: Checked) -> tuple[int, int]:
 async def atomize_section(
     section: Section, roster: list[Speaker], ctx, *, index: int
 ) -> SectionAtoms:
+    res = await _atomize(section, roster, ctx, index=index)
+    log_event(
+        "atomize_section",
+        request_id=ctx.request_id,
+        section_index=index,
+        claims=len(res.claims),
+        dropped=res.dropped,
+        gaps=res.coverage_gaps,
+        retries=res.retries,
+        **({"failure": res.failure} if res.failure else {}),
+    )
+    return res
+
+
+async def _atomize(section: Section, roster: list[Speaker], ctx, *, index: int) -> SectionAtoms:
     if not section.text.strip():
         return SectionAtoms(section_index=index, status="ok")
     timeout = ctx.call_timeout("atomize")

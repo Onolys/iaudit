@@ -51,6 +51,13 @@ ALLOWED_FIELDS = frozenset(
         "cache_write_tokens",
         "models",
         "tier_calls",
+        "pairs",
+        "section_index",
+        "claims",
+        "dropped",
+        "gaps",
+        "retries",
+        "failure",
         "exc_class",
         "frames",
     }
