@@ -10,7 +10,7 @@ Source of truth: [PRD.md](PRD.md). For each in-scope claim, find the transcript 
 | # | Task | Depends on | Status |
 |---|---|---|---|
 | 1 | Stemmer, BM25 top-k, Q/A and clarification neighbors | 03 | done |
-| 2 | `auto` choice between whole transcript and shortlist | 1 | todo |
+| 2 | `auto` choice between whole transcript and shortlist | 1 | done |
 | 3 | Linker prompt and call with one `cache_prefix` | 2 | todo |
 | 4 | Validation: shortlist membership, `locate()` dry run, snapping, answer status, `ambiguous_turns` | 3, 02 | todo |
 | 5 | Retry and per-claim `stalled` | 4 | todo |
