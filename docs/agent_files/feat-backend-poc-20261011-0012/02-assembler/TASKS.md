@@ -9,15 +9,15 @@ Source of truth: [PRD.md](PRD.md). Turns internal drafts from 03-05 into a contr
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Draft models, `assemble()` entry point, counts-only report | 01 | todo |
-| 2 | `locate()`: exact, normalized, guarded fuzzy, ellipsis, hint | 1 | todo |
-| 3 | Evidence resolution and `eN` ids | 2 | todo |
-| 4 | Claim resolution and overlap policy | 2 | todo |
-| 5 | Repair table | 3, 4 | todo |
-| 6 | Rule 9 core copy check | 5 | todo |
-| 7 | Warnings and status | 5 | todo |
-| 8 | Final validation: `check_rules` and schema, quarantine once | 6, 7 | todo |
-| 9 | Reproduce `examples/response.json` spans | 8 | todo |
+| 1 | Draft models, `assemble()` entry point, counts-only report | 01 | done |
+| 2 | `locate()`: exact, normalized, guarded fuzzy, ellipsis, hint | 1 | done |
+| 3 | Evidence resolution and `eN` ids | 2 | done |
+| 4 | Claim resolution and overlap policy | 2 | done |
+| 5 | Repair table | 3, 4 | done |
+| 6 | Rule 9 core copy check | 5 | done |
+| 7 | Warnings and status | 5 | done |
+| 8 | Final validation: `check_rules` and schema, quarantine once | 6, 7 | done |
+| 9 | Reproduce `examples/response.json` spans | 8 | done |
 | 10 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
 
 ## Task 1 — Draft models and entry point

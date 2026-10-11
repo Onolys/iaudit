@@ -9,16 +9,16 @@ Source of truth: [PRD.md](PRD.md). A runnable `backend/` service serving `POST /
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Project skeleton: uv, ruff, pytest, src layout | none | todo |
-| 2 | Contract loader: schemas read in place, fail at startup | 1 | todo |
-| 3 | `IAUDIT_*` settings | 1 | todo |
-| 4 | Internal models and enum-drift test | 2 | todo |
-| 5 | Error mapping to contract error bodies | 2 | todo |
-| 6 | LLM client: LiteLLM, fixture, stub and failing clients | 3 | todo |
-| 7 | Pipeline seam, `StubPipeline`, factory, 504 backstop | 4, 6 | todo |
-| 8 | `POST /v1/audit` checks in order, `/healthz`, CORS | 5, 7 | todo |
-| 9 | Logging allowlist and sentinel test | 8 | todo |
-| 10 | One live call to confirm model ids and JSON-schema output | 6 | todo |
+| 1 | Project skeleton: uv, ruff, pytest, src layout | none | done |
+| 2 | Contract loader: schemas read in place, fail at startup | 1 | done |
+| 3 | `IAUDIT_*` settings | 1 | done |
+| 4 | Internal models and enum-drift test | 2 | done |
+| 5 | Error mapping to contract error bodies | 2 | done |
+| 6 | LLM client: LiteLLM, fixture, stub and failing clients | 3 | done |
+| 7 | Pipeline seam, `StubPipeline`, factory, 504 backstop | 4, 6 | done |
+| 8 | `POST /v1/audit` checks in order, `/healthz`, CORS | 5, 7 | done |
+| 9 | Logging allowlist and sentinel test | 8 | done |
+| 10 | One live call to confirm model ids and JSON-schema output | 6 | skipped (user decision) |
 | 11 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
 
 ## Task 1 — Project skeleton

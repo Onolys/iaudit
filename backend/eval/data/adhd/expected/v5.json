@@ -1,0 +1,10 @@
+{
+ "fixture": "adhd-v5",
+ "target_text": "He currently forgets work assignments weekly.",
+ "verdict": "insufficient_evidence",
+ "concerns_required": [
+  "timeframe_mismatch"
+ ],
+ "concerns_allowed": [],
+ "explanation_contains": []
+}

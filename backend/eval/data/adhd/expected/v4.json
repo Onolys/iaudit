@@ -1,0 +1,10 @@
+{
+ "fixture": "adhd-v4",
+ "target_text": "He is easily distracted by his surroundings.",
+ "verdict": "insufficient_evidence",
+ "concerns_required": [
+  "question_as_answer"
+ ],
+ "concerns_allowed": [],
+ "explanation_contains": []
+}

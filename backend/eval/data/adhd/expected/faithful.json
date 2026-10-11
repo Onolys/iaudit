@@ -1,0 +1,8 @@
+{
+ "fixture": "adhd-faithful",
+ "all_claims": {
+  "verdict": "supported",
+  "concerns_required": [],
+  "concerns_allowed": []
+ }
+}
