@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.0.0",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 32
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent described working a morning shift, after being asked about his café job.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 0,
+              "char": 18
+            },
+            "end": {
+              "index": 1,
+              "char": 29
+            }
+          },
+          "note": "The question names the workplace and the answer gives the shift."
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 33
+        },
+        "end": {
+          "index": 0,
+          "char": 104
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "Tiredness is reported as mild and not daily, and the informant says his sleep is fine.",
+      "suggested_revision": "He reports mild tiredness after some shifts; sleep is described as fine.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "Mild, occasional tiredness becomes daily exhaustion.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "unsupported_causal_link",
+          "explanation": "A sleep disruption is given as the cause, though sleep is reported as fine.",
+          "evidence_ids": [
+            "e2",
+            "e3"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 4,
+              "char": 14
+            },
+            "end": {
+              "index": 4,
+              "char": 35
+            }
+          },
+          "note": "The respondent limits how often he is tired."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 37
+            },
+            "end": {
+              "index": 3,
+              "char": 56
+            }
+          },
+          "note": "The informant reports normal sleep."
+        },
+        {
+          "id": "e3",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 36
+            }
+          },
+          "note": "Tiredness is linked to shifts, not to sleep."
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 105
+        },
+        "end": {
+          "index": 0,
+          "char": 140
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The informant reports tiredness after shifts, while the respondent plays it down. The two accounts differ in degree.",
+      "suggested_revision": null,
+      "concerns": [
+        {
+          "type": "conflicting_accounts_flattened",
+          "explanation": "Two different accounts are written as agreement.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 34
+            }
+          }
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 4,
+              "char": 0
+            },
+            "end": {
+              "index": 4,
+              "char": 35
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

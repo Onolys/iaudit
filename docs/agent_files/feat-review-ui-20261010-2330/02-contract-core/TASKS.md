@@ -9,10 +9,10 @@ Source of truth: docs/agent_files/feat-review-ui-20261010-2330/02-contract-core/
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Types and Ajv validators | 01/T1, 01/T3 | todo |
-| 2 | Code points, bounds check, span walk | 1 | todo |
-| 3 | Response analysis and evidence ordering | 2 | todo |
-| 4 | Excerpt chunks and index export surface | 3 | todo |
+| 1 | Types and Ajv validators | 01/T1, 01/T3 | done |
+| 2 | Code points, bounds check, span walk | 1 | done |
+| 3 | Response analysis and evidence ordering | 2 | done |
+| 4 | Excerpt chunks and index export surface | 3 | done |
 
 ## Task 1 — Types and Ajv validators
 What it is / what it means: Typed, validated entry points for request and response (R1, R2; Decisions 1, 2, 4, 7-9).

@@ -1,0 +1,168 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-01",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 58
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent described forgetting names now and then and framed it as a long-standing trait.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 1,
+              "char": 13
+            },
+            "end": {
+              "index": 1,
+              "char": 37
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 59
+        },
+        "end": {
+          "index": 0,
+          "char": 97
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "The respondent denied getting lost on familiar routes. The informant described one missed turn, which the respondent tied to roadworks.",
+      "suggested_revision": "He denied getting lost while driving; a family member recalled one missed turn.",
+      "concerns": [
+        {
+          "type": "negation_reversal",
+          "explanation": "A denial is presented as an established behaviour.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "One reported event is written as frequent.",
+          "evidence_ids": [
+            "e2",
+            "e3"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 2,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 6
+            }
+          },
+          "note": "Asked about getting lost, the respondent says it does not happen."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 4,
+              "char": 0
+            },
+            "end": {
+              "index": 4,
+              "char": 49
+            }
+          },
+          "note": "The informant recalls a single wrong turn in early summer."
+        },
+        {
+          "id": "e3",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 5,
+              "char": 0
+            },
+            "end": {
+              "index": 5,
+              "char": 31
+            }
+          },
+          "note": "The respondent links that one event to road changes."
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 98
+        },
+        "end": {
+          "index": 0,
+          "char": 143
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The interviewer asked about the period since spring, but the respondent described his memory as mostly unchanged.",
+      "suggested_revision": "Since spring he reports his memory as mostly unchanged.",
+      "concerns": [
+        {
+          "type": "certainty_inflation",
+          "explanation": "A sharp decline is stated as fact without a reported change.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "context_stripping",
+          "explanation": "The respondent's framing of name-forgetting as lifelong is dropped.",
+          "evidence_ids": []
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 0,
+              "char": 0
+            },
+            "end": {
+              "index": 1,
+              "char": 12
+            }
+          },
+          "note": "The question sets the timeframe; the answer does not report a decline."
+        }
+      ]
+    }
+  ]
+}

@@ -9,9 +9,9 @@ Source of truth: docs/agent_files/feat-review-ui-20261010-2330/01-frontend-scaff
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Project toolchain and @contracts alias | none | todo |
-| 2 | Env config and README | 1 | todo |
-| 3 | Tokens module and placeholder app | 1 | todo |
+| 1 | Project toolchain and @contracts alias | none | done |
+| 2 | Env config and README | 1 | done |
+| 3 | Tokens module and placeholder app | 1 | done |
 
 ## Task 1 — Project toolchain and @contracts alias
 What it is / what it means: The Vite + React + strict TypeScript + Vitest skeleton in `frontend/`, with npm and a committed lockfile (PRD Req 1-3, 7; Decisions 1-4, 7).

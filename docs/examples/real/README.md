@@ -8,7 +8,7 @@ The patients are role-played, but the step being checked is real: a clinician wr
 
 **Audience:** contributors testing the auditor.
 
-Hand-written mock samples live separately and are kept. They target each check on purpose; this real data won't cover every check.
+Hand-written mock samples live in [`../mock/`](../mock/) and are kept. They target each check on purpose; this real data won't cover every check.
 
 | File | What it is |
 |---|---|
