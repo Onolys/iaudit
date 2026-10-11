@@ -9,7 +9,9 @@ This is the JSON **body** of one synchronous call. HTTP path, method, and auth a
 | [audit-request.schema.json](audit-request.schema.json) | Input. Machine-checked structure. |
 | [audit-response.schema.json](audit-response.schema.json) | Output. Machine-checked structure. |
 | [error-response.schema.json](error-response.schema.json) | Body of any non-2xx reply. See [Error response](#error-response). |
-| [examples/request.json](examples/request.json), [examples/response.json](examples/response.json) | One fictional worked example. |
+| [examples/request.json](examples/request.json), [examples/response.json](examples/response.json) | One fictional worked example (pair `default`). |
+| [examples/partial.request.json](examples/partial.request.json), [examples/partial.response.json](examples/partial.response.json) | Fictional `partial` audit: one section not processed, plus a second warning. |
+| [examples/out-of-range.request.json](examples/out-of-range.request.json), [examples/out-of-range.response.json](examples/out-of-range.response.json) | Fictional audit where exactly one claim span runs past the section text. It intentionally breaks rule 1 so consumers can be tested against it; no other example does. |
 | This file | Conventions, field meanings, allowed values, and rules a schema cannot express. |
 
 If this file and a schema disagree about **structure**, the schema wins. If they disagree about a **rule the schema cannot express**, this file wins. Change them in the same commit.

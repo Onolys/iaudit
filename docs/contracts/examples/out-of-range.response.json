@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "out-of-range-001",
+  "status": "complete",
+  "warnings": [
+    {
+      "code": "span_out_of_range",
+      "message": "One claim position does not fit the supplied text.",
+      "claim_id": "c-bad"
+    }
+  ],
+  "claims": [
+    {
+      "id": "c-drive",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 35
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent says they drive short trips only.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e-drive",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 1,
+              "char": 5
+            },
+            "end": {
+              "index": 1,
+              "char": 21
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-way",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 36
+        },
+        "end": {
+          "index": 0,
+          "char": 75
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent says they have no trouble finding their way.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e-way",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 16
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-bad",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 116
+        },
+        "end": {
+          "index": 0,
+          "char": 136
+        }
+      },
+      "verdict": "insufficient_evidence",
+      "explanation": "Not substantiated by the supplied interview.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": []
+    }
+  ]
+}

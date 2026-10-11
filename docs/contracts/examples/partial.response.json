@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "partial-001",
+  "status": "partial",
+  "warnings": [
+    {
+      "code": "section_not_processed",
+      "message": "Section 1 was not processed.",
+      "section_index": 1
+    },
+    {
+      "code": "ambiguous_speaker",
+      "message": "The speaker of one turn could not be confirmed.",
+      "claim_id": "c-early"
+    }
+  ],
+  "claims": [
+    {
+      "id": "c-sleep-all",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 42
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "The respondent describes sleep as mostly fine with two early wakings. This is a potential concern about frequency inflation: 'every night' is not substantiated by the supplied interview.",
+      "suggested_revision": "The participant slept mostly well, with two early wakings last week.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "Two early wakings are described as every night.",
+          "evidence_ids": [
+            "e-fine"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e-fine",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 1,
+              "char": 0
+            },
+            "end": {
+              "index": 1,
+              "char": 12
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-early",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 43
+        },
+        "end": {
+          "index": 0,
+          "char": 75
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent states the same count and period.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e-twice",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 1,
+              "char": 13
+            },
+            "end": {
+              "index": 1,
+              "char": 45
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-appetite",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 76
+        },
+        "end": {
+          "index": 0,
+          "char": 101
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent describes appetite as normal.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e-normal",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 19
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
