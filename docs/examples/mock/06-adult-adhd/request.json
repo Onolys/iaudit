@@ -1,0 +1,418 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-06",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Thanks for coming in, Sam. To start, can you tell me what made you want an assessment now?",
+      "timestamp": "00:00:03"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "My manager flagged that I've missed a few deadlines this quarter. And honestly I've felt scattered for years, but it's got harder since I was promoted in March.",
+      "timestamp": "00:00:12"
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What does scattered look like on a normal workday?",
+      "timestamp": "00:00:25"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I'll open my inbox to answer one email and forty minutes later I've got six tabs open and I still haven't sent it. Meetings are the worst. If one runs past half an hour, I lose the thread completely.",
+      "timestamp": "00:00:30"
+    },
+    {
+      "id": "t4",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How often does losing the thread in meetings happen?",
+      "timestamp": "00:00:47"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Most meetings that go long. Maybe three or four times a week.",
+      "timestamp": "00:00:52"
+    },
+    {
+      "id": "t6",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "And when you're doing something you enjoy, say a hobby?",
+      "timestamp": "00:00:59"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Different story. I build model railways and I can sit for four hours without noticing the time. Same with video games.",
+      "timestamp": "00:01:05"
+    },
+    {
+      "id": "t8",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you make careless mistakes in your work?",
+      "timestamp": "00:01:15"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Sometimes. Typos in reports, mostly. Last month I sent a client the wrong invoice, which was bad.",
+      "timestamp": "00:01:20"
+    },
+    {
+      "id": "t10",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How many times has something like the invoice happened?",
+      "timestamp": "00:01:29"
+    },
+    {
+      "id": "t11",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "That kind of thing, with a client? Just the once. The typos are more like weekly.",
+      "timestamp": "00:01:34"
+    },
+    {
+      "id": "t12",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What about misplacing things, like keys, phone or wallet?",
+      "timestamp": "00:01:42"
+    },
+    {
+      "id": "t13",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Constantly. Every single day I'm hunting for something. My partner put a hook by the door for my keys and that's helped a bit.",
+      "timestamp": "00:01:47"
+    },
+    {
+      "id": "t14",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Let's go back to childhood. Do you remember having trouble focusing at school?",
+      "timestamp": "00:01:58"
+    },
+    {
+      "id": "t15",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yeah. My report cards always said I could do better if I paid attention. Teachers moved me to the front of the class more than once.",
+      "timestamp": "00:02:05"
+    },
+    {
+      "id": "t16",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How old were you then, roughly?",
+      "timestamp": "00:02:17"
+    },
+    {
+      "id": "t17",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Seven or eight, maybe. By secondary school I'd learned to cram the night before, so it looked fine on paper.",
+      "timestamp": "00:02:22"
+    },
+    {
+      "id": "t18",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Did you ever see anyone about it as a child?",
+      "timestamp": "00:02:32"
+    },
+    {
+      "id": "t19",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No. Nobody really talked about that back then.",
+      "timestamp": "00:02:38"
+    },
+    {
+      "id": "t20",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Now, restlessness. Do you find it hard to stay seated?",
+      "timestamp": "00:02:43"
+    },
+    {
+      "id": "t21",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Not really, no. I fidget and I tap my pen, but I can sit through a whole film without getting up.",
+      "timestamp": "00:02:49"
+    },
+    {
+      "id": "t22",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you feel restless inside, even when you're sitting still?",
+      "timestamp": "00:02:59"
+    },
+    {
+      "id": "t23",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "A bit, in the evenings. Like my brain is still running when I want to wind down.",
+      "timestamp": "00:03:05"
+    },
+    {
+      "id": "t24",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you interrupt people, or finish their sentences for them?",
+      "timestamp": "00:03:14"
+    },
+    {
+      "id": "t25",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "My partner says I do. I don't always notice it myself.",
+      "timestamp": "00:03:20"
+    },
+    {
+      "id": "t26",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Would it be alright if I asked your partner a couple of questions?",
+      "timestamp": "00:03:26"
+    },
+    {
+      "id": "t27",
+      "speaker": "partner1",
+      "role": "informant",
+      "text": "Sure. Yes, it happens a lot. At dinner with friends Sam will jump in before someone has finished, mostly when it's a topic Sam is excited about.",
+      "timestamp": "00:03:33"
+    },
+    {
+      "id": "t28",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How about impulsive decisions, with spending or driving?",
+      "timestamp": "00:03:45"
+    },
+    {
+      "id": "t29",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I bought a kayak on a whim last summer. That's the big one. Day to day I'm careful with money, we share a budget.",
+      "timestamp": "00:03:50"
+    },
+    {
+      "id": "t30",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Any speeding tickets or accidents?",
+      "timestamp": "00:04:01"
+    },
+    {
+      "id": "t31",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "One speeding ticket, about ten years ago. Nothing since.",
+      "timestamp": "00:04:06"
+    },
+    {
+      "id": "t32",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How's your sleep?",
+      "timestamp": "00:04:11"
+    },
+    {
+      "id": "t33",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I go to bed late because I can't switch off, usually after one. Then I'm up at seven for work.",
+      "timestamp": "00:04:16"
+    },
+    {
+      "id": "t34",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Does tiredness make the focus problems worse?",
+      "timestamp": "00:04:26"
+    },
+    {
+      "id": "t35",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Probably, on bad nights. But the focus thing is there even after a good weekend of sleep.",
+      "timestamp": "00:04:31"
+    },
+    {
+      "id": "t36",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Coffee, alcohol, anything else you use?",
+      "timestamp": "00:04:40"
+    },
+    {
+      "id": "t37",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Three coffees a day. A glass of wine at the weekend. Nothing else.",
+      "timestamp": "00:04:45"
+    },
+    {
+      "id": "t38",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How has your mood been generally?",
+      "timestamp": "00:04:52"
+    },
+    {
+      "id": "t39",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Fine, mostly. I get frustrated with myself, but I wouldn't say I'm depressed.",
+      "timestamp": "00:04:57"
+    },
+    {
+      "id": "t40",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Now the effect on work. You mentioned deadlines. How many have you missed?",
+      "timestamp": "00:05:04"
+    },
+    {
+      "id": "t41",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Three this quarter. Actually, wait, two. One of them I got an extension on beforehand, so that doesn't really count.",
+      "timestamp": "00:05:11"
+    },
+    {
+      "id": "t42",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Has there been any formal action from work?",
+      "timestamp": "00:05:21"
+    },
+    {
+      "id": "t43",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No formal warning. My manager raised it in my review and suggested I look into this.",
+      "timestamp": "00:05:26"
+    },
+    {
+      "id": "t44",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How about at home? Bills, chores?",
+      "timestamp": "00:05:34"
+    },
+    {
+      "id": "t45",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Bills are fine because they're all on autopay. Chores I start and don't finish. There's a half-painted spare room that's been like that since June.",
+      "timestamp": "00:05:39"
+    },
+    {
+      "id": "t46",
+      "speaker": "partner1",
+      "role": "informant",
+      "text": "That's true. I've mostly taken over the paperwork and the appointments, because things were slipping.",
+      "timestamp": "00:05:51"
+    },
+    {
+      "id": "t47",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How long has that arrangement been in place?",
+      "timestamp": "00:05:59"
+    },
+    {
+      "id": "t48",
+      "speaker": "partner1",
+      "role": "informant",
+      "text": "About two years now, since we moved in together.",
+      "timestamp": "00:06:04"
+    },
+    {
+      "id": "t49",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "And relationships or friendships, any strain?",
+      "timestamp": "00:06:09"
+    },
+    {
+      "id": "t50",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Some. My partner gets frustrated when I forget things we agreed on. Friends mostly find it funny.",
+      "timestamp": "00:06:14"
+    },
+    {
+      "id": "t51",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you tried anything to manage it?",
+      "timestamp": "00:06:23"
+    },
+    {
+      "id": "t52",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Phone reminders, and a paper planner. The planner lasts about two weeks before I forget it exists.",
+      "timestamp": "00:06:28"
+    },
+    {
+      "id": "t53",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Is there anything else you think I should know?",
+      "timestamp": "00:06:37"
+    },
+    {
+      "id": "t54",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Just that I'm not looking for an excuse. I want to understand why this is so hard for me when it seems easy for everyone else.",
+      "timestamp": "00:06:42"
+    },
+    {
+      "id": "t55",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "That's really helpful. Thank you both.",
+      "timestamp": "00:06:54"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-inattention",
+      "label": "Inattention",
+      "score": 7,
+      "text": "Reports persistent difficulty sustaining attention on work tasks and in long meetings, losing the thread three to four times a week. Attention is reported as intact for preferred activities such as model building and video games. Makes frequent careless errors, including client-facing invoicing mistakes on a regular basis. Misplaces everyday items daily. Inattentive symptoms present since early adolescence, with teachers first raising concerns in secondary school."
+    },
+    {
+      "id": "sec-hyperactivity",
+      "label": "Hyperactivity and impulsivity",
+      "score": 3,
+      "text": "Denies difficulty remaining seated; describes fidgeting and evening inner restlessness. Reports frequently interrupting others and finishing their sentences. Impulsive spending is a recurrent problem."
+    },
+    {
+      "id": "sec-impact",
+      "label": "Functional impact",
+      "score": "moderate",
+      "text": "Has missed three work deadlines this quarter. Late bedtimes from difficulty switching off are the cause of the daytime attention problems. Concerns were raised informally at a work review, with no formal warning. Partner has taken over household paperwork and appointments for about two years. Phone reminders and a paper planner have been tried; the planner is typically abandoned within a couple of weeks. Presentation is consistent with ADHD, predominantly inattentive type."
+    }
+  ]
+}

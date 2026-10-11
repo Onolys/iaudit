@@ -1,0 +1,694 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-06",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c-inatt-1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 132
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent describes drifting off an email task into other tabs, and losing track in meetings that run long, at the stated weekly rate.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 114
+            }
+          },
+          "note": "Drifts away from a simple email task."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 4,
+              "char": 0
+            },
+            "end": {
+              "index": 5,
+              "char": 61
+            }
+          },
+          "note": "Gives a weekly frequency for losing track in long meetings."
+        }
+      ]
+    },
+    {
+      "id": "c-inatt-2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 133
+        },
+        "end": {
+          "index": 0,
+          "char": 229
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent contrasts work with hobbies, describing hours of uninterrupted focus on model railways and games.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 7,
+              "char": 17
+            },
+            "end": {
+              "index": 7,
+              "char": 118
+            }
+          },
+          "note": "Long, unbroken focus on hobbies."
+        }
+      ]
+    },
+    {
+      "id": "c-inatt-3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 230
+        },
+        "end": {
+          "index": 0,
+          "char": 324
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Weekly typing errors in reports are described, but the client invoicing error happened once, not regularly.",
+      "suggested_revision": "Reports weekly typographical errors in reports and a single client invoicing error last month.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "A one-off client-facing error is written up as a regular occurrence.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 9,
+              "char": 11
+            },
+            "end": {
+              "index": 9,
+              "char": 97
+            }
+          },
+          "note": "Describes routine typos and one invoicing error."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 10,
+              "char": 0
+            },
+            "end": {
+              "index": 11,
+              "char": 81
+            }
+          },
+          "note": "Clarifies that the client error happened only once."
+        }
+      ]
+    },
+    {
+      "id": "c-inatt-4",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 325
+        },
+        "end": {
+          "index": 0,
+          "char": 356
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent says they search for some item every day.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 12,
+              "char": 0
+            },
+            "end": {
+              "index": 13,
+              "char": 55
+            }
+          },
+          "note": "Daily searching for misplaced items."
+        }
+      ]
+    },
+    {
+      "id": "c-inatt-5",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 357
+        },
+        "end": {
+          "index": 0,
+          "char": 468
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Childhood attention problems are described, but they were placed in primary school at around seven or eight. The respondent says that by secondary school the difficulty was masked by cramming.",
+      "suggested_revision": "Reports attention difficulties from around age seven or eight, noted on primary school reports; by secondary school these were masked by last-minute studying.",
+      "concerns": [
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "Onset is moved from middle childhood to early adolescence, and the teacher concerns are moved to the wrong school stage.",
+          "evidence_ids": [
+            "e2",
+            "e3"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 15,
+              "char": 6
+            },
+            "end": {
+              "index": 15,
+              "char": 132
+            }
+          },
+          "note": "Teachers noted attention problems in childhood."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 16,
+              "char": 0
+            },
+            "end": {
+              "index": 17,
+              "char": 22
+            }
+          },
+          "note": "Places the concerns at about seven or eight."
+        },
+        {
+          "id": "e3",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 17,
+              "char": 23
+            },
+            "end": {
+              "index": 17,
+              "char": 108
+            }
+          },
+          "note": "Secondary school performance appeared fine."
+        }
+      ]
+    },
+    {
+      "id": "c-hyper-1",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 0
+        },
+        "end": {
+          "index": 1,
+          "char": 87
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent denies trouble staying seated, mentions fidgeting and pen tapping, and describes a busy mind in the evenings.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 21,
+              "char": 0
+            },
+            "end": {
+              "index": 21,
+              "char": 97
+            }
+          },
+          "note": "Denies leaving the seat; describes fidgeting."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 23,
+              "char": 0
+            },
+            "end": {
+              "index": 23,
+              "char": 80
+            }
+          },
+          "note": "Inner restlessness at night."
+        }
+      ]
+    },
+    {
+      "id": "c-hyper-2",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 88
+        },
+        "end": {
+          "index": 1,
+          "char": 157
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Frequent interrupting is described, but by the partner. The respondent only passes on the partner's view and says they often do not notice it.",
+      "suggested_revision": "Partner reports frequent interrupting in group conversation; Sam relays this and is not always aware of it.",
+      "concerns": [
+        {
+          "type": "wrong_attribution",
+          "explanation": "An informant's observation is recorded as the respondent's own report.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 25,
+              "char": 0
+            },
+            "end": {
+              "index": 25,
+              "char": 54
+            }
+          },
+          "note": "Relays the partner's view; limited self-awareness."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 27,
+              "char": 6
+            },
+            "end": {
+              "index": 27,
+              "char": 96
+            }
+          },
+          "note": "The partner describes frequent interrupting."
+        }
+      ]
+    },
+    {
+      "id": "c-hyper-3",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 158
+        },
+        "end": {
+          "index": 1,
+          "char": 200
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "One impulsive purchase is described. The respondent calls it the main example and says that everyday spending is careful and budgeted.",
+      "suggested_revision": "Reports one impulsive large purchase last summer; describes everyday spending as careful and budgeted.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "A single purchase is generalised into a recurrent pattern.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 29,
+              "char": 0
+            },
+            "end": {
+              "index": 29,
+              "char": 59
+            }
+          },
+          "note": "One impulsive purchase."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 29,
+              "char": 60
+            },
+            "end": {
+              "index": 29,
+              "char": 113
+            }
+          },
+          "note": "Routine spending is controlled."
+        }
+      ]
+    },
+    {
+      "id": "c-impact-1",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 0
+        },
+        "end": {
+          "index": 2,
+          "char": 45
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "The respondent first said three, then corrected this to two, because one deadline was extended in advance.",
+      "suggested_revision": "Has missed two work deadlines this quarter; a third was extended in advance.",
+      "concerns": [
+        {
+          "type": "correction_ignored",
+          "explanation": "The first figure is kept and the respondent's correction straight afterwards is dropped.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 41,
+              "char": 0
+            },
+            "end": {
+              "index": 41,
+              "char": 19
+            }
+          },
+          "note": "The first figure, revised straight away."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 41,
+              "char": 20
+            },
+            "end": {
+              "index": 41,
+              "char": 116
+            }
+          },
+          "note": "The corrected figure and the reason for it."
+        }
+      ]
+    },
+    {
+      "id": "c-impact-2",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 46
+        },
+        "end": {
+          "index": 2,
+          "char": 138
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "Late bedtimes are described, and tiredness is said to probably make focus worse on bad nights. But the respondent says the focus problem persists after a well-rested weekend, so sleep is not given as the cause.",
+      "suggested_revision": "Reports late bedtimes from difficulty switching off; tiredness may worsen focus on poor nights, but attention problems persist after good sleep.",
+      "concerns": [
+        {
+          "type": "unsupported_causal_link",
+          "explanation": "A possible aggravating factor is presented as the cause.",
+          "evidence_ids": [
+            "e1",
+            "e3"
+          ]
+        },
+        {
+          "type": "certainty_inflation",
+          "explanation": "A tentative probably becomes a definite causal statement.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 33,
+              "char": 0
+            },
+            "end": {
+              "index": 33,
+              "char": 63
+            }
+          },
+          "note": "Late bedtimes are described."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 35,
+              "char": 0
+            },
+            "end": {
+              "index": 35,
+              "char": 24
+            }
+          },
+          "note": "Tiredness is a tentative, partial aggravator."
+        },
+        {
+          "id": "e3",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 35,
+              "char": 25
+            },
+            "end": {
+              "index": 35,
+              "char": 89
+            }
+          },
+          "note": "Attention problems persist after good sleep."
+        }
+      ]
+    },
+    {
+      "id": "c-impact-3",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 139
+        },
+        "end": {
+          "index": 2,
+          "char": 212
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent says the manager raised the issue at a review and there was no formal warning.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 43,
+              "char": 0
+            },
+            "end": {
+              "index": 43,
+              "char": 84
+            }
+          },
+          "note": "Informal concern only."
+        }
+      ]
+    },
+    {
+      "id": "c-impact-4",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 213
+        },
+        "end": {
+          "index": 2,
+          "char": 293
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The partner says they took over paperwork and appointments and gives the two-year duration.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 46,
+              "char": 13
+            },
+            "end": {
+              "index": 46,
+              "char": 101
+            }
+          },
+          "note": "The partner took over these tasks."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 47,
+              "char": 0
+            },
+            "end": {
+              "index": 48,
+              "char": 48
+            }
+          },
+          "note": "Duration of the arrangement."
+        }
+      ]
+    },
+    {
+      "id": "c-impact-5",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 294
+        },
+        "end": {
+          "index": 2,
+          "char": 407
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent lists both strategies and says the planner is forgotten after about two weeks.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 52,
+              "char": 0
+            },
+            "end": {
+              "index": 52,
+              "char": 98
+            }
+          },
+          "note": "Strategies tried and how long the planner lasts."
+        }
+      ]
+    },
+    {
+      "id": "c-impact-6",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 408
+        },
+        "end": {
+          "index": 2,
+          "char": 477
+        }
+      },
+      "verdict": "out_of_scope",
+      "explanation": "This is a diagnostic conclusion, not a factual statement about the interview.",
+      "out_of_scope_reason": "Whether the presentation meets diagnostic criteria depends on external criteria and clinical judgement, which this audit does not assess.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": []
+    }
+  ]
+}

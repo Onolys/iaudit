@@ -1,0 +1,439 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-08",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Hi Leo, I'm going to ask you and your mum some questions today. There are no right or wrong answers. Is that okay?",
+      "timestamp": "00:00:03"
+    },
+    {
+      "id": "t1",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "Okay.",
+      "timestamp": "00:00:14"
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mum, can you tell me what prompted the referral?",
+      "timestamp": "00:00:19"
+    },
+    {
+      "id": "t3",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "His teacher, Ms Patel, sent a note home in October saying he's struggling to finish written work and he's often out of his seat. We'd noticed homework was a battle too.",
+      "timestamp": "00:00:24"
+    },
+    {
+      "id": "t4",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Leo, what's school like for you?",
+      "timestamp": "00:00:38"
+    },
+    {
+      "id": "t5",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "It's okay. I like maths and PE. I don't like writing because it takes forever.",
+      "timestamp": "00:00:43"
+    },
+    {
+      "id": "t6",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "What happens when you have to write something?",
+      "timestamp": "00:00:51"
+    },
+    {
+      "id": "t7",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "I start and then I think about other stuff. Like Minecraft. And then the time is over.",
+      "timestamp": "00:00:56"
+    },
+    {
+      "id": "t8",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you get out of your seat in class?",
+      "timestamp": "00:01:05"
+    },
+    {
+      "id": "t9",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "Sometimes. To sharpen my pencil. Ms Patel says I do it too much.",
+      "timestamp": "00:01:10"
+    },
+    {
+      "id": "t10",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mum, how many times has the school contacted you this term?",
+      "timestamp": "00:01:17"
+    },
+    {
+      "id": "t11",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Twice. The October note, and a phone call last week.",
+      "timestamp": "00:01:23"
+    },
+    {
+      "id": "t12",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Was the phone call about the same things?",
+      "timestamp": "00:01:29"
+    },
+    {
+      "id": "t13",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Partly. It was mainly that he'd pushed another boy in the lunch queue. According to Leo, the other boy had pushed in front of him first.",
+      "timestamp": "00:01:34"
+    },
+    {
+      "id": "t14",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Leo, can you tell me about that?",
+      "timestamp": "00:01:46"
+    },
+    {
+      "id": "t15",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "Jayden pushed in front of me so I pushed him back. I said sorry after.",
+      "timestamp": "00:01:51"
+    },
+    {
+      "id": "t16",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mum, has anything like that happened before?",
+      "timestamp": "00:01:59"
+    },
+    {
+      "id": "t17",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Not at school, no. He and his sister squabble at home, but that's normal sibling stuff, I think.",
+      "timestamp": "00:02:04"
+    },
+    {
+      "id": "t18",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How does homework go at home?",
+      "timestamp": "00:02:13"
+    },
+    {
+      "id": "t19",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "It takes an hour for something that should take twenty minutes. I have to sit next to him or he drifts off.",
+      "timestamp": "00:02:18"
+    },
+    {
+      "id": "t20",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Is that every night?",
+      "timestamp": "00:02:28"
+    },
+    {
+      "id": "t21",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Every night we have homework, so four nights a week.",
+      "timestamp": "00:02:33"
+    },
+    {
+      "id": "t22",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Leo, do you have friends at school?",
+      "timestamp": "00:02:39"
+    },
+    {
+      "id": "t23",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "Yeah, lots. Me and Omar and Sami play football every break.",
+      "timestamp": "00:02:44"
+    },
+    {
+      "id": "t24",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mum, what's your sense of his friendships?",
+      "timestamp": "00:02:50"
+    },
+    {
+      "id": "t25",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Honestly, I worry. He doesn't get invited to birthday parties much. I think he only really has Omar.",
+      "timestamp": "00:02:55"
+    },
+    {
+      "id": "t26",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Leo, do you get invited to parties?",
+      "timestamp": "00:03:04"
+    },
+    {
+      "id": "t27",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "Sometimes. I went to Sami's party.",
+      "timestamp": "00:03:09"
+    },
+    {
+      "id": "t28",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do the other kids ever leave you out?",
+      "timestamp": "00:03:14"
+    },
+    {
+      "id": "t29",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "No. Well, once in the playground they said I couldn't play tag because I always change the rules.",
+      "timestamp": "00:03:19"
+    },
+    {
+      "id": "t30",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How did that feel?",
+      "timestamp": "00:03:28"
+    },
+    {
+      "id": "t31",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "Annoying. But then we played football instead.",
+      "timestamp": "00:03:33"
+    },
+    {
+      "id": "t32",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mum, does he find it hard to take turns or to wait?",
+      "timestamp": "00:03:38"
+    },
+    {
+      "id": "t33",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Yes, with board games especially. He'll grab the dice. He's better with his grandad, funnily enough. Grandad is very patient with him.",
+      "timestamp": "00:03:45"
+    },
+    {
+      "id": "t34",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Let's talk about routines at home. What time does Leo go to bed?",
+      "timestamp": "00:03:55"
+    },
+    {
+      "id": "t35",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Lights out at half past eight, but he's often still awake at ten.",
+      "timestamp": "00:04:02"
+    },
+    {
+      "id": "t36",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Leo, what do you do when you can't sleep?",
+      "timestamp": "00:04:09"
+    },
+    {
+      "id": "t37",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "I read with my torch. Or I just think about stuff.",
+      "timestamp": "00:04:14"
+    },
+    {
+      "id": "t38",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Does he use screens before bed?",
+      "timestamp": "00:04:20"
+    },
+    {
+      "id": "t39",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "He has the tablet until about eight. We stopped it at bedtime about a month ago, and I'm not sure it's made a difference yet.",
+      "timestamp": "00:04:25"
+    },
+    {
+      "id": "t40",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Is he tired in the mornings?",
+      "timestamp": "00:04:37"
+    },
+    {
+      "id": "t41",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Very hard to wake. Some mornings it's a real fight to get him to school on time.",
+      "timestamp": "00:04:42"
+    },
+    {
+      "id": "t42",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Has he always been a poor sleeper?",
+      "timestamp": "00:04:51"
+    },
+    {
+      "id": "t43",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Since he was a toddler, really.",
+      "timestamp": "00:04:56"
+    },
+    {
+      "id": "t44",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How has his mood been?",
+      "timestamp": "00:05:01"
+    },
+    {
+      "id": "t45",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "Mostly happy. He gets frustrated with homework and sometimes says he's stupid.",
+      "timestamp": "00:05:06"
+    },
+    {
+      "id": "t46",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Leo, do you ever feel like that?",
+      "timestamp": "00:05:13"
+    },
+    {
+      "id": "t47",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "When I can't do the writing. Not other times.",
+      "timestamp": "00:05:18"
+    },
+    {
+      "id": "t48",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Is there anything you worry about a lot?",
+      "timestamp": "00:05:23"
+    },
+    {
+      "id": "t49",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "Spiders. And whether I'll get picked for the football team.",
+      "timestamp": "00:05:28"
+    },
+    {
+      "id": "t50",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Mum, were there any concerns about his development when he was younger, like speech or walking?",
+      "timestamp": "00:05:34"
+    },
+    {
+      "id": "t51",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "No, everything was on time. He was an early talker, actually.",
+      "timestamp": "00:05:42"
+    },
+    {
+      "id": "t52",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Is there any family history of attention or learning difficulties?",
+      "timestamp": "00:05:48"
+    },
+    {
+      "id": "t53",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "My brother was diagnosed with dyslexia at school. Nothing else that I know of.",
+      "timestamp": "00:05:54"
+    },
+    {
+      "id": "t54",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Has Leo had his eyes and hearing checked?",
+      "timestamp": "00:06:01"
+    },
+    {
+      "id": "t55",
+      "speaker": "parent1",
+      "role": "informant",
+      "text": "His hearing was checked last year and it was fine. Eyes, not recently.",
+      "timestamp": "00:06:06"
+    },
+    {
+      "id": "t56",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Leo, if you could change one thing about school, what would it be?",
+      "timestamp": "00:06:13"
+    },
+    {
+      "id": "t57",
+      "speaker": "child1",
+      "role": "respondent",
+      "text": "Less writing. And a longer break.",
+      "timestamp": "00:06:20"
+    },
+    {
+      "id": "t58",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Thank you both. That's really helpful.",
+      "timestamp": "00:06:25"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-school",
+      "label": "School and attention",
+      "score": "elevated",
+      "text": "Teacher has reported difficulty completing written work and frequent out-of-seat behaviour, first raised in October. Leo describes losing focus during writing tasks as his thoughts drift to other topics. Leo acknowledges that he leaves his seat too often. Has had repeated physical altercations with peers at school. Homework takes about an hour on four nights a week and needs a parent sitting alongside him."
+    },
+    {
+      "id": "sec-peers",
+      "label": "Peer relationships",
+      "score": "moderate",
+      "text": "Leo reports that he is rarely invited to birthday parties and has only one close friend. Was once excluded from a playground game by peers for changing the rules. Has difficulty waiting his turn in games, consistently across all the adults who play with him."
+    },
+    {
+      "id": "sec-home",
+      "label": "Sleep and home routines",
+      "score": "elevated",
+      "text": "Long-standing difficulty settling at night since toddlerhood, often still awake at ten despite lights out at half past eight. Removing the tablet at bedtime has not improved his sleep. Frequently describes himself as stupid. Developmental milestones were on time; hearing was normal last year, and vision has not been checked recently. Presentation raises the possibility of ADHD, combined presentation."
+    }
+  ]
+}

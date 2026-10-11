@@ -1,0 +1,672 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-07",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c-mood-1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 128
+        }
+      },
+      "verdict": "supported",
+      "explanation": "Duration, today's rating and the weekly count of bad days all match the respondent's answers.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 1,
+              "char": 39
+            },
+            "end": {
+              "index": 1,
+              "char": 86
+            }
+          },
+          "note": "Two months of low mood."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 7,
+              "char": 0
+            },
+            "end": {
+              "index": 7,
+              "char": 19
+            }
+          },
+          "note": "Today's rating."
+        },
+        {
+          "id": "e3",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 8,
+              "char": 0
+            },
+            "end": {
+              "index": 9,
+              "char": 17
+            }
+          },
+          "note": "Weekly count of bad days."
+        }
+      ]
+    },
+    {
+      "id": "c-mood-2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 129
+        },
+        "end": {
+          "index": 0,
+          "char": 192
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Reduced enjoyment is one reason given, but the respondent also says the class moved to a time that clashes with work.",
+      "suggested_revision": "Has missed the last four pottery classes, partly from reduced enjoyment and partly because the new class time clashes with work shifts.",
+      "concerns": [
+        {
+          "type": "context_stripping",
+          "explanation": "A second, practical reason is left out, so the missed classes look like a pure loss of interest.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 38
+            },
+            "end": {
+              "index": 3,
+              "char": 101
+            }
+          },
+          "note": "Classes have been missed."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 5,
+              "char": 0
+            },
+            "end": {
+              "index": 5,
+              "char": 123
+            }
+          },
+          "note": "Gives two reasons, one of them a scheduling clash."
+        }
+      ]
+    },
+    {
+      "id": "c-mood-3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 193
+        },
+        "end": {
+          "index": 0,
+          "char": 238
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Guilt is endorsed. Worthlessness is explicitly denied in the same answer.",
+      "suggested_revision": "Endorses guilt about having less energy for her children; denies feeling worthless.",
+      "concerns": [
+        {
+          "type": "negation_reversal",
+          "explanation": "A symptom the respondent explicitly denied is recorded as endorsed.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 15,
+              "char": 0
+            },
+            "end": {
+              "index": 15,
+              "char": 87
+            }
+          },
+          "note": "Guilt is endorsed."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 15,
+              "char": 88
+            },
+            "end": {
+              "index": 15,
+              "char": 123
+            }
+          },
+          "note": "Worthlessness is denied."
+        }
+      ]
+    },
+    {
+      "id": "c-mood-4",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 239
+        },
+        "end": {
+          "index": 0,
+          "char": 289
+        }
+      },
+      "verdict": "supported",
+      "explanation": "Asked directly, the respondent clearly denies both and names protective reasons.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 12,
+              "char": 0
+            },
+            "end": {
+              "index": 13,
+              "char": 56
+            }
+          },
+          "note": "A direct question and a clear denial."
+        }
+      ]
+    },
+    {
+      "id": "c-mood-5",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 290
+        },
+        "end": {
+          "index": 0,
+          "char": 376
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent describes a few months of similar symptoms after the second birth and says counselling helped.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 53,
+              "char": 0
+            },
+            "end": {
+              "index": 53,
+              "char": 99
+            }
+          },
+          "note": "Earlier postnatal episode that improved with counselling."
+        }
+      ]
+    },
+    {
+      "id": "c-anx-1",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 0
+        },
+        "end": {
+          "index": 1,
+          "char": 125
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The worry topics, the duration of years and the recent worsening all come from the respondent.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 19,
+              "char": 0
+            },
+            "end": {
+              "index": 19,
+              "char": 62
+            }
+          },
+          "note": "Topics and pervasiveness of the worry."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 23,
+              "char": 0
+            },
+            "end": {
+              "index": 23,
+              "char": 109
+            }
+          },
+          "note": "Long-standing, and worse since the low mood began."
+        }
+      ]
+    },
+    {
+      "id": "c-anx-2",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 126
+        },
+        "end": {
+          "index": 1,
+          "char": 192
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "The respondent denies a full panic attack and describes brief chest tightness, about twice in the past month.",
+      "suggested_revision": "Denies full panic attacks; reports brief chest tightness in supermarket queues about twice in the past month.",
+      "concerns": [
+        {
+          "type": "negation_reversal",
+          "explanation": "A denied symptom, a full panic attack, is recorded as present.",
+          "evidence_ids": [
+            "e1"
+          ]
+        },
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "About two episodes a month become several a week.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 25,
+              "char": 0
+            },
+            "end": {
+              "index": 25,
+              "char": 98
+            }
+          },
+          "note": "Denies panic attacks; describes brief tightness."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 26,
+              "char": 0
+            },
+            "end": {
+              "index": 27,
+              "char": 30
+            }
+          },
+          "note": "Frequency of the episodes."
+        }
+      ]
+    },
+    {
+      "id": "c-anx-3",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 193
+        },
+        "end": {
+          "index": 1,
+          "char": 218
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "The respondent still does the shopping, now early on Sundays when it is quieter. That is partial avoidance, not complete avoidance.",
+      "suggested_revision": "Continues to shop but now goes at quieter times, which she recognises as partial avoidance.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "A change of shopping time is written up as total avoidance.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 29,
+              "char": 26
+            },
+            "end": {
+              "index": 29,
+              "char": 50
+            }
+          },
+          "note": "Still shops."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 31,
+              "char": 0
+            },
+            "end": {
+              "index": 31,
+              "char": 83
+            }
+          },
+          "note": "Shops at quieter times."
+        }
+      ]
+    },
+    {
+      "id": "c-anx-4",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 219
+        },
+        "end": {
+          "index": 1,
+          "char": 243
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Headaches are reported, but a few times a week, not every day.",
+      "suggested_revision": "Reports headaches a few times a week, together with persistent shoulder tension.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "A few times a week becomes daily.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 33,
+              "char": 39
+            },
+            "end": {
+              "index": 33,
+              "char": 67
+            }
+          },
+          "note": "Stated headache frequency."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-1",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 0
+        },
+        "end": {
+          "index": 2,
+          "char": 83
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent falls asleep easily, wakes at four and cannot get back to sleep, about five nights a week.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 37,
+              "char": 7
+            },
+            "end": {
+              "index": 37,
+              "char": 83
+            }
+          },
+          "note": "Easy sleep onset, early waking."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 38,
+              "char": 0
+            },
+            "end": {
+              "index": 39,
+              "char": 25
+            }
+          },
+          "note": "Frequency."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-2",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 84
+        },
+        "end": {
+          "index": 2,
+          "char": 129
+        }
+      },
+      "verdict": "insufficient_evidence",
+      "explanation": "The idea of napping to make up for lost sleep comes from the clinician's question. The respondent echoed the question and gave no clear answer.",
+      "suggested_revision": "Daytime napping was asked about but not clearly answered.",
+      "concerns": [
+        {
+          "type": "question_as_answer",
+          "explanation": "The interviewer's suggestion is recorded as though the respondent had confirmed it.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 40,
+              "char": 0
+            },
+            "end": {
+              "index": 41,
+              "char": 46
+            }
+          },
+          "note": "The question is echoed back without an answer."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-3",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 130
+        },
+        "end": {
+          "index": 2,
+          "char": 175
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Reduced appetite is described and looser clothes suggest weight loss. The respondent has not weighed herself, so no weight loss is documented.",
+      "suggested_revision": "Reduced appetite; reports looser-fitting clothes, but weight has not been measured.",
+      "concerns": [
+        {
+          "type": "unsupported_claim",
+          "explanation": "No measurement was described, so documented weight loss is not substantiated by the supplied interview.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 43,
+              "char": 0
+            },
+            "end": {
+              "index": 43,
+              "char": 49
+            }
+          },
+          "note": "Reduced appetite."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 45,
+              "char": 0
+            },
+            "end": {
+              "index": 45,
+              "char": 54
+            }
+          },
+          "note": "Looser clothes, but no weighing."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-4",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 176
+        },
+        "end": {
+          "index": 2,
+          "char": 215
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The respondent drinks most evenings, but usually one glass. Two glasses are mentioned only for Fridays.",
+      "suggested_revision": "Drinks one glass of wine most evenings and two on Fridays, up from weekends only.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "The Friday amount is applied to every night, and most evenings becomes every night.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 47,
+              "char": 0
+            },
+            "end": {
+              "index": 47,
+              "char": 69
+            }
+          },
+          "note": "Stated amount and pattern."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 48,
+              "char": 0
+            },
+            "end": {
+              "index": 49,
+              "char": 35
+            }
+          },
+          "note": "Drinking has increased recently."
+        }
+      ]
+    }
+  ]
+}

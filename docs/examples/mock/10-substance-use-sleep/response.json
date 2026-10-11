@@ -1,0 +1,606 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "mock-10",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c-alc-1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 56
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent gives the weeknight number of cans and their size and type.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 17,
+              "char": 0
+            },
+            "end": {
+              "index": 17,
+              "char": 41
+            }
+          },
+          "note": "Weeknight quantity."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 21,
+              "char": 0
+            },
+            "end": {
+              "index": 21,
+              "char": 54
+            }
+          },
+          "note": "Strength and size."
+        }
+      ]
+    },
+    {
+      "id": "c-alc-2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 57
+        },
+        "end": {
+          "index": 0,
+          "char": 104
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "The respondent first said eight, then immediately withdrew it as an exaggeration and gave six.",
+      "suggested_revision": "Drinks around six large cans on each of Friday and Saturday nights.",
+      "concerns": [
+        {
+          "type": "correction_ignored",
+          "explanation": "The figure the respondent retracted is kept instead of the corrected one.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 19,
+              "char": 0
+            },
+            "end": {
+              "index": 19,
+              "char": 47
+            }
+          },
+          "note": "The first figure, withdrawn straight away."
+        },
+        {
+          "id": "e2",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 19,
+              "char": 48
+            },
+            "end": {
+              "index": 19,
+              "char": 97
+            }
+          },
+          "note": "The corrected figure."
+        }
+      ]
+    },
+    {
+      "id": "c-alc-3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 105
+        },
+        "end": {
+          "index": 0,
+          "char": 139
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "Asked whether he felt he ought to cut down, the respondent said yes and that he had thought about it.",
+      "suggested_revision": "Has thought about cutting down; his sister has commented on his drinking, and he sometimes feels guilty afterwards.",
+      "concerns": [
+        {
+          "type": "contradictory_evidence",
+          "explanation": "A direct answer in the interview conflicts with the claim.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 26,
+              "char": 0
+            },
+            "end": {
+              "index": 27,
+              "char": 28
+            }
+          },
+          "note": "A direct question, answered yes."
+        }
+      ]
+    },
+    {
+      "id": "c-alc-4",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 140
+        },
+        "end": {
+          "index": 0,
+          "char": 228
+        }
+      },
+      "verdict": "supported",
+      "explanation": "He clearly denies drinking in the morning and describes a week off alcohol during illness with no shakes or sweats.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 33,
+              "char": 0
+            },
+            "end": {
+              "index": 33,
+              "char": 34
+            }
+          },
+          "note": "Denies morning drinking."
+        },
+        {
+          "id": "e2",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 34,
+              "char": 0
+            },
+            "end": {
+              "index": 35,
+              "char": 71
+            }
+          },
+          "note": "No withdrawal symptoms during abstinence."
+        }
+      ]
+    },
+    {
+      "id": "c-alc-5",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 229
+        },
+        "end": {
+          "index": 0,
+          "char": 260
+        }
+      },
+      "verdict": "insufficient_evidence",
+      "explanation": "The clinician asked about going to work hungover and the respondent declined to answer. Only arriving drunk was denied.",
+      "suggested_revision": "Denies attending work intoxicated; declined to say whether he has attended work hungover.",
+      "concerns": [
+        {
+          "type": "question_as_answer",
+          "explanation": "The clinician's question is recorded as a denial the respondent never gave.",
+          "evidence_ids": [
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 51,
+              "char": 18
+            },
+            "end": {
+              "index": 51,
+              "char": 43
+            }
+          },
+          "note": "Only intoxication at work is denied."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 52,
+              "char": 0
+            },
+            "end": {
+              "index": 53,
+              "char": 31
+            }
+          },
+          "note": "The question was declined."
+        }
+      ]
+    },
+    {
+      "id": "c-sub-1",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 0
+        },
+        "end": {
+          "index": 1,
+          "char": 39
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "Daily use was in his twenties and stopped about ten years ago. Current use is one joint on Saturday nights, to wind down, and he does not link it to his sleep.",
+      "suggested_revision": "Smokes one cannabis joint on Saturday nights to unwind; daily use stopped about ten years ago.",
+      "concerns": [
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "A past pattern of daily use is presented as current.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        },
+        {
+          "type": "unsupported_causal_link",
+          "explanation": "A sleep motive is added that the respondent did not give.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 38,
+              "char": 0
+            },
+            "end": {
+              "index": 39,
+              "char": 44
+            }
+          },
+          "note": "Current weekly use and the reason for it."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 41,
+              "char": 0
+            },
+            "end": {
+              "index": 41,
+              "char": 75
+            }
+          },
+          "note": "Daily use belongs to the past."
+        }
+      ]
+    },
+    {
+      "id": "c-sub-2",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 40
+        },
+        "end": {
+          "index": 1,
+          "char": 122
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent describes two occasions of use at one event last year and denies regular use.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 43,
+              "char": 0
+            },
+            "end": {
+              "index": 43,
+              "char": 75
+            }
+          },
+          "note": "Occasional, not regular, use."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-1",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 0
+        },
+        "end": {
+          "index": 2,
+          "char": 64
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent describes taking one to two hours to fall asleep and waking around three.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 32
+            },
+            "end": {
+              "index": 3,
+              "char": 122
+            }
+          },
+          "note": "Sleep onset and night waking."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-2",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 65
+        },
+        "end": {
+          "index": 2,
+          "char": 123
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent dates the sleep problem to May and links its start to the new shift pattern.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 4,
+              "char": 0
+            },
+            "end": {
+              "index": 5,
+              "char": 89
+            }
+          },
+          "note": "Onset and the matching change in shifts."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-3",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 124
+        },
+        "end": {
+          "index": 2,
+          "char": 200
+        }
+      },
+      "verdict": "insufficient_evidence",
+      "explanation": "The breakup is mentioned only when mood is discussed. The respondent ties the sleep problem to the shift rota and never links it to the breakup.",
+      "suggested_revision": "Reports feeling lonely since a breakup in the spring; he links the onset of insomnia to the night-shift rota.",
+      "concerns": [
+        {
+          "type": "unsupported_causal_link",
+          "explanation": "Two things that happened around the same time are joined by a cause the interview does not support.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 55,
+              "char": 0
+            },
+            "end": {
+              "index": 55,
+              "char": 49
+            }
+          },
+          "note": "The breakup is raised only about mood."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 5,
+              "char": 0
+            },
+            "end": {
+              "index": 5,
+              "char": 62
+            }
+          },
+          "note": "Sleep onset is tied to shifts instead."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-4",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 201
+        },
+        "end": {
+          "index": 2,
+          "char": 262
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "One episode of dozing at a red light after a night shift last month is described, and the respondent stresses it happened only once.",
+      "suggested_revision": "Reports one episode of nodding off at a red light on the way back from a night shift last month.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "A single episode becomes a repeated pattern.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 11,
+              "char": 0
+            },
+            "end": {
+              "index": 11,
+              "char": 72
+            }
+          },
+          "note": "A single episode."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 12,
+              "char": 0
+            },
+            "end": {
+              "index": 13,
+              "char": 45
+            }
+          },
+          "note": "When it happened, and the setting."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-5",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 263
+        },
+        "end": {
+          "index": 2,
+          "char": 315
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Drinking to get to sleep after night shifts is how it started. The respondent says it is now more a habit than a sleep aid.",
+      "suggested_revision": "Started drinking to get to sleep after night shifts; now describes the drinking as more of a habit.",
+      "concerns": [
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "The original reason for drinking is presented as the current one.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 22,
+              "char": 0
+            },
+            "end": {
+              "index": 23,
+              "char": 102
+            }
+          },
+          "note": "The motive has changed over time."
+        }
+      ]
+    },
+    {
+      "id": "c-sleep-6",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 316
+        },
+        "end": {
+          "index": 2,
+          "char": 367
+        }
+      },
+      "verdict": "out_of_scope",
+      "explanation": "This is a diagnostic conclusion, not a factual statement about the interview.",
+      "out_of_scope_reason": "Whether diagnostic criteria are met depends on external criteria and clinical judgement, which this audit does not assess.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": []
+    }
+  ]
+}
