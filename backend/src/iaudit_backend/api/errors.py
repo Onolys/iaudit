@@ -39,7 +39,7 @@ def _response(status: int, code: str, message: str, request_id: str | None = Non
     return JSONResponse(status_code=status, content=error_body(code, message, request_id))
 
 
-def _log_exc(exc: BaseException) -> None:
+def log_exception(exc: BaseException) -> None:
     # class and frames only: exception messages may contain user data
     tb = exc.__traceback__
     frames = []
@@ -79,5 +79,5 @@ def register_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def _any(_: Request, exc: Exception):
-        _log_exc(exc)
+        log_exception(exc)
         return _response(500, "internal_error", "Internal server error.")

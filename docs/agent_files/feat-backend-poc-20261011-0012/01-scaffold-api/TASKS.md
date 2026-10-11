@@ -16,7 +16,7 @@ Source of truth: [PRD.md](PRD.md). A runnable `backend/` service serving `POST /
 | 5 | Error mapping to contract error bodies | 2 | done |
 | 6 | LLM client: LiteLLM, fixture, stub and failing clients | 3 | done |
 | 7 | Pipeline seam, `StubPipeline`, factory, 504 backstop | 4, 6 | done |
-| 8 | `POST /v1/audit` checks in order, `/healthz`, CORS | 5, 7 | todo |
+| 8 | `POST /v1/audit` checks in order, `/healthz`, CORS | 5, 7 | done |
 | 9 | Logging allowlist and sentinel test | 8 | todo |
 | 10 | One live call to confirm model ids and JSON-schema output | 6 | todo |
 | 11 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
