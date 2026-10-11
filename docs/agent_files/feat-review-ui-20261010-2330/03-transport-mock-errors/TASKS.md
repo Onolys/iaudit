@@ -10,7 +10,7 @@ Source of truth: docs/agent_files/feat-review-ui-20261010-2330/03-transport-mock
 | # | Task | Depends on | Status |
 |---|---|---|---|
 | 1 | Error types and HTTP client | 02/T1 | done |
-| 2 | Mock registry and runAudit pipeline | 1, 02/T4 | todo |
+| 2 | Mock registry and runAudit pipeline | 1, 02/T4 | done |
 | 3 | useAuditLoader state machine | 2 | todo |
 | 4 | LoadingView, ErrorScreen, WarningsBanner | 1, 3 | todo |
 
