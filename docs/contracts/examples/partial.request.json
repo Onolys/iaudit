@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "partial-001",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "interviewer1",
+      "role": "interviewer",
+      "text": "How has your sleep been this month?"
+    },
+    {
+      "id": "t1",
+      "speaker": "participant1",
+      "role": "respondent",
+      "text": "Mostly fine. I woke up early twice last week."
+    },
+    {
+      "id": "t2",
+      "speaker": "interviewer1",
+      "role": "interviewer",
+      "text": "And your appetite?"
+    },
+    {
+      "id": "t3",
+      "speaker": "participant1",
+      "role": "respondent",
+      "text": "It has been normal."
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-sleep",
+      "label": "Sleep and appetite",
+      "score": 1,
+      "text": "The participant sleeps poorly every night. They woke early twice last week. Their appetite is normal."
+    },
+    {
+      "id": "sec-mood",
+      "label": "Mood",
+      "text": "The participant reports a low mood most days."
+    }
+  ]
+}
