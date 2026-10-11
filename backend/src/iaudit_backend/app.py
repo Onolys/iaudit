@@ -29,6 +29,7 @@ from iaudit_backend.pipeline import (
     make_pipeline,
     run_with_backstop,
 )
+from iaudit_backend.safe_log import log_event
 
 log = logging.getLogger("iaudit")
 SUPPORTED_VERSION = "1.0.0"
@@ -86,6 +87,32 @@ def create_app(
 
     @app.post("/v1/audit")
     async def audit(request: Request):
+        started = time.monotonic()
+        info: dict = {}
+        status, outcome = 200, "ok"
+        try:
+            return await _audit(request, info)
+        except ApiError as exc:
+            status, outcome = exc.status, exc.code
+            raise
+        finally:
+            metrics = info.pop("metrics", None)
+            if metrics is not None:
+                snap = metrics.snapshot()
+                info["calls"] = snap["calls"]
+                info["calls_ok"] = snap["ok"]
+                for k in ("input_tokens", "output_tokens", "cache_read_tokens"):
+                    info[k] = sum(t[k] for t in snap["by_tier"].values())
+                info["models"] = ",".join(sorted({r["model"] for r in snap["records"]}))
+            log_event(
+                "audit_request",
+                status=status,
+                outcome=outcome,
+                total_ms=round((time.monotonic() - started) * 1000),
+                **info,
+            )
+
+    async def _audit(request: Request, info: dict):
         request_id: str | None = None
         try:
             # 1. body size
@@ -93,6 +120,7 @@ def create_app(
             if declared and declared.isdigit() and int(declared) > settings.max_body_bytes:
                 raise ApiError("payload_too_large", "Request body is too large.", 413)
             body = await request.body()
+            info["body_bytes"] = len(body)
             if len(body) > settings.max_body_bytes:
                 raise ApiError("payload_too_large", "Request body is too large.", 413)
 
@@ -105,6 +133,11 @@ def create_app(
                 raise ApiError("invalid_request", "Body must be a JSON object.", 400)
             rid = raw.get("request_id")
             request_id = rid if isinstance(rid, str) and rid else None
+            info["request_id"] = request_id
+            if isinstance(raw.get("transcript"), list):
+                info["turns"] = len(raw["transcript"])
+            if isinstance(raw.get("assessment"), list):
+                info["sections"] = len(raw["assessment"])
 
             # 3. version, before schema validation
             if "schema_version" in raw and raw["schema_version"] != SUPPORTED_VERSION:
@@ -162,7 +195,8 @@ def create_app(
                 request_id=request_id,
                 deadline=time.monotonic() + settings.audit_deadline_s,
             )
-            ctx.extras["audit_uuid"] = str(uuid.uuid4())
+            ctx.extras["audit_uuid"] = info["audit_uuid"] = str(uuid.uuid4())
+            info["metrics"] = ctx.metrics
             result = await run_with_backstop(
                 app.state.pipeline, model, ctx, settings, grace_s=backstop_grace_s
             )
