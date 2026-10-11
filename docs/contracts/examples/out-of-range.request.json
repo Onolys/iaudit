@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "out-of-range-001",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "interviewer1",
+      "role": "interviewer",
+      "text": "Do you drive?"
+    },
+    {
+      "id": "t1",
+      "speaker": "participant1",
+      "role": "respondent",
+      "text": "Yes, short trips only."
+    },
+    {
+      "id": "t2",
+      "speaker": "interviewer1",
+      "role": "interviewer",
+      "text": "Any trouble finding your way?"
+    },
+    {
+      "id": "t3",
+      "speaker": "participant1",
+      "role": "respondent",
+      "text": "No, none at all."
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-daily",
+      "label": "Daily living",
+      "text": "The participant drives short trips. They have no trouble finding their way. They avoid highways."
+    }
+  ]
+}

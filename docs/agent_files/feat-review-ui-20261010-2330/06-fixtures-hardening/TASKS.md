@@ -9,7 +9,7 @@ Source of truth: docs/agent_files/feat-review-ui-20261010-2330/06-fixtures-harde
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Fixture pairs and contracts README | none | todo |
+| 1 | Fixture pairs and contracts README | none | done |
 | 2 | Fixture validation test | 1 | todo |
 | 3 | Mock-flow smoke test | 1, 2, 04, 05 | todo |
 
