@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -72,7 +72,7 @@ describe("concerns", () => {
 
   it("renders a toggle button for a concern that cites a placed excerpt", () => {
     render(<ClaimDetail {...exampleProps("c-contradicted")} />);
-    const buttons = screen.getAllByRole("button");
+    const buttons = within(screen.getByLabelText("Potential concerns")).getAllByRole("button");
     expect(buttons).toHaveLength(2);
     expect(buttons[0].textContent).toContain("Negation reversal");
     expect(buttons[0].getAttribute("aria-pressed")).toBe("false");

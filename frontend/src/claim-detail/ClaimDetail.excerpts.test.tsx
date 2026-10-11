@@ -114,7 +114,7 @@ describe("excerpts", () => {
       concerns: [{ type: "negation_reversal", explanation: "why", evidence_ids: ["e2"] }],
     });
     const { container } = render(<ClaimDetail {...inlineProps(req, claim)} />);
-    const btn = screen.getByRole("button");
+    const btn = screen.getByRole("button", { name: /Negation reversal/ });
     fireEvent.click(btn);
     const [r0, r3] = rows(container);
     expect(r3.classList.contains("emphasised")).toBe(true);

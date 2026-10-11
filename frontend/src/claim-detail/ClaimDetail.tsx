@@ -45,13 +45,31 @@ function ClaimDetailBody({ claim, request, check }: ClaimDetailProps) {
       {typeof claim.suggested_revision === "string" && (
         <SuggestionBox text={claim.suggested_revision} />
       )}
-      <ConcernList
-        concerns={claim.concerns}
-        placedIds={placedIds}
-        activeIndex={activeConcern}
-        onToggle={(i) => setActiveConcern((cur) => (cur === i ? null : i))}
-      />
-      <ExcerptList request={request} placed={placed} unplaceable={unplaceable} activeIds={activeIds} />
+      {claim.verdict === "out_of_scope" ? (
+        claim.out_of_scope_reason && (
+          <section className="cd-oos" aria-label="Out of scope reason">
+            <h3>Why this is out of scope</h3>
+            <p>{claim.out_of_scope_reason}</p>
+          </section>
+        )
+      ) : (
+        <>
+          <ConcernList
+            concerns={claim.concerns}
+            placedIds={placedIds}
+            activeIndex={activeConcern}
+            onToggle={(i) => setActiveConcern((cur) => (cur === i ? null : i))}
+          />
+          <ExcerptList
+            request={request}
+            placed={placed}
+            unplaceable={unplaceable}
+            verdict={claim.verdict}
+            evidenceCount={claim.evidence.length}
+            activeIds={activeIds}
+          />
+        </>
+      )}
     </article>
   );
 }
