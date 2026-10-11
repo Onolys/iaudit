@@ -16,7 +16,9 @@ class LLMRequest:
     response_model: type[BaseModel]
     call_tag: str
     cache_prefix: str | None = None  # stable leading text marked cacheable
-    cache_prefixes: list[str] = field(default_factory=list)  # up to 2 ordered breakpoints
+    cache_prefixes: list[str] = field(
+        default_factory=list
+    )  # up to 2 ordered breakpoints; replaces cache_prefix when set
     unit: str | None = None  # section index or claim id, for metrics
     max_tokens: int = 1024
     temperature: float = 0.0

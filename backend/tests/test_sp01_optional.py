@@ -157,3 +157,24 @@ async def test_single_cache_prefix_still_works():
     )
     system = fake.calls[0]["messages"][0]["content"]
     assert json.dumps(system).count("cache_control") == 1
+
+
+FIXED_KEY = "df61adfd490005e69c880a0033174adc6dd29b8b66c6da6f1496ee57290deb76"
+
+
+def test_fixture_key_depends_on_cache_prefixes():
+    from iaudit_backend.llm import FixtureClient
+
+    a = FixtureClient.key_for(_req(cache_prefixes=["RULES v1", "TRANSCRIPT A"]))
+    b = FixtureClient.key_for(_req(cache_prefixes=["RULES v2", "TRANSCRIPT B"]))
+    assert a != b
+
+
+def test_fixture_key_unchanged_when_cache_prefixes_empty():
+    from iaudit_backend.llm import FixtureClient
+
+    assert FixtureClient.key_for(_req(cache_prefix="P")) == FixtureClient.key_for(
+        _req(cache_prefix="P", cache_prefixes=[])
+    )
+    # pinned: keys for existing recordings must not move
+    assert FixtureClient.key_for(_req(cache_prefix="P")) == FIXED_KEY
