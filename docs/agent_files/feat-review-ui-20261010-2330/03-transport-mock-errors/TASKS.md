@@ -12,7 +12,7 @@ Source of truth: docs/agent_files/feat-review-ui-20261010-2330/03-transport-mock
 | 1 | Error types and HTTP client | 02/T1 | done |
 | 2 | Mock registry and runAudit pipeline | 1, 02/T4 | done |
 | 3 | useAuditLoader state machine | 2 | done |
-| 4 | LoadingView, ErrorScreen, WarningsBanner | 1, 3 | todo |
+| 4 | LoadingView, ErrorScreen, WarningsBanner | 1, 3 | done |
 
 ## Task 1 — Error types and HTTP client
 What it is / what it means: The `LoadError` union and the fetch layer (R2, R3 taxonomy, R5, R8; Decisions 6, 9, 10, 12, 14).
