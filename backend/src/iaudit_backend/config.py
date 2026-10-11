@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     # Mode
     llm_mode: Literal["live", "fixture", "stub"] = "live"
     fixture_dir: str = "tests/fixtures/llm"
+    # Assembler (SP02)
+    fuzzy_threshold: float = 90
+    claim_fuzzy_threshold: float = 90
+    fuzzy_min_len: int = 12
+    copy_ngram: int = 8
+    cross_turn_slack: int = 0
     # Misc
     log_level: str = "INFO"
     pipeline: Literal["stub", "full"] = "stub"

@@ -9,7 +9,7 @@ Source of truth: [PRD.md](PRD.md). Turns internal drafts from 03-05 into a contr
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Draft models, `assemble()` entry point, counts-only report | 01 | todo |
+| 1 | Draft models, `assemble()` entry point, counts-only report | 01 | done |
 | 2 | `locate()`: exact, normalized, guarded fuzzy, ellipsis, hint | 1 | todo |
 | 3 | Evidence resolution and `eN` ids | 2 | todo |
 | 4 | Claim resolution and overlap policy | 2 | todo |
