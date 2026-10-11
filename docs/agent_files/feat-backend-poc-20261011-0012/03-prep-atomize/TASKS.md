@@ -10,7 +10,7 @@ Source of truth: [PRD.md](PRD.md). Rules-only dialogue acts and question-answer 
 | # | Task | Depends on | Status |
 |---|---|---|---|
 | 1 | Turn index and rules-only dialogue acts | 01 | done |
-| 2 | Question-answer pairing by speaker | 1 | todo |
+| 2 | Question-answer pairing by speaker | 1 | done |
 | 3 | `scales.py` ordinal scales | 01 | todo |
 | 4 | `AtomicClaim` model, fixed `oos_reason`, config | 01 | todo |
 | 5 | Atomizer prompt and "Jordan" few-shot | 4 | todo |
