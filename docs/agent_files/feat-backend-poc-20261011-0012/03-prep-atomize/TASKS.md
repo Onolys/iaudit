@@ -12,7 +12,7 @@ Source of truth: [PRD.md](PRD.md). Rules-only dialogue acts and question-answer 
 | 1 | Turn index and rules-only dialogue acts | 01 | done |
 | 2 | Question-answer pairing by speaker | 1 | done |
 | 3 | `scales.py` ordinal scales | 01 | done |
-| 4 | `AtomicClaim` model, fixed `oos_reason`, config | 01 | todo |
+| 4 | `AtomicClaim` model, fixed `oos_reason`, config | 01 | done |
 | 5 | Atomizer prompt and "Jordan" few-shot | 4 | todo |
 | 6 | `atomize_section` / `atomize_sections` call | 3, 5, 02/T2 | todo |
 | 7 | Span resolution, validation, one retry, section failures | 6 | todo |

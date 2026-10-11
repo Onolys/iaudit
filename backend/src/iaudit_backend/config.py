@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     fuzzy_min_len: int = 12
     copy_ngram: int = 8
     cross_turn_slack: int = 0
+    # Atomizer (SP03)
+    atomize_max_claims: int = 30
+    atomize_max_tokens: int = 4000
+    atomize_retry: bool = True
     # Misc
     log_level: str = "INFO"
     pipeline: Literal["stub", "full"] = "stub"
