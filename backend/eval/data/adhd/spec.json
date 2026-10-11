@@ -170,5 +170,55 @@
   "S5": "Childhood report cards repeatedly noted daydreaming and unfinished work.",
   "S6": "He received a review comment about seeming disengaged in meetings.",
   "S7": "He denies careless mistakes at work."
- }
+ },
+ "variants": [
+  {
+   "id": "v1",
+   "op": "replace",
+   "target": "S1",
+   "text": "Alex loses attention in every meeting, several times a day."
+  },
+  {
+   "id": "v2",
+   "op": "replace",
+   "target": "S7",
+   "text": "He makes frequent careless mistakes in reports."
+  },
+  {
+   "id": "v3",
+   "op": "append",
+   "target": null,
+   "text": "He frequently forgets appointments."
+  },
+  {
+   "id": "v4",
+   "op": "append",
+   "target": null,
+   "text": "He is easily distracted by his surroundings."
+  },
+  {
+   "id": "v5",
+   "op": "append",
+   "target": null,
+   "text": "He currently forgets work assignments weekly."
+  },
+  {
+   "id": "v6",
+   "op": "replace",
+   "target": "S4",
+   "text": "Both Alex and his partner agree he forgets errands about twice a month."
+  },
+  {
+   "id": "v7",
+   "op": "replace",
+   "target": "S3",
+   "text": "The unfinished bathroom shows his difficulty completing tasks."
+  },
+  {
+   "id": "v8",
+   "op": "replace",
+   "target": "S6",
+   "text": "His distractibility caused a negative performance review."
+  }
+ ]
 }
