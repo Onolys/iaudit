@@ -22,6 +22,17 @@ def sentences_for(spec: dict, fixture: str) -> list[str]:
     return out
 
 
+def expected_for(spec: dict, fixture: str) -> dict:
+    """Simple expected result (07 R5a): no evidence, slots or offsets."""
+    if fixture == "faithful":
+        return {
+            "fixture": "adhd-faithful",
+            "all_claims": {"verdict": "supported", "concerns_required": [], "concerns_allowed": []},
+        }
+    v = next(x for x in spec["variants"] if x["id"] == fixture)
+    return {"fixture": f"adhd-{fixture}", "target_text": v["text"], **v["expected"]}
+
+
 def build() -> dict[str, str]:
     """Relative path -> file content for every generated file."""
     spec = load_spec()
@@ -29,6 +40,7 @@ def build() -> dict[str, str]:
     for fx in ["faithful", *[v["id"] for v in spec["variants"]]]:
         req = make_request(spec, f"adhd-{fx}", sentences_for(spec, fx))
         files[f"requests/{fx}.json"] = dump_json(req)
+        files[f"expected/{fx}.json"] = dump_json(expected_for(spec, fx))
     return files
 
 

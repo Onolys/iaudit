@@ -1,0 +1,12 @@
+{
+ "fixture": "adhd-v1",
+ "target_text": "Alex loses attention in every meeting, several times a day.",
+ "verdict": "partially_supported",
+ "concerns_required": [
+  "frequency_severity_inflation"
+ ],
+ "concerns_allowed": [],
+ "explanation_contains": [
+  "inflates"
+ ]
+}
