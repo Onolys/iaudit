@@ -122,3 +122,32 @@ def index_turns(turns: list[Turn]) -> list[IndexedTurn]:
             )
         )
     return out
+
+
+_MID_CORRECTION = re.compile(r"\b(?:actually|i mean|rather|sorry|scratch that|i misspoke)\b")
+_MID_HYPO = re.compile(r"\b(?:if|would)\b")
+
+
+def unsure_acts(turns: list[Turn], indexed: list[IndexedTurn]) -> dict[int, frozenset[Act]]:
+    """Per turn, the act kinds the rules could not decide (R2 "unsure" column).
+
+    Only these kinds go to the LLM; a turn the rules decided on every kind is never sent.
+    """
+    out: dict[int, frozenset[Act]] = {}
+    for t, it in zip(turns, indexed, strict=True):
+        text = t.text.lower().replace("\u2019", "'")
+        kinds: set[Act] = set()
+        if Act.question not in it.acts:
+            sents = _sentences(t.text)
+            tag_only = all(_TAG.search(s.strip().lower()) for s in sents if "?" in s)
+            if ("?" in t.text and not tag_only) or any(
+                _norm(s).split()[:1] and _norm(s).split()[0] in (_AUX | _WH) for s in sents
+            ):
+                kinds.add(Act.question)
+        if Act.correction not in it.acts and _MID_CORRECTION.search(text):
+            kinds.add(Act.correction)
+        if Act.hypothetical not in it.acts and _MID_HYPO.search(text):
+            kinds.add(Act.hypothetical)
+        if kinds:
+            out[it.index] = frozenset(kinds)
+    return out

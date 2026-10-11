@@ -1,12 +1,14 @@
 """Per-section and per-claim flows. Each writes its result into RunState as it completes."""
 
+import asyncio
+
 from iaudit_backend.assembler.models import ClaimDraft
 from iaudit_backend.atomize import atomize_section
 from iaudit_backend.atomize.models import AtomicClaim
 from iaudit_backend.check import check_one, passthrough_oos
 from iaudit_backend.link import build_link_context, link_one
 from iaudit_backend.models import AuditRequest, Section
-from iaudit_backend.prep import prep
+from iaudit_backend.prep import prep, prep_rules_only
 
 from .state import RunState
 
@@ -14,7 +16,12 @@ from .state import RunState
 async def prep_flow(st: RunState, req: AuditRequest, ctx) -> None:
     try:
         with st.span("prep"):
-            st.prep = await prep(req.transcript, ctx)
+            try:
+                st.prep = await asyncio.wait_for(
+                    prep(req.transcript, ctx), ctx.settings.prep_soft_timeout_s
+                )
+            except TimeoutError:  # prep must never stall the claims waiting on it
+                st.prep = prep_rules_only(req.transcript)
     finally:
         st.prep_ready.set()  # waiters never hang, even if prep failed or was cancelled
 

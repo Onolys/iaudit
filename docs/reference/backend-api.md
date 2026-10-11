@@ -61,6 +61,7 @@ Set as `IAUDIT_<NAME>` environment variables. `Settings` in `config.py` also rea
 | `IAUDIT_AUDIT_DEADLINE_S` | `60` | Hard cap for one audit. A startup warning is logged above 100. |
 | `IAUDIT_LLM_TIMEOUT_S`, `IAUDIT_LLM_MAX_RETRIES`, `IAUDIT_LLM_MAX_CONCURRENCY` | `30`, `1`, `20` | Per-call timeout, retries, and parallel calls. |
 | `IAUDIT_MAX_BODY_BYTES`, `IAUDIT_MAX_TURNS`, `IAUDIT_MAX_SECTIONS` | `2000000`, `2000`, `50` | Request limits. |
+| `IAUDIT_PREP_LLM` | `false` | When `true`, a cheap-tier model tags the few transcript turns the rules could not decide (question, correction, hypothetical). A failed or invalid chunk keeps the rule result. `IAUDIT_PREP_CHUNK_TURNS` (30) and `IAUDIT_PREP_CONTEXT_TURNS` (3) size the calls. If prep runs past `IAUDIT_PREP_SOFT_TIMEOUT_S` (10), the rules-only result is used. |
 | `IAUDIT_PIPELINE_MAX_CLAIMS` | `80` | Claims audited per request. More are dropped and `input_truncated` is emitted. |
 | `IAUDIT_SERVER_TIMING` | `false` | When `true`, a 200 reply carries a `Server-Timing` header with durations only: `total`, then `prep`, `atomize`, `link`, `check`, `assemble` in milliseconds. |
 | `IAUDIT_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins. |

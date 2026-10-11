@@ -67,6 +67,9 @@ class Settings(BaseSettings):
     min_call_s: float = 4
     cancel_grace_s: float = 1
     prep_soft_timeout_s: float = 10
+    prep_llm: bool = False  # cheap-tier act tagging for unsure turns (03 optional)
+    prep_chunk_turns: int = 30
+    prep_context_turns: int = 3
     prep_call_timeout_s: float = 10
     atomize_call_timeout_s: float = 25
     link_call_timeout_s: float = 20
