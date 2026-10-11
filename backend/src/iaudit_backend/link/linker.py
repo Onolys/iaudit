@@ -62,6 +62,7 @@ async def _link(claim: AtomicClaim, lctx: LinkContext, ctx) -> LinkResult:
         user=user,
         response_model=LinkerOutput,
         call_tag="link",
+        unit=claim.id,
         cache_prefix=prefix,
         max_tokens=ctx.settings.link_max_tokens,
         temperature=0.0,

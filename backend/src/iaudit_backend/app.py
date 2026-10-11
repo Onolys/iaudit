@@ -56,6 +56,16 @@ def _count_dupes(items: list[dict]) -> int:
     return len(ids) - len(set(ids))
 
 
+def _server_timing(total_ms: float, pipeline_metrics: dict | None) -> str:
+    """Durations only: total plus one entry per pipeline stage (no text, no ids)."""
+    parts = [f"total;dur={round(total_ms)}"]
+    for stage in ("prep", "atomize", "link", "check", "assemble"):
+        ms = (pipeline_metrics or {}).get(f"{stage}_ms")
+        if isinstance(ms, int | float):
+            parts.append(f"{stage};dur={round(ms)}")
+    return ", ".join(parts)
+
+
 def create_app(
     settings: Settings | None = None,
     llm: LLMClient | None = None,
@@ -126,15 +136,22 @@ def create_app(
 
     async def _audit(request: Request, info: dict):
         request_id: str | None = None
+        started = time.monotonic()
         try:
             # 1. body size
             declared = request.headers.get("content-length")
             if declared and declared.isdigit() and int(declared) > settings.max_body_bytes:
                 raise ApiError("payload_too_large", "Request body is too large.", 413)
-            body = await request.body()
+            chunks: list[bytes] = []
+            size = 0
+            async for chunk in request.stream():  # stop reading as soon as the cap is passed
+                size += len(chunk)
+                if size > settings.max_body_bytes:
+                    info["body_bytes"] = size
+                    raise ApiError("payload_too_large", "Request body is too large.", 413)
+                chunks.append(chunk)
+            body = b"".join(chunks)
             info["body_bytes"] = len(body)
-            if len(body) > settings.max_body_bytes:
-                raise ApiError("payload_too_large", "Request body is too large.", 413)
 
             # 2. parse
             try:
@@ -215,7 +232,12 @@ def create_app(
             out = result.to_json()
             if out.get("request_id") != request_id or contract.validate_response(out):
                 raise ApiError("internal_error", "Internal server error.", 500, request_id)
-            return JSONResponse(out)
+            headers = {}
+            if settings.server_timing:
+                headers["Server-Timing"] = _server_timing(
+                    (time.monotonic() - started) * 1000, ctx.extras.get("pipeline_metrics")
+                )
+            return JSONResponse(out, headers=headers)
         except ApiError as exc:
             exc.request_id = exc.request_id or request_id
             raise

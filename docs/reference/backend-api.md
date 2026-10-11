@@ -19,7 +19,7 @@ One call is synchronous. The audit has a hard time cap (`IAUDIT_AUDIT_DEADLINE_S
 
 `POST /v1/audit` checks in this order and stops at the first failure.
 
-1. Body size, from `Content-Length` and again on the bytes read.
+1. Body size, from `Content-Length` and again while the body is read (reading stops as soon as the cap is passed).
 2. The body parses as a JSON object.
 3. `schema_version` equals `1.0.0` (checked before the schema, so an old client gets `unsupported_version`).
 4. Turn count and section count.
@@ -62,6 +62,7 @@ Set as `IAUDIT_<NAME>` environment variables. `Settings` in `config.py` also rea
 | `IAUDIT_LLM_TIMEOUT_S`, `IAUDIT_LLM_MAX_RETRIES`, `IAUDIT_LLM_MAX_CONCURRENCY` | `30`, `1`, `20` | Per-call timeout, retries, and parallel calls. |
 | `IAUDIT_MAX_BODY_BYTES`, `IAUDIT_MAX_TURNS`, `IAUDIT_MAX_SECTIONS` | `2000000`, `2000`, `50` | Request limits. |
 | `IAUDIT_PIPELINE_MAX_CLAIMS` | `80` | Claims audited per request. More are dropped and `input_truncated` is emitted. |
+| `IAUDIT_SERVER_TIMING` | `false` | When `true`, a 200 reply carries a `Server-Timing` header with durations only: `total`, then `prep`, `atomize`, `link`, `check`, `assemble` in milliseconds. |
 | `IAUDIT_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins. |
 | `IAUDIT_CONTRACTS_DIR` | `docs/contracts` of the repo | Where the schemas are read. Environment only: not a `Settings` field, so `.env` does not set it. |
 | `IAUDIT_LOG_LEVEL` | `INFO` | Logging level. Logs carry counts and ids only, never text. |

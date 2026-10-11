@@ -240,6 +240,7 @@ async def verify(
         user=user,
         response_model=VerifierOutput,
         call_tag="check",
+        unit=claim.id,
         cache_prefix=prefix,
         max_tokens=cfg.check_max_tokens,
         temperature=0.0,

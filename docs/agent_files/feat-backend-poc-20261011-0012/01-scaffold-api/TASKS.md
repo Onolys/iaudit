@@ -19,7 +19,7 @@ Source of truth: [PRD.md](PRD.md). A runnable `backend/` service serving `POST /
 | 8 | `POST /v1/audit` checks in order, `/healthz`, CORS | 5, 7 | done |
 | 9 | Logging allowlist and sentinel test | 8 | done |
 | 10 | One live call to confirm model ids and JSON-schema output | 6 | skipped (user decision) |
-| 11 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
+| 11 | [OPTIONAL, gated] Optional items | all core in every SP | done |
 
 ## Task 1 — Project skeleton
 What it is / what it means: The shared home every later sub-project builds in (R1, D5).

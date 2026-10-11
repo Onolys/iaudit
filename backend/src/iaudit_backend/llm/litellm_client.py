@@ -16,6 +16,7 @@ from .errors import LLMBadOutput, LLMTimeout, LLMUnavailable
 from .types import LLMRequest, LLMResult, MetricsCollector, Usage
 
 RETRY_MARGIN_S = 1.0
+MAX_CACHE_PREFIXES = 2
 # Errors that retrying cannot fix.
 _NO_RETRY = ("AuthenticationError", "PermissionDeniedError", "NotFoundError", "BadRequestError")
 
@@ -65,15 +66,12 @@ class LiteLLMClient:
         return self._acompletion
 
     def _kwargs(self, req: LLMRequest, timeout_s: float) -> dict[str, Any]:
-        if req.cache_prefix:
+        prefixes = req.cache_prefixes or ([req.cache_prefix] if req.cache_prefix else [])
+        if prefixes:
             system: Any = [
-                {
-                    "type": "text",
-                    "text": req.cache_prefix,
-                    "cache_control": {"type": "ephemeral"},
-                },
-                {"type": "text", "text": req.system},
-            ]
+                {"type": "text", "text": p, "cache_control": {"type": "ephemeral"}}
+                for p in prefixes
+            ] + [{"type": "text", "text": req.system}]
         else:
             system = req.system
         return {
@@ -104,6 +102,8 @@ class LiteLLMClient:
     async def complete_json(
         self, req: LLMRequest, metrics: MetricsCollector | None = None
     ) -> LLMResult:
+        if len(req.cache_prefixes) > MAX_CACHE_PREFIXES:
+            raise ValueError(f"at most {MAX_CACHE_PREFIXES} cache prefixes are supported")
         timeout_s = req.timeout_s or self._s.llm_timeout_s
         model = self._model(req.tier)
         started = time.monotonic()
