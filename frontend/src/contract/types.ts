@@ -112,3 +112,10 @@ export interface AuditResponse {
   warnings: Warning[];
   claims: Claim[];
 }
+
+export interface ClaimCheck {
+  spanOutOfRange: boolean;
+  claimSpanOk: boolean;
+  /** key = Evidence.id; true = placeable */
+  evidence: Record<string, boolean>;
+}
