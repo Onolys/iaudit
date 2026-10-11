@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { ROLE_STYLE, SELECTED_CLAIM_BACKGROUND, VERDICT_STYLE } from "./index";
+import { ROLE_STYLE, selectedClaimBackground, VERDICT_STYLE } from "./index";
 
 const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
 
@@ -12,7 +12,7 @@ describe("tokens", () => {
     for (const [k, v] of Object.entries(ROLE_STYLE)) {
       expect(css).toContain(`--role-${k}: ${v.color};`);
     }
-    expect(css).toContain(`--selected-claim-bg: ${SELECTED_CLAIM_BACKGROUND};`);
+    expect(css).toContain(`--selected-claim-bg: ${selectedClaimBackground};`);
   });
 
   it("uses the fixed underline styles", () => {

@@ -34,4 +34,4 @@ export const ROLE_STYLE: Record<EvidenceRole, RoleStyle> = {
   qualifying: { label: "Qualifying", color: "#b45309" },
 };
 
-export const SELECTED_CLAIM_BACKGROUND = "#e5e7eb";
+export const selectedClaimBackground = "#e5e7eb";
