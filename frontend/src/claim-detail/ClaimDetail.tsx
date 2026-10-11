@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { AuditRequest, Claim, ClaimCheck } from "../contract";
 import { orderEvidence } from "../contract";
+import { ExcerptList } from "./ExcerptList";
 import { ConcernList } from "./ConcernList";
 import { SuggestionBox } from "./SuggestionBox";
 import { VerdictBadge } from "./VerdictBadge";
@@ -19,8 +20,10 @@ export function ClaimDetail(props: ClaimDetailProps) {
 
 function ClaimDetailBody({ claim, request, check }: ClaimDetailProps) {
   const [activeConcern, setActiveConcern] = useState<number | null>(null);
-  const { placed } = orderEvidence(request, claim, check);
+  const { placed, unplaceable } = orderEvidence(request, claim, check);
   const placedIds = new Set(placed.map((e) => e.id));
+  const active = activeConcern === null ? undefined : claim.concerns[activeConcern];
+  const activeIds = active ? new Set(active.evidence_ids) : null;
 
   return (
     <article className="cd-root" data-claim-id={claim.id}>
@@ -48,6 +51,7 @@ function ClaimDetailBody({ claim, request, check }: ClaimDetailProps) {
         activeIndex={activeConcern}
         onToggle={(i) => setActiveConcern((cur) => (cur === i ? null : i))}
       />
+      <ExcerptList request={request} placed={placed} unplaceable={unplaceable} activeIds={activeIds} />
     </article>
   );
 }

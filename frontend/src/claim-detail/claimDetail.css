@@ -11,3 +11,16 @@
 button.cd-concern { cursor: pointer; }
 button.cd-concern[aria-pressed="true"] { border-color: #111827; background: var(--selected-claim-bg); }
 .cd-concern-static { border-style: dashed; }
+.cd-excerpts { display: flex; flex-direction: column; gap: 8px; }
+.cd-chunk { display: flex; flex-direction: column; gap: 4px; }
+.cd-row { position: relative; border-left: 4px solid transparent; padding: 4px 8px; background: #fff; }
+.cd-row.context { background: #f9fafb; color: #6b7280; border-left-color: #e5e7eb; }
+.cd-row.dimmed, .cd-note.dimmed { opacity: 0.45; }
+.cd-row.emphasised { background: #fffbeb; }
+.cd-row-head { display: flex; justify-content: space-between; font-size: 0.8rem; color: #6b7280; }
+.cd-highlight { background: #fef08a; }
+.cd-overlap { background: #d1d5db; }
+.cd-dim { opacity: 0.5; }
+.cd-chip { display: inline-block; margin-top: 2px; padding: 0 6px; border: 1px solid; border-radius: 999px; font-size: 0.75rem; }
+.cd-note { margin: 2px 0 0 12px; font-size: 0.9rem; }
+.cd-oor { margin: 0; padding: 4px 8px; border: 1px dashed #9ca3af; border-radius: 4px; font-size: 0.9rem; }
