@@ -3,13 +3,16 @@
 import re
 
 from iaudit_backend.atomize.models import AtomicClaim
+from iaudit_backend.config import Settings
 from iaudit_backend.link.models import LinkResult
-from iaudit_backend.models import ConcernType
+from iaudit_backend.models import ConcernType, EvidenceRole, Verdict
 
+from .amounts import compare_amounts, polarity_reversals
 from .group_a import GroupA
 from .models import (
     CONF_VALUE,
     Concern,
+    Decision,
     FlagObs,
     InferenceObs,
     JudgedEvidence,
@@ -200,3 +203,191 @@ def flag_concerns(items: list[JudgedEvidence], flags: list[FlagObs]) -> list[Con
         if ctype is not None:
             out.append(Concern(ctype, list(f.keys) or base))
     return out
+
+
+# --- roles, decision table, dedup -----------------------------------------------------------
+
+_CHAIN = (
+    ConcernType.wrong_attribution,
+    ConcernType.negation_reversal,
+    ConcernType.frequency_severity_inflation,
+    ConcernType.contradictory_evidence,
+)
+_ORDER = {t: n for n, t in enumerate(ConcernType)}
+_Role = EvidenceRole
+
+
+def _role(it: JudgedEvidence) -> EvidenceRole | None:
+    """The role an item plays for the claim; None means nobody cites it (dropped later)."""
+    o = it.obs
+    if not it.endorsed:
+        return _Role.qualifying
+    if o is None:
+        return None
+    if it.escalated:
+        return _Role.contradicting
+    if it.demote or it.attribution == "mismatch":
+        return _Role.qualifying
+    if o.relation == "contradicts":
+        return _Role.contradicting
+    if o.relation == "entails":
+        return _Role.qualifying if o.experiencer == "other_person" else _Role.supporting
+    return _Role.supporting if it.cited else None  # cited by a flag: partial support
+
+
+def _merge(concerns: list[Concern]) -> list[Concern]:
+    """One concern per type; evidence keys are unioned; 'inflates' wins over 'understates'."""
+    merged: dict[ConcernType, Concern] = {}
+    for c in concerns:
+        m = merged.get(c.type)
+        if m is None:
+            merged[c.type] = Concern(c.type, list(c.keys), c.direction, c.scale)
+            continue
+        m.keys = list(dict.fromkeys([*m.keys, *c.keys]))
+        if c.direction == "inflates":
+            m.direction = "inflates"
+        if c.scale and m.scale and c.scale != m.scale:
+            m.scale = "frequency and severity"
+    return list(merged.values())
+
+
+def dedup(concerns: list[Concern]) -> list[Concern]:
+    """Explain once: a specific concern suppresses a more generic one on the same items."""
+    cs = {c.type: c for c in _merge(concerns)}
+    for n, low in enumerate(_CHAIN):
+        for high in _CHAIN[:n]:
+            if low in cs and high in cs:
+                lc, hc = cs[low], cs[high]
+                if not lc.keys or not hc.keys or set(lc.keys) & set(hc.keys):
+                    del cs[low]
+                    break
+    if ConcernType.conflicting_accounts_flattened in cs:
+        cs.pop(ConcernType.contradictory_evidence, None)
+    if any(t != ConcernType.unsupported_claim for t in cs):
+        cs.pop(ConcernType.unsupported_claim, None)
+    return sorted(cs.values(), key=lambda c: _ORDER[c.type])
+
+
+def _candidates(
+    claim: AtomicClaim, items: list[JudgedEvidence], sig: Signals, cfg: Settings
+) -> list[Concern]:
+    out: list[Concern] = []
+    base = [it for it in items if counts_as_support_base(it)]
+    # Experiencer: the behaviour is described, but about someone else.
+    other = [
+        it.key
+        for it in items
+        if it.obs is not None
+        and it.obs.relation in ("entails", "contradicts")
+        and it.obs.experiencer == "other_person"
+        and it.endorsed
+        and not it.demote
+    ]
+    if other:
+        out.append(Concern(ConcernType.wrong_attribution, other))
+    # Reporter: the content is there, but only from speakers the claim does not name.
+    mism = [
+        it.key
+        for it in items
+        if it.attribution == "mismatch"
+        and it.endorsed
+        and it.obs is not None
+        and it.obs.relation == "entails"
+        and it.obs.experiencer != "other_person"
+    ]
+    if mism and not base:
+        out.append(Concern(ConcernType.wrong_attribution, mism))
+    contra = [it for it in items if _role(it) == _Role.contradicting and not it.escalated]
+    rev = polarity_reversals(claim, contra)
+    if rev:
+        out.append(Concern(ConcernType.negation_reversal, rev))
+    if contra:
+        out.append(Concern(ConcernType.contradictory_evidence, [it.key for it in contra]))
+    flagged = {f.type for f in sig.flags}
+    if "conflicting_accounts_flattened" not in flagged:
+        by_key = {it.key: it for it in items}
+        for f in compare_amounts(claim, base, cfg):
+            if f.escalate:
+                by_key[f.key].escalated = True
+            out.append(
+                Concern(ConcernType.frequency_severity_inflation, [f.key], f.direction, f.kind)
+            )
+    ck = certainty_keys(claim, items, sig.flags, cfg.check_min_conf_p1)
+    if ck:
+        out.append(Concern(ConcernType.certainty_inflation, ck))
+    out += flag_concerns(items, sig.flags)
+    return out
+
+
+def decide(
+    claim: AtomicClaim, judged: list[JudgedEvidence], signals: Signals, cfg: Settings
+) -> Decision:
+    """Pure: observations in, verdict + concerns + evidence roles out (decision table D0-D9)."""
+    if claim.scope != "in_scope":
+        return Decision(Verdict.out_of_scope, row="D0")
+    if not judged:
+        return Decision(
+            Verdict.insufficient_evidence, [Concern(ConcernType.unsupported_claim)], row="D2"
+        )
+    cands = _candidates(claim, judged, signals, cfg)  # may escalate items to contradicting
+    roles = {it.key: _role(it) for it in judged}
+    sup = [k for k, r in roles.items() if r == _Role.supporting]
+    con = [k for k, r in roles.items() if r == _Role.contradicting]
+    tf_keys = [it.key for it in judged if it.demote == "timeframe"]
+    inf_keys = [it.key for it in judged if it.demote == "inference"]
+    if con and not any(c.type == ConcernType.contradictory_evidence for c in cands):
+        cands.append(Concern(ConcernType.contradictory_evidence, con))
+    if con and not sup:
+        row, verdict = "D4", Verdict.contradicted
+        kept = [c for c in cands if c.type in _CHAIN]
+    elif con:
+        row, verdict = "D5", Verdict.partially_supported
+        kept = cands
+    elif not sup:
+        row = "D6" if _has_demoted(judged) else "D7"
+        verdict = Verdict.insufficient_evidence
+        kept = [c for c in cands if c.type == ConcernType.wrong_attribution]
+        if tf_keys:
+            kept.append(Concern(ConcernType.timeframe_mismatch, tf_keys))
+        if inf_keys:
+            kept.append(Concern(ConcernType.unsupported_claim, inf_keys))
+        if not kept:
+            kept = [Concern(ConcernType.unsupported_claim)]
+    else:
+        kept = [
+            c
+            for c in cands
+            if c.type not in (ConcernType.contradictory_evidence, ConcernType.timeframe_mismatch)
+        ]
+        row, verdict = ("D8", Verdict.partially_supported) if kept else ("D9", Verdict.supported)
+    concerns = dedup(kept)
+    return _finish(judged, roles, concerns, verdict, row)
+
+
+def _has_demoted(judged: list[JudgedEvidence]) -> bool:
+    return any(
+        it.demote
+        or it.attribution == "mismatch"
+        or (it.obs and it.obs.experiencer == "other_person")
+        for it in judged
+        if it.obs is not None and it.obs.relation != "not_addresses"
+    )
+
+
+def _finish(judged, roles, concerns, verdict, row) -> Decision:
+    out: dict[str, EvidenceRole] = {}
+    counts: dict[str, int] = {}
+    cited = {k for c in concerns for k in c.keys}
+    for it in judged:
+        r = roles[it.key]
+        if r is None and it.key in cited:
+            r = _Role.qualifying  # cited by a concern but not entailing
+        if r is None:
+            counts["items_dropped"] = counts.get("items_dropped", 0) + 1
+            continue
+        if r != it.linked.draft.role:
+            counts["role_disagreements"] = counts.get("role_disagreements", 0) + 1
+        out[it.key] = r
+    for c in concerns:
+        c.keys = [k for k in c.keys if k in out]
+    return Decision(verdict, concerns, out, row, counts)
