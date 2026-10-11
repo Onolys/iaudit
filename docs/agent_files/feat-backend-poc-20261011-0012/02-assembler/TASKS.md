@@ -11,7 +11,7 @@ Source of truth: [PRD.md](PRD.md). Turns internal drafts from 03-05 into a contr
 |---|---|---|---|
 | 1 | Draft models, `assemble()` entry point, counts-only report | 01 | done |
 | 2 | `locate()`: exact, normalized, guarded fuzzy, ellipsis, hint | 1 | done |
-| 3 | Evidence resolution and `eN` ids | 2 | todo |
+| 3 | Evidence resolution and `eN` ids | 2 | done |
 | 4 | Claim resolution and overlap policy | 2 | todo |
 | 5 | Repair table | 3, 4 | todo |
 | 6 | Rule 9 core copy check | 5 | todo |
