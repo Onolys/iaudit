@@ -10,7 +10,7 @@ from iaudit_backend.safe_log import log_event
 from .llm import tag_unsure
 from .models import Act, IndexedTurn, PrepResult, QAPair
 from .pairing import pair_turns
-from .rules import index_turns, unsure_acts
+from .rules import index_turns, rederive_position_acts, unsure_acts
 
 __all__ = [
     "Act",
@@ -38,6 +38,7 @@ async def prep(turns: list[Turn], ctx) -> PrepResult:
         kinds = unsure_acts(turns, indexed)
         undecided = len(kinds)
         indexed, degraded = await tag_unsure(indexed, kinds, ctx)
+        indexed = rederive_position_acts(indexed)  # replies depend on the merged question set
     indexed, pairs = pair_turns(indexed)
     log_event(
         "prep",

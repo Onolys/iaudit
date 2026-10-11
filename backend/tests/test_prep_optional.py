@@ -157,3 +157,32 @@ async def test_soft_timeout_falls_back_to_rules_only(make_ctx, monkeypatch):
     st = RunState()
     await flow.prep_flow(st, req, make_ctx(prep_soft_timeout_s=0.05))
     assert st.prep is not None and len(st.prep.turns) == 2 and st.prep_ready.is_set()
+
+
+# -- replies to a question only the LLM found -------------------------------------------------
+
+
+async def test_reply_acts_are_rederived_from_the_merged_questions(make_ctx):
+    t = turns("Would often lose keys, then", "Yes.", "Fine.")
+    off = await prep(t, make_ctx())
+    assert off.turns[1].acts == frozenset({A.backchannel}) and off.qa_pairs == []
+    on = await prep(t, make_ctx(llm=Tagger({0: ["question"]}), prep_llm=True))
+    assert on.turns[0].acts >= {A.question}
+    assert on.turns[1].acts == frozenset({A.answer}) and on.turns[1].responds_to == 0
+
+
+async def test_longer_reply_becomes_an_answer_and_a_new_question_is_not_one(make_ctx):
+    t = turns("Would often lose keys, then", "I lose them weekly.", "Do it later.")
+    res = await prep(t, make_ctx(llm=Tagger({0: ["question"], 2: ["question"]}), prep_llm=True))
+    assert A.answer in res.turns[1].acts
+    assert A.question in res.turns[2].acts and A.answer not in res.turns[2].acts
+
+
+async def test_llm_detected_question_and_yes_is_endorsed_not_non_answer(make_ctx):
+    from iaudit_backend.link.validate import answer_status
+
+    res = await prep(
+        turns("Would often lose keys, then", "Yes."),
+        make_ctx(llm=Tagger({0: ["question"]}), prep_llm=True),
+    )
+    assert answer_status([0, 1], res) == "endorsed"
