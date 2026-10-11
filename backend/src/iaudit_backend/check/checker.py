@@ -170,10 +170,8 @@ async def check_one(
     try:
         draft, counts = await _check(claim, link, prep, turns, ctx)
     except Exception as exc:  # a bug in one claim must not take down the others
-        log_event(
-            "check_claim", claim_id=claim.id, failure="bad_output", exc_class=type(exc).__name__
-        )
-        return _stall(claim, "bad_output", ctx)
+        log_event("check_claim", claim_id=claim.id, failure="error", exc_class=type(exc).__name__)
+        return _stall(claim, "error", ctx)
     log_event("check_claim", claim_id=claim.id, **counts)
     return draft
 

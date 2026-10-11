@@ -1,9 +1,12 @@
 import asyncio
 import time
 
+import pytest
 from pl_scripted import Scripted
 
 from iaudit_backend import contract
+from iaudit_backend.api.errors import DeadlineExceeded
+from iaudit_backend.atomize.models import AtomizerOutput
 from iaudit_backend.models import AuditRequest
 from iaudit_backend.pipeline.full import FullPipeline
 
@@ -49,22 +52,31 @@ async def test_deadline_returns_partial_audit_in_time_and_leaks_nothing(make_ctx
 
 
 async def test_unfinished_section_becomes_section_not_processed(make_ctx):
-    class SlowAtomize(Scripted):
+    class SlowSecond(Scripted):
         async def complete_json(self, req, metrics=None):
-            if req.call_tag == "atomize":
+            if req.call_tag == "atomize" and "careless" in req.user:
                 await asyncio.sleep(30)
             return await super().complete_json(req, metrics)
 
-    s = SlowAtomize()
-    req = AuditRequest.model_validate(s.request)
+        def _atomize(self, req):
+            mine = [c for c in self.claims if c["segments"][0] in req.user]
+            return AtomizerOutput.model_validate({"claims": mine, "links": []})
+
+    s = SlowSecond()
+    text = s.request["assessment"][0]["text"].split(". ")
+    s.request["assessment"] = [
+        {"id": "sA", "text": text[0] + "."},
+        {"id": "sB", "text": text[-1]},
+    ]
     ctx = make_ctx(
-        llm=s, request_id="r", deadline_in=0.8, assemble_reserve_s=0.2, min_call_s=0.05,
+        llm=s, request_id="r", deadline_in=1.5, assemble_reserve_s=0.3, min_call_s=0.05,
         cancel_grace_s=0.2,
     )  # fmt: skip
-    resp = await FullPipeline().run(req, ctx)
-    body = resp.to_json()
-    assert body["status"] == "partial" and body["claims"] == []
-    assert [w["code"] for w in body["warnings"]] == ["section_not_processed"]
+    body = (await FullPipeline().run(AuditRequest.model_validate(s.request), ctx)).to_json()
+    assert body["status"] == "partial" and len(body["claims"]) == 1
+    assert [(w["code"], w["section_index"]) for w in body["warnings"]] == [
+        ("section_not_processed", 1)
+    ]
 
 
 async def test_stages_see_the_llm_deadline_not_the_request_deadline(make_ctx):
@@ -84,5 +96,6 @@ async def test_stages_see_the_llm_deadline_not_the_request_deadline(make_ctx):
 async def test_no_call_starts_when_less_than_min_call_s_remains(make_ctx):
     s = Scripted()
     ctx = make_ctx(llm=s, request_id="r", deadline_in=3.5, assemble_reserve_s=0.5)  # 3 s < 4 s
-    resp = await FullPipeline().run(AuditRequest.model_validate(s.request), ctx)
-    assert s.calls == [] and resp.status == "partial"
+    with pytest.raises(DeadlineExceeded):  # nothing usable finished: 504, not an empty audit
+        await FullPipeline().run(AuditRequest.model_validate(s.request), ctx)
+    assert s.calls == []

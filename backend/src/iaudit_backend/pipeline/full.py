@@ -10,6 +10,7 @@ from iaudit_backend.check import stalled_draft
 from iaudit_backend.models import AuditRequest, AuditResponse
 
 from .flow import prep_flow, section_flow
+from .guards import assess
 from .state import RunState
 
 
@@ -40,8 +41,27 @@ class FullPipeline:
             for t in list(st.tasks):  # outer cancellation: never leak tasks
                 t.cancel()
         internal = self._collect(st, len(req.assessment), ctx)
+        self._guard(st, req, internal, ctx)
         outcome = await asyncio.to_thread(assemble, req, internal, cfg)
         return AuditResponse.model_validate(outcome.response)
+
+    @staticmethod
+    def _guard(st: RunState, req: AuditRequest, internal: InternalAudit, ctx) -> None:
+        by_key = {d.key: d for d in internal.claims}
+        in_scope = [c for c in st.admitted.values() if c.scope == "in_scope"]
+        reasons = {a.failure for a in st.atoms.values() if a.failure}
+        reasons |= set(ctx.extras.get("check_stalls", {}).values())
+        if st.errors:
+            reasons.add("error")
+        err = assess(
+            sections_total=len(req.assessment),
+            sections_ok=sum(1 for a in st.atoms.values() if a.status == "ok"),
+            in_scope=len(in_scope),
+            in_scope_ok=sum(1 for c in in_scope if by_key[c.id].outcome == "ok"),
+            reasons=reasons,
+        )
+        if err is not None:
+            raise err
 
     @staticmethod
     def _collect(st: RunState, n_sections: int, ctx) -> InternalAudit:

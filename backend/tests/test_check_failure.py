@@ -56,7 +56,7 @@ def setup(**by_claim):
         (LLMTimeout("t"), "timeout"),
         (LLMUnavailable("u"), "unavailable"),
         (LLMBadOutput("b"), "bad_output"),
-        (RuntimeError("bug"), "bad_output"),
+        (RuntimeError("bug"), "error"),
     ],
 )
 async def test_one_failure_stalls_only_that_claim(make_ctx, bad, reason):
