@@ -14,7 +14,7 @@ Source of truth: [PRD.md](PRD.md). A runnable `backend/` service serving `POST /
 | 3 | `IAUDIT_*` settings | 1 | done |
 | 4 | Internal models and enum-drift test | 2 | done |
 | 5 | Error mapping to contract error bodies | 2 | done |
-| 6 | LLM client: LiteLLM, fixture, stub and failing clients | 3 | todo |
+| 6 | LLM client: LiteLLM, fixture, stub and failing clients | 3 | done |
 | 7 | Pipeline seam, `StubPipeline`, factory, 504 backstop | 4, 6 | todo |
 | 8 | `POST /v1/audit` checks in order, `/healthz`, CORS | 5, 7 | todo |
 | 9 | Logging allowlist and sentinel test | 8 | todo |
