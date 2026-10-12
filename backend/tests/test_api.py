@@ -61,6 +61,15 @@ def test_not_json_and_not_object(client):
     assert_error(post(client, b"\xff\xfe"), 400, "invalid_request")
 
 
+def test_content_type_must_be_json(client, example_request):
+    body = json.dumps(example_request).encode()
+    r = post(client, body, {"content-type": "text/plain"})
+    assert_error(r, 415, "invalid_request")
+    assert (
+        post(client, body, {"content-type": "application/json; charset=utf-8"}).status_code == 200
+    )
+
+
 def test_unsupported_version_before_schema(client, example_request):
     example_request["schema_version"] = "2.0.0"
     example_request["bogus"] = 1  # would also fail schema validation

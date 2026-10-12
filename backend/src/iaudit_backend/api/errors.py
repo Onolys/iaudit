@@ -61,7 +61,7 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(DeadlineExceeded)
     @app.exception_handler(TimeoutError)
     async def _deadline(_: Request, exc: Exception):
-        return _response(504, "unavailable", "The audit did not finish before the deadline.")
+        return _response(504, "unavailable", "The audit could not produce a usable result.")
 
     @app.exception_handler(StarletteHTTPException)
     async def _http(_: Request, exc: StarletteHTTPException):

@@ -36,11 +36,12 @@ Every non-2xx reply has the contract error body (`error.code`, `error.message`, 
 | 400 | `invalid_request` | Not JSON, not an object, fails the request schema, or has duplicate ids. |
 | 400 | `unsupported_version` | `schema_version` is present and is not `1.0.0`. |
 | 413 | `payload_too_large` | Body over `IAUDIT_MAX_BODY_BYTES`, turns over `IAUDIT_MAX_TURNS`, or sections over `IAUDIT_MAX_SECTIONS`. |
+| 415 | `invalid_request` | `Content-Type` is present and is not `application/json`. |
 | 422 | `invalid_request` | Framework fallback for malformed request parameters. |
 | 404, 405 | `other` | Unknown path or wrong method. |
 | 500 | `internal_error` | Unexpected failure, or the reply failed the response schema. |
 | 503 | `unavailable` | Nothing usable finished because the model provider was unavailable. |
-| 504 | `unavailable` | Nothing usable finished before the deadline. |
+| 504 | `unavailable` | Nothing usable finished: the deadline passed, or every unit failed (for example, unusable model output). |
 
 A run where some sections or claims finish is **not** an error: it returns 200 with warnings (and `status: "partial"` when a section was not processed). The 503 and 504 replies apply only when no section was audited, or when every in-scope claim stalled, so an empty result cannot be mistaken for "nothing wrong".
 

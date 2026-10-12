@@ -138,6 +138,10 @@ def create_app(
         request_id: str | None = None
         started = time.monotonic()
         try:
+            # 0. content type (a missing header is tolerated; an explicit non-JSON one is not)
+            media_type = request.headers.get("content-type", "").split(";")[0].strip().lower()
+            if media_type and media_type != "application/json":
+                raise ApiError("invalid_request", "Content-Type must be application/json.", 415)
             # 1. body size
             declared = request.headers.get("content-length")
             if declared and declared.isdigit() and int(declared) > settings.max_body_bytes:
@@ -247,7 +251,7 @@ def create_app(
             ) from None
         except DeadlineExceeded:
             raise ApiError(
-                "unavailable", "The audit did not finish before the deadline.", 504, request_id
+                "unavailable", "The audit could not produce a usable result.", 504, request_id
             ) from None
         except Exception as exc:
             log_exception(exc)
