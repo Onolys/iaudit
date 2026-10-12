@@ -198,7 +198,9 @@ def test_assembly_error_is_runtime_error():
 
 def test_supported_claim_whose_only_quote_has_a_verbatim_ellipsis_stays_supported(example_request):
     quote = "I... I just forget what I was doing."
-    example_request["transcript"][5]["text"] = f"In the morning, when I get to my desk at the office, {quote}"
+    example_request["transcript"][5]["text"] = (
+        f"In the morning, when I get to my desk at the office, {quote}"
+    )
     d = cd(
         "a",
         "The patient has trouble at work.",

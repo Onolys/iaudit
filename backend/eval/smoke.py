@@ -13,16 +13,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from eval.adhd import DATA
+from eval.match import SEVERITY
 
 NAMES = ["faithful", *[f"v{i}" for i in range(1, 9)]]
-# Worst last: a split claim takes the most severe verdict among its pieces.
-SEVERITY = [
-    "supported",
-    "out_of_scope",
-    "partially_supported",
-    "insufficient_evidence",
-    "contradicted",
-]
 
 
 @dataclass
@@ -76,7 +69,7 @@ def _overlaps(claim: dict, section: int, start: int, end: int) -> bool:
 
 
 def _worst(verdicts: list[str]) -> str:
-    return max(verdicts, key=lambda v: SEVERITY.index(v) if v in SEVERITY else len(SEVERITY))
+    return max(verdicts, key=lambda v: SEVERITY.get(v, 5))
 
 
 def _judge_faithful(response: dict) -> Outcome:
