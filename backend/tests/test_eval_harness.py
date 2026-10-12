@@ -35,3 +35,38 @@ async def test_each_variant_target_is_found_and_scored_by_bucket(vid):
     (bucket,) = [b for b, r in rep["buckets"].items() if r["tp"] == 1]
     assert rep["buckets"][bucket]["recall"] == 1.0
     assert rep["buckets"][bucket]["verdict_accuracy"] == {"correct": 1, "total": 1}
+
+
+def _resp(*pieces):
+    def pt(c):
+        return {"char": c, "index": 0}
+
+    return {
+        "claims": [
+            {
+                "span": {"start": pt(s), "end": pt(e)},
+                "verdict": v,
+                "concerns": [{"type": t} for t in ts],
+                "explanation": "",
+            }
+            for s, e, v, ts in pieces
+        ]
+    }
+
+
+def test_smoke_judge_split_target_takes_partial_over_insufficient():
+    from eval.smoke import judge
+
+    text = "Alpha beta. Gamma delta."
+    expected = {
+        "fixture": "vx",
+        "target_text": text,
+        "verdict": "partially_supported",
+        "concerns_required": ["frequency_severity_inflation"],
+    }
+    resp = _resp(
+        (0, 11, "partially_supported", ["frequency_severity_inflation"]),
+        (12, 24, "insufficient_evidence", []),
+    )
+    out = judge(expected, resp, [text])
+    assert out.actual_verdict == "partially_supported" and out.passed
