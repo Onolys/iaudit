@@ -137,8 +137,8 @@ describe("WarningsBanner", () => {
     const items = screen.getAllByRole("listitem");
     expect(items).toHaveLength(2);
     expect(items[0].textContent).toContain("Skipped it.");
-    expect(items[0].textContent).toContain("Section 0");
-    expect(items[1].textContent).toContain("Section 2");
+    expect(items[0].textContent).toContain("Section 1");
+    expect(items[1].textContent).toContain("Section 3");
     expect(items[1].textContent).toContain("c-9");
     expect(screen.queryByRole("button")).toBeNull();
   });

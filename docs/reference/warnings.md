@@ -23,7 +23,7 @@ Each case is one fixed message, at most once per claim for the adjustments.
 | The verdict changed because cited evidence could not be verified | The verdict was adjusted because cited evidence could not be verified. |
 | The verdict changed because a contradicting excerpt conflicts with it | The verdict was adjusted because a contradicting excerpt conflicts with it. |
 | Wording was replaced to avoid reproducing the transcript | The wording was adjusted to avoid reproducing transcript text. Triggered by a quoted span of four or more words, a timestamp, or a run of `IAUDIT_COPY_NGRAM` (8) words from the transcript that the assessment does not itself contain. |
-| The claim was not audited in time or the model failed | The claim was not audited in the available time. The claim is still returned, as `insufficient_evidence`. |
+| The claim was not audited in time or the model failed | The claim could not be audited. The claim is still returned, as `insufficient_evidence`. |
 | The claim failed final validation | The claim failed final validation and was omitted. |
 | Two claims overlapped | The less severe claim was omitted, or trimmed when `IAUDIT_OVERLAP_TRIM` is on, to keep claim spans from overlapping. |
 | A claim could not be located | The claim could not be located in the section text and was omitted. |

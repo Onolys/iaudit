@@ -24,11 +24,12 @@ Values here are the defaults. Tuning values (thresholds, caps, windows) are gues
 | `IAUDIT_MODEL_CHEAP` | `anthropic/claude-haiku-4-5-20251001` | LiteLLM model id for the cheap tier (prep tagging). |
 | `IAUDIT_MODEL_MID` | `anthropic/claude-sonnet-5-5` | LiteLLM model id for the mid tier (atomize, link, check). |
 | `IAUDIT_MODEL_STRONG` | `anthropic/claude-opus-5-5` | LiteLLM model id for the strong tier. Offline use only. |
-| `IAUDIT_LLM_TIMEOUT_S` | `30` | Longest one model call may run. |
-| `IAUDIT_AUDIT_DEADLINE_S` | `60` | Hard cap for one audit. A startup warning is logged above 100. |
+| `IAUDIT_LLM_TIMEOUT_S` | `30` | Default call timeout for a stage with no `*_CALL_TIMEOUT_S` of its own, and the time a retry needs to fit. A stage cap replaces it, even when longer. |
+| `IAUDIT_AUDIT_DEADLINE_S` | `100` | Hard cap for one audit. A startup warning is logged above 100. |
 | `IAUDIT_LLM_MAX_RETRIES` | `1` | Retries of a failed model call (timeout, bad JSON, provider error). |
 | `IAUDIT_LLM_MAX_CONCURRENCY` | `20` | Model calls in flight at once, across the whole service. |
 | `IAUDIT_LLM_MODE` | `live` | `live` calls providers; `fixture` replays recordings from `fixture_dir`; `stub` makes every model call fail as unavailable. |
+| `IAUDIT_LLM_RESPONSE_FORMAT` | `json_object` | `json_object` relies on the prompt for the schema and validates replies here. `json_schema` asks the provider for strict structured output; Haiku 5.5 often returns empty claims with it. |
 | `IAUDIT_FIXTURE_DIR` | `tests/fixtures/llm` | Recordings for `fixture` mode. |
 
 ## Orchestration
@@ -41,7 +42,7 @@ Values here are the defaults. Tuning values (thresholds, caps, windows) are gues
 | `IAUDIT_CANCEL_GRACE_S` | `1` | How long unfinished work gets to stop after the deadline. |
 | `IAUDIT_PIPELINE_MAX_CLAIMS` | `80` | Claims audited per request. More are dropped and `input_truncated` is emitted. |
 | `IAUDIT_PREP_CALL_TIMEOUT_S` | `10` | Per-call cap for prep tagging. |
-| `IAUDIT_ATOMIZE_CALL_TIMEOUT_S` | `25` | Per-call cap for atomize. |
+| `IAUDIT_ATOMIZE_CALL_TIMEOUT_S` | `60` | Per-call cap for atomize. Replaces `IAUDIT_LLM_TIMEOUT_S` for this stage; the call is still bounded by the time left in the audit. |
 | `IAUDIT_LINK_CALL_TIMEOUT_S` | `20` | Per-call cap for link. |
 | `IAUDIT_CHECK_CALL_TIMEOUT_S` | `20` | Per-call cap for check. |
 | `IAUDIT_CACHE_LAYOUT` | `per_stage` | `shared` gives link and check one cached system-plus-transcript prefix (whole mode). |
@@ -65,7 +66,7 @@ Values here are the defaults. Tuning values (thresholds, caps, windows) are gues
 | Variable | Default | Meaning |
 |---|---|---|
 | `IAUDIT_ATOMIZE_MAX_CLAIMS` | `30` | Most claims asked of the atomizer per section. |
-| `IAUDIT_ATOMIZE_MAX_TOKENS` | `4000` | Output token cap for the atomizer call. |
+| `IAUDIT_ATOMIZE_MAX_TOKENS` | `16000` | Output token cap for the atomizer call. Haiku 5.5 allows up to 128000 output tokens, but `atomize_call_timeout_s` (60 s) ends the call first on very long outputs. |
 | `IAUDIT_ATOMIZE_RETRY` | `true` | Retry a section once when the atomizer answer fails validation. |
 
 ## Link

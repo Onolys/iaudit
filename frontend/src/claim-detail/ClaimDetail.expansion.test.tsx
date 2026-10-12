@@ -30,6 +30,13 @@ const claimOf = (evidence: Claim["evidence"]): Claim => ({
 const btn = (re: RegExp) => screen.queryAllByRole("button", { name: re });
 
 describe("expansion", () => {
+  it("never promises more turns than are hidden", () => {
+    const { container } = render(<ClaimDetail {...inlineProps(req, claimOf([ev("e1", 1), ev("e2", 18)]))} />);
+    expect(turns(container)).toEqual([1, 18]);
+    expect(btn(/Show 1 more turn above \(1 hidden\)/)).toHaveLength(1);
+    expect(btn(/Show 1 more turn below \(1 hidden\)/)).toHaveLength(1);
+  });
+
   it("shows hidden counts and adds exactly 3 turns per click", () => {
     const { container } = render(<ClaimDetail {...inlineProps(req, claimOf([ev("e1", 10)]))} />);
     expect(turns(container)).toEqual([10]);
