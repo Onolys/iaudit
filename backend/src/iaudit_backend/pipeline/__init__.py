@@ -28,12 +28,15 @@ class RequestContext:
         return max(0.0, self.deadline - time.monotonic())
 
     def call_timeout(self, stage: str) -> float | None:
-        """Per-call timeout bounded by the remaining budget; None when too little is left."""
+        """Per-call timeout: the stage cap (llm_timeout_s if none), bounded by the remaining budget.
+
+        None when too little is left.
+        """
         left = self.remaining()
         if left < self.settings.min_call_s:
             return None
         cap = getattr(self.settings, f"{stage}_call_timeout_s", self.settings.llm_timeout_s)
-        return min(cap, self.settings.llm_timeout_s, left)
+        return min(cap, left)
 
     @property
     def fixture_scope(self) -> str | None:

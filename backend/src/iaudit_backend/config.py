@@ -23,11 +23,14 @@ class Settings(BaseSettings):
     model_strong: str = "anthropic/claude-opus-5-5"
     # Timeouts / retries / concurrency
     llm_timeout_s: float = 30
-    audit_deadline_s: float = 60
+    audit_deadline_s: float = 100
     llm_max_retries: int = 1
     llm_max_concurrency: int = 20
     # Mode
     llm_mode: Literal["live", "fixture", "stub"] = "live"
+    # json_object: the prompt carries the schema and replies are validated here. json_schema asks
+    # the provider for strict structured output; Haiku 5.5 often returns empty claims with it.
+    llm_response_format: Literal["json_object", "json_schema"] = "json_object"
     fixture_dir: str = "tests/fixtures/llm"
     # Assembler (SP02)
     fuzzy_threshold: float = 90
@@ -38,7 +41,7 @@ class Settings(BaseSettings):
     cross_turn_slack: int = 0
     # Atomizer (SP03)
     atomize_max_claims: int = 30
-    atomize_max_tokens: int = 4000
+    atomize_max_tokens: int = 16000
     atomize_retry: bool = True
     # Link (SP04)
     link_mode: Literal["auto", "whole", "shortlist"] = "auto"
@@ -81,7 +84,7 @@ class Settings(BaseSettings):
     prep_chunk_turns: int = 30
     prep_context_turns: int = 3
     prep_call_timeout_s: float = 10
-    atomize_call_timeout_s: float = 25
+    atomize_call_timeout_s: float = 60
     link_call_timeout_s: float = 20
     check_call_timeout_s: float = 20
     pipeline_max_claims: int = 80

@@ -132,7 +132,7 @@ def test_llm_output_schema_has_no_code_owned_fields():
 
 def test_config_keys():
     s = Settings()
-    assert (s.atomize_max_claims, s.atomize_max_tokens, s.atomize_retry) == (30, 4000, True)
+    assert (s.atomize_max_claims, s.atomize_max_tokens, s.atomize_retry) == (30, 16000, True)
 
 
 def test_raw_claim_parses_with_inconsistent_scope_and_category():

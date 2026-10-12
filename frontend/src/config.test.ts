@@ -20,8 +20,8 @@ describe("getConfig", () => {
   });
 
   it("auditUrl is passed through when set", () => {
-    vi.stubEnv("VITE_AUDIT_URL", "http://localhost:8000/audit");
-    expect(getConfig().auditUrl).toBe("http://localhost:8000/audit");
+    vi.stubEnv("VITE_AUDIT_URL", "http://localhost:8000/v1/audit");
+    expect(getConfig().auditUrl).toBe("http://localhost:8000/v1/audit");
   });
 
   it.each([undefined, ""])("auditUrl is null for %j", (v) => {

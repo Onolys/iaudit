@@ -14,7 +14,7 @@ def test_defaults():
     assert s.model_mid == "anthropic/claude-sonnet-5-5"
     assert s.model_strong == "anthropic/claude-opus-5-5"
     assert s.llm_timeout_s == 30
-    assert s.audit_deadline_s == 60
+    assert s.audit_deadline_s == 100
     assert s.llm_max_retries == 1
     assert s.llm_max_concurrency == 20
     assert s.llm_mode == "live"
