@@ -140,3 +140,11 @@ def test_start_and_end_are_never_inside_whitespace():
     t = "x   spaced   out   y"
     m = locate(t, "spaced out", None, CFG)
     assert not t[m.start].isspace() and not t[m.end - 1].isspace()
+
+
+def test_verbatim_quote_containing_ellipsis_is_found_whole():
+    t = "In the morning, when I get to my desk at the office, I... I just forget what I was doing."
+    q = "I... I just forget what I was doing."
+    m = locate(t, q, None, CFG)
+    assert m is not None and (m.tier, m.start) == ("exact", 53)
+    assert sl(t, m) == q
