@@ -128,7 +128,6 @@ def build() -> dict[str, str]:
         concerns_required=NOROLES_EXPECTED["concerns_required"],
         expect_warnings=NOROLES_EXPECTED["expect_warnings"],
         bucket=CONCERNS.index("unsupported_claim") + 1,
-        evidence=[],
         status="proposed",
     )
     files[f"gold/{NOROLES}.jsonl"] = _jsonl(gold_v4)

@@ -1,0 +1,8 @@
+{
+ "note": "Estimates, $ per million tokens, from the brainstorm; edit when pricing changes. Keys match a fragment of the model id.",
+ "models": {
+  "haiku": {"input": 1.0, "output": 5.0},
+  "sonnet": {"input": 2.0, "output": 10.0},
+  "opus": {"input": 4.0, "output": 20.0}
+ }
+}
