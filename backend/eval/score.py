@@ -34,7 +34,10 @@ class Counts:
     def prf(self) -> dict:
         p = self.tp / (self.tp + self.fp) if self.tp + self.fp else None
         r = self.tp / (self.tp + self.fn) if self.tp + self.fn else None
-        f1 = 2 * p * r / (p + r) if p and r else (0.0 if p is not None and r is not None else None)
+        if self.tp:
+            f1 = 2 * p * r / (p + r)
+        else:  # nothing right: 0.0 when there were gold faults, unmeasured when there were none
+            f1 = 0.0 if self.tp + self.fn else None
         return {"tp": self.tp, "fp": self.fp, "fn": self.fn, "n": self.tp + self.fn,
                 "precision": p, "recall": r, "f1": f1}  # fmt: skip
 

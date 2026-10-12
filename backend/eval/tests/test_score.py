@@ -232,3 +232,27 @@ def test_cost_estimate_from_prices():
     tokens = {"anthropic/claude-sonnet-5-5": {"input": 1_000_000, "output": 100_000,
                                               "cache_read": 1_000_000, "cache_write": 0}}  # fmt: skip
     assert cost_usd(tokens, prices) == pytest.approx(2.0 + 1.0 + 0.2)
+
+
+def test_missing_every_gold_fault_scores_f1_zero_not_unmeasured():
+    from eval.score import Counts
+
+    r = Counts(tp=0, fp=0, fn=3).prf()
+    assert r["recall"] == 0.0 and r["precision"] is None and r["f1"] == 0.0
+    assert Counts(tp=0, fp=2, fn=3).prf()["f1"] == 0.0
+    assert Counts(tp=0, fp=2, fn=0).prf()["f1"] is None  # no gold faults: recall is undefined
+
+
+def test_report_and_compare_show_and_flag_a_zero_to_one_gain():
+    from eval.compare import deltas
+    from eval.score import Counts, FixtureResult
+
+    def rep(counts):
+        res = FixtureResult("x", True, "")
+        res.detection[7] = counts
+        return aggregate([res])
+
+    missed, found = rep(Counts(tp=0, fp=0, fn=3)), rep(Counts(tp=3, fp=0, fn=0))
+    assert missed["buckets"]["7"]["f1"] == 0.0 and found["buckets"]["7"]["f1"] == 1.0
+    (row,) = deltas(missed, found)
+    assert row["delta"] == 1.0 and row["flag"] is True

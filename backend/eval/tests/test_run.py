@@ -37,7 +37,7 @@ def run(argv, capsys):
 def test_oracle_passes_the_poc_gate_and_writes_reports(tmp_path, capsys):
     code, out = run(["--mode", "oracle", "--gate", "poc", "--out", str(tmp_path)], capsys)
     assert code == 0 and out.count("PASS") == 9 and "FAIL" not in out
-    assert "adhd-multi: skipped" in out
+    assert "adhd-multi: skipped" in out and "cdr: not built" in out
     rep = json.loads((tmp_path / "oracle" / "report.json").read_text())
     assert rep["split"] == "poc-all" and rep["errors"] == [] and rep["mode"] == "oracle"
     md = (tmp_path / "report.md").read_text()

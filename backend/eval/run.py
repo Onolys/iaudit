@@ -245,6 +245,8 @@ def main(argv: list[str] | None = None) -> int:
              "estimate; no precision claim is made from it."]  # fmt: skip
     if not (DATA / "requests" / "multi.json").exists():
         print("adhd-multi: skipped (waiting for an approved composition, 07 O-5)")
+    if not (EVAL_DIR / "private" / "prepare_cdr.py").exists():
+        print("cdr: not built (waiting for the interview files, 07 O-10 and O-11)")
 
     if args.baseline:
         try:
