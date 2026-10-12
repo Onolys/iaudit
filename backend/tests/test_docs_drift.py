@@ -21,6 +21,25 @@ def test_every_setting_is_in_configuration_md():
     assert missing == []
 
 
+def _fmt(value) -> str:
+    if isinstance(value, bool):
+        return "`true`" if value else "`false`"
+    if isinstance(value, list):
+        return "`" + ",".join(value) + "`"
+    return f"`{value}`"
+
+
+def test_configuration_md_defaults_match_settings():
+    text = (DOCS / "reference" / "configuration.md").read_text(encoding="utf-8")
+    rows = dict(re.findall(r"^\| `IAUDIT_([A-Z0-9_]+)` \| ([^|]+?) \|", text, re.M))
+    wrong = {
+        n: (rows[n.upper()], _fmt(f.default))
+        for n, f in Settings.model_fields.items()
+        if rows.get(n.upper()) != _fmt(f.default)
+    }
+    assert wrong == {}
+
+
 def test_configuration_md_names_no_unknown_setting():
     text = (DOCS / "reference" / "configuration.md").read_text(encoding="utf-8")
     named = set(re.findall(r"`IAUDIT_([A-Z0-9_]+)`", text))

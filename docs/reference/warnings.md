@@ -4,7 +4,7 @@ When the backend emits each contract warning code. The code list and the warning
 
 **Audience:** users.
 
-`status` is `partial` if and only if a `section_not_processed` warning is present. Warnings come in this order: section warnings, then claim warnings in claim order, then aggregates.
+`status` is `partial` if and only if a `section_not_processed` warning is present. Warnings come in this order: section warnings, then claim warnings in claim order, then aggregates. The one exception is the `other` warning for a claim dropped by final validation, which is appended last.
 
 | Code | Carries | Emitted when |
 |---|---|---|

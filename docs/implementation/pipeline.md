@@ -31,7 +31,7 @@ atomize s1 ─▶ claim flows ─▶ link ─▶ check ─┼─▶ assemble ─
 | A section's atomize fails | `section_not_processed` warning, status `partial`. |
 | Prep passes `prep_soft_timeout_s` | Rules-only prep result; claims continue. |
 | More claims than `pipeline_max_claims` | Extra claims dropped, `input_truncated`. |
-| Nothing usable finished | `guards.assess` raises: 503 if every unit saw an unavailable provider, 500 for an unexpected error, otherwise 504. A run of only out-of-scope claims is valid. |
+| Nothing usable finished | `guards.assess` raises: 503 if any unit failed on the provider, else 500 for an unexpected error, else 504. A run of only out-of-scope claims is valid. |
 
 ## Cache layout and warm-up (optional)
 
