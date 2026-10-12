@@ -13,7 +13,7 @@ The request and response bodies are defined by the [contract](../contracts/READM
 | `POST /v1/audit` | Audit one assessment against one interview. Body: an `AuditRequest`. Reply: an `AuditResponse`. |
 | `GET /healthz` | Liveness. Returns `{"status": "ok"}`. |
 
-One call is synchronous. The audit has a hard time cap (`IAUDIT_AUDIT_DEADLINE_S`, default 60 s); the review UI waits up to 120 s.
+One call is synchronous. The audit has a hard time cap (`IAUDIT_AUDIT_DEADLINE_S`, default 100 s); the review UI waits up to 120 s.
 
 ## How a request is checked
 
@@ -51,7 +51,7 @@ Only the origins in `IAUDIT_CORS_ORIGINS` (default `http://localhost:5173`) may 
 
 ## Settings
 
-Every `IAUDIT_*` setting, its default and its meaning is in [configuration.md](configuration.md). The few that decide how a request fails are the limits (`IAUDIT_MAX_BODY_BYTES`, `IAUDIT_MAX_TURNS`, `IAUDIT_MAX_SECTIONS`), the deadline (`IAUDIT_AUDIT_DEADLINE_S`, default 60 s) and the mode switches `IAUDIT_PIPELINE` and `IAUDIT_LLM_MODE`.
+Every `IAUDIT_*` setting, its default and its meaning is in [configuration.md](configuration.md). The few that decide how a request fails are the limits (`IAUDIT_MAX_BODY_BYTES`, `IAUDIT_MAX_TURNS`, `IAUDIT_MAX_SECTIONS`), the deadline (`IAUDIT_AUDIT_DEADLINE_S`, default 100 s) and the mode switches `IAUDIT_PIPELINE` and `IAUDIT_LLM_MODE`.
 
 ## Warnings
 

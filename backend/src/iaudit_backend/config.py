@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     model_strong: str = "anthropic/claude-opus-5-5"
     # Timeouts / retries / concurrency
     llm_timeout_s: float = 30
-    audit_deadline_s: float = 60
+    audit_deadline_s: float = 100
     llm_max_retries: int = 1
     llm_max_concurrency: int = 20
     # Mode
@@ -84,7 +84,7 @@ class Settings(BaseSettings):
     prep_chunk_turns: int = 30
     prep_context_turns: int = 3
     prep_call_timeout_s: float = 10
-    atomize_call_timeout_s: float = 25
+    atomize_call_timeout_s: float = 60
     link_call_timeout_s: float = 20
     check_call_timeout_s: float = 20
     pipeline_max_claims: int = 80
