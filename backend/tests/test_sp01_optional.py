@@ -57,14 +57,15 @@ async def test_body_reading_stops_once_over_the_cap():
 # -- Server-Timing ---------------------------------------------------------------------------
 
 
-def test_server_timing_header_absent_by_default(example_request):
+def test_server_timing_header_is_on_by_default_and_can_be_switched_off(example_request):
     with _client() as c:
-        r = c.post("/v1/audit", json=example_request)
-    assert r.status_code == 200 and "server-timing" not in r.headers
+        assert "server-timing" in c.post("/v1/audit", json=example_request).headers
+    with _client(server_timing=False) as c:
+        assert "server-timing" not in c.post("/v1/audit", json=example_request).headers
 
 
 def test_server_timing_header_has_durations_only(example_request):
-    with _client(server_timing=True) as c:
+    with _client() as c:
         r = c.post("/v1/audit", json=example_request)
     assert r.status_code == 200
     header = r.headers["server-timing"]
@@ -96,7 +97,7 @@ def test_server_timing_includes_stage_durations_from_the_pipeline(example_reques
 
 
 def test_server_timing_not_added_to_errors():
-    with _client(server_timing=True) as c:
+    with _client() as c:
         r = c.post("/v1/audit", content=b"{nope")
     assert r.status_code == 400 and "server-timing" not in r.headers
 

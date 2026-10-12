@@ -11,8 +11,9 @@ from iaudit_backend.models import AuditRequest, AuditResponse
 
 from .flow import prep_flow, section_flow
 from .guards import assess
-from .metrics import log_audit_done, summarize
+from .metrics import log_audit_done, pipeline_snapshot, summarize
 from .state import RunState
+from .warmup import warmup_enabled, warmup_flow
 
 
 def _section_reason(failure: str | None) -> str:
@@ -30,6 +31,10 @@ class FullPipeline:
         try:
             roster = roster_from_turns(req.transcript)
             st.spawn(lambda: prep_flow(st, req, sctx))
+            if warmup_enabled(req, cfg):
+                st.warm_ready.clear()
+                # untracked on purpose: a slow warm-up must never hold the run open
+                st.warm_task = asyncio.create_task(warmup_flow(st, req, sctx))
             for i, section in enumerate(req.assessment):
                 st.spawn(
                     lambda i=i, s=section: section_flow(st, req, roster, i, s, sctx), section=i
@@ -42,15 +47,27 @@ class FullPipeline:
         finally:
             for t in list(st.tasks):  # outer cancellation: never leak tasks
                 t.cancel()
+            if st.warm_task is not None:
+                st.warm_task.cancel()
         internal = self._collect(st, len(req.assessment), ctx)
-        self._guard(st, req, internal, ctx)
         a0 = time.monotonic()
+        try:
+            self._guard(st, req, internal, ctx)
+        except Exception:  # 503 / 504 / 500: the run still leaves its numbers behind
+            self._record(st, internal, ctx, t0, a0, a0, llm_deadline)
+            raise
         outcome = await asyncio.to_thread(assemble, req, internal, cfg)
-        now = time.monotonic()
+        self._record(st, internal, ctx, t0, a0, time.monotonic(), llm_deadline)
+        return AuditResponse.model_validate(outcome.response)
+
+    @staticmethod
+    def _record(st, internal, ctx, t0: float, a0: float, now: float, llm_deadline: float) -> None:
         summary = summarize(st, internal, round((now - a0) * 1000), round((now - t0) * 1000))
         ctx.extras["pipeline_metrics"] = summary
+        ctx.metrics.set_pipeline(
+            *pipeline_snapshot(st, summary, t0, llm_deadline, a0, ctx.deadline)
+        )
         log_audit_done(ctx, summary)
-        return AuditResponse.model_validate(outcome.response)
 
     @staticmethod
     def _guard(st: RunState, req: AuditRequest, internal: InternalAudit, ctx) -> None:

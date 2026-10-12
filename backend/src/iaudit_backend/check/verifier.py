@@ -16,6 +16,7 @@ from iaudit_backend.config import Settings
 from iaudit_backend.link.models import LinkResult
 from iaudit_backend.link.prompt import render_claim_block, render_turns
 from iaudit_backend.llm import LLMBadOutput, LLMError, LLMRequest, LLMTimeout
+from iaudit_backend.pipeline.layout import shared_layout
 from iaudit_backend.prep import IndexedTurn, PrepResult
 
 from .models import VerifierOutput
@@ -235,6 +236,10 @@ async def verify(
         res.stall = "timeout"
         return res
     prefix, system, user = build_prompt(claim, link, prep, turns)
+    prefixes: list[str] = []
+    if link.mode == "whole" and cfg.cache_layout == "shared":
+        prefixes, system = shared_layout(turns, common_system(), stage_block())
+        prefix = None
     req = LLMRequest(
         tier="mid",
         system=system,
@@ -243,6 +248,7 @@ async def verify(
         call_tag="check",
         unit=claim.id,
         cache_prefix=prefix,
+        cache_prefixes=prefixes,
         max_tokens=cfg.check_max_tokens,
         temperature=0.0,
         timeout_s=timeout,

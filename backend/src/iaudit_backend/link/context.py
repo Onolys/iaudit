@@ -39,13 +39,17 @@ class LinkContext:
         return Shortlist(indices=[], mode="empty")
 
 
+def choose_mode(est_tokens: int, cfg) -> str:
+    """whole | shortlist, from the transcript size and `link_mode`."""
+    if cfg.link_mode == "auto":
+        return "whole" if est_tokens < cfg.link_whole_max_tokens else "shortlist"
+    return cfg.link_mode
+
+
 def build_link_context(turns: list[Turn], prep: PrepResult, ctx) -> LinkContext:
     cfg = ctx.settings
     est = estimate_tokens(turns)
-    if cfg.link_mode == "auto":
-        mode = "whole" if est < cfg.link_whole_max_tokens else "shortlist"
-    else:
-        mode = cfg.link_mode
+    mode = choose_mode(est, cfg)
     return LinkContext(
         turns=turns,
         prep=prep,

@@ -11,6 +11,7 @@ from iaudit_backend.models import AuditRequest, Section
 from iaudit_backend.prep import prep, prep_rules_only
 
 from .state import RunState
+from .warmup import wait_warm
 
 
 async def prep_flow(st: RunState, req: AuditRequest, ctx) -> None:
@@ -52,6 +53,7 @@ async def claim_flow(st: RunState, req: AuditRequest, claim: AtomicClaim, ctx) -
         raise RuntimeError("prep did not complete")
     if st.link_ctx is None:  # no await between check and set: built exactly once
         st.link_ctx = build_link_context(req.transcript, st.prep, ctx)
+    await wait_warm(st, ctx.settings.warmup_max_wait_s)
     with st.span("link"):
         link = await link_one(claim, st.link_ctx, ctx)
     with st.span("check"):

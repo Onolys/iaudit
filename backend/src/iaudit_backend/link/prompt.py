@@ -119,6 +119,10 @@ def stage_block() -> str:
     return f"# Output schema\n\n{schema}\n\n# Examples\n\n" + "\n\n".join(shots)
 
 
+def stage_system_and_block() -> tuple[str, str]:
+    return common_system(), stage_block()
+
+
 def common_system() -> str:
     return SYSTEM_PATH.read_text(encoding="utf-8")
 

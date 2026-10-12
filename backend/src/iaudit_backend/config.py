@@ -85,9 +85,14 @@ class Settings(BaseSettings):
     link_call_timeout_s: float = 20
     check_call_timeout_s: float = 20
     pipeline_max_claims: int = 80
+    # Cache layout and warm-up (06 optional)
+    cache_layout: Literal["per_stage", "shared"] = "per_stage"
+    cache_warmup: bool = False  # live mode only; needs the shared layout
+    cache_min_prefix_tokens: int = 1024
+    warmup_max_wait_s: float = 2
     # Misc
     log_level: str = "INFO"
-    server_timing: bool = False
+    server_timing: bool = True
     pipeline: Literal["stub", "full"] = "full"
 
     @model_validator(mode="after")

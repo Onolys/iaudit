@@ -68,8 +68,10 @@ Set as `IAUDIT_<NAME>` environment variables. `Settings` in `config.py` also rea
 | `IAUDIT_LINK_CACHE_BREAKPOINTS` | `1` | `2` caches the transcript and the instruction block separately in whole-transcript mode. |
 | `IAUDIT_CHECK_RATE_RATIO` | `1.5` | When a claim names two or more accounts and two speakers give weekly rates that differ by at least this ratio, the claim is flagged for conflicting accounts even if both fall in one frequency bucket. |
 | `IAUDIT_CHECK_CONF_LOW`, `_MEDIUM`, `_HIGH` | `0.3`, `0.6`, `0.9` | What the verifier's low, medium and high confidence are worth against the floors `IAUDIT_CHECK_MIN_CONF_P0` (0.5) and `IAUDIT_CHECK_MIN_CONF_P1` (0.6). Must be in increasing order. |
+| `IAUDIT_CACHE_LAYOUT` | `per_stage` | `shared` gives the evidence-finding and checking stages one cached system-plus-transcript prefix (whole-transcript mode), with each stage's instructions cached after it. |
+| `IAUDIT_CACHE_WARMUP`, `IAUDIT_CACHE_MIN_PREFIX_TOKENS`, `IAUDIT_WARMUP_MAX_WAIT_S` | `false`, `1024`, `2` | With the shared layout in live mode, tiny calls at the start of an audit write those prefixes to the provider cache while claims are still being extracted. Skipped for transcripts under the minimum size. Stages wait at most the given seconds for it. |
 | `IAUDIT_PIPELINE_MAX_CLAIMS` | `80` | Claims audited per request. More are dropped and `input_truncated` is emitted. |
-| `IAUDIT_SERVER_TIMING` | `false` | When `true`, a 200 reply carries a `Server-Timing` header with durations only: `total`, then `prep`, `atomize`, `link`, `check`, `assemble` in milliseconds. |
+| `IAUDIT_SERVER_TIMING` | `true` | When `true`, a 200 reply carries a `Server-Timing` header with durations only: `total`, then `prep`, `atomize`, `link`, `check`, `assemble` in milliseconds. |
 | `IAUDIT_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins. |
 | `IAUDIT_CONTRACTS_DIR` | `docs/contracts` of the repo | Where the schemas are read. Environment only: not a `Settings` field, so `.env` does not set it. |
 | `IAUDIT_LOG_LEVEL` | `INFO` | Logging level. Logs carry counts and ids only, never text. |
