@@ -13,7 +13,7 @@ Source of truth: [PRD.md](PRD.md). Documents the landed backend, last. Docs desc
 | 2 | `docs/reference/backend-api.md` | 06 | done |
 | 3 | Architecture blurb, index links, mission check 7 wording | 2 | done |
 | 4 | Link check and no-transcript-text check | 1, 3 | done |
-| 5 | [OPTIONAL, gated] Optional docs | all core in every SP | todo |
+| 5 | [OPTIONAL, gated] Optional docs | all core in every SP | done |
 
 ## Task 1 — Backend README
 What it is / what it means: How to run the backend (R10 core, D1).

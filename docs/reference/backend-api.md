@@ -50,46 +50,10 @@ Only the origins in `IAUDIT_CORS_ORIGINS` (default `http://localhost:5173`) may 
 
 ## Settings
 
-Set as `IAUDIT_<NAME>` environment variables. `Settings` in `config.py` also reads a `.env` file in the directory the server starts in (normally `backend/`). Defaults come from `Settings`.
-
-| Variable | Default | Meaning |
-|---|---|---|
-| `IAUDIT_PIPELINE` | `full` | `full` runs the audit; `stub` returns a valid empty audit. |
-| `IAUDIT_LLM_MODE` | `live` | `live` calls providers; `fixture` replays recorded calls from `IAUDIT_FIXTURE_DIR`; `stub` makes every model call fail as unavailable. |
-| `IAUDIT_FIXTURE_DIR` | `tests/fixtures/llm` | Recorded calls for `fixture` mode. |
-| `IAUDIT_MODEL_CHEAP`, `_MID`, `_STRONG` | Haiku 4.5, Sonnet 5.5, Opus 5.5 | LiteLLM model ids for the three tiers. |
-| `IAUDIT_AUDIT_DEADLINE_S` | `60` | Hard cap for one audit. A startup warning is logged above 100. |
-| `IAUDIT_LLM_TIMEOUT_S`, `IAUDIT_LLM_MAX_RETRIES`, `IAUDIT_LLM_MAX_CONCURRENCY` | `30`, `1`, `20` | Per-call timeout, retries, and parallel calls. |
-| `IAUDIT_MAX_BODY_BYTES`, `IAUDIT_MAX_TURNS`, `IAUDIT_MAX_SECTIONS` | `2000000`, `2000`, `50` | Request limits. |
-| `IAUDIT_PREP_LLM` | `false` | When `true`, a cheap-tier model tags the few transcript turns the rules could not decide (question, correction, hypothetical). A failed or invalid chunk keeps the rule result. `IAUDIT_PREP_CHUNK_TURNS` (30) and `IAUDIT_PREP_CONTEXT_TURNS` (3) size the calls. If prep runs past `IAUDIT_PREP_SOFT_TIMEOUT_S` (10), the rules-only result is used. |
-| `IAUDIT_LINK_PER_SPEAKER_FLOOR`, `IAUDIT_LINK_MAX_SPEAKER_ADDS` | `2`, `4` | Evidence search adds the best turns of a speaker who has matches but fewer than the floor in the top results, up to the add cap in total. `0` turns it off. |
-| `IAUDIT_LINK_LATER_CORRECTION_CAP` | `3` | Pulls in later turns where the same speaker corrects themselves on the claim's topic. `0` turns it off. |
-| `IAUDIT_LINK_FUSION`, `IAUDIT_LINK_RRF_K` | `false`, `60` | Fuse the keyword ranking with a fuzzy-match ranking by reciprocal rank. |
-| `IAUDIT_LINK_CACHE_BREAKPOINTS` | `1` | `2` caches the transcript and the instruction block separately in whole-transcript mode. |
-| `IAUDIT_CHECK_RATE_RATIO` | `1.5` | When a claim names two or more accounts and two speakers give weekly rates that differ by at least this ratio, the claim is flagged for conflicting accounts even if both fall in one frequency bucket. |
-| `IAUDIT_CHECK_CONF_LOW`, `_MEDIUM`, `_HIGH` | `0.3`, `0.6`, `0.9` | What the verifier's low, medium and high confidence are worth against the floors `IAUDIT_CHECK_MIN_CONF_P0` (0.5) and `IAUDIT_CHECK_MIN_CONF_P1` (0.6). Must be in increasing order. |
-| `IAUDIT_CACHE_LAYOUT` | `per_stage` | `shared` gives the evidence-finding and checking stages one cached system-plus-transcript prefix (whole-transcript mode), with each stage's instructions cached after it. |
-| `IAUDIT_CACHE_WARMUP`, `IAUDIT_CACHE_MIN_PREFIX_TOKENS`, `IAUDIT_WARMUP_MAX_WAIT_S` | `false`, `1024`, `2` | With the shared layout in live mode, tiny calls at the start of an audit write those prefixes to the provider cache while claims are still being extracted. Skipped for transcripts under the minimum size. Stages wait at most the given seconds for it. |
-| `IAUDIT_PIPELINE_MAX_CLAIMS` | `80` | Claims audited per request. More are dropped and `input_truncated` is emitted. |
-| `IAUDIT_SERVER_TIMING` | `true` | When `true`, a 200 reply carries a `Server-Timing` header with durations only: `total`, then `prep`, `atomize`, `link`, `check`, `assemble` in milliseconds. |
-| `IAUDIT_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins. |
-| `IAUDIT_CONTRACTS_DIR` | `docs/contracts` of the repo | Where the schemas are read. Environment only: not a `Settings` field, so `.env` does not set it. |
-| `IAUDIT_LOG_LEVEL` | `INFO` | Logging level. Logs carry counts and ids only, never text. |
-
-Stage tuning knobs (`IAUDIT_ATOMIZE_*`, `IAUDIT_LINK_*`, `IAUDIT_CHECK_*`, per-stage `*_CALL_TIMEOUT_S`, `IAUDIT_ASSEMBLE_RESERVE_S`, `IAUDIT_MIN_CALL_S`, and similar) are listed in `Settings` and are not needed to run the service.
-
-**Provider keys.** The service reads the standard provider variables LiteLLM uses, for example `ANTHROPIC_API_KEY`. They are not `IAUDIT_*` settings and are never logged. With `IAUDIT_LLM_MODE=live` and no key present, the service starts, logs a warning, and audits fail with 503.
+Every `IAUDIT_*` setting, its default and its meaning is in [configuration.md](configuration.md). The few that decide how a request fails are the limits (`IAUDIT_MAX_BODY_BYTES`, `IAUDIT_MAX_TURNS`, `IAUDIT_MAX_SECTIONS`), the deadline (`IAUDIT_AUDIT_DEADLINE_S`, default 60 s) and the mode switches `IAUDIT_PIPELINE` and `IAUDIT_LLM_MODE`.
 
 ## Warnings
 
-`warnings` appears on every 200 reply. `status` is `partial` if and only if at least one `section_not_processed` warning is present.
-
-| Code | Emitted when |
-|---|---|
-| `section_not_processed` | A section produced no claims because the audit ran out of time, an internal error occurred, or no claim could be located in it. Carries `section_index`. |
-| `ambiguous_speaker` | A claim relies on a turn with no `role`. No speaker is assumed. Carries `claim_id`. |
-| `input_truncated` | More claims were found than `IAUDIT_PIPELINE_MAX_CLAIMS`; the extra claims were not audited. |
-| `span_out_of_range` | A claim or evidence span did not fit the input and was omitted. A safety net; not expected in normal runs. |
-| `other` | A claim was adjusted or omitted: its verdict changed because cited evidence could not be verified or conflicts with it; wording was changed to avoid reproducing transcript text (a quoted span of four or more words, a timestamp, or eight or more consecutive words from the transcript that the assessment does not itself contain; the last is `IAUDIT_COPY_NGRAM`, default `8`, `0` turns it off); the claim was not audited in time; it failed final validation; it overlapped another claim and was omitted, or was trimmed to remove the overlap (`IAUDIT_OVERLAP_TRIM`, default `true`); or it could not be located in the text. |
+Every 200 reply carries a `warnings` list, and `status` is `partial` if and only if a `section_not_processed` warning is present. When each code is emitted: [warnings.md](warnings.md).
 
 A claim that stalls on a model failure or the deadline is returned with verdict `insufficient_evidence`, not dropped.

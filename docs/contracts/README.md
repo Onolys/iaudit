@@ -2,7 +2,7 @@
 
 Source of truth for the evidence-audit request and response. The frontend owns this contract. The backend implements it.
 
-This is the JSON **body** of one synchronous call. HTTP path, method, and auth are out of scope. There is no streaming and no background job: one request, one response.
+This is the JSON **body** of one synchronous call. HTTP path, method, and auth are out of scope. The backend's HTTP path, status codes and CORS are in [../reference/backend-api.md](../reference/backend-api.md). There is no streaming and no background job: one request, one response.
 
 | File | What it is |
 |---|---|
