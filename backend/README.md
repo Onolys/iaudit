@@ -54,3 +54,5 @@ Runs the ADHD faithful fixture and its 8 variants through `POST /v1/audit`, prin
 uv run python -m eval.smoke
 uv run python -m eval.smoke --base-url http://localhost:8000
 ```
+
+More evaluation modes (gold, linked, e2e, replay): [eval/README.md](eval/README.md).

@@ -2,14 +2,17 @@
 
 import json
 import re
+import tomllib
 from pathlib import Path
 
 from iaudit_backend.prep.prompt import EXAMPLES as PREP_EXAMPLES
 
 ROOT = Path(__file__).resolve().parents[1]
-PROMPTS = ROOT / "src" / "iaudit_backend" / "prompts"
-EVAL_DIRS = [ROOT / "eval" / "data", ROOT / "tests" / "data"]
-N = 8
+SRC = ROOT / "src" / "iaudit_backend"
+PROMPTS = SRC / "prompts"
+CONFIG = tomllib.loads((ROOT / "eval" / "leakage.toml").read_text(encoding="utf-8"))
+EVAL_DIRS = [ROOT / d for d in CONFIG["scored_dirs"]]
+N = CONFIG["window"]
 _WORD = re.compile(r"[^\W_]+")
 
 
@@ -36,9 +39,13 @@ def shared(a_texts, b_texts):
     return windows(a_texts) & windows(b_texts)
 
 
+def prompt_files():
+    return sorted(p for g in CONFIG["prompt_globs"] for p in SRC.glob(g))
+
+
 def prompt_texts():
     texts = list(PREP_EXAMPLES)
-    for p in sorted(PROMPTS.glob("*_fewshot.json")):
+    for p in prompt_files():
         texts += list(strings(json.loads(p.read_text(encoding="utf-8"))))
     return texts
 
@@ -84,3 +91,30 @@ def test_link_and_check_fewshot_files_are_scanned_and_clean():
     for name in ("link_fewshot.json", "check_fewshot.json"):
         texts = list(strings(json.loads((PROMPTS / name).read_text(encoding="utf-8"))))
         assert shared(texts, eval_texts()) == set(), name
+
+
+def test_config_names_the_eight_word_window_and_includes_the_atomize_fewshot():
+    assert N == 8
+    assert "atomize_fewshot.json" in {p.name for p in prompt_files()}
+
+
+def speakers(obj):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k in ("speaker", "subject_speaker", "source") and isinstance(v, str):
+                yield v
+            yield from speakers(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from speakers(v)
+
+
+def test_example_speakers_never_use_the_scored_ids():
+    scored = set(CONFIG["scored_speaker_ids"])
+    for p in prompt_files():
+        used = set(speakers(json.loads(p.read_text(encoding="utf-8"))))
+        assert not used & scored, (p.name, used & scored)
+
+
+def test_a_seeded_scored_speaker_id_is_caught():
+    assert set(speakers({"turns": [{"speaker": "alex1"}]})) & set(CONFIG["scored_speaker_ids"])
