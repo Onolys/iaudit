@@ -17,7 +17,7 @@ Source of truth: [PRD.md](PRD.md). Rules-only dialogue acts and question-answer 
 | 6 | `atomize_section` / `atomize_sections` call | 3, 5, 02/T2 | done |
 | 7 | Span resolution, validation, one retry, section failures | 6 | done |
 | 8 | Counts-only logging and sentinel test | 7 | done |
-| 9 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
+| 9 | [OPTIONAL, gated] Optional items | all core in every SP | done |
 
 ## Task 1 — Turn index and dialogue acts
 What it is / what it means: Deterministic per-turn acts with no LLM (R1, R2, D3, D5).

@@ -16,7 +16,7 @@ Source of truth: [PRD.md](PRD.md). The async `FullPipeline` that runs prep ‖ a
 | 5 | Basic metrics and `audit_done` log line | 2 | done |
 | 6 | Default pipeline flipped to `full`; `DeadlineExceeded` | 4 | done |
 | 7 | ADHD faithful + 8 variants replay through `FullPipeline` | 6, 07a/T3 | done |
-| 8 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
+| 8 | [OPTIONAL, gated] Optional items | all core in every SP | done |
 
 ## Task 1 — Budget helpers and entry points
 What it is / what it means: The interfaces 06 needs from 01-05 (R8, R2).

@@ -18,7 +18,7 @@ Source of truth: [PRD.md](PRD.md). For each linked claim, decide verdict, concer
 | 7 | Evidence roles, decision table D0-D9, dedup | 4, 5, 6 | done |
 | 8 | Explanation templates and `suggested_revision` | 7 | done |
 | 9 | Failure handling, logging, config, variant-map test | 8 | done |
-| 10 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
+| 10 | [OPTIONAL, gated] Optional items | all core in every SP | done |
 
 ## Task 1 — Entry points
 What it is / what it means: The checker surface 06 calls (R1).

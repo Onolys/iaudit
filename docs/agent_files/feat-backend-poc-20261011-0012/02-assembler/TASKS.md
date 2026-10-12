@@ -18,7 +18,7 @@ Source of truth: [PRD.md](PRD.md). Turns internal drafts from 03-05 into a contr
 | 7 | Warnings and status | 5 | done |
 | 8 | Final validation: `check_rules` and schema, quarantine once | 6, 7 | done |
 | 9 | Reproduce `examples/response.json` spans | 8 | done |
-| 10 | [OPTIONAL, gated] Optional items | all core in every SP | todo |
+| 10 | [OPTIONAL, gated] Optional items | all core in every SP | done |
 
 ## Task 1 — Draft models and entry point
 What it is / what it means: The internal input model 03-06 produce (Inputs table, D-11).

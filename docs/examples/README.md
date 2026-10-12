@@ -8,4 +8,7 @@ Runnable public-API usage examples.
 - [real/](real/): 10 real (role-played) PriMock57 consultations with evaluator-derived answer keys, for testing the auditor.
 - [../contracts/examples/](../contracts/examples/): the single worked example that belongs to the contract itself.
 
-Placeholder beyond those pointers.
+- [curl.md](curl.md): call the backend with curl, including an error case.
+- [python_client.py](python_client.py): a standard-library client that prints a verdict per claim.
+
+`IAUDIT_PIPELINE=stub` returns an empty valid audit without a key; real output needs provider keys.
