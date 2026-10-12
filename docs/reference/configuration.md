@@ -29,6 +29,7 @@ Values here are the defaults. Tuning values (thresholds, caps, windows) are gues
 | `IAUDIT_LLM_MAX_RETRIES` | `1` | Retries of a failed model call (timeout, bad JSON, provider error). |
 | `IAUDIT_LLM_MAX_CONCURRENCY` | `20` | Model calls in flight at once, across the whole service. |
 | `IAUDIT_LLM_MODE` | `live` | `live` calls providers; `fixture` replays recordings from `fixture_dir`; `stub` makes every model call fail as unavailable. |
+| `IAUDIT_LLM_RESPONSE_FORMAT` | `json_object` | `json_object` relies on the prompt for the schema and validates replies here. `json_schema` asks the provider for strict structured output; Haiku 5.5 often returns empty claims with it. |
 | `IAUDIT_FIXTURE_DIR` | `tests/fixtures/llm` | Recordings for `fixture` mode. |
 
 ## Orchestration
@@ -65,7 +66,7 @@ Values here are the defaults. Tuning values (thresholds, caps, windows) are gues
 | Variable | Default | Meaning |
 |---|---|---|
 | `IAUDIT_ATOMIZE_MAX_CLAIMS` | `30` | Most claims asked of the atomizer per section. |
-| `IAUDIT_ATOMIZE_MAX_TOKENS` | `4000` | Output token cap for the atomizer call. |
+| `IAUDIT_ATOMIZE_MAX_TOKENS` | `8000` | Output token cap for the atomizer call. |
 | `IAUDIT_ATOMIZE_RETRY` | `true` | Retry a section once when the atomizer answer fails validation. |
 
 ## Link

@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     llm_max_concurrency: int = 20
     # Mode
     llm_mode: Literal["live", "fixture", "stub"] = "live"
+    # json_object: the prompt carries the schema and replies are validated here. json_schema asks
+    # the provider for strict structured output; Haiku 5.5 often returns empty claims with it.
+    llm_response_format: Literal["json_object", "json_schema"] = "json_object"
     fixture_dir: str = "tests/fixtures/llm"
     # Assembler (SP02)
     fuzzy_threshold: float = 90
@@ -38,7 +41,7 @@ class Settings(BaseSettings):
     cross_turn_slack: int = 0
     # Atomizer (SP03)
     atomize_max_claims: int = 30
-    atomize_max_tokens: int = 4000
+    atomize_max_tokens: int = 8000
     atomize_retry: bool = True
     # Link (SP04)
     link_mode: Literal["auto", "whole", "shortlist"] = "auto"

@@ -18,7 +18,7 @@ OVERLAP = "An overlapping claim was omitted to keep claim spans from overlapping
 def section_warning(index: int, reason: str) -> dict:
     return {
         "code": "section_not_processed",
-        "message": NOT_PROCESSED[reason].format(i=index),
+        "message": NOT_PROCESSED[reason].format(i=index + 1),
         "section_index": index,
     }
 
@@ -36,7 +36,7 @@ def event_warning(ev: ClaimEvent, id_of: dict[str, str]) -> dict:
     if ev.kind == "unlocatable":
         return {
             "code": "other",
-            "message": UNLOCATABLE.format(i=ev.section_index),
+            "message": UNLOCATABLE.format(i=ev.section_index + 1),
             "section_index": ev.section_index,
         }
     if ev.kind == "overlap_trimmed":

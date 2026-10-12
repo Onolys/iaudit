@@ -14,7 +14,7 @@ export function WarningsBanner({ response }: { response: AuditResponse }) {
           {response.warnings.map((w, i) => (
             <li key={i}>
               <strong>{w.code.replaceAll("_", " ")}</strong>: {w.message}
-              {w.section_index !== undefined ? ` (Section ${w.section_index})` : ""}
+              {w.section_index !== undefined ? ` (Section ${w.section_index + 1})` : ""}
               {w.claim_id !== undefined ? ` (claim ${w.claim_id})` : ""}
             </li>
           ))}

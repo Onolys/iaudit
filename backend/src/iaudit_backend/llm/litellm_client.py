@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import sys
 import time
 from collections.abc import Awaitable, Callable
@@ -20,6 +21,15 @@ RETRY_MARGIN_S = 1.0
 MAX_CACHE_PREFIXES = 2
 # Errors that retrying cannot fix.
 _NO_RETRY = ("AuthenticationError", "PermissionDeniedError", "NotFoundError", "BadRequestError")
+
+
+_FENCE = re.compile(r"^\s*```(?:json)?\s*(.*?)\s*```\s*$", re.DOTALL)
+
+
+def _unfence(text: str) -> str:
+    """Some models wrap JSON replies in a markdown fence even when asked for a bare object."""
+    m = _FENCE.match(text)
+    return m.group(1) if m else text
 
 
 def _get(obj: Any, name: str, default: Any = 0) -> Any:
@@ -76,6 +86,18 @@ class LiteLLMClient:
             self._acompletion = litellm.acompletion
         return self._acompletion
 
+    def _response_format(self, req: LLMRequest) -> dict[str, Any]:
+        if self._s.llm_response_format == "json_object":
+            return {"type": "json_object"}
+        return {
+            "type": "json_schema",
+            "json_schema": {
+                "name": req.response_model.__name__,
+                "schema": req.response_model.model_json_schema(),
+                "strict": True,
+            },
+        }
+
     def _kwargs(self, req: LLMRequest, timeout_s: float) -> dict[str, Any]:
         prefixes = req.cache_prefixes or ([req.cache_prefix] if req.cache_prefix else [])
         if prefixes:
@@ -91,17 +113,13 @@ class LiteLLMClient:
                 {"role": "system", "content": system},
                 {"role": "user", "content": req.user},
             ],
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": req.response_model.__name__,
-                    "schema": req.response_model.model_json_schema(),
-                    "strict": True,
-                },
-            },
+            "response_format": self._response_format(req),
             "max_tokens": req.max_tokens,
             "temperature": req.temperature,
             "timeout": timeout_s,
+            "drop_params": True,  # newer models reject temperature=0
+            # Haiku 5.5 thinks by default and can spend all of max_tokens on it, leaving no JSON.
+            "thinking": {"type": "disabled"},
             "num_retries": 0,
         }
 
@@ -173,7 +191,7 @@ class LiteLLMClient:
         usage = _usage(resp)
         try:
             content = resp.choices[0].message.content
-            parsed = req.response_model.model_validate(json.loads(content))
+            parsed = req.response_model.model_validate(json.loads(_unfence(content)))
         except (ValueError, TypeError, AttributeError, IndexError, ValidationError) as exc:
             raise LLMBadOutput("LLM output was not valid for the schema") from exc
         return parsed, usage

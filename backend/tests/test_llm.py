@@ -72,10 +72,21 @@ async def test_success_captures_usage_and_latency():
     assert res.attempts == 1 and res.latency_ms >= 0
     kw = fake.calls[0]
     assert kw["num_retries"] == 0 and kw["model"] == settings().model_cheap
-    assert kw["response_format"]["type"] == "json_schema"
+    assert kw["response_format"] == {"type": "json_object"}
+    assert kw["drop_params"] is True
+    assert kw["thinking"] == {"type": "disabled"}
     snap = m.snapshot()
     assert snap["calls"] == 1 and snap["by_tier"]["cheap"]["input_tokens"] == 10
     assert "hello" not in json.dumps(snap)
+
+
+async def test_json_schema_format_is_opt_in():
+    fake = Fake(completion('{"answer": "ok"}'))
+    await LiteLLMClient(
+        settings(llm_response_format="json_schema"), acompletion=fake
+    ).complete_json(req())
+    rf = fake.calls[0]["response_format"]
+    assert rf["type"] == "json_schema" and rf["json_schema"]["strict"] is True
 
 
 async def test_cache_control_present_only_with_prefix():
@@ -85,6 +96,12 @@ async def test_cache_control_present_only_with_prefix():
     await c.complete_json(req())
     assert "cache_control" in json.dumps(fake.calls[0]["messages"])
     assert "cache_control" not in json.dumps(fake.calls[1]["messages"])
+
+
+async def test_fenced_json_reply_is_accepted():
+    fake = Fake(completion('```json\n{"answer": "ok"}\n```'))
+    res = await LiteLLMClient(settings(), acompletion=fake).complete_json(req())
+    assert res.parsed == Out(answer="ok") and res.attempts == 1
 
 
 async def test_bad_json_retries_once_then_raises():

@@ -4,8 +4,11 @@ interface Props {
   down?: { hidden: number; onClick: () => void };
 }
 
-const label = (dir: "above" | "below", hidden: number) =>
-  `Show 3 more turns ${dir} (${hidden} hidden)`;
+const STEP = 3;
+const label = (dir: "above" | "below", hidden: number) => {
+  const n = Math.min(STEP, hidden);
+  return `Show ${n} more ${n === 1 ? "turn" : "turns"} ${dir} (${hidden} hidden)`;
+};
 
 export function ExpandControl({ up, down }: Props) {
   const up_ = up && up.hidden > 0 ? up : undefined;

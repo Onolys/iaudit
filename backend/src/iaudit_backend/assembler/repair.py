@@ -19,13 +19,13 @@ EXPLANATIONS = {
     ),
     Verdict.contradicted: "The cited excerpts conflict with this claim.",
 }
-STALLED_EXPLANATION = "This claim could not be audited in the available time."
+STALLED_EXPLANATION = "This claim could not be audited."
 GENERIC_OUT_OF_SCOPE = "This statement cannot be checked against the supplied interview."
 UNSUPPORTED_CONCERN = "Nothing verifiable in the supplied interview establishes this claim."
 CONTRADICTORY_CONCERN = "An excerpt in the supplied interview conflicts with this claim."
 CHANGED_WARNING = "Verdict was adjusted because cited evidence could not be verified."
 CONFLICT_WARNING = "Verdict was adjusted because a contradicting excerpt conflicts with it."
-STALLED_WARNING = "Claim was not audited in the available time."
+STALLED_WARNING = "Claim could not be audited."
 
 
 @dataclass
