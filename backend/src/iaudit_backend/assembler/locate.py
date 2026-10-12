@@ -120,8 +120,11 @@ def _locate_one(text: str, needle: str, hint: int | None, cfg: Settings) -> Matc
 
 def locate(text: str, needle: str, hint: int | None, cfg: Settings) -> Match | None:
     """Find `needle` in `text`. Offsets are code points in `text` exactly as received."""
+    whole = _locate_one(text, needle, hint, cfg)
+    if whole is not None and whole.tier != "fuzzy":
+        return whole
     if not _ELLIPSIS.search(needle):
-        return _locate_one(text, needle, hint, cfg)
+        return whole
     frags = [f.strip() for f in _ELLIPSIS.split(needle) if f.strip()]
     if not frags:
         return None

@@ -194,3 +194,20 @@ def test_report_has_no_canary_text(example_request):
 
 def test_assembly_error_is_runtime_error():
     assert issubclass(AssemblyError, RuntimeError)
+
+
+def test_supported_claim_whose_only_quote_has_a_verbatim_ellipsis_stays_supported(example_request):
+    quote = "I... I just forget what I was doing."
+    example_request["transcript"][5]["text"] = (
+        f"In the morning, when I get to my desk at the office, {quote}"
+    )
+    d = cd(
+        "a",
+        "The patient has trouble at work.",
+        verdict="supported",
+        evidence=[ev("e1", "supporting", (5, quote))],
+    )
+    out = run(example_request, InternalAudit(claims=[d]))
+    c = out.response["claims"][0]
+    assert c["verdict"] == "supported"
+    assert "unsupported_claim" not in [x["type"] for x in c.get("concerns", [])]
