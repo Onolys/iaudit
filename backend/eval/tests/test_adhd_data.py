@@ -19,7 +19,7 @@ def test_committed_request_validates_against_schema(fx):
 
 def test_rebuild_is_byte_identical_to_committed(tmp_path):
     main(tmp_path)
-    built = sorted(p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*.json"))
+    built = sorted(p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*.json*"))
     assert built == sorted(build())
     for rel in built:
         assert (tmp_path / rel).read_bytes() == (DATA / rel).read_bytes(), rel
@@ -28,7 +28,7 @@ def test_rebuild_is_byte_identical_to_committed(tmp_path):
 def test_no_stray_generated_files():
     on_disk = {
         p.relative_to(DATA).as_posix()
-        for sub in ("requests", "expected")
+        for sub in ("requests", "expected", "gold")
         for p in (DATA / sub).glob("*")
     }
     assert on_disk == set(build())

@@ -1,0 +1,746 @@
+{
+ "note": "Hand-authored gold for the ADHD set. Controls by faithful sentence; targets by variant. Slots follow AtomicClaim; evidence are whole turns.",
+ "controls": {
+  "S1": [
+   {
+    "claim_text": "Alex reports losing attention in most meetings, about three to four times a week",
+    "slots": {
+     "proposition": "Alex loses attention in most meetings, about three to four times a week.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "Alex",
+     "subject_speaker": "alex1",
+     "reported_by": [
+      {
+       "source": "self",
+       "speaker": "alex1"
+      }
+     ],
+     "polarity": "affirmed",
+     "quantities": [
+      {
+       "kind": "frequency",
+       "raw": "most meetings",
+       "bucket": "most",
+       "rate_per_week": null
+      },
+      {
+       "kind": "frequency",
+       "raw": "about three to four times a week",
+       "bucket": "often",
+       "rate_per_week": 3.5
+      }
+     ],
+     "timeframe": "current",
+     "timeframe_explicit": false,
+     "hedged": true,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 3,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     },
+     {
+      "turn": 1,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting",
+       "qualifying"
+      ],
+      "required": false
+     }
+    ],
+    "status": "approved"
+   }
+  ],
+  "S2": [
+   {
+    "claim_text": "He reports misplacing his phone daily",
+    "slots": {
+     "proposition": "Alex misplaces his phone daily.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "Alex",
+     "subject_speaker": "alex1",
+     "reported_by": [
+      {
+       "source": "self",
+       "speaker": "alex1"
+      }
+     ],
+     "polarity": "affirmed",
+     "quantities": [
+      {
+       "kind": "frequency",
+       "raw": "daily",
+       "bucket": "always",
+       "rate_per_week": 7.0
+      }
+     ],
+     "timeframe": "current",
+     "timeframe_explicit": false,
+     "hedged": true,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 7,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     }
+    ],
+    "status": "approved"
+   },
+   {
+    "claim_text": "has a system for keys",
+    "slots": {
+     "proposition": "Alex has a system for keeping track of his keys.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "Alex",
+     "subject_speaker": "alex1",
+     "reported_by": [
+      {
+       "source": "self",
+       "speaker": "alex1"
+      }
+     ],
+     "polarity": "affirmed",
+     "quantities": [],
+     "timeframe": "current",
+     "timeframe_explicit": false,
+     "hedged": false,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 9,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     }
+    ],
+    "status": "approved"
+   }
+  ],
+  "S3": [
+   {
+    "claim_text": "He describes some difficulty finishing household projects",
+    "slots": {
+     "proposition": "Alex has some difficulty finishing household projects.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "Alex",
+     "subject_speaker": "alex1",
+     "reported_by": [
+      {
+       "source": "self",
+       "speaker": "alex1"
+      }
+     ],
+     "polarity": "affirmed",
+     "quantities": [
+      {
+       "kind": "severity",
+       "raw": "some difficulty",
+       "bucket": "mild",
+       "rate_per_week": null
+      }
+     ],
+     "timeframe": "current",
+     "timeframe_explicit": false,
+     "hedged": false,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 11,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     }
+    ],
+    "status": "approved"
+   },
+   {
+    "claim_text": "the current unfinished project is partly because they ran out of paint",
+    "slots": {
+     "proposition": "The current unfinished project is partly due to running out of paint.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "the current unfinished project",
+     "subject_speaker": null,
+     "reported_by": [
+      {
+       "source": "unspecified",
+       "speaker": null
+      }
+     ],
+     "polarity": "affirmed",
+     "quantities": [],
+     "timeframe": "current",
+     "timeframe_explicit": false,
+     "hedged": false,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 11,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     }
+    ],
+    "status": "approved"
+   }
+  ],
+  "S4": [
+   {
+    "claim_text": "His partner reports he forgets agreed errands about twice a month",
+    "slots": {
+     "proposition": "Alex forgets agreed errands about twice a month, according to his partner.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "he",
+     "subject_speaker": "alex1",
+     "reported_by": [
+      {
+       "source": "informant",
+       "speaker": "sam1"
+      }
+     ],
+     "polarity": "affirmed",
+     "quantities": [
+      {
+       "kind": "frequency",
+       "raw": "about twice a month",
+       "bucket": "sometimes",
+       "rate_per_week": 0.46
+      }
+     ],
+     "timeframe": "current",
+     "timeframe_explicit": false,
+     "hedged": true,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 19,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     },
+     {
+      "turn": 23,
+      "role": "qualifying",
+      "roles_ok": [
+       "qualifying",
+       "supporting"
+      ],
+      "required": false
+     }
+    ],
+    "status": "approved"
+   },
+   {
+    "claim_text": "Alex estimates once a month",
+    "slots": {
+     "proposition": "Alex estimates he forgets agreed errands once a month.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "Alex",
+     "subject_speaker": "alex1",
+     "reported_by": [
+      {
+       "source": "self",
+       "speaker": "alex1"
+      }
+     ],
+     "polarity": "affirmed",
+     "quantities": [
+      {
+       "kind": "frequency",
+       "raw": "once a month",
+       "bucket": "sometimes",
+       "rate_per_week": 0.23
+      }
+     ],
+     "timeframe": "current",
+     "timeframe_explicit": false,
+     "hedged": true,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 23,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     }
+    ],
+    "status": "approved"
+   }
+  ],
+  "S5": [
+   {
+    "claim_text": "Childhood report cards repeatedly noted daydreaming and unfinished work",
+    "slots": {
+     "proposition": "Childhood report cards repeatedly noted daydreaming and unfinished work.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "Childhood report cards",
+     "subject_speaker": null,
+     "reported_by": [
+      {
+       "source": "unspecified",
+       "speaker": null
+      }
+     ],
+     "polarity": "affirmed",
+     "quantities": [
+      {
+       "kind": "frequency",
+       "raw": "repeatedly",
+       "bucket": "often",
+       "rate_per_week": null
+      }
+     ],
+     "timeframe": "childhood",
+     "timeframe_explicit": true,
+     "hedged": false,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 15,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     }
+    ],
+    "status": "approved"
+   }
+  ],
+  "S6": [
+   {
+    "claim_text": "He received a review comment about seeming disengaged in meetings",
+    "slots": {
+     "proposition": "Alex received a review comment about seeming disengaged in meetings.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "Alex",
+     "subject_speaker": "alex1",
+     "reported_by": [
+      {
+       "source": "unspecified",
+       "speaker": null
+      }
+     ],
+     "polarity": "affirmed",
+     "quantities": [],
+     "timeframe": "past",
+     "timeframe_explicit": false,
+     "hedged": false,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 25,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     }
+    ],
+    "status": "approved"
+   }
+  ],
+  "S7": [
+   {
+    "claim_text": "He denies careless mistakes at work",
+    "slots": {
+     "proposition": "Alex does not make careless mistakes at work.",
+     "scope": "in_scope",
+     "oos_category": null,
+     "subject_text": "Alex",
+     "subject_speaker": "alex1",
+     "reported_by": [
+      {
+       "source": "self",
+       "speaker": "alex1"
+      }
+     ],
+     "polarity": "negated",
+     "quantities": [],
+     "timeframe": "current",
+     "timeframe_explicit": false,
+     "hedged": false,
+     "links": []
+    },
+    "evidence": [
+     {
+      "turn": 5,
+      "role": "supporting",
+      "roles_ok": [
+       "supporting"
+      ],
+      "required": true
+     }
+    ],
+    "status": "approved"
+   }
+  ]
+ },
+ "targets": {
+  "v1": {
+   "claim_text": "Alex loses attention in every meeting, several times a day",
+   "slots": {
+    "proposition": "Alex loses attention in every meeting, several times a day.",
+    "scope": "in_scope",
+    "oos_category": null,
+    "subject_text": "Alex",
+    "subject_speaker": null,
+    "reported_by": [
+     {
+      "source": "unspecified",
+      "speaker": null
+     }
+    ],
+    "polarity": "affirmed",
+    "quantities": [
+     {
+      "kind": "frequency",
+      "raw": "every meeting",
+      "bucket": "always",
+      "rate_per_week": null
+     },
+     {
+      "kind": "frequency",
+      "raw": "several times a day",
+      "bucket": "always",
+      "rate_per_week": null
+     }
+    ],
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "links": []
+   },
+   "evidence": [
+    {
+     "turn": 3,
+     "role": "supporting",
+     "roles_ok": [
+      "supporting",
+      "qualifying"
+     ],
+     "required": true
+    }
+   ],
+   "status": "approved"
+  },
+  "v2": {
+   "claim_text": "He makes frequent careless mistakes in reports",
+   "slots": {
+    "proposition": "Alex makes frequent careless mistakes in reports.",
+    "scope": "in_scope",
+    "oos_category": null,
+    "subject_text": "He",
+    "subject_speaker": null,
+    "reported_by": [
+     {
+      "source": "unspecified",
+      "speaker": null
+     }
+    ],
+    "polarity": "affirmed",
+    "quantities": [
+     {
+      "kind": "frequency",
+      "raw": "frequent",
+      "bucket": "often",
+      "rate_per_week": null
+     }
+    ],
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "links": []
+   },
+   "evidence": [
+    {
+     "turn": 5,
+     "role": "contradicting",
+     "roles_ok": [
+      "contradicting"
+     ],
+     "required": true
+    }
+   ],
+   "status": "approved"
+  },
+  "v3": {
+   "claim_text": "He frequently forgets appointments",
+   "slots": {
+    "proposition": "Alex frequently forgets appointments.",
+    "scope": "in_scope",
+    "oos_category": null,
+    "subject_text": "He",
+    "subject_speaker": null,
+    "reported_by": [
+     {
+      "source": "unspecified",
+      "speaker": null
+     }
+    ],
+    "polarity": "affirmed",
+    "quantities": [
+     {
+      "kind": "frequency",
+      "raw": "frequently",
+      "bucket": "often",
+      "rate_per_week": null
+     }
+    ],
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "links": []
+   },
+   "evidence": [
+    {
+     "turn": 21,
+     "role": "contradicting",
+     "roles_ok": [
+      "contradicting"
+     ],
+     "required": true
+    }
+   ],
+   "status": "approved"
+  },
+  "v4": {
+   "claim_text": "He is easily distracted by his surroundings",
+   "slots": {
+    "proposition": "Alex is easily distracted by his surroundings.",
+    "scope": "in_scope",
+    "oos_category": null,
+    "subject_text": "He",
+    "subject_speaker": null,
+    "reported_by": [
+     {
+      "source": "unspecified",
+      "speaker": null
+     }
+    ],
+    "polarity": "affirmed",
+    "quantities": [],
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "links": []
+   },
+   "evidence": [
+    {
+     "turn": 12,
+     "role": "qualifying",
+     "roles_ok": [
+      "qualifying"
+     ],
+     "required": false
+    },
+    {
+     "turn": 13,
+     "role": "qualifying",
+     "roles_ok": [
+      "qualifying"
+     ],
+     "required": false
+    }
+   ],
+   "status": "approved"
+  },
+  "v5": {
+   "claim_text": "He currently forgets work assignments weekly",
+   "slots": {
+    "proposition": "Alex currently forgets work assignments weekly.",
+    "scope": "in_scope",
+    "oos_category": null,
+    "subject_text": "He",
+    "subject_speaker": null,
+    "reported_by": [
+     {
+      "source": "unspecified",
+      "speaker": null
+     }
+    ],
+    "polarity": "affirmed",
+    "quantities": [
+     {
+      "kind": "frequency",
+      "raw": "weekly",
+      "bucket": "often",
+      "rate_per_week": 1.0
+     }
+    ],
+    "timeframe": "current",
+    "timeframe_explicit": true,
+    "hedged": false,
+    "links": []
+   },
+   "evidence": [
+    {
+     "turn": 17,
+     "role": "qualifying",
+     "roles_ok": [
+      "qualifying"
+     ],
+     "required": true
+    }
+   ],
+   "status": "proposed"
+  },
+  "v6": {
+   "claim_text": "Both Alex and his partner agree he forgets errands about twice a month",
+   "slots": {
+    "proposition": "Alex and his partner both say Alex forgets errands about twice a month.",
+    "scope": "in_scope",
+    "oos_category": null,
+    "subject_text": "he",
+    "subject_speaker": "alex1",
+    "reported_by": [
+     {
+      "source": "self",
+      "speaker": "alex1"
+     },
+     {
+      "source": "informant",
+      "speaker": "sam1"
+     }
+    ],
+    "polarity": "affirmed",
+    "quantities": [
+     {
+      "kind": "frequency",
+      "raw": "about twice a month",
+      "bucket": "sometimes",
+      "rate_per_week": 0.46
+     }
+    ],
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": true,
+    "links": []
+   },
+   "evidence": [
+    {
+     "turn": 19,
+     "role": "supporting",
+     "roles_ok": [
+      "supporting"
+     ],
+     "required": true
+    },
+    {
+     "turn": 23,
+     "role": "contradicting",
+     "roles_ok": [
+      "contradicting",
+      "qualifying"
+     ],
+     "required": true
+    }
+   ],
+   "status": "proposed"
+  },
+  "v7": {
+   "claim_text": "The unfinished bathroom shows his difficulty completing tasks",
+   "slots": {
+    "proposition": "The unfinished bathroom shows Alex has difficulty completing tasks.",
+    "scope": "in_scope",
+    "oos_category": null,
+    "subject_text": "The unfinished bathroom",
+    "subject_speaker": null,
+    "reported_by": [
+     {
+      "source": "unspecified",
+      "speaker": null
+     }
+    ],
+    "polarity": "affirmed",
+    "quantities": [],
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "links": []
+   },
+   "evidence": [
+    {
+     "turn": 11,
+     "role": "qualifying",
+     "roles_ok": [
+      "qualifying",
+      "supporting"
+     ],
+     "required": true
+    }
+   ],
+   "status": "proposed"
+  },
+  "v8": {
+   "claim_text": "His distractibility caused a negative performance review",
+   "slots": {
+    "proposition": "Alex's distractibility caused a negative performance review.",
+    "scope": "in_scope",
+    "oos_category": null,
+    "subject_text": "His distractibility",
+    "subject_speaker": null,
+    "reported_by": [
+     {
+      "source": "unspecified",
+      "speaker": null
+     }
+    ],
+    "polarity": "affirmed",
+    "quantities": [],
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "links": []
+   },
+   "evidence": [
+    {
+     "turn": 25,
+     "role": "qualifying",
+     "roles_ok": [
+      "qualifying",
+      "supporting"
+     ],
+     "required": true
+    }
+   ],
+   "status": "proposed"
+  }
+ }
+}

@@ -23,9 +23,9 @@ def request(fx):
     return json.loads(build()[f"requests/{fx}.json"])
 
 
-def test_nine_expected_files():
+def test_nine_expected_files_plus_the_optional_noroles_variant():
     assert sorted(k for k in build() if k.startswith("expected/")) == sorted(
-        f"expected/{f}.json" for f in FIXTURES
+        f"expected/{f}.json" for f in [*FIXTURES, "v4-noroles"]
     )
 
 

@@ -1,0 +1,13 @@
+{
+ "fixture": "adhd-v4-noroles",
+ "target_text": "He is easily distracted by his surroundings.",
+ "verdict": "insufficient_evidence",
+ "concerns_required": [
+  "unsupported_claim"
+ ],
+ "concerns_allowed": [],
+ "explanation_contains": [],
+ "expect_warnings": [
+  "ambiguous_speaker"
+ ]
+}
