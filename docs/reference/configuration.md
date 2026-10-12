@@ -66,7 +66,7 @@ Values here are the defaults. Tuning values (thresholds, caps, windows) are gues
 | Variable | Default | Meaning |
 |---|---|---|
 | `IAUDIT_ATOMIZE_MAX_CLAIMS` | `30` | Most claims asked of the atomizer per section. |
-| `IAUDIT_ATOMIZE_MAX_TOKENS` | `8000` | Output token cap for the atomizer call. |
+| `IAUDIT_ATOMIZE_MAX_TOKENS` | `16000` | Output token cap for the atomizer call. Haiku 5.5 allows up to 128000 output tokens, but `atomize_call_timeout_s` (25 s) ends the call first on long outputs. |
 | `IAUDIT_ATOMIZE_RETRY` | `true` | Retry a section once when the atomizer answer fails validation. |
 
 ## Link

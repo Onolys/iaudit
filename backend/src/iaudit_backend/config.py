@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     cross_turn_slack: int = 0
     # Atomizer (SP03)
     atomize_max_claims: int = 30
-    atomize_max_tokens: int = 8000
+    atomize_max_tokens: int = 16000
     atomize_retry: bool = True
     # Link (SP04)
     link_mode: Literal["auto", "whole", "shortlist"] = "auto"

@@ -49,7 +49,7 @@ async def test_request_shape(make_ctx):
     assert (req.tier, req.call_tag, req.temperature) == ("mid", "atomize", 0.0)
     assert req.response_model is AtomizerOutput
     assert req.cache_prefix == build_cache_prefix(30)
-    assert req.max_tokens == 8000
+    assert req.max_tokens == 16000
     assert req.deadline == ctx.deadline
     assert 0 < req.timeout_s <= ctx.settings.llm_timeout_s
     assert "Alex forgets things." in req.user and "alex1" in req.user
