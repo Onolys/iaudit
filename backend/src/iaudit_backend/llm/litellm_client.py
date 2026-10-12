@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import sys
 import time
 from collections.abc import Awaitable, Callable
 from typing import Any
@@ -16,6 +17,7 @@ from .errors import LLMBadOutput, LLMTimeout, LLMUnavailable
 from .types import LLMRequest, LLMResult, MetricsCollector, Usage
 
 RETRY_MARGIN_S = 1.0
+MAX_CACHE_PREFIXES = 2
 # Errors that retrying cannot fix.
 _NO_RETRY = ("AuthenticationError", "PermissionDeniedError", "NotFoundError", "BadRequestError")
 
@@ -38,6 +40,16 @@ def _usage(resp: Any) -> Usage:
         cache_read_tokens=int(cache_read or 0),
         cache_write_tokens=int(_get(u, "cache_creation_input_tokens", 0) or 0),
     )
+
+
+def _kind(exc: BaseException | None) -> str:
+    if isinstance(exc, LLMTimeout):
+        return "timeout"
+    if isinstance(exc, LLMBadOutput):
+        return "bad_output"
+    if isinstance(exc, LLMUnavailable):
+        return "unavailable"
+    return "error"
 
 
 class LiteLLMClient:
@@ -65,15 +77,12 @@ class LiteLLMClient:
         return self._acompletion
 
     def _kwargs(self, req: LLMRequest, timeout_s: float) -> dict[str, Any]:
-        if req.cache_prefix:
+        prefixes = req.cache_prefixes or ([req.cache_prefix] if req.cache_prefix else [])
+        if prefixes:
             system: Any = [
-                {
-                    "type": "text",
-                    "text": req.cache_prefix,
-                    "cache_control": {"type": "ephemeral"},
-                },
-                {"type": "text", "text": req.system},
-            ]
+                {"type": "text", "text": p, "cache_control": {"type": "ephemeral"}}
+                for p in prefixes
+            ] + [{"type": "text", "text": req.system}]
         else:
             system = req.system
         return {
@@ -104,6 +113,8 @@ class LiteLLMClient:
     async def complete_json(
         self, req: LLMRequest, metrics: MetricsCollector | None = None
     ) -> LLMResult:
+        if len(req.cache_prefixes) > MAX_CACHE_PREFIXES:
+            raise ValueError(f"at most {MAX_CACHE_PREFIXES} cache prefixes are supported")
         timeout_s = req.timeout_s or self._s.llm_timeout_s
         model = self._model(req.tier)
         started = time.monotonic()
@@ -129,20 +140,22 @@ class LiteLLMClient:
                     retryable = not getattr(exc, "no_retry", False)
                     if (
                         not retryable
+                        or not req.retry
                         or attempts > self._s.llm_max_retries
                         or not self._can_retry(req, timeout_s)
                     ):
                         raise
         except Exception:
             self._record(
-                metrics, req, model, usage, (time.monotonic() - started) * 1000, attempts, False
-            )
+                metrics, req, model, usage, (time.monotonic() - started) * 1000, attempts, False,
+                _kind(sys.exc_info()[1]),
+            )  # fmt: skip
             raise
 
     @staticmethod
-    def _record(metrics, req, model, usage, latency_ms, attempts, ok) -> None:
+    def _record(metrics, req, model, usage, latency_ms, attempts, ok, error_kind=None) -> None:
         if metrics is not None:
-            metrics.record(req, model, usage, latency_ms, attempts, ok)
+            metrics.record(req, model, usage, latency_ms, attempts, ok, error_kind)
 
     async def _once(self, req: LLMRequest, timeout_s: float):
         async with self._sem:

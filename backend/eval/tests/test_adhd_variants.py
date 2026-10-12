@@ -7,10 +7,10 @@ from eval.build_adhd import build, main, sentences_for
 from iaudit_backend.contract import validate_request
 
 
-def test_builds_nine_requests():
+def test_builds_nine_requests_plus_the_optional_noroles_variant():
     out = build()
     assert sorted(k for k in out if k.startswith("requests/")) == sorted(
-        f"requests/{n}.json" for n in ["faithful", *[f"v{i}" for i in range(1, 9)]]
+        f"requests/{n}.json" for n in ["faithful", *[f"v{i}" for i in range(1, 9)], "v4-noroles"]
     )
 
 

@@ -32,6 +32,27 @@ def summarize(st: RunState, internal: InternalAudit, assemble_ms: int, total_ms:
     return out
 
 
+def pipeline_snapshot(
+    st: RunState, summary: dict, t0: float, llm_deadline: float, now: float, deadline: float
+) -> tuple[dict, dict]:
+    """(stages, counters) for `MetricsCollector.snapshot()`. Times are relative to `t0`;
+    `calls` is the number of units the stage ran (sections or claims), `over_budget` means the
+    stage was still running at the LLM deadline."""
+    stages = {
+        s: {
+            "first_start_ms": round((st.spans[s][0] - t0) * 1000),
+            "last_end_ms": round((st.spans[s][1] - t0) * 1000),
+            "calls": st.span_units.get(s, 0),
+            "over_budget": st.spans[s][1] >= llm_deadline,
+        }
+        for s in STAGES
+        if s in st.spans
+    }
+    counters = {k: int(v) for k, v in summary.items() if not k.endswith("_ms")}
+    counters["remaining_ms_at_assemble"] = max(0, round((deadline - now) * 1000))
+    return stages, counters
+
+
 def log_audit_done(ctx, summary: dict) -> None:
     snap = ctx.metrics.snapshot()
     log_event(

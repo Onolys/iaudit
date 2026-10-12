@@ -82,6 +82,7 @@ class JudgedEvidence:
     demote: str | None = None  # "timeframe" | "inference"
     cited: bool = False  # cited by an accepted 8/10/12 flag: counts as partial support
     escalated: bool = False  # amount gap made it a contradiction
+    speakers: list[str] = field(default_factory=list)  # who said the cited turns
 
 
 @dataclass

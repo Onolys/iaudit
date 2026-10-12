@@ -22,6 +22,7 @@ log = logging.getLogger("iaudit")
 @dataclass
 class RunState:
     prep_ready: asyncio.Event = field(default_factory=asyncio.Event)
+    warm_ready: asyncio.Event = field(default_factory=asyncio.Event)
     idle: asyncio.Event = field(default_factory=asyncio.Event)
     prep: PrepResult | None = None
     link_ctx: Any = None  # built once, after prep is ready
@@ -36,10 +37,15 @@ class RunState:
     cancelled: int = 0
     tasks: set[asyncio.Task] = field(default_factory=set)
     outstanding: int = 0
+    warm_task: asyncio.Task | None = None
     spans: dict[str, list[float]] = field(default_factory=dict)  # stage -> [first start, last end]
+    span_units: dict[str, int] = field(
+        default_factory=dict
+    )  # stage -> units run (sections, claims)
 
     def __post_init__(self) -> None:
         self.idle.set()
+        self.warm_ready.set()  # no warm-up unless one is started
 
     # -- write-once results -------------------------------------------------------------
     def write_atoms(self, index: int, atoms: SectionAtoms) -> None:
@@ -96,6 +102,7 @@ class RunState:
     @contextlib.contextmanager
     def span(self, stage: str) -> Iterator[None]:
         start = time.monotonic()
+        self.span_units[stage] = self.span_units.get(stage, 0) + 1
         try:
             yield
         finally:

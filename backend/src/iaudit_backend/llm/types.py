@@ -16,11 +16,16 @@ class LLMRequest:
     response_model: type[BaseModel]
     call_tag: str
     cache_prefix: str | None = None  # stable leading text marked cacheable
+    cache_prefixes: list[str] = field(
+        default_factory=list
+    )  # up to 2 ordered breakpoints; replaces cache_prefix when set
+    unit: str | None = None  # section index or claim id, for metrics
     max_tokens: int = 1024
     temperature: float = 0.0
     timeout_s: float | None = None
     fixture_key: str | None = None
     deadline: float | None = None  # monotonic; gates the transport retry
+    retry: bool = True  # False: one attempt only (warm-up calls)
 
 
 @dataclass
@@ -45,6 +50,11 @@ class MetricsCollector:
 
     def __init__(self) -> None:
         self.records: list[dict[str, Any]] = []
+        self.stages: dict[str, dict[str, Any]] = {}  # filled by the pipeline after a run
+        self.counters: dict[str, int] = {}
+
+    def set_pipeline(self, stages: dict[str, dict[str, Any]], counters: dict[str, int]) -> None:
+        self.stages, self.counters = stages, counters
 
     def record(
         self,
@@ -54,11 +64,13 @@ class MetricsCollector:
         latency_ms: float,
         attempts: int,
         ok: bool,
+        error_kind: str | None = None,
     ) -> None:
         self.records.append(
             {
                 "call_tag": req.call_tag,
                 "tier": req.tier,
+                "unit": req.unit,
                 "model": model,
                 "input_tokens": usage.input_tokens,
                 "output_tokens": usage.output_tokens,
@@ -67,6 +79,7 @@ class MetricsCollector:
                 "latency_ms": round(latency_ms, 1),
                 "attempts": attempts,
                 "ok": ok,
+                "error_kind": error_kind,
             }
         )
 
@@ -86,7 +99,12 @@ class MetricsCollector:
             t["calls"] += 1
             for k in ("input_tokens", "output_tokens", "cache_read_tokens", "cache_write_tokens"):
                 t[k] += r[k]
+        read = sum(r["cache_read_tokens"] for r in self.records)
+        total = read + sum(r["input_tokens"] for r in self.records)
         return {
+            "cache_hit_ratio": round(read / total, 4) if total else 0.0,
+            "stages": {k: dict(v) for k, v in self.stages.items()},
+            "counters": dict(self.counters),
             "calls": len(self.records),
             "ok": sum(1 for r in self.records if r["ok"]),
             "by_tier": by_tier,

@@ -6,6 +6,7 @@ from iaudit_backend.atomize.models import AtomicClaim
 from iaudit_backend.config import Settings
 from iaudit_backend.link.models import LinkResult
 from iaudit_backend.models import ConcernType, EvidenceRole, Verdict
+from iaudit_backend.prep import Act
 
 from .amounts import compare_amounts, polarity_reversals
 from .group_a import GroupA
@@ -72,6 +73,47 @@ def apply_timeframe(claim: AtomicClaim, items: list[JudgedEvidence], flags: list
 # --- certainty, flags, causal cue, inference --------------------------------------------------
 
 
+def _reply_speakers(e, turns: list) -> list[str]:
+    """Who said the item's reply turns. A question turn only frames the answer, so its asker is
+    left out (unless every turn is a question)."""
+    idx = [s.turn_index for s in e.draft.segments if 0 <= s.turn_index < len(turns)]
+    replies = [i for i in idx if Act.question not in turns[i].acts] or idx
+    return sorted({turns[i].speaker for i in replies})
+
+
+def _rate_ratio_conflict(
+    claim: AtomicClaim, items: list[JudgedEvidence], sig: Signals, ratio: float
+) -> None:
+    """Bucket 11 in code: two accounts give numeric weekly rates that differ by `ratio` or more.
+
+    "Twice a month" and "once a month" share an ordinal bucket, so the amount check cannot see
+    them. Needs a claim that names two or more accounts and items from different speakers.
+    """
+    if any(f.type == "conflicting_accounts_flattened" for f in sig.flags):
+        return
+    if len({(r.source, r.speaker) for r in claim.reported_by}) < 2:
+        return
+    rated: list[tuple[JudgedEvidence, float]] = []
+    for it in items:
+        o = it.obs
+        if o is None or o.relation == "not_addresses" or not it.endorsed or it.demote:
+            continue
+        rates = [x.rate_per_week for x in o.frequency if x.rate_per_week and x.rate_per_week > 0]
+        if rates:
+            rated.append((it, rates[0]))
+    for n, (a, ra) in enumerate(rated):
+        for b, rb in rated[n + 1 :]:
+            if a.speakers and b.speakers and set(a.speakers).isdisjoint(b.speakers):
+                if max(ra, rb) / min(ra, rb) >= ratio:
+                    sig.flags.append(
+                        FlagObs(
+                            type="conflicting_accounts_flattened", keys=[a.key, b.key], conf="high"
+                        )
+                    )
+                    sig.counts["ratio_conflicts"] = sig.counts.get("ratio_conflicts", 0) + 1
+                    return
+
+
 def has_causal_cue(claim: AtomicClaim) -> bool:
     return bool(_CAUSAL_CUE.search(claim.proposition))
 
@@ -90,7 +132,11 @@ def counts_as_support_base(it: JudgedEvidence) -> bool:
 
 
 def certainty_keys(
-    claim: AtomicClaim, items: list[JudgedEvidence], flags: list[FlagObs], p1: float
+    claim: AtomicClaim,
+    items: list[JudgedEvidence],
+    flags: list[FlagObs],
+    p1: float,
+    values: dict[str, float] = CONF_VALUE,
 ) -> list[str]:
     """Bucket 6: only an unhedged claim against a strongly hedged item; 'probably' is ignored."""
     if claim.hedged:
@@ -100,7 +146,7 @@ def certainty_keys(
         for it in items
         if counts_as_support_base(it)
         and it.obs.certainty == "hedged_strong"
-        and CONF_VALUE[it.obs.conf] >= p1
+        and values[it.obs.conf] >= p1
     ]
     for f in flags:
         if f.type == "certainty_inflation":
@@ -150,6 +196,7 @@ def judge(
     turns: list,
     vout: VerifierOutput,
     counts: dict[str, int] | None = None,
+    cfg: Settings | None = None,
 ) -> tuple[list[JudgedEvidence], Signals]:
     """Join the link items, group A results and floored observations; run the per-item checks."""
     sig = Signals(counts=dict(counts or {}))
@@ -160,6 +207,7 @@ def judge(
             linked=e,
             obs=obs.get(e.draft.key),
             turns=[s.turn_index for s in e.draft.segments if 0 <= s.turn_index < len(turns)],
+            speakers=_reply_speakers(e, turns),
             endorsed=e.answer_status not in _NON_ENDORSED,
             attribution=ga.attribution.get(e.draft.key, "ok"),
         )
@@ -173,6 +221,7 @@ def judge(
             continue
         sig.flags.append(f.model_copy(update={"keys": [k for k in f.keys if k in known]}))
     apply_timeframe(claim, items, sig.flags)
+    _rate_ratio_conflict(claim, items, sig, (cfg or Settings()).check_rate_ratio)
     sig.failed_inference = resolve_inferences(link, {it.key: it for it in items}, vout.inferences)
     cited = {
         k
@@ -319,7 +368,7 @@ def _candidates(
             out.append(
                 Concern(ConcernType.frequency_severity_inflation, [f.key], f.direction, f.kind)
             )
-    ck = certainty_keys(claim, items, sig.flags, cfg.check_min_conf_p1)
+    ck = certainty_keys(claim, items, sig.flags, cfg.check_min_conf_p1, cfg.check_conf_values)
     if ck:
         out.append(Concern(ConcernType.certainty_inflation, ck))
     out += flag_concerns(items, sig.flags)

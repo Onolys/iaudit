@@ -7,12 +7,13 @@ from iaudit_backend.assembler.models import EvidenceDraft
 from iaudit_backend.atomize.models import AtomicClaim
 from iaudit_backend.llm import LLMBadOutput, LLMError, LLMRequest, LLMTimeout
 from iaudit_backend.models import Turn
+from iaudit_backend.pipeline.layout import shared_layout
 from iaudit_backend.prep import PrepResult
 from iaudit_backend.safe_log import log_event
 
 from .context import LinkContext, build_link_context
 from .models import LinkerOutput, LinkResult
-from .prompt import build_prompt
+from .prompt import FALLBACK_SYSTEM, build_prompt, stage_system_and_block
 from .validate import validate_output
 
 _UNSAFE = re.compile(r"[^A-Za-z0-9_-]")
@@ -56,13 +57,22 @@ async def _link(claim: AtomicClaim, lctx: LinkContext, ctx) -> LinkResult:
         res.status, res.reason = "stalled", "timeout"
         return res
     prefix, system, user = build_prompt(claim, lctx.turns, lctx.prep, sl.indices, sl.mode)
+    prefixes: list[str] = []
+    if sl.mode == "whole" and ctx.settings.cache_layout == "shared":
+        prefixes, system = shared_layout(lctx.turns, *stage_system_and_block())
+        prefix = None
+    elif sl.mode == "whole" and ctx.settings.link_cache_breakpoints == 2:
+        # transcript and stage block cached separately (stage block moves out of `system`)
+        prefixes, prefix, system = [prefix, system], None, FALLBACK_SYSTEM
     req = LLMRequest(
         tier="mid",
         system=system,
         user=user,
         response_model=LinkerOutput,
         call_tag="link",
+        unit=claim.id,
         cache_prefix=prefix,
+        cache_prefixes=prefixes,
         max_tokens=ctx.settings.link_max_tokens,
         temperature=0.0,
         timeout_s=timeout,

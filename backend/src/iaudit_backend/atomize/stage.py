@@ -109,6 +109,7 @@ async def _atomize(section: Section, roster: list[Speaker], ctx, *, index: int) 
         user=render_user(section.text, roster),
         response_model=AtomizerOutput,
         call_tag="atomize",
+        unit=f"s{index}",
         cache_prefix=build_cache_prefix(cfg.atomize_max_claims),
         max_tokens=cfg.atomize_max_tokens,
         temperature=0.0,

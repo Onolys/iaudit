@@ -23,18 +23,17 @@ class FixtureClient:
 
     @staticmethod
     def key_for(req: LLMRequest) -> str:
-        canonical = json.dumps(
-            {
-                "tier": req.tier,
-                "call_tag": req.call_tag,
-                "system": req.system,
-                "user": req.user,
-                "cache_prefix": req.cache_prefix,
-                "schema": req.response_model.__name__,
-            },
-            sort_keys=True,
-            ensure_ascii=False,
-        )
+        data = {
+            "tier": req.tier,
+            "call_tag": req.call_tag,
+            "system": req.system,
+            "user": req.user,
+            "cache_prefix": req.cache_prefix,
+            "schema": req.response_model.__name__,
+        }
+        if req.cache_prefixes:  # left out when empty so existing recordings keep their keys
+            data["cache_prefixes"] = req.cache_prefixes
+        canonical = json.dumps(data, sort_keys=True, ensure_ascii=False)
         return hashlib.sha256(f"{req.tier}|{req.call_tag}|{canonical}".encode()).hexdigest()
 
     async def complete_json(

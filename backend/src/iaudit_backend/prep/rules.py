@@ -1,6 +1,7 @@
 """R2: deterministic dialogue-act rules. Every unsure case resolves to no act."""
 
 import re
+from dataclasses import replace
 
 from iaudit_backend.models import Turn
 
@@ -91,6 +92,17 @@ def _polar_only(text: str) -> bool:
     return 1 <= len(toks) <= 2 and all(t in _POLAR for t in toks)
 
 
+def _position_acts(text: str, is_question: bool, after_question: bool) -> set[Act]:
+    """`answer` / `backchannel`: decided by the turn's text and whether a question precedes it."""
+    if _pure_continuer(text):
+        return {Act.backchannel}
+    if _polar_only(text):
+        return {Act.answer if after_question else Act.backchannel}
+    if after_question and not is_question:
+        return {Act.answer}
+    return set()
+
+
 def index_turns(turns: list[Turn]) -> list[IndexedTurn]:
     """Turn index plus rule-based acts (no pairing; see pairing.py)."""
     questions = [_is_question(t.text) for t in turns]
@@ -100,12 +112,7 @@ def index_turns(turns: list[Turn]) -> list[IndexedTurn]:
         if questions[i]:
             acts.add(Act.question)
         after_question = i > 0 and questions[i - 1] and turns[i - 1].speaker != t.speaker
-        if _pure_continuer(t.text):
-            acts.add(Act.backchannel)
-        elif _polar_only(t.text):
-            acts.add(Act.answer if after_question else Act.backchannel)
-        elif after_question and not questions[i]:
-            acts.add(Act.answer)
+        acts |= _position_acts(t.text, questions[i], after_question)
         if _is_correction(t.text):
             acts.add(Act.correction)
         if _is_hypothetical(t.text):
@@ -121,4 +128,45 @@ def index_turns(turns: list[Turn]) -> list[IndexedTurn]:
                 acts=frozenset(acts),
             )
         )
+    return out
+
+
+def rederive_position_acts(turns: list[IndexedTurn]) -> list[IndexedTurn]:
+    """Recompute `answer` / `backchannel` after the question set changed (LLM tagging)."""
+    out = []
+    for i, t in enumerate(turns):
+        is_q = Act.question in t.acts
+        prev = turns[i - 1] if i > 0 else None
+        after_q = prev is not None and Act.question in prev.acts and prev.speaker != t.speaker
+        acts = (t.acts - {Act.answer, Act.backchannel}) | _position_acts(t.text, is_q, after_q)
+        out.append(replace(t, acts=frozenset(acts)) if acts != t.acts else t)
+    return out
+
+
+_MID_CORRECTION = re.compile(r"\b(?:actually|i mean|rather|sorry|scratch that|i misspoke)\b")
+_MID_HYPO = re.compile(r"\b(?:if|would)\b")
+
+
+def unsure_acts(turns: list[Turn], indexed: list[IndexedTurn]) -> dict[int, frozenset[Act]]:
+    """Per turn, the act kinds the rules could not decide (R2 "unsure" column).
+
+    Only these kinds go to the LLM; a turn the rules decided on every kind is never sent.
+    """
+    out: dict[int, frozenset[Act]] = {}
+    for t, it in zip(turns, indexed, strict=True):
+        text = t.text.lower().replace("\u2019", "'")
+        kinds: set[Act] = set()
+        if Act.question not in it.acts:
+            sents = _sentences(t.text)
+            tag_only = all(_TAG.search(s.strip().lower()) for s in sents if "?" in s)
+            if ("?" in t.text and not tag_only) or any(
+                _norm(s).split()[:1] and _norm(s).split()[0] in (_AUX | _WH) for s in sents
+            ):
+                kinds.add(Act.question)
+        if Act.correction not in it.acts and _MID_CORRECTION.search(text):
+            kinds.add(Act.correction)
+        if Act.hypothetical not in it.acts and _MID_HYPO.search(text):
+            kinds.add(Act.hypothetical)
+        if kinds:
+            out[it.index] = frozenset(kinds)
     return out

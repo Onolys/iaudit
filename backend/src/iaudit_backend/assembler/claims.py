@@ -101,8 +101,32 @@ def _resolve(d: ClaimDraft, text: str, cfg: Settings) -> tuple[int, int, str] | 
     return first, last, worst
 
 
+_MIN_TRIMMED_CHARS = 3
+
+
+def _try_trim(loser: LocatedClaim, other: LocatedClaim, text: str) -> bool:
+    """Cut the loser's overlapping end. False (loser untouched) if too little text would remain."""
+    start, end = loser.start, loser.end
+    if loser.start < other.start:  # loser comes first: cut its tail
+        end = other.start
+        while end > start and text[end - 1].isspace():
+            end -= 1
+    else:  # loser comes second: cut its head
+        start = other.end
+        while start < end and text[start].isspace():
+            start += 1
+    if sum(not ch.isspace() for ch in text[start:end]) < _MIN_TRIMMED_CHARS:
+        return False
+    loser.start, loser.end = start, end
+    return True
+
+
 def _drop_overlaps(
-    located: list[LocatedClaim], events: list[ClaimEvent], report: AssembleReport
+    located: list[LocatedClaim],
+    events: list[ClaimEvent],
+    report: AssembleReport,
+    text: str = "",
+    trim: bool = False,
 ) -> list[LocatedClaim]:
     def drop(c: LocatedClaim, kind: str, kept: LocatedClaim) -> None:
         events.append(ClaimEvent(kind, c.key, c.section, kept.key))
@@ -135,12 +159,15 @@ def _drop_overlaps(
     while i < len(out) - 1:
         a, b = out[i], out[i + 1]
         if b.start < a.end:
-            if b.severity > a.severity:
-                drop(a, "overlap_partial", b)
-                out.pop(i)
-            else:
-                drop(b, "overlap_partial", a)
-                out.pop(i + 1)
+            loser, winner = (a, b) if b.severity > a.severity else (b, a)
+            if trim and _try_trim(loser, winner, text):
+                events.append(ClaimEvent("overlap_trimmed", loser.key, loser.section, winner.key))
+                report.repair("overlap_trimmed")
+                out.sort(key=lambda c: (c.start, c.end))
+                i = 0
+                continue
+            drop(loser, "overlap_partial", winner)
+            out.remove(loser)
             i = max(i - 1, 0)
         else:
             i += 1
@@ -174,7 +201,9 @@ def resolve_claims(
     for idx, section in enumerate(sections):
         located = by_section.get(idx, [])
         if located:
-            res.claims.extend(_drop_overlaps(located, res.events, report))
+            res.claims.extend(
+                _drop_overlaps(located, res.events, report, section.text, cfg.overlap_trim)
+            )
         elif section.text.strip() and idx not in failed:
             res.unprocessed.append((idx, "no_claims_located"))
     res.claims.sort(key=lambda c: (c.section, c.start))

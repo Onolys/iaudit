@@ -3,7 +3,9 @@ from iaudit_backend.assembler.models import AssembleReport, ClaimDraft, SectionF
 from iaudit_backend.config import Settings
 from iaudit_backend.models import AuditRequest
 
-CFG = Settings()
+CFG = Settings(
+    overlap_trim=False
+)  # core drop policy; trimming is tested in test_assembler_optional
 SEC = "The caregiver reported two medication lapses. The patient frequently loses keys. Done."
 
 
@@ -28,9 +30,9 @@ def cd(key, *segs, section=0, hint=None, verdict="supported"):
     )
 
 
-def run(drafts, *texts, failures=()):
+def run(drafts, *texts, failures=(), cfg=CFG):
     r = AssembleReport()
-    res = resolve_claims(drafts, sections(*texts), list(failures), CFG, r)
+    res = resolve_claims(drafts, sections(*texts), list(failures), cfg, r)
     return res, r
 
 

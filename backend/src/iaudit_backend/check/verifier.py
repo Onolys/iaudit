@@ -16,9 +16,10 @@ from iaudit_backend.config import Settings
 from iaudit_backend.link.models import LinkResult
 from iaudit_backend.link.prompt import render_claim_block, render_turns
 from iaudit_backend.llm import LLMBadOutput, LLMError, LLMRequest, LLMTimeout
+from iaudit_backend.pipeline.layout import shared_layout
 from iaudit_backend.prep import IndexedTurn, PrepResult
 
-from .models import CONF_VALUE, VerifierOutput
+from .models import VerifierOutput
 
 PROMPTS = Path(__file__).resolve().parents[1] / "prompts"
 _FALLBACK_SYSTEM = "Return the JSON object only."
@@ -159,26 +160,27 @@ def clean_output(out: VerifierOutput, link: LinkResult) -> tuple[VerifierOutput,
 def apply_floors(out: VerifierOutput, cfg: Settings) -> tuple[VerifierOutput, dict[str, int]]:
     """Fixed confidence floors. Below the floor an observation is dropped and counted."""
     counts: dict[str, int] = {}
+    vals = cfg.check_conf_values
 
     def drop(name: str) -> None:
         counts[name] = counts.get(name, 0) + 1
 
     items = []
     for i in out.items:
-        if CONF_VALUE[i.conf] >= cfg.check_min_conf_p0:
+        if vals[i.conf] >= cfg.check_min_conf_p0:
             items.append(i)
         else:
             drop("items_below_floor")
     flags = []
     for f in out.flags:
         counts["flags_seen"] = counts.get("flags_seen", 0) + 1
-        if CONF_VALUE[f.conf] >= cfg.check_min_conf_p1:
+        if vals[f.conf] >= cfg.check_min_conf_p1:
             flags.append(f)
         else:
             drop("flags_below_floor")
     infs = []
     for g in out.inferences:
-        if CONF_VALUE[g.conf] >= cfg.check_min_conf_p0:
+        if vals[g.conf] >= cfg.check_min_conf_p0:
             infs.append(g)
         else:
             drop("inferences_below_floor")
@@ -234,13 +236,19 @@ async def verify(
         res.stall = "timeout"
         return res
     prefix, system, user = build_prompt(claim, link, prep, turns)
+    prefixes: list[str] = []
+    if link.mode == "whole" and cfg.cache_layout == "shared":
+        prefixes, system = shared_layout(turns, common_system(), stage_block())
+        prefix = None
     req = LLMRequest(
         tier="mid",
         system=system,
         user=user,
         response_model=VerifierOutput,
         call_tag="check",
+        unit=claim.id,
         cache_prefix=prefix,
+        cache_prefixes=prefixes,
         max_tokens=cfg.check_max_tokens,
         temperature=0.0,
         timeout_s=timeout,

@@ -11,6 +11,7 @@ AMBIGUOUS = "Speaker role was missing for turn(s) {turns}; no speaker was assume
 OUT_OF_RANGE = "An evidence or claim span did not fit the input and was omitted."
 TRUNCATED = "The input could not be processed in full."
 UNLOCATABLE = "A claim in section {i} could not be located in the text and was omitted."
+OVERLAP_TRIMMED = "A claim was trimmed to keep claim spans from overlapping."
 OVERLAP = "An overlapping claim was omitted to keep claim spans from overlapping."
 
 
@@ -38,6 +39,11 @@ def event_warning(ev: ClaimEvent, id_of: dict[str, str]) -> dict:
             "message": UNLOCATABLE.format(i=ev.section_index),
             "section_index": ev.section_index,
         }
+    if ev.kind == "overlap_trimmed":
+        w = {"code": "other", "message": OVERLAP_TRIMMED}
+        if ev.key in id_of:
+            w["claim_id"] = id_of[ev.key]
+        return w
     w = {"code": "other", "message": OVERLAP}
     if ev.kept_key in id_of:
         w["claim_id"] = id_of[ev.kept_key]
