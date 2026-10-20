@@ -5,8 +5,8 @@ Project B of 4 (B eval-core, C eval-tofueval, D eval-ui, A taxonomy-v1): black-b
 ## Sub-projects
 | Sub-project | PRD | Scope | Depends on | Status |
 |---|---|---|---|---|
-| B1 Contract run_info | [PRD](01-contract-run-info/PRD.md) | Optional `run_info` (models, prompt hashes, tokens, optional `cost_usd`) in AuditResponse; shared contract 1.1.0 across backend, frontend, validators, docs; ADR 0014 | none | draft |
-| B2 Eval engine | [PRD](02-eval-engine/PRD.md) | `eval/` project: dataset adapter protocol and metadata keys, selection, HTTP client with schema validation, crash-safe run store, resume, cost cap, probe, download framework, synthetic dataset | B1 | draft |
+| B1 Contract run_info | [PRD](01-contract-run-info/PRD.md) | Optional `run_info` (models, prompt hashes; optional tokens/`cost_usd` declared but not populated by the backend) in AuditResponse; shared contract 1.1.0 across backend, frontend, validators, docs; ADR 0014 | none | draft |
+| B2 Eval engine | [PRD](02-eval-engine/PRD.md) | `eval/` project: dataset adapter protocol and metadata keys, selection, HTTP client with schema validation, crash-safe run store, resume, optional cost cap, probe, download framework, synthetic dataset | B1 | draft |
 | B3 Metrics & scoring | [PRD](03-metrics-scoring/PRD.md) | Metrics registry, failure policy, clustered bootstrap CIs, `metrics.json`/`compare.json`/`item_rows.json`, compare on shared items | B2 | draft |
 | B4 Eval API + dev script | [PRD](04-eval-api-devscript/PRD.md) | Local FastAPI server (127.0.0.1:8100), `eval-api.schema.json` (bundles B3 schemas), `scripts/dev.sh` | B2, B3 | draft |
 
@@ -20,7 +20,11 @@ graph LR
 ```
 
 ## Locked decisions
-- `cost_usd` optional in `run_info`, omitted when the backend has no price; no fake zeros.
+- Backend does no token accounting or pricing (no `pricing.py`); `tokens` and `cost_usd` are optional contract fields consumers show only if present; no fake zeros.
+- `max_cost_usd` optional in the start-run request (unset = no cap); cap set + response lacks `cost_usd` = run fails (fail closed).
+- Audit deadline 100 s is canonical (ADR 0008 corrected in B2).
+- `leakage.toml` is extended to scan root `eval/data` in C1; `eval/` tests are not added to PR CI; concurrency 4 accepted.
+- Contract 1.2.0 bump: saved 1.1.0 items will not open in the frontend; accepted, no compat work.
 - One shared contract version; a bump moves backend, frontend and validators together.
 - Eval never imports `iaudit_backend`; schemas read from `docs/contracts/`.
 - Item ids are filename-safe (`[A-Za-z0-9._-]{1,128}`); stored states `running|finished|aborted_cost|aborted|failed`, `interrupted` derived.
@@ -29,15 +33,15 @@ graph LR
 - One run at a time; polling, no push; no CLI.
 
 ## Open questions and risks (after reconciliation)
-- [OPEN] LiteLLM `prompt_tokens` may already include cache tokens: blocks the `cost_usd` formula (B1).
-- [OPEN] Audit deadline: ADR 0008 says 60 s, `config.py` `audit_deadline_s` is 100 s (B2); owner picks canonical.
-- [OPEN] Add `eval/` unit tests to PR CI? (B2)
-- [OPEN] `leakage.toml` does not cover root `eval/data` (B2, C1, A1).
-- [OPEN] Missing `cost_usd` makes the max-cost cap unenforceable; add fail-closed `require_cost`? (B2)
-- [OPEN] Concurrency 4 vs backend rate limits untested live (B2).
-- [DEFERRED] Shared hash/price code between backend and `backend/eval`; per-attempt token accounting (B1); non-label gold, cross-run significance (B3); item-list pagination UI, two-server lockfile (B4).
+- [RESOLVED: moot, no backend cost, owner decision 2026-10-20] LiteLLM cache tokens vs `cost_usd` formula (B1).
+- [RESOLVED: 100 s canonical; ADR 0008 updated in B2, owner decision 2026-10-20] Audit deadline.
+- [RESOLVED: not added, owner decision 2026-10-20] `eval/` unit tests in PR CI (B2).
+- [RESOLVED: C1 extends `leakage.toml` to root `eval/data`, owner decision 2026-10-20] Leakage scan coverage (B2, C1, A1).
+- [RESOLVED: fail closed, no `require_cost`, owner decision 2026-10-20] Missing `cost_usd` with a cap set (B2).
+- [RESOLVED: 4 accepted, owner decision 2026-10-20] Concurrency vs backend rate limits (B2).
+- [DEFERRED] Shared hash code between backend and `backend/eval` (B1); non-label gold, cross-run significance (B3); item-list pagination UI, two-server lockfile (B4).
 
 ## Manual (owner) steps
-- Confirm price numbers in `backend/src/iaudit_backend/pricing.py` (B1).
+- [RESOLVED: no `pricing.py`, owner decision 2026-10-20] Confirm price numbers (B1).
 - First live smoke of `scripts/dev.sh` with provider API keys in the environment (B4).
-- Re-check the backend checks the request version before the schema (needed by the zero-spend probe, B2).
+- [RESOLVED: verified, `app.py` ~line 175 checks `schema_version` before schema validation] Backend request-version check order (zero-spend probe, B2).

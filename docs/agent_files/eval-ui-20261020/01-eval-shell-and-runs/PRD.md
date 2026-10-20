@@ -49,9 +49,9 @@ Timeouts: 10 s default (polls, lists), 30 s for POSTs (start run probes the back
 - Dataset `<select>` from `listDatasets`; selection remembered in `localStorage` (try/catch). Split `<select>` from the dataset's `splits[]` plus `all`; reset on dataset change. Selecting split `test` shows the informational line from `DatasetMeta.test_split_note` (no confirm, no block).
 - **N** input: blank = whole split; integer ≥ 1 else inline error and Run disabled; value > split size → clamped on blur with note "N clamped to {size}" (size from `DatasetMeta`; all-split = sum).
 - **Estimate**: debounced (400 ms) `estimate({dataset,split,n})` on any change. Shows `~$X.XX for {n_items} items (rough)`. When `est_cost_usd === null` (B2 `basis: "none"`) shows the server `note` (fallback "Cost unknown — run a pilot (e.g. N=5) first"); Run stays enabled.
-- **Max cost** field (USD, required, > 0; prefilled with 1.5 × estimate rounded up when known, else empty and Run disabled with hint). With unknown estimate the cap is still required.
+- **Max cost** field (USD, optional; blank = no cap, sent as omitted `max_cost_usd`; if set must be > 0 else inline error and Run disabled). Prefilled with 1.5 × estimate rounded up when the estimate is known, else empty. Backend fails closed: a set cap with responses lacking `cost_usd` fails the run with an API error, shown like any failed run (state chip + error message, Resume available).
 - **Run** → `startRun`; on 202 immediately begins polling `getRun`. `data_missing` (409) or `data_present=false` replaces Run with **Download data**; click → `startDownload`, then poll `getDownload` until `ready|failed` (B2/B4 enum `not_downloaded|downloading|ready|failed`); show `downloading…`; `failed` shows API error text + Retry; `ready` refetches datasets and restores Run.
-- **Progress** (while a run is active): bar `done/total`, failures, cost (`$—` when `progress.cost_known=false`), **Abort** (`abortRun`, disabled while aborting). Terminal states hide Abort and show the state chip, then the runs list refreshes.
+- **Progress** (while a run is active): bar `done/total`, failures, cost (shown only when `progress` carries `cost_usd`, else omitted), **Abort** (`abortRun`, disabled while aborting). Terminal states hide Abort and show the state chip, then the runs list refreshes.
 - One active run only (B4): 409 `run_active` shows "Run {id} is already active" with a button that attaches progress to it. On mount, the panel scans `listRuns` for `state==="running"` and attaches (tab reload recovers a live run). `schema_mismatch` / `backend_unreachable` errors display the API message and `detail` versions verbatim.
 
 **R6 `RunsList`.** Table from `listRuns` (refetched on mount, after start/abort/resume/terminal poll, plus manual Refresh): checkbox, Date, Dataset, Split, N (`n_items`), Schema, State chip, Cost (`totals.cost_usd`, `—` if null), failures. `aborted_cost` renders "aborted: cost cap". **Resume** button for `aborted|aborted_cost|interrupted|failed` and `finished` with `totals.failures>0` (B4 rule); disabled while another run is active. Row click (not checkbox/button) → `view:"run"`. Tick at most two; checkboxes for runs of a different dataset than the first tick are disabled; **Compare selected (2)** enabled at exactly two → `view:"compare"`. Empty: "No runs yet. Start one above." While a run is active the list row polls via the same `getRun` data (no second poller; list refetch on terminal).
@@ -94,7 +94,7 @@ Shared with D2: `EvalApp` view union, `EvalApi`/`EvalError` types, `usePolling`,
 | 5 | Poll loop | Sequential setTimeout, keep last data on miss | `setInterval` | No overlap/pile-up on slow server |
 | 6 | Single poller | RunPanel's `getRun` poll only; list refetches on terminal | Poll `listRuns` too | B4 allows one active run; fewer calls |
 | 7 | Proxy Host | `changeOrigin:false` | `true` | B4 Host/Origin allowlist expects localhost:5173 |
-| 8 | Max cost with unknown estimate | Required field, no default | Allow blank = uncapped | B2 cap only enforceable if costs known; forces explicit choice |
+| 8 | Max cost | Optional, blank = no cap; set cap + missing `cost_usd` fails the run (server, fail closed) | Required field | Owner decision 2026-10-20: backend computes no cost; cap enforced only when costs are present |
 | 9 | Run attach on reload | Scan `listRuns` for `running` | Persist run id in localStorage | Server is source of truth; survives cleared storage |
 | 10 | Persistence | Last dataset only, `localStorage` try/catch | Persist split/N/view | Brief §5.3 |
 
@@ -105,7 +105,8 @@ Shared with D2: `EvalApp` view union, `EvalApi`/`EvalError` types, `usePolling`,
 - [RESOLVED: B4 passes B2's `Estimate` through unchanged (`basis` `prior_runs`|`none`, `note`)] Cold-start note text comes from the server.
 - [RESOLVED: B4 `DatasetSummary.splits[]` = `{name, size|null}`; `DatasetMeta` adds descriptions and `test_split_note`] D1 still calls both on dataset change, but sizes are available from the list.
 - [RESOLVED: assumed sufficient] `state=aborted_cost` renders "aborted: cost cap"; no extra reason field.
-- [OPEN] `max_cost_usd` is required by B4 `POST /runs`, but with no `run_info.cost_usd` (cost_usd is optional, omitted when the backend has no price) the cap is unenforceable. B2 records `cost_known=false` plus a warning; D1 shows a warning when `progress.cost_known=false`. Fail-closed `require_cost` is a user decision (see B2 Risks).
+- [RESOLVED: `max_cost_usd` optional in form and B4 `POST /runs`; set cap with missing `cost_usd` fails the run (fail closed), surfaced as a failed run; no `cost_known` warning UI; `require_cost` dropped; owner decision 2026-10-20] Backend computes no tokens/cost; UI shows `tokens`/`cost_usd` only if present.
+- [RESOLVED: concurrency 4 accepted, no CI for eval; owner decision 2026-10-20]
 - [RESOLVED: B4 commits `eval/api/eval-api.schema.json` (bundling B3's schemas) before D1 tests run; D1 R7 adds the alias and `fs.allow`] Schema location. Pre-B4 fallback: assume the sketch above.
 - [RESOLVED: B4 decision 7] Prefix stripped by proxy `rewrite`, server serves at root.
 - [RESOLVED: B4 decision 3] One run at a time, so one progress panel.
@@ -116,7 +117,7 @@ Shared with D2: `EvalApp` view union, `EvalApi`/`EvalError` types, `usePolling`,
 1. `npm run typecheck && npm test && npm run build` pass; existing Audit tests unchanged and green.
 2. Toggle shows Audit (idle prompt) by default; switching to Eval shows Run + Runs sections; back to Audit shows a fresh idle state.
 3. With the eval server stopped, Eval shows the "not reachable" banner with Retry; Audit still works.
-4. Estimate known → shown as rough; unknown → "run a pilot" text; blank/invalid N or missing max cost disables Run; N above split size is clamped with a note.
+4. Estimate known → shown as rough; unknown → "run a pilot" text; blank/invalid N or an invalid (non-positive) max cost disables Run; blank max cost does not; N above split size is clamped with a note.
 5. Run → progress bar updates ~1 s, Abort stops it; reload mid-run re-attaches; closing the tab does not stop the run.
 6. Missing data shows Download with status and error/Retry; completion restores Run.
 7. Runs list shows all columns, Resume only for resumable states, max two same-dataset ticks, Compare and row click set the D2 views.

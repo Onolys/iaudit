@@ -40,8 +40,8 @@ D's UI needs a stable, testable server contract before D is built (D brief §5.4
 | `GET /datasets/{name}` | - | `DatasetMeta` = B2 `metadata.json` fields (`title`, `description`, `license`, `gold_kind`, `test_split_note`, `default_split`, `splits[{name, description, size\|null}]`); `size` from B2 `Dataset.split_sizes()`, null when data absent |
 | `POST /datasets/{name}/download` | - | 202 `DownloadStatus` |
 | `GET /datasets/{name}/download` | - | `DownloadStatus` `{status: not_downloaded\|downloading\|ready\|failed (B2 enum), error?, files?}` |
-| `POST /runs/estimate` | `{dataset, split, n?, seed?}` | `Estimate` = B2 `Estimate` unchanged `{basis: "prior_runs"\|"none", n_items, est_input_tokens, est_output_tokens, est_cost_usd: number\|null, rough: true, note}` |
-| `POST /runs` | `{dataset, split, n?, seed?, max_cost_usd, tags?}` (`tags` e.g. `{contamination: str}`, optional, default unset; D1 has no UI field in v1) | 202 `{run_id}` |
+| `POST /runs/estimate` | `{dataset, split, n?, seed?}` | `Estimate` = B2 `Estimate` unchanged `{basis: "prior_runs"\|"none", n_items, est_input_tokens, est_output_tokens, est_cost_usd: number\|null, rough: true, note}` (cost/token fields are null unless prior runs reported them; UI shows cost only if present) |
+| `POST /runs` | `{dataset, split, n?, seed?, max_cost_usd?, tags?}` (`max_cost_usd` optional, default unset = no cap; if set and a response lacks `cost_usd` the run fails closed, state `failed`; `tags` e.g. `{contamination: str}`, optional, default unset; D1 has no UI field in v1) | 202 `{run_id}` |
 | `GET /runs` | - | `RunSummary[]`, newest first |
 | `GET /runs/{id}` | - | `RunDetail` = `RunSummary` + `progress` + `run_info` (run.json fields: git_commit, git_dirty, fingerprint models + prompt_hashes, mapping_version, seed, concurrency, max_cost_usd, tags, mixed, warnings) |
 | `POST /runs/{id}/abort` | - | `RunSummary` (state `aborted`) |
@@ -54,7 +54,7 @@ D's UI needs a stable, testable server contract before D is built (D brief §5.4
 
 - `RunSummary`: `{run_id, dataset, split, n_requested, n_items, seed, created_at, finished_at?, schema_version, state, score_state, totals:{cost_usd: number\|null, failures}, git_dirty}`.
 - `state` ∈ `running | finished | aborted | aborted_cost | interrupted | failed`. `score_state` ∈ `pending | running | done | failed` (drives D's "Scoring..." spinner). B2 stores `running|finished|aborted_cost|aborted|failed` and derives `interrupted` (running with no live lock) via `store.effective_state`; the API reports the effective state and B4 writes no new states. `score_state` is `done` when `metrics.json` exists, otherwise tracked in memory by `RunManager` (`failed` after a scoring exception).
-- `progress`: `{done, total, failures, cost_usd: number|null, cost_known}`; `cost_usd` is `null` when responses lack `run_info` (optional per locked decision).
+- `progress`: `{done, total, failures, cost_usd: number|null}`; `cost_usd` is `null` when responses lack `cost_usd` (optional per locked decision; the backend does not populate it).
 - `ItemRow`: defined once in B3 R8 (`{item_id, label?, status, gold, pred, match, outcome?, detail?}`) and written at scoring as `item_rows.json` using the adapter's `item_row` hook (C2 for TofuEval). Before scoring finishes, or for runs never scored, B4 builds the generic row from item files (`gold`/`pred`/`match` null). `ItemDetail.gold` is opaque JSON typed by `gold_kind` (C2 defines `tofueval_summary_sentences`; D2's GoldPanel switches on it). Filter `failed` = `status == "failed"`; `mismatch` = `match == false`.
 - Resume allowed from `aborted`, `aborted_cost`, `interrupted`, `failed`, and `finished` with failures. Rescore refused while `running`. Compare refused across datasets.
 
@@ -124,7 +124,7 @@ eval/api/eval-api.schema.json   # {$defs: {...}, "x-routes": {"GET /runs": "RunS
 ## Tests (`eval/tests/api/`; no network, no spend)
 - Fixtures: B2's fake HTTP backend and synthetic dataset; app built via `create_app(...)` with `httpx.ASGITransport`.
 - Every response of every route validated against `eval-api.schema.json`; stale-schema test.
-- Flows: start→poll→finished→auto-score→metrics; abort; cost abort→`aborted_cost`→resume; second start→409; restart sweep (pre-seeded `running` run → `interrupted`); backend down→502; probe version mismatch→409; data missing→409; download task states.
+- Flows: start→poll→finished→auto-score→metrics; abort; cap set + known costs → `aborted_cost` → resume; cap set + missing `cost_usd` → `failed`; second start→409; restart sweep (pre-seeded `running` run → `interrupted`); backend down→502; probe version mismatch→409; data missing→409; download task states.
 - Guards: `../` and encoded variants in ids → 404/422; foreign Origin/Host → 403; sentinel word in a synthetic transcript never appears in captured logs (mirrors backend scenario S9).
 - `bash -n` plus a `dev.sh --check` (preflight only) test; full script run is manual.
 

@@ -22,15 +22,19 @@ graph LR
 - Plain tables, no charts, no router; polling ~1 s; one run at a time.
 - All server access via one never-throwing `evalApi`; types hand-mirrored and Ajv-checked against `eval-api.schema.json`.
 - Item view replays saved data through the existing validators; `ReviewShell`, `LeftPane`, `RightPane`, `reviewState` untouched.
-- `cost_usd` optional: UI shows "unknown" and warns when `cost_known=false`.
+- Backend computes no tokens/cost; `tokens`/`cost_usd` optional, UI shows them only if present (else "unknown"), no `cost_known` warning.
+- `max_cost_usd` optional (blank = no cap); set cap + missing `cost_usd` fails the run (fail closed), surfaced as a failed run.
+- Item view rejecting items saved under older contract versions (1.1.0 after A1) is accepted; no replay compat.
+- Eval concurrency 4; no CI for eval.
 - Contamination tag: no UI field in v1.
 - D1 creates `docs/reference/eval-ui.md`; D2 appends.
 
 ## Open questions and risks (after reconciliation)
-- [OPEN] `max_cost_usd` is required but unenforceable when responses lack `cost_usd`; fail-closed option is a user call (D1, B2).
-- [OPEN] After A1 moves the contract to 1.2.0, saved 1.1.0 items (incl. the pre-A1 baseline) fail the item view's version pin (D2, A1).
+- [RESOLVED: owner decision 2026-10-20] `max_cost_usd` optional, fail closed when cap set and cost missing (D1, B2).
+- [RESOLVED: owner decision 2026-10-20] Saved 1.1.0 items fail the item view's pin after A1; accepted (D2, A1).
 - [DEFERRED] Item-list pagination/sort, next/previous item, concurrency/seed fields, ours-per-sentence in GoldPanel, production proxy.
 
 ## Manual (owner) steps
 - Live smoke with `scripts/dev.sh` and provider keys: pilot run, close and reopen the tab mid-run (D1).
 - Eyeball one real TofuEval item against the source after download (D2).
+- Final end-to-end test only after all changes land (owner; includes the pre-A1 baseline item view caveat).

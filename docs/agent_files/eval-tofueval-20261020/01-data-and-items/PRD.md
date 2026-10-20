@@ -5,7 +5,7 @@ date: 2026-10-20
 ---
 # PRD: C1 TofuEval data & items
 
-Repo/branch: iaudit / `users/codex/eval-investigation` · Depends on: B2 (adapter protocol, `metadata.json` loader, download framework, `select`), B4 (UI Download button calls it) · Owns: `eval/datasets/tofueval/{metadata.json, adapter.py, download.py, items.py, transcripts.py, assessment.py}`, `eval/tests/datasets/tofueval/` incl. `fixtures/` (fictional)
+Repo/branch: iaudit / `users/codex/eval-investigation` · Depends on: B2 (adapter protocol, `metadata.json` loader, download framework, `select`), B4 (UI Download button calls it) · Owns: `eval/datasets/tofueval/{metadata.json, adapter.py, download.py, items.py, transcripts.py, assessment.py}`, `eval/tests/datasets/tofueval/` incl. `fixtures/` (fictional); one added entry in `backend/eval/leakage.toml` (req. 11)
 
 ## TL;DR
 Turn the three public sources into 1,777 audit requests. `download.py` fetches the pinned TofuEval commit plus the MediaSum and MeetingBank files into gitignored `eval/data/tofueval/`, proves all 100 doc ids resolve, and records hashes. `items.py` groups CSV rows into summary items with per-sentence gold fields kept intact. `transcripts.py`/`assessment.py` build schema-valid `transcript` turns and a one-section `assessment` with a verified per-sentence offset map. Gold projection, `mapping.json`, metrics, slices, `references.json` are C2.
@@ -46,6 +46,7 @@ Turn the three public sources into 1,777 audit requests. `download.py` fetches t
 8. **Request**: `{schema_version, request_id, transcript, assessment}`, `schema_version` read from the loaded schema `const` (1.1.0 after B1), validated with the schema loader B2 provides; invalid = hard error before any send.
 9. **Adapter** (`adapter.py`): `items(split)`, `to_request(item)`; `gold`/`project` left to C2. Selection/seeding/N is B2's `select`, clustered by `doc_id`.
 10. **Caching/performance**: `derived/transcripts.json` read once per process (lazy singleton); turns built per `(dataset, doc_id)` and memoised; all 1,777 requests build in a few seconds with no network.
+11. **Leakage guard** (owner decision 2026-10-20): extend `backend/eval/leakage.toml` so `test_prompt_leakage` scans root `eval/data` (incl. `eval/data/tofueval/derived/transcripts.json`). `prompt_globs` are relative to `backend/src/iaudit_backend/`, but the test resolves `scored_dirs` against `backend/`, so the change is one entry reaching repo root (`../eval/data`; loader tweak only if the test cannot resolve it). Absent data skips gracefully (test already guards `d.exists()`); other keys untouched.
 
 ## Architecture
 ```
@@ -92,12 +93,13 @@ Flow: CSV rows -> `items.py` (group, sort, join) -> `assessment.py` (text + offs
 - [OPEN] Paper says segments average 970 (MediaSum) / 930 (MeetingBank) words; sources measure 778 / 752 whitespace words. Ratio 1.25 / 1.24 suggests the paper counted tokens `[verified: counts; token explanation is inference, untested]`. Cheapest test: tokenise the 100 docs with a common tokenizer and compare to 970/930.
 - [OPEN] MediaSum `ccdv/mediasum` vs original `news_dialogue.json` equality (TofuEval README uses the original). Cheapest test: owner diffs 3 ids.
 - [RESOLVED: reconciled with `02-eval-engine/PRD.md`] B2 interface names (Item payload/meta, download hook, split names, metadata keys).
-- [OPEN] Audit deadline: ADR 0008 says 60 s but `config.py` `audit_deadline_s` is 100 s [verified; see B2 Risks]. ~750-1,000-word transcripts with up to 63 turns (MediaSum) or ~15 MeetingBank chunks may hit it and return `partial`/timeouts. Cheapest test: 5-item live dev run.
+- [RESOLVED: 100 s (`config.py` `audit_deadline_s`) is canonical; ADR 0008 corrected in eval-core B2, owner decision 2026-10-20] Audit deadline number disagreement.
+- [DEFERRED] Long transcripts (~750-1,000 words, up to 63 MediaSum turns or ~15 MeetingBank chunks) may still hit 100 s and return `partial`/timeouts. Validated by the first 5-item pilot run (not an owner decision).
 - [RESOLVED: raw `uid` match, 50/50 found, 244 double-space occurrences are in text, not ids] MeetingBank ids with spaces. IDs are matched exactly `[verified]`.
 - [RESOLVED: all 50 ids present, none duplicated] MediaSum `id` coverage `[verified]`.
 - [RESOLVED: 100 unique ids globally] `doc_id` safe as cluster key across datasets.
 - [OPEN] MediaSum speaker strings may include generic labels (e.g. "Unidentified Male"); passed through as supplied, which is allowed but may affect attribution checks.
-- [OPEN] `leakage.toml` `scored_dirs` covers `backend/eval/*` only, not root `eval/data/tofueval` (see B2 Risks). Extending it edits backend files; owner decides. Real data first exists after this project's first download.
+- [RESOLVED: extend `leakage.toml` to scan root `eval/data`; C1 owns it (req. 11), owner decision 2026-10-20] `leakage.toml` coverage of `eval/data/tofueval`.
 
 ## Acceptance Criteria
 - Fixture tests (small fictional CSV + JSONL + zip shaped like the real sources, no real text committed) cover: sort by int (10 after 9), gaps, duplicate row, embedded newline, missing id -> error, missing topic -> error, id slug uniqueness, offset assert, MeetingBank splitter (60-word cap, over-long sentence, reconstruction), MediaSum turn mapping.
@@ -105,3 +107,4 @@ Flow: CSV rows -> `items.py` (group, sort, join) -> `assessment.py` (text + offs
 - Real-data smoke (local, after download): 1,777 items (split by doc: dev 70 docs, test 30 docs; dev 3,437 / test 1,510 rows), 4,947 rows, 966 "no", 1,479 original-five items, all 100 ids resolved, all requests schema-valid, all offset asserts pass.
 - Re-running download with unchanged sources yields identical hashes; tampered file is rejected.
 - No file under `eval/data/` or any TofuEval text is tracked by git; no TofuEval text in prompts.
+- `backend/eval/leakage.toml` reaches root `eval/data`; `test_prompt_leakage` passes with the data present and skips gracefully when absent.

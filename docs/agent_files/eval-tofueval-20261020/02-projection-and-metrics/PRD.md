@@ -151,7 +151,7 @@ Projection  = {"sentences": [{"sent_idx", "label", "meta": bool, "claim_ids": [.
 - [RESOLVED: B3 R1/R8/R9 (see `03-metrics-scoring/PRD.md`)] `pred=None` is handled by B3's policy before dataset metrics; per-item hook is `adapter.item_row`; compare warns on differing `mapping_version`.
 - [RESOLVED: `run.json` `tags`, set only via the optional `tags` field of the B4 start-run request; default unset; no D1 UI field in v1] Where the contamination tag is set.
 - [OPEN] Add `concern_match_given_detected` (match among gold sentences predicted inconsistent)? Separates concern agreement from recall; not in locked list, so not built unless approved.
-- [OPEN] Rule 1 (any 1-code-point overlap) may over-flag if claim offsets are loose; decided by dev sample (R5 of C brief). Not tuned on test.
+- [RESOLVED: a claim overlapping two summary sentences flags BOTH, accepted as designed; owner decision 2026-10-20] Rule 1 (any 1-code-point overlap) over-flag. Stays observable on dev via `boundary_crossing_rate`; not tuned on test.
 - [OPEN] Persisting `exp` for the GoldPanel: assumed on-demand only (D2 decision).
 - [DEFERRED] `concern_not_in_mapping` evidence may inform a future, separately versioned mapping decision (not A1; A1 leaves v1.0.0 untouched).
 - [DEFERRED] Per-type CIs are wide (CO 30, TAM 39, OF 42): n always shown, types never ranked.
