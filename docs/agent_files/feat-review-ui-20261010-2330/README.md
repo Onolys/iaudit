@@ -5,7 +5,7 @@ date: 2026-10-10
 ---
 # Review UI v1 — index
 
-Hackathon MVP: read-only React + TS + Vite viewer (`frontend/`) over the audit contract in `docs/contracts/`. Upload a request, show the audit beside the text. Source: [brainstorming.md](../ab-20261010-221456-a271e3e2/brainstorming.md). Governing scope: `docs/mission.md`.
+Hackathon MVP: read-only React + TS + Vite viewer (`frontend/`) over the audit contract in `docs/contracts/`. Upload a request, show the audit beside the text. Governing scope: `docs/mission.md`.
 
 ## Sub-projects
 | # | Sub-project | Depends on | PRD | TASKS | Tasks |
