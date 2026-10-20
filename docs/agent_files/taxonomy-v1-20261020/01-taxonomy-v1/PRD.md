@@ -21,7 +21,7 @@ Add one concern, `quantity_mismatch` (mission check 13), appended as the 13th en
 - `quantity_mismatch` end to end: mission, contract, backend enum/prompt/synth/template, frontend label, fixtures, ADR 0015.
 - Widened definitions and two labelling rules in prompt, templates, mission, concepts docs.
 - ADHD harness green with gold for buckets 1-12 unchanged; bucket 13 covered separately.
-- A recorded before/after on TofuEval dev via the eval UI.
+- Everything the owner needs to record a before/after on TofuEval dev via the eval UI (owner manual run; agents run no live LLM calls or evals).
 
 **Non-Goals**
 - Verifying numbers against the real world; auditing scoring rules or rubric totals (mission exclusion stays); diagnosis, protocol review, new formats.
@@ -102,12 +102,13 @@ verifier prompt  --flag quantity_mismatch(keys,conf)-->  verifier.apply_floors (
 | 9 | Contract version | 1.2.0 for all three schemas | Fold into 1.1.0; 1.0.0 silently | New allowed value is minor by the README's rule; B1 owns 1.1.0 and the shared-version rule |
 | 10 | ADR | 0015 "Add quantity_mismatch; widen attribution and context stripping" (ADR 0014 is B1's) | None | ADR 0010 shows contract-visible choices get ADRs |
 | 11 | mapping.json | **Leave v1.0.0 untouched** | Bump to v1.1.0 to allow `quantity_mismatch` for Reasoning Error/Contradiction | A mapping bump after seeing results is label drift (C integrity rule 1). Reasoning Error is recall-only already (any flag counts), so number errors that now carry the new label still count for recall. Mapped concern-match may fall where a number error moves from `contradictory_evidence` to `quantity_mismatch`; accepted by owner as a labelled known side effect (finer types can be combined later); the report states it, plus a separate count of `quantity_mismatch` outputs. No secondary mapping file |
-| 12 | Measurement | TofuEval dev, same model/mapping/split, via eval UI (no CLI); baseline run before the first A1 commit | Re-baseline after | Clean before/after; wording tuned on dev only; test split run once at the end |
+| 12 | Measurement | TofuEval dev, same model/mapping/split, via eval UI (no CLI); baseline run before the first A1 commit. Owner runs all live passes manually; agents build only | Re-baseline after | Clean before/after; wording tuned on dev only; test split run once at the end |
 | 13 | Fixture | New fictional mock `11-...` (medication/team size) plus boundary pairs as tests | Edit an existing mock | Existing mocks' offsets and ADHD gold stay untouched |
 
 ## Manual steps
 - User approves the final mission wording (table above) before implementation starts; the mission wins on conflict.
-- User records the TofuEval dev baseline (C/D tooling) before A1 prompt changes merge, and runs the after pass; test-split run only at the end.
+- User records the TofuEval dev baseline (C/D tooling) before A1 prompt changes merge, and runs the after pass; test-split run once, only at the end.
+- User runs the final end-to-end test (incl. saved-item replay) after all changes. Owner runs everything live manually; implementing agents run no live LLM calls, live evals, or TofuEval before/after.
 - User confirms the 13-label ADR wording and ADR number if B1's changes.
 
 ## Risks / Open Questions
@@ -120,8 +121,8 @@ verifier prompt  --flag quantity_mismatch(keys,conf)-->  verifier.apply_floors (
 - User decisions recorded here: mission amended to allow arithmetic in `quantity_mismatch` (Decision 3); a version bump moves backend, frontend and validators together (Req 8).
 - [RESOLVED: Decisions 5, 13] Double-labelling with frequency: pinned by chain order and 10 boundary pairs asserting exactly one of the two types; ADHD frequency fixtures must not change.
 - [RESOLVED: recordings empty] Fixture-mode replay: recordings dir is empty (`backend/eval/recorded` README), so prompt edits break no recorded keys; re-check at implementation.
-- [OPEN] Widened `wrong_attribution` may raise false positives on current-vs-previous items; widened `context_stripping` may over-fire on legitimate summarization. Mitigation: clean few-shot cases, ADHD bucket 3 and 8 precision compared before/after.
-- [OPEN] Prompt growth vs the audit deadline: 100 s (`config.py` `audit_deadline_s`) is canonical; ADR 0008 is corrected in eval-core B2 (owner decision 2026-10-20). Compare p95 latency on the ADHD set against 100 s; prompt token count only if available (backend does not compute tokens/cost).
+- [DEFERRED: owner measures in manual runs] Widened `wrong_attribution` may raise false positives on current-vs-previous items; widened `context_stripping` may over-fire on legitimate summarization. Mitigation: clean few-shot cases, ADHD bucket 3 and 8 precision compared before/after by the owner in their own runs.
+- [DEFERRED: owner measures in manual runs; checks p95 latency] Prompt growth vs the audit deadline: 100 s (`config.py` `audit_deadline_s`) is canonical; ADR 0008 is corrected in eval-core B2 (owner decision 2026-10-20). Compare p95 latency on the ADHD set against 100 s; prompt token count only if available (backend does not compute tokens/cost).
 - [DEFERRED] Deterministic numeric comparison in code (Decision 4 alt b); rename `other_person`; broaden `unsupported_causal_link`; evidence-based escalation to contradicted.
 - Labelled evidence caveat: the 13-of-84 residue behind the brief is LLM-judged, not gold; a recall change is evidence about the implementation, not proof the taxonomy is right.
 
@@ -130,9 +131,9 @@ verifier prompt  --flag quantity_mismatch(keys,conf)-->  verifier.apply_floors (
 - `grep` for `"1.1.0"` contract strings over docs/contracts, docs/examples, backend/src, backend/eval, frontend/src finds none (ADR text excepted); all three schemas, mock `validate.py`, backend and frontend reject any other version.
 - Schema enum has 13 values with `quantity_mismatch` last; Python `ConcernType`, TS `CONCERN_TYPES`, and `CONCERN_LABELS` match; label test passes for 13.
 - Unit tests: `decide()` with a quantity flag yields D8 (entails) or D4 (contradicts) with `quantity_mismatch`; frequency and quantity on the same key yield only frequency; quantity and contradictory on the same key yield only quantity; flag suppressed when claim or cited turn lacks a number token; `not_addresses` + flag keeps the concern; template contains no digits or banned words.
-- 10 fictional boundary pairs (rate vs count, date vs count, "about ten" vs "ten", rounding incl. dropped decimals, sum, unstated figure, attribution to previous medication, scope broadening, faithful generalization, merged facts) with scripted verifier outputs pass in CI; same pairs in an opt-in live run are reported, not gated.
+- 10 fictional boundary pairs (rate vs count, date vs count, "about ten" vs "ten", rounding incl. dropped decimals, sum, unstated figure, attribution to previous medication, scope broadening, faithful generalization, merged facts) with scripted verifier outputs pass in CI; same pairs in a live run are an owner manual check (reported, not gated; agents do not run them).
 - New mock fixture passes `docs/examples/mock/validate.py` and contains a `quantity_mismatch` concern; mock README counts updated to 13.
 - `test_prompt_leakage` passes with new few-shot; no TofuEval or brief-sample text in prompts.
 - ADHD: `uv run pytest`, `ruff check`, `python -m eval.run --mode oracle --gate poc` green; gold for buckets 1-12 byte-identical; oracle buckets unchanged; frontend `npm run typecheck` and `npm test` pass.
 - ADR 0015 plus `docs/decisions/README.md` line added in the same commit as the schema.
-- TofuEval dev before/after recorded in the eval UI under mapping v1.0.0 (same models/prompts hashes except the A1 change), reporting per-group recall, the `quantity_mismatch` count, and the concern-match caveat.
+- Owner manual check (agents do not run live): TofuEval dev before/after recorded in the eval UI under mapping v1.0.0 (same models/prompts hashes except the A1 change), reporting per-group recall, the `quantity_mismatch` count, and the concern-match caveat.

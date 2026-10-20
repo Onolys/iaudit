@@ -81,7 +81,7 @@ type GoldRenderer = ComponentType<{ gold: unknown }>;      // registry: Record<s
 | D9 | Gold registry | `Record<gold_kind, renderer>` + JSON fallback | Hard-coded TofuEval | Locked; new dataset needs one entry, no UI rewrite |
 
 ## Manual steps
-- Eyeball one real TofuEval item (gold panel vs source CSV) after C2 data is downloaded: needs the user's local download and a paid run [owner only].
+- Owner manual check: eyeball one real TofuEval item (gold panel vs source CSV) after C2 data is downloaded: needs the user's local download and a paid run [owner only]. Agents verify with fixtures and fake fetch only (see README "Manual (owner) steps").
 
 ## Risks / Open Questions
 - [RESOLVED: B3 R7] Primary vs secondary are separate entries with `policy`; field names per the interface comment above; only `toMetricRows` and fixtures depend on them.
@@ -106,4 +106,4 @@ type GoldRenderer = ComponentType<{ gold: unknown }>;      // registry: Record<s
 7. Compare shows `n shared`, deltas and disagreements; "No shared items" for zero; click-through opens the item and Back returns to the comparison.
 8. All fixtures validate against `eval/api/eval-api.schema.json`; `ReviewShell`/`LeftPane`/`RightPane`/`reviewState` diffs are empty; existing Audit tests still pass.
 9. Tests (`docs/testing/frontend.md` conventions, injected `fetch`, Testing Library): `MetricsTable`, `RunInfoBlock`, `ItemList`, `GoldPanel` (both renderers), `buildLoadResult` (ok pair from `docs/contracts/examples/`, stale, bad request), `ItemDetail` (ok/failed/stale/fetch error), `RunDetail` (scoring poll), `CompareView`, `Header` without `onFile`; `eval/mock-flow.test.tsx` extended with run -> item -> compare. `npm test`, `npm run typecheck`, `npm run build` pass.
-10. Docs updated: `docs/reference/eval-ui.md` (run detail, items, gold kinds, compare), `docs/implementation/frontend.md` (eval section, `buildLoadResult`, Header change), `docs/testing/frontend.md` (new tests, release-checklist item: open one real eval item), `docs/concepts/review-ui.md` (item view is read-only replay); folder READMEs linked.
+10. Docs updated: `docs/reference/eval-ui.md` (run detail, items, gold kinds, compare), `docs/implementation/frontend.md` (eval section, `buildLoadResult`, Header change), `docs/testing/frontend.md` (new tests, release-checklist item: open one real eval item, an owner manual check), `docs/concepts/review-ui.md` (item view is read-only replay); folder READMEs linked.

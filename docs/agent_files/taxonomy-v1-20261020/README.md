@@ -28,10 +28,14 @@ graph LR
 - No tuning on the TofuEval test split; no benchmark text in prompts or fixtures.
 
 ## Open questions and risks (after reconciliation)
-- [OPEN] Widened definitions may raise false positives (check ADHD buckets 3 and 8).
-- [OPEN] Prompt growth vs the 100 s audit deadline (`config.py`, canonical; ADR 0008 corrected in eval-core B2): check p95 latency on ADHD set.
+- [DEFERRED: owner measures in manual runs] Widened definitions may raise false positives; owner compares ADHD bucket 3 and 8 precision before/after.
+- [DEFERRED: owner measures in manual runs] Prompt growth vs the 100 s audit deadline (`config.py`, canonical; ADR 0008 corrected in eval-core B2): owner checks p95 latency.
 - [DEFERRED] Deterministic numeric comparison in code; rename `other_person`; broaden `unsupported_causal_link`; evidence-based escalation to contradicted.
 
 ## Manual (owner) steps
 - Approve final mission wording before implementation; confirm ADR wording/number.
-- Record the TofuEval dev baseline before A1 prompt changes merge; run the after pass; test split once at the end; final test of saved-item replay after all changes.
+- Record the TofuEval dev baseline before A1 prompt changes merge.
+- Run the after pass.
+- Run the test split once, at the end.
+- Final end-to-end test (incl. saved-item replay) after all changes.
+- Owner runs everything live manually; agents build prompts, schema, code, fixtures, scripted tests, docs, and run only offline checks (pytest, ruff, oracle gate, npm typecheck/test).

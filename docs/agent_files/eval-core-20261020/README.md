@@ -43,5 +43,8 @@ graph LR
 
 ## Manual (owner) steps
 - [RESOLVED: no `pricing.py`, owner decision 2026-10-20] Confirm price numbers (B1).
-- First live smoke of `scripts/dev.sh` with provider API keys in the environment (B4).
+- Agents run offline only: no live LLM/provider calls, no real backend with keys, no real dataset downloads, no live smoke (owner decision 2026-10-20). Agents build code, schemas, fake/stub backends, fixtures, offline tests, docs and `scripts/dev.sh`; the owner runs everything live. `python -m eval.run --mode oracle --gate poc` is offline fixture-based and stays agent-run.
+- Owner manual check: first live smoke of `scripts/dev.sh` (backend + eval server + frontend, Ctrl-C leaves no orphans, `--stub`) with provider API keys in the environment (B4).
+- Owner manual check: real dataset download via the download framework, then a small live pilot run against the real backend; results appear in the UI (B2, B4).
+- Owner manual check: ADR 0013 replay against live recordings, if/when recordings exist (B1).
 - [RESOLVED: verified, `app.py` ~line 175 checks `schema_version` before schema validation] Backend request-version check order (zero-spend probe, B2).

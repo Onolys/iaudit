@@ -35,6 +35,8 @@ graph LR
 - [DEFERRED] Item-list pagination/sort, next/previous item, concurrency/seed fields, ours-per-sentence in GoldPanel, production proxy.
 
 ## Manual (owner) steps
-- Live smoke with `scripts/dev.sh` and provider keys: pilot run, close and reopen the tab mid-run (D1).
-- Eyeball one real TofuEval item against the source after download (D2).
+- Agents run offline only: no live LLM/provider calls, no real backend with keys, no real dataset downloads, no live smoke, no real-browser checks (owner decision 2026-10-20). Fake-fetch/stub-server tests and fixtures stay agent-run.
+- Owner manual check: live smoke with `scripts/dev.sh` and provider keys: pilot run, close and reopen the tab in a real browser mid-run, confirm it re-attaches and the run keeps going (D1).
+- Owner manual check: `/eval-api/health` through the running Vite dev server reaches the real eval server (D1).
+- Owner manual check: eyeball one real TofuEval item against the source after download; also confirm run detail, item replay and compare render with real run results in the UI (D2).
 - Final end-to-end test only after all changes land (owner; includes the pre-A1 baseline item view caveat).

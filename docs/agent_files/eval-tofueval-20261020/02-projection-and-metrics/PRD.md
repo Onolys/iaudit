@@ -8,7 +8,7 @@ date: 2026-10-20
 Repo/branch: iaudit / `users/codex/eval-investigation` · Depends on: C1 `01-data-and-items` (items, requests), B3 `03-metrics-scoring` (registry, slicing, bootstrap, policies), B1 (contract 1.1.0 response shape) · Owns: `eval/datasets/tofueval/{projection.py, labels.py, metrics.py, item_rows.py, integrity.py, mapping.json, references.json}`, `eval/datasets/tofueval/mapping_history/` (created on first bump), `eval/tests/tofueval/` (projection, metrics, mapping, references tests + fictional fixtures). Shared edits: the `gold`/`project`/`item_row`/`pairs`/`mapping_version`/`report_extra` bodies in C1's `adapter.py` (thin delegation only), and the `levels`, `slices`, `metrics`, `references`, `mapping`, `gold_kind`, `pool_all` keys in C1's `metadata.json`.
 
 ## TL;DR
-Given a saved `AuditResponse` and a C1 item, C2 produces a native TofuEval-style prediction: each summary sentence is labelled consistent / inconsistent / unresolved from the claims whose spans overlap it; the summary label aggregates sentences. C2 registers the TofuEval metrics (balanced accuracy, inconsistent-class P/R/F1, recall for 7 error types, concern agreement for 5, diagnostics, R4 dual-policy and R10 base-rate), the slice grid, paper reference rows, per-item rows for the UI, and the integrity block (mapping version, test-run count). Everything is pure Python over saved runs: no network, no LLM, no TofuEval text.
+Given a saved `AuditResponse` and a C1 item, C2 produces a native TofuEval-style prediction: each summary sentence is labelled consistent / inconsistent / unresolved from the claims whose spans overlap it; the summary label aggregates sentences. C2 registers the TofuEval metrics (balanced accuracy, inconsistent-class P/R/F1, recall for 7 error types, concern agreement for 5 (plus concern agreement given detection), diagnostics, R4 dual-policy and R10 base-rate), the slice grid, paper reference rows, per-item rows for the UI, and the integrity block (mapping version, test-run count). Everything is pure Python over saved runs: no network, no LLM, no TofuEval text.
 
 ## Problem
 - TofuEval gold is sentence-level binary plus post-hoc multi-label error types; iAudit emits atomic claims with five verdicts and 12 concerns. Without a frozen, deterministic projection, results are researcher-degrees-of-freedom (brief decisions 13-20, 23).
@@ -57,13 +57,14 @@ Given a saved `AuditResponse` and a C1 item, C2 produces a native TofuEval-style
 | `prec_inconsistent`, `rec_inconsistent`, `f1_inconsistent` | both | inconsistent = positive |
 | `recall_by_type` x 7 | sentence | among gold-inconsistent sentences carrying type T, share predicted inconsistent; multi-label rows count in every type they carry; metric name `rec_type_<T>` (type is in the name, not a slice), n shown |
 | `concern_match_rate` x 5 | sentence | among gold sentences with scored type T (dataset-applicable per mapping), share where the union of concerns over all mapped claims intersects the allowed set; unresolved counts as no match (primary) |
+| `concern_match_given_detected` x 5 | sentence | among gold sentences with scored type T that we predicted inconsistent, share where the union of concerns over all mapped claims intersects the allowed set; separates concern agreement from recall; unresolved/consistent predictions are outside the denominator; n shown |
 | `concern_match_base_rate` x 5 (R10) | sentence | same test applied to gold-**consistent** sentences: chance level for any-in-set |
 | `unresolved_rate`, `meta_consistent_n` | both / sentence | coverage and policy tallies |
 | `claims_per_sentence`, `unmapped_claim_rate`, `boundary_crossing_rate` | diagnostic | adapter health (R5 of C brief) |
 | `concern_not_in_mapping` | diagnostic | per concern type outside every allowed set: count on mapped claims (feeds project A) |
 | R4 diagnostic: `bacc_sentence_meta_unresolved`, `bacc_summary_meta_unresolved` (extra levels emitted by `pairs()`) | both | meta sentences re-labelled unresolved (wrong in primary); headline policy stays `meta_as_consistent` |
 
-**R6a Mapping onto B3.** `bacc_*`, `prec/rec/f1_inconsistent` and `unresolved_rate` are metadata aliases of B3 built-ins (`balanced_accuracy`; `precision`/`recall`/`f1` with `positive: "inconsistent"`; `failure_rate` with `reason: unresolved`) and need no code; the seven type metrics are aliases of `recall_by_type` with a `tag` param. `concern_match_rate`/`concern_match_base_rate` are boolean levels `concern:<T>` emitted by `pairs()` (B3 R1). The diagnostics read scalar counts carried in `pair.meta` and are the only code in `metrics.py` (`pairwise` metrics). Exact level names are fixed at task time.
+**R6a Mapping onto B3.** `bacc_*`, `prec/rec/f1_inconsistent` and `unresolved_rate` are metadata aliases of B3 built-ins (`balanced_accuracy`; `precision`/`recall`/`f1` with `positive: "inconsistent"`; `failure_rate` with `reason: unresolved`) and need no code; the seven type metrics are aliases of `recall_by_type` with a `tag` param. `concern_match_rate`/`concern_match_base_rate` are boolean levels `concern:<T>` emitted by `pairs()` (B3 R1); `concern_match_given_detected` is implemented the same way: boolean level `concern_detected:<T>` emitted by `pairs()` only for gold-inconsistent sentences with scored type T whose projected label is inconsistent, rate metric on that level (alias, no new metric code). Same slices (`group_dataset`), CI, n and null-on-empty conventions as `concern_match_rate`. The diagnostics read scalar counts carried in `pair.meta` and are the only code in `metrics.py` (`pairwise` metrics). Exact level names are fixed at task time.
 
 **R7 Slices.** B3 slices one-way over `pair.meta`, so the crossed grid is expressed as derived meta keys declared in `slices`: `model_group`, `dataset`, `topic_category`, `model_name`, plus `group_dataset` (`original_five|mediasum`, ...), `group_topic`, `group_model`. Metadata sets `pool_all: false` so no entry pools original-five with Model-Extra; the `model_group` slice is the "all datasets" row within a group. Type metrics use `group_dataset` only. `contamination` is the run-level tag `run.json` `tags.contamination` (B2; default unset), shown in `metrics.json` `run.tags`, not a partition.
 
@@ -123,7 +124,7 @@ Projection  = {"sentences": [{"sent_idx", "label", "meta": bool, "claim_ids": [.
 
 \*Printed "30B" in Table 3 but "33B" in Table 4; keep the Table 3 label.
 
-**Worked fixture** (fictional, 1 item, 6 sentences; gold-inconsistent s1 EI, s4 TAM): predictions s1 inconsistent, s2 consistent, s3 inconsistent, s4 unresolved, s5 meta, s6 consistent. Primary: TP=1, FN=1 (s4 unresolved), FP=1 (s3), TN=3 (s2,s5,s6) so `rec_inconsistent`=0.5, `prec_inconsistent`=0.5, `bacc_sentence`=(0.5+0.75)/2=0.625. Secondary (s4 excluded): bacc=(1+0.75)/2=0.875. R4 alt (s5 unresolved becomes FP): TN=2, bacc=(0.5+0.5)/2=0.5. `meta_consistent_n`=1; `concern_match_rate[EI]`=1/1 if s1's claim carries `unsupported_claim`, `[TAM]`=0/1 primary. The test file derives these numbers by hand in comments, not by calling the code under test.
+**Worked fixture** (fictional, 1 item, 6 sentences; gold-inconsistent s1 EI, s4 TAM): predictions s1 inconsistent, s2 consistent, s3 inconsistent, s4 unresolved, s5 meta, s6 consistent. Primary: TP=1, FN=1 (s4 unresolved), FP=1 (s3), TN=3 (s2,s5,s6) so `rec_inconsistent`=0.5, `prec_inconsistent`=0.5, `bacc_sentence`=(0.5+0.75)/2=0.625. Secondary (s4 excluded): bacc=(1+0.75)/2=0.875. R4 alt (s5 unresolved becomes FP): TN=2, bacc=(0.5+0.5)/2=0.5. `meta_consistent_n`=1; `concern_match_rate[EI]`=1/1 if s1's claim carries `unsupported_claim`, `[TAM]`=0/1 primary. `concern_match_given_detected[EI]`=1/1 (s1 detected); `[TAM]`: n=0, value null (s4 unresolved, not detected). The test file derives these numbers by hand in comments, not by calling the code under test.
 
 ## Decisions
 | # | Decision | Choice | Alternatives considered | Why |
@@ -142,6 +143,7 @@ Projection  = {"sentences": [{"sent_idx", "label", "meta": bool, "claim_ids": [.
 | 12 | Integrity enforcement | Report block + warnings | Hard block | Decision 13 (informational) |
 
 ## Manual steps
+- Owner runs live dev/test runs manually; agents run no live audits/evals. Code is built so those runs score and show in the UI. Acceptance above is fixture-only.
 - Operator sets `tags.contamination` per run (release/cutoff vs 2024-03) through the start-run request body (B4); there is no UI field in v1.
 - Optional: one human glance at PDF p.7 to confirm the text-layer reading (low risk; header and caption verified by text).
 - On any future mapping bump (a separate decision, not project A1): maintainer copies the old file to `mapping_history/`, bumps version, adds a new sha pin.
@@ -150,14 +152,14 @@ Projection  = {"sentences": [{"sent_idx", "label", "meta": bool, "claim_ids": [.
 - [RESOLVED: pdftotext layout, PDF p.7; header order and caption "test set" confirmed; 5 brief rows match] R7 Table 3 column assignment.
 - [RESOLVED: B3 R1/R8/R9 (see `03-metrics-scoring/PRD.md`)] `pred=None` is handled by B3's policy before dataset metrics; per-item hook is `adapter.item_row`; compare warns on differing `mapping_version`.
 - [RESOLVED: `run.json` `tags`, set only via the optional `tags` field of the B4 start-run request; default unset; no D1 UI field in v1] Where the contamination tag is set.
-- [OPEN] Add `concern_match_given_detected` (match among gold sentences predicted inconsistent)? Separates concern agreement from recall; not in locked list, so not built unless approved.
+- [RESOLVED: added as `concern_match_given_detected` x 5 (R6, R6a), owner decision 2026-10-20] Separate concern agreement from recall.
 - [RESOLVED: a claim overlapping two summary sentences flags BOTH, accepted as designed; owner decision 2026-10-20] Rule 1 (any 1-code-point overlap) over-flag. Stays observable on dev via `boundary_crossing_rate`; not tuned on test.
-- [OPEN] Persisting `exp` for the GoldPanel: assumed on-demand only (D2 decision).
+- [RESOLVED: `exp` on-demand only, never persisted, owner decision 2026-10-20] Persisting `exp` for the GoldPanel.
 - [DEFERRED] `concern_not_in_mapping` evidence may inform a future, separately versioned mapping decision (not A1; A1 leaves v1.0.0 untouched).
 - [DEFERRED] Per-type CIs are wide (CO 30, TAM 39, OF 42): n always shown, types never ranked.
 
 ## Acceptance Criteria
-- Fixture tests (fictional only): each boundary case (inside one sentence, spans two, in join space, wrong section index, empty span), each sentence/summary label rule, failed item, meta mix, multi-label type, MeetingBank overrides (Mis-Referencing excluded, Opinion-as-Fact without `wrong_attribution`) pass against hand-computed values; the worked example above reproduces 0.625 / 0.875 / 0.5.
+- Fixture tests (fictional only): each boundary case (inside one sentence, spans two, in join space, wrong section index, empty span), each sentence/summary label rule, failed item, meta mix, multi-label type, MeetingBank overrides (Mis-Referencing excluded, Opinion-as-Fact without `wrong_attribution`) pass against hand-computed values; the worked example above reproduces 0.625 / 0.875 / 0.5 and `concern_match_given_detected` EI=1/1, TAM=null (n=0).
 - `mapping.json` equals brief §5.7; sha pin test passes; loader rejects an allowed concern missing from the current enum and ignores an unknown predicted concern.
 - All listed metrics appear with `{metric,value,n,ci,slice,impl}`; no headline entry lacks `model_group`.
 - `references.json` has 10 rows x 8 values equal to the table above, each labelled "paper-reported, different model & date".

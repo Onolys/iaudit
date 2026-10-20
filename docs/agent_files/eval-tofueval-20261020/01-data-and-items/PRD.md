@@ -38,9 +38,9 @@ Turn the three public sources into 1,777 audit requests. `download.py` fetches t
    - Any of the 100 ids missing, duplicated, or ambiguous -> raise, name the ids, write nothing partial (temp dir + atomic rename).
 3. **Items** (`items.py`): load 4 CSVs; group key (dataset, doc_id, topic, model_name) -> 1,777 items; `sent_idx` cast to int and sorted; `topic_category` joined from the JSON (hard error on a missing topic); `split` from the id file; `is_extra = model_name == "Model-Extra"`.
 4. **Item fields**, mapped onto B2's `Item`: `id`, `doc_id` (cluster key), `split`; `meta` (slice attributes) = `dataset`, `topic`, `topic_category`, `model_name`, `model_group` (`original_five`|`model_extra`; `is_extra = model_name == "Model-Extra"`), `has_gaps`; `payload` = `{sentences[]}`. Each sentence: `sent_idx`, `text` (verbatim `summ_sent`), `label` (raw `yes`/`no`; C2 normalises to consistent/inconsistent), `types[]` (CSV `type` split on `,`, stripped; raw strings kept), `exp`, `contamination_identifier`, `start`, `end` (offsets, req. 7). `payload` is built in memory from local data and never written to run files.
-5. **Item id**: `{dataset}--{doc_slug}--{topic_slug}--{model_slug}` (lowercase, `[^a-z0-9]+` -> `-`, trimmed). Build asserts all ids unique, `doc_id` unique across the 100 docs, and each id matches B2's `[A-Za-z0-9._-]{1,128}` (a longer id fails the build; shortening rule would be a new decision, max length not yet measured). `request_id` is left unset: B2's engine sets `<run_id>:<item_id>`.
+5. **Item id**: `{dataset}--{doc_slug}--{topic_slug}--{model_slug}` (lowercase, `[^a-z0-9]+` -> `-`, trimmed). Build asserts all ids unique, `doc_id` unique across the 100 docs, and each id matches B2's `[A-Za-z0-9._-]{1,128}` (**length guard**, owner decision 2026-10-20: if a slugged id exceeds 128 chars, truncate and append `-` + first 8 hex of sha256 of the full untruncated id so total <= 128; deterministic; uniqueness re-asserted after shortening, collision raises). `request_id` is left unset: B2's engine sets `<run_id>:<item_id>`.
 6. **Transcript -> turns** (`transcripts.py`), ids `t0..tn`, no `role`, no `timestamp`:
-   - MediaSum: one turn per `(speaker[i], utt[i])` in order; speaker verbatim; text verbatim. Assert `len(speaker)==len(utt)` and non-empty speaker.
+   - MediaSum: one turn per `(speaker[i], utt[i])` in order; speaker verbatim; text verbatim. Generic labels (e.g. "Unidentified Male") are kept as-is; all occurrences of the same label are ONE speaker; no disambiguation or inference. Assert `len(speaker)==len(utt)` and non-empty speaker.
    - MeetingBank: speaker `"unlabeled"`; blob split into sentences at `(?<=[.!?])\s+`, then greedy-packed into turns of at most **60 words** (whitespace-split), never splitting a sentence (an over-long sentence is its own turn); chunks joined with one space. Frozen at `adapter_version`; any change bumps it. Test asserts chunks concatenated with one space equal the blob with whitespace runs collapsed.
 7. **Assessment** (`assessment.py`): one section `{id: "s0", text}`, sentences joined by one space in `sent_idx` order; offsets in Unicode code points via `len()` accumulation; build-time assert `text[start:end] == summ_sent` for every sentence; no `label`/`score`. Gaps in `sent_idx` and duplicate rows are handled per Decisions 7-8.
 8. **Request**: `{schema_version, request_id, transcript, assessment}`, `schema_version` read from the loaded schema `const` (1.1.0 after B1), validated with the schema loader B2 provides; invalid = hard error before any send.
@@ -84,27 +84,31 @@ Flow: CSV rows -> `items.py` (group, sort, join) -> `assessment.py` (text + offs
 | 13 | HF revision | Resolve and record the HF commit sha at first download, then pin it | Floating `main` | Reproducibility |
 
 ## Manual steps (owner)
+Owner runs everything live. Implementing agents download no real data and run no live audits/evals; the code is built so the owner's runs work and results appear in the UI.
 1. [DEFERRED] **MeetingBank source equality**: confirm HF `huuuyeah/meetingbank` text equals what annotators saw (`lytang/MeetingBank-transcript` per TofuEval README, field `source`, `meeting_id`) for a handful of ids; also spot-check a few "no" explanations against the text.
 2. Run the first UI download; review `manifest.json`; commit the confirmed `expected_sha256` values to `metadata.json`.
 3. Accept licenses (MediaSum research-use, MeetingBank CC BY-NC-ND 4.0); data stays local.
+4. Run the real-data smoke and the 5-item pilot run (see Acceptance Criteria, owner manual checks).
 
 ## Risks / Open Questions
 - [DEFERRED] Annotated text vs HF sources (manual step 1). Downstream results carry this caveat until closed.
-- [OPEN] Paper says segments average 970 (MediaSum) / 930 (MeetingBank) words; sources measure 778 / 752 whitespace words. Ratio 1.25 / 1.24 suggests the paper counted tokens `[verified: counts; token explanation is inference, untested]`. Cheapest test: tokenise the 100 docs with a common tokenizer and compare to 970/930.
-- [OPEN] MediaSum `ccdv/mediasum` vs original `news_dialogue.json` equality (TofuEval README uses the original). Cheapest test: owner diffs 3 ids.
+- [RESOLVED: note only, no work, owner decision 2026-10-20] Paper says segments average 970 (MediaSum) / 930 (MeetingBank) words; sources measure 778 / 752 whitespace words. Ratio 1.25 / 1.24 suggests the paper counted tokens `[verified: counts; token explanation is inference, untested]`.
+- [RESOLVED: assumption, owner accepted: `ccdv/mediasum` is identical to original `news_dialogue.json`; implement with `ccdv/mediasum` now; no equality-check task, owner decision 2026-10-20] MediaSum source equality (TofuEval README uses the original).
 - [RESOLVED: reconciled with `02-eval-engine/PRD.md`] B2 interface names (Item payload/meta, download hook, split names, metadata keys).
 - [RESOLVED: 100 s (`config.py` `audit_deadline_s`) is canonical; ADR 0008 corrected in eval-core B2, owner decision 2026-10-20] Audit deadline number disagreement.
-- [DEFERRED] Long transcripts (~750-1,000 words, up to 63 MediaSum turns or ~15 MeetingBank chunks) may still hit 100 s and return `partial`/timeouts. Validated by the first 5-item pilot run (not an owner decision).
+- [DEFERRED] Long transcripts (~750-1,000 words, up to 63 MediaSum turns or ~15 MeetingBank chunks) may still hit 100 s and return `partial`/timeouts. Checked by the owner's first 5-item pilot run (manual; agents run no live audits).
+- [RESOLVED: guard in req. 5 (hash-suffix shortening, fixture-tested), owner decision 2026-10-20] Max item-id length after slugging vs the 128 limit.
 - [RESOLVED: raw `uid` match, 50/50 found, 244 double-space occurrences are in text, not ids] MeetingBank ids with spaces. IDs are matched exactly `[verified]`.
 - [RESOLVED: all 50 ids present, none duplicated] MediaSum `id` coverage `[verified]`.
 - [RESOLVED: 100 unique ids globally] `doc_id` safe as cluster key across datasets.
-- [OPEN] MediaSum speaker strings may include generic labels (e.g. "Unidentified Male"); passed through as supplied, which is allowed but may affect attribution checks.
+- [RESOLVED: keep as-is; same label = one speaker; no disambiguation or inference, owner decision 2026-10-20] Generic MediaSum speaker labels (e.g. "Unidentified Male"); may affect attribution checks.
 - [RESOLVED: extend `leakage.toml` to scan root `eval/data`; C1 owns it (req. 11), owner decision 2026-10-20] `leakage.toml` coverage of `eval/data/tofueval`.
 
 ## Acceptance Criteria
-- Fixture tests (small fictional CSV + JSONL + zip shaped like the real sources, no real text committed) cover: sort by int (10 after 9), gaps, duplicate row, embedded newline, missing id -> error, missing topic -> error, id slug uniqueness, offset assert, MeetingBank splitter (60-word cap, over-long sentence, reconstruction), MediaSum turn mapping.
+- Fixture tests (small fictional CSV + JSONL + zip shaped like the real sources, no real text committed) cover: sort by int (10 after 9), gaps, duplicate row, embedded newline, missing id -> error, missing topic -> error, id slug uniqueness, over-128-char id shortened deterministically with hash suffix (<=128, unique, stable across runs), offset assert, MeetingBank splitter (60-word cap, over-long sentence, reconstruction), MediaSum turn mapping.
 - `to_request` output validates against the loaded request schema for every fixture item.
-- Real-data smoke (local, after download): 1,777 items (split by doc: dev 70 docs, test 30 docs; dev 3,437 / test 1,510 rows), 4,947 rows, 966 "no", 1,479 original-five items, all 100 ids resolved, all requests schema-valid, all offset asserts pass.
-- Re-running download with unchanged sources yields identical hashes; tampered file is rejected.
+- **[Owner manual check]** Real-data smoke (local, after owner download; agents do not run it, code must support it): 1,777 items (split by doc: dev 70 docs, test 30 docs; dev 3,437 / test 1,510 rows), 4,947 rows, 966 "no", 1,479 original-five items, all 100 ids resolved, all requests schema-valid, all offset asserts pass.
+- Tampered file is rejected and a failed id resolution writes nothing partial (fixture-tested). **[Owner manual check]** Re-running the real download with unchanged sources yields identical hashes.
+- **[Owner manual check]** 5-item pilot run: items run end to end and results appear in the UI; long-transcript deadline behaviour observed (DEFERRED note).
 - No file under `eval/data/` or any TofuEval text is tracked by git; no TofuEval text in prompts.
-- `backend/eval/leakage.toml` reaches root `eval/data`; `test_prompt_leakage` passes with the data present and skips gracefully when absent.
+- `backend/eval/leakage.toml` reaches root `eval/data`; `test_prompt_leakage` skips gracefully when data is absent (agent-verifiable); **[owner manual check]** it passes with the real data present.

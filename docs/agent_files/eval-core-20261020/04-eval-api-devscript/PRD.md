@@ -126,10 +126,10 @@ eval/api/eval-api.schema.json   # {$defs: {...}, "x-routes": {"GET /runs": "RunS
 - Every response of every route validated against `eval-api.schema.json`; stale-schema test.
 - Flows: start→poll→finished→auto-score→metrics; abort; cap set + known costs → `aborted_cost` → resume; cap set + missing `cost_usd` → `failed`; second start→409; restart sweep (pre-seeded `running` run → `interrupted`); backend down→502; probe version mismatch→409; data missing→409; download task states.
 - Guards: `../` and encoded variants in ids → 404/422; foreign Origin/Host → 403; sentinel word in a synthetic transcript never appears in captured logs (mirrors backend scenario S9).
-- `bash -n` plus a `dev.sh --check` (preflight only) test; full script run is manual.
+- `bash -n` plus a `dev.sh --check` (preflight only) test stay agent-run; full script run is an owner manual check (agents do not start the real backend, eval server and frontend together).
 
 ## Manual steps
-- First live smoke of `scripts/dev.sh` needs provider API keys in the environment (owner only).
+- Owner manual check: first live smoke of `scripts/dev.sh` with provider API keys in the environment (owner only). Includes AC 8 (all three up, prefixed output, Ctrl-C leaves no orphans, `--stub`). Agent-run: `bash -n`, `--check`, and the offline API tests with fakes.
 
 ## Risks / Open Questions
 - [RESOLVED: B3 R8 `item_rows.json` + adapter `item_row` hook (C2)] Per-dataset `gold`/`pred`/`match` strings for the items list.
@@ -145,10 +145,10 @@ eval/api/eval-api.schema.json   # {$defs: {...}, "x-routes": {"GET /runs": "RunS
 ## Acceptance Criteria
 1. All routes above exist; every response validates against the committed schema; export test passes.
 2. Server binds 127.0.0.1:8100 and refuses foreign Origin/Host.
-3. A run survives a closed client; killing the server leaves it `interrupted` after restart and resumable to completion.
+3. A run survives a closed client; a simulated server restart (offline test: ASGI app + fake backend, pre-seeded `running` run) leaves it `interrupted` and resumable to completion.
 4. Only one run active; second start returns 409 with the active id.
 5. Backend down → 502 `backend_unreachable`; version mismatch → 409 `schema_mismatch`; no run directory is created for either.
 6. Id traversal attempts never touch files outside roots.
 7. No transcript text or item ids in logs (sentinel test).
-8. `scripts/dev.sh` brings up all three, prefixed output, Ctrl-C leaves no orphan processes; `--stub` works.
+8. [Owner manual check] `scripts/dev.sh` brings up all three, prefixed output, Ctrl-C leaves no orphan processes; `--stub` works.
 9. Docs files listed above exist and are linked from their folder READMEs.

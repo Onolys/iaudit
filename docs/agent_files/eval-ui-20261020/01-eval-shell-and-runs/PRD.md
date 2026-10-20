@@ -99,7 +99,7 @@ Shared with D2: `EvalApp` view union, `EvalApi`/`EvalError` types, `usePolling`,
 | 10 | Persistence | Last dataset only, `localStorage` try/catch | Persist split/N/view | Brief §5.3 |
 
 ## Manual steps
-- Live smoke (owner): `scripts/dev.sh` with provider keys; start a ~5-item pilot, close and reopen the tab mid-run, confirm it re-attaches.
+- Owner manual check: live smoke with `scripts/dev.sh` with provider keys; start a ~5-item pilot, close and reopen the tab in a real browser mid-run, confirm it re-attaches. Also covers the live half of AC 5 and AC 10. Agent-run: fake-fetch tests only (see README "Manual (owner) steps").
 
 ## Risks / Open Questions
 - [RESOLVED: B4 passes B2's `Estimate` through unchanged (`basis` `prior_runs`|`none`, `note`)] Cold-start note text comes from the server.
@@ -118,9 +118,9 @@ Shared with D2: `EvalApp` view union, `EvalApi`/`EvalError` types, `usePolling`,
 2. Toggle shows Audit (idle prompt) by default; switching to Eval shows Run + Runs sections; back to Audit shows a fresh idle state.
 3. With the eval server stopped, Eval shows the "not reachable" banner with Retry; Audit still works.
 4. Estimate known → shown as rough; unknown → "run a pilot" text; blank/invalid N or an invalid (non-positive) max cost disables Run; blank max cost does not; N above split size is clamped with a note.
-5. Run → progress bar updates ~1 s, Abort stops it; reload mid-run re-attaches; closing the tab does not stop the run.
+5. Run → progress bar updates ~1 s, Abort stops it; reload mid-run re-attaches (fake-fetch test, agent-run). [Owner manual check] closing and reopening the tab in a real browser does not stop the run.
 6. Missing data shows Download with status and error/Retry; completion restores Run.
 7. Runs list shows all columns, Resume only for resumable states, max two same-dataset ticks, Compare and row click set the D2 views.
 8. 3 consecutive poll failures show the banner; recovery clears it; unmount/toggle stops all polling (fake-timer test).
 9. All eval fixtures validate against `eval/api/eval-api.schema.json`.
-10. `/eval-api/health` through the Vite dev server reaches the eval server (manual or stub-server test).
+10. `/eval-api/health` through the Vite dev server reaches the eval server: stub-server test (agent-run, offline); against the real eval server is an owner manual check.

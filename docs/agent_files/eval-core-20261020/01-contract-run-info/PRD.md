@@ -94,11 +94,12 @@ Not touched: `.github/workflows/*` (both only run pytest/vitest/`eval.run --mode
 | 9 | ADR | Add ADR 0014 "run_info is optional; one shared contract version" (decisions README lists one-line decisions with reasons; 0010 shows contract choices get ADRs) | No ADR | Shared-version rule and price ownership are non-obvious |
 
 ## Manual steps
-- None. [RESOLVED: no `pricing.py`, so no price numbers to confirm, owner decision 2026-10-20]
+- Owner manual check (only if recordings exist): ADR 0013 replay against live recordings (see README "Manual (owner) steps").
+- [RESOLVED: no `pricing.py`, so no price numbers to confirm, owner decision 2026-10-20]
 
 ## Risks / Open Questions
 - [RESOLVED: one shared version; see Decision 1] Request vs response bump (brief R1).
-- [RESOLVED: recordings empty] `backend/eval/recorded/README.md` says it is "empty until the first live pass" [verified: only README present]; fixture keys hash `tier|call_tag|prompt` (`fixture_client.py:37`), not the version. ADR 0013 replay and nightly (`--mode oracle`) are unaffected. Re-run both to confirm.
+- [RESOLVED: recordings empty] `backend/eval/recorded/README.md` says it is "empty until the first live pass" [verified: only README present]; fixture keys hash `tier|call_tag|prompt` (`fixture_client.py:37`), not the version. ADR 0013 replay and nightly (`--mode oracle`) are unaffected. Agent re-runs `--mode oracle` (offline) to confirm; replay against live recordings, if any exist, is an owner manual check.
 - [RESOLVED: moot, no backend cost, owner decision 2026-10-20] LiteLLM `prompt_tokens` vs cache tokens.
 - [DEFERRED] Share one hash implementation between backend and `backend/eval` (touches ADHD harness; not requested). [RESOLVED: shared price code moot, owner decision 2026-10-20]
 - [RESOLVED: moot, no backend token accounting, owner decision 2026-10-20] Per-attempt token accounting for retried calls.

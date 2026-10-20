@@ -143,7 +143,8 @@ Unknown keys are preserved and readable by the adapter (C1 uses `adapter_version
 | 15 | Request id | Engine sets `request_id=<run_id>:<item_id>` if adapter gave none; response echo checked | No id | Contract echoes it; detects mixed-up replies |
 
 ## Manual steps
-- None for B2. (MeetingBank equality check remains an owner task in C. [DEFERRED])
+- Owner manual check: real dataset download and live runs against the real backend with provider keys. Agents verify download and engine only with fakes (`httpx.MockTransport`, synthetic dataset); no live calls (see README "Manual (owner) steps").
+- Nothing else for B2. (MeetingBank equality check remains an owner task in C. [DEFERRED])
 
 ## Risks / Open Questions
 - [RESOLVED: not added, owner decision 2026-10-20] `uv run pytest` for `eval/` in PR CI.
