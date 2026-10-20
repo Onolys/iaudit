@@ -206,6 +206,33 @@ Appendix H of the [paper PDF](https://aclanthology.org/2024.naacl-long.251.pdf) 
 
 The paper's LLM findings should be read with their setting and date: GPT-4 performed best on balanced accuracy in most evaluated settings, while specialized factuality metrics could do better on some error categories. Explanation prompting did not improve binary factuality classification in that study. This does not support a blanket claim that LLM evaluators never work, or a conclusion about every current model.
 
+### 5.4.1 Crosswalk of all twelve concerns to TofuEval
+
+This is an **interpretive crosswalk**, checked against the [mission](../../mission.md) and TofuEval's [Appendix G.1, printed page 4473 / PDF page 19](https://aclanthology.org/2024.naacl-long.251.pdf#page=19). It is not a deterministic conversion of released category gold. No complete category pair is safely interchangeable.
+
+Abbreviations: **EI** = Extrinsic Information; **MR** = Mis-Referencing; **OF** = Opinion as Fact; **RE** = Reasoning Error; **TAM** = Tense/Aspect/Modality; **CO** = Contradiction; **NMS** = Nuanced Meaning Shift. TAM is the paper's full category name, sometimes shortened in release descriptions.
+
+Important definition boundaries: EI introduces unverifiable source additions but exempts everyday commonsense. MR transfers source-grounded content between source-grounded entities. OF factualizes a source opinion. RE uses grounded premises; ungrounded premises instead point to EI. TAM includes grammatical aspect. CO specifically concerns negation or antonyms. NMS concerns changed word/phrase senses in paraphrase, rather than every lost qualification. These boundaries come from Appendix G.1; the concern relationships below are our interpretation.
+
+| iAudit concern | Nearest TofuEval type(s) | Match status | Why the match is limited |
+|---|---|---|---|
+| `unsupported_claim` | EI; other types depending on the discrepancy | Broad analogue | iAudit's support check includes altered source meaning, not just added information. |
+| `contradictory_evidence` | CO | iAudit is broader | Explicit evidence can conflict through attribution, timing, or quantity without negation/antonyms. |
+| `wrong_attribution` | MR | Partial overlap | Person/source attribution and entity-content reassignment overlap but have different boundaries. |
+| `timeframe_mismatch` | TAM | Partial overlap | Timing is one component; modality and grammatical aspect need not change timeframe. |
+| `negation_reversal` | CO | Subset relationship | The direct negation mechanism fits; CO also includes antonyms. Exceptions need contextual interpretation. |
+| `certainty_inflation` | OF, TAM | Partial overlap | Opinion and modal changes cover some cases; estimates and secondhand reports are broader. |
+| `frequency_severity_inflation` | RE; NMS only for an actual sense change | No dedicated type | Overgeneralization can overlap; neither type establishes frequency/severity gold. |
+| `context_stripping` | OF, TAM, RE, depending on what is lost | No dedicated type | Removing a qualification has several mechanisms; it is not automatically NMS. |
+| `question_as_answer` | EI or TAM, case dependent | No dedicated type | Question/answer status is not a native category; hypothetical and unsupported assertions differ. |
+| `correction_ignored` | Resulting error may fit CO, TAM, or another type | No dedicated type | TofuEval does not separately identify failure to apply a later correction. |
+| `conflicting_accounts_flattened` | MR, OF, or RE in some cases | No dedicated type | These may describe the resulting distortion, not unresolved disagreement itself. |
+| `unsupported_causal_link` | RE if premises are grounded; EI otherwise | Partial overlap | Causal inference is only part of the broader reasoning class. |
+
+**Reverse gaps:** TofuEval can label non-person entity reassignment, arithmetic mistakes or noncausal relational inference, lexical-sense paraphrase errors, and grammatical-aspect changes without a dedicated corresponding iAudit concern. Such content may still trigger general support or contradiction checks; the missing dedicated label does not establish that the product ignores it. Conversely, question/answer confusion, later corrections, conflicting accounts, and frequency/severity distortions are explicit iAudit mechanisms without dedicated TofuEval categories.
+
+For evaluation, keep binary error detection and report detection recall within each native TofuEval error group; this needs no forced taxonomy mapping or new annotation. Any future concern-classification experiment must disclose its interpretive mapping and unmatched cases separately. This crosswalk changes no mission, concern feature, or schema.
+
 ### 5.5 Terms and source access
 
 The repository uses MIT-0, but its no-training instruction and underlying source terms must also be respected. MediaSum carries research-use restrictions described in the repository's third-party license material. MeetingBank states [CC BY-NC-ND 4.0 terms](https://meetingbank.github.io/license/). Do not assume the annotation repository license grants unrestricted use of separately sourced transcripts or redistribution of transformed source material.
