@@ -2,5 +2,5 @@
 # Globs are relative to backend/src/iaudit_backend/. Scored data is eval/data/ and eval/private/.
 window = 8
 prompt_globs = ["prompts/*_fewshot.json"]
-scored_dirs = ["eval/data", "eval/private", "tests/data"]
+scored_dirs = ["eval/data", "eval/private", "tests/data", "../eval/data"]
 scored_speaker_ids = ["alex1", "sam1", "clinician1"]
