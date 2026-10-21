@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: done
 summary: Ten tasks: Vite proxy and config, typed evalApi client, schema-validated fixtures, usePolling, EvalApp shell, Audit/Eval toggle, RunPanel form, RunPanel run lifecycle, RunsList, docs.
 date: 2026-10-20
 ---
