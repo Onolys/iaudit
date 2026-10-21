@@ -26,6 +26,7 @@ REVISABLE = frozenset(
         ConcernType.negation_reversal,
         ConcernType.certainty_inflation,
         ConcernType.context_stripping,
+        ConcernType.quantity_mismatch,
     }
 )
 
@@ -72,9 +73,9 @@ def concern_text(c: Concern, s: Slots) -> str:
             "the other way; a reviewer may wish to confirm."
         ),
         t.wrong_attribution: (
-            "The behavior appears in the interview, but the source or the person described "
-            "may differ from what the claim states; a reviewer may wish to confirm who it "
-            "concerns."
+            "The behavior appears in the interview, but the source, person or entity described "
+            "may differ from what the claim states; a reviewer may wish to confirm who or "
+            "what it concerns."
         ),
         t.timeframe_mismatch: (
             "The related passage describes a different time period than the claim states, so "
@@ -91,7 +92,8 @@ def concern_text(c: Concern, s: Slots) -> str:
             "stated amount may differ from what the interview supports."
         ),
         t.context_stripping: (
-            "The related passage includes a qualifier or reason that the claim leaves out."
+            "The related passage includes a qualifier, reason or limit that the claim leaves out "
+            "or broadens."
         ),
         t.question_as_answer: (
             "The related passage is an interviewer question without an answer, so it is not "
