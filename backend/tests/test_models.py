@@ -24,10 +24,7 @@ def test_enum_drift():
     resp = _schema("audit-response.schema.json")["$defs"]
     req = _schema("audit-request.schema.json")["$defs"]
     assert _values(Verdict) == resp["Claim"]["properties"]["verdict"]["enum"]
-    # Contract schema gains quantity_mismatch (13th) in Task 4 (1.2.0); until then it is a prefix.
-    schema_types = resp["Concern"]["properties"]["type"]["enum"]
-    assert _values(ConcernType)[: len(schema_types)] == schema_types
-    assert _values(ConcernType)[len(schema_types) :] in ([], ["quantity_mismatch"])
+    assert _values(ConcernType) == resp["Concern"]["properties"]["type"]["enum"]
     assert _values(EvidenceRole) == resp["Evidence"]["properties"]["role"]["enum"]
     assert _values(WarningCode) == resp["Warning"]["properties"]["code"]["enum"]
     assert _values(Role) == req["Turn"]["properties"]["role"]["enum"]

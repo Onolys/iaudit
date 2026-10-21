@@ -4,7 +4,7 @@ import type { AuditRequest, AuditResponse, Claim } from "../contract";
 import { initialState, reviewReducer } from "./reviewState";
 
 const request: AuditRequest = {
-  schema_version: "1.1.0",
+  schema_version: "1.2.0",
   transcript: [{ id: "t0", speaker: "A", text: "hello world" }],
   assessment: [
     { id: "s0", text: "aaaa bbbb cccc" },
@@ -22,7 +22,7 @@ const claim = (id: string, verdict: Claim["verdict"], index: number, start: numb
 });
 
 const response: AuditResponse = {
-  schema_version: "1.1.0",
+  schema_version: "1.2.0",
   status: "complete",
   warnings: [],
   claims: [

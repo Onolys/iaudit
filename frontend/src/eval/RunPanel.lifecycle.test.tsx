@@ -75,6 +75,6 @@ it("shows failed state and the server's actual cost error", async () => {
   expect(screen.getByText("failed")).toBeTruthy(); expect(screen.getByText("No cost was returned")).toBeTruthy();
 });
 it.each(["schema_mismatch","backend_unreachable"])("preserves %s message and detail", async code => {
-  const s=setup(); await tick(); s.setStartError({code,message:"Exact server message",detail:{expected:"1.1.0",actual:"0.0.0"}}); start(); await tick();
+  const s=setup(); await tick(); s.setStartError({code,message:"Exact server message",detail:{expected:"1.2.0",actual:"0.0.0"}}); start(); await tick();
   expect(screen.getByText("Exact server message")).toBeTruthy(); expect(screen.getByText(/"actual": "0.0.0"/)).toBeTruthy();
 });

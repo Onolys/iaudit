@@ -35,7 +35,7 @@ const claim = (id: string, verdict: Claim["verdict"], index: number, start: numb
 });
 
 const request: AuditRequest = {
-  schema_version: "1.1.0",
+  schema_version: "1.2.0",
   transcript: [{ id: "t0", speaker: "A", text: "hello" }],
   assessment: [
     { id: "s0", label: "Alpha", score: 2, text: "one two three four" },
@@ -44,7 +44,7 @@ const request: AuditRequest = {
   ],
 };
 const multi = (claims: Claim[], warnings: AuditResponse["warnings"] = []) =>
-  build(request, { schema_version: "1.1.0", status: "complete", warnings, claims });
+  build(request, { schema_version: "1.2.0", status: "complete", warnings, claims });
 
 const claimEl = (c: HTMLElement, id: string) => c.querySelector(`.left-pane [data-claim-id="${id}"]`) as HTMLElement;
 

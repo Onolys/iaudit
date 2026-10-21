@@ -16,7 +16,7 @@ def test_example_response_valid(example_response):
 
 
 def test_error_example_valid():
-    body = {"schema_version": "1.1.0", "error": {"code": "other", "message": "x"}}
+    body = {"schema_version": "1.2.0", "error": {"code": "other", "message": "x"}}
     assert contract.validate_error(body) == []
 
 

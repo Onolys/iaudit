@@ -14,6 +14,7 @@ export const CONCERN_LABELS: Record<ConcernType, string> = {
   correction_ignored: "Correction ignored",
   conflicting_accounts_flattened: "Conflicting accounts flattened",
   unsupported_causal_link: "Unsupported causal links",
+  quantity_mismatch: "Quantity mismatch",
 };
 
 export const concernLabel = (type: string): string =>

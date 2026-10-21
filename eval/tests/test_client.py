@@ -192,7 +192,7 @@ async def test_invalid_response_bad_body():
 
 async def test_invalid_response_schema():
     def handler(request):
-        return httpx.Response(200, json={"schema_version": "1.1.0", "oops": 1})
+        return httpx.Response(200, json={"schema_version": "1.2.0", "oops": 1})
 
     c = AuditClient("http://fake", transport=httpx.MockTransport(handler))
     async with c:
