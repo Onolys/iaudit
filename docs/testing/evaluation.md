@@ -36,3 +36,17 @@ Few-shot examples are fictional and must not share an 8-word run with scored dat
 ## Not built yet
 
 Multi-fault fixture `adhd-multi` (waits for approved content) and the cleanup script for the real CDR interviews (waits for the files). A 60/20/20 split and the 0.8 precision gate wait for more data.
+
+## Dataset evaluation API (from repository `eval/`)
+
+This separate evaluation engine uses dataset adapters and a black-box HTTP backend.
+Run `uv run pytest tests/api` for offline API coverage, including the committed-schema
+staleness check, guards, background controls and read routes. Tests inject fake clients
+and fictional datasets; no provider keys or listening backend are needed. Run
+`uv run pytest` for the entire engine/scoring/API suite and `uv run ruff check src tests`.
+See the [API reference](../reference/eval-api.md) and
+[server internals](../implementation/eval-server.md).
+
+From the repository root, `bash -n scripts/dev.sh` and `bash scripts/dev.sh --check`
+check syntax and preflight only. A full-stack launch (even `--stub`), real dataset
+download or live audit is an owner-only manual check; preflight success is not a live smoke.
