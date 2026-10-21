@@ -11,9 +11,7 @@ import zipfile
 from dataclasses import asdict
 from pathlib import Path, PurePosixPath
 
-import httpx
-
-from iaudit_eval.download import FileRecord, _fetch, _hash_file, _now
+from iaudit_eval.download import FileRecord, _fetch, _hash_file, _now, https_client
 
 from .items import load_items, load_split_index
 from .transcripts import build_mediasum_turns, build_meetingbank_turns
@@ -28,6 +26,9 @@ _REQUIRED = {
     *(f"topic_category/{dataset}_topic_category.json" for dataset in ("mediasum", "meetingbank")),
 }
 
+_MAX_MEMBER_BYTES = 512 << 20  # per extracted archive member / declared stream size
+_MAX_LINE_BYTES = 64 << 20  # one transcript record per line; real records are a few MB
+
 
 def _extract(archive: Path, destination: Path) -> None:
     """Write only required annotation files and root license/readme members."""
@@ -35,6 +36,12 @@ def _extract(archive: Path, destination: Path) -> None:
     with zipfile.ZipFile(archive) as zipped:
         for member in zipped.infolist():
             parts = PurePosixPath(member.filename).parts
+            if (
+                member.filename.startswith(("/", "\\"))
+                or "\\" in member.filename
+                or ".." in parts
+            ):
+                raise ValueError(f"Unsafe archive member {member.filename!r}")
             if member.is_dir() or len(parts) < 2:
                 continue
             relative = "/".join(parts[1:])
@@ -42,19 +49,34 @@ def _extract(archive: Path, destination: Path) -> None:
                 continue
             if relative in seen or member.external_attr >> 16 & 0o170000 == 0o120000:
                 raise ValueError(f"Ambiguous archive member {relative!r}")
+            if member.file_size > _MAX_MEMBER_BYTES:
+                raise ValueError(f"Archive member {relative!r} is too large")
             seen.add(relative)
             target = destination / relative
             target.parent.mkdir(parents=True, exist_ok=True)
+            written = 0
             with zipped.open(member) as source, target.open("wb") as output:
-                shutil.copyfileobj(source, output)
+                while chunk := source.read(1 << 16):
+                    written += len(chunk)
+                    if written > _MAX_MEMBER_BYTES:
+                        raise ValueError(f"Archive member {relative!r} is too large")
+                    output.write(chunk)
     if missing := _REQUIRED - seen:
         raise ValueError(f"Missing annotation files: {sorted(missing)}")
+
+
+def _lines(stream):
+    """Yield lines, refusing any longer than the cap instead of buffering it."""
+    while line := stream.readline(_MAX_LINE_BYTES + 1):
+        if len(line) > _MAX_LINE_BYTES:
+            raise ValueError("Transcript source line exceeds the size limit")
+        yield line
 
 
 def _resolve(stream, dataset, wanted):
     selected = {}
     duplicate, ambiguous = set(), set()
-    for line in stream:
+    for line in _lines(stream):
         if not line.strip():
             continue
         row = json.loads(line)
@@ -85,7 +107,7 @@ def _resolve(stream, dataset, wanted):
             )
             if not turns or any(not turn["text"].strip() for turn in turns):
                 raise ValueError("empty transcript")
-        except (AssertionError, TypeError, ValueError) as exc:
+        except (TypeError, ValueError) as exc:
             raise ValueError(f"Invalid transcript for {dataset}/{doc_id}: {exc}") from exc
     return selected
 
@@ -132,7 +154,7 @@ def download(data_dir, progress, *, metadata=None, transport=None) -> list[FileR
     timestamp = _now()
     try:
         sources = []
-        with httpx.Client(transport=transport, follow_redirects=True, timeout=60) as client:
+        with https_client(transport) as client:
             for original in metadata["sources"]:
                 source = dict(original)
                 if source.get("hf"):
@@ -163,9 +185,12 @@ def download(data_dir, progress, *, metadata=None, transport=None) -> list[FileR
                 target = stage / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 _fetch(client, dict(source, filename=target.name), target.parent, progress)
-                source["local_path"] = relative
+                if source["id"] != "tofueval":
+                    source["local_path"] = relative
                 sources.append(source)
         _extract(stage / "raw/tofueval.zip", stage / "repo")
+        # Decision 12: hash extracted files only; the GitHub archive is not byte-stable.
+        shutil.rmtree(stage / "raw")
         index = load_split_index(stage / "repo/document_ids_dev_test_split.json")
         duplicates = []
         load_items(stage / "repo", duplicate_records=duplicates)
@@ -176,6 +201,8 @@ def download(data_dir, progress, *, metadata=None, transport=None) -> list[FileR
                 with zipfile.ZipFile(stage / "mediasum/test_data.zip") as zipped:
                     if zipped.namelist().count("test_data.txt") != 1:
                         raise ValueError("Missing or ambiguous MediaSum test_data.txt")
+                    if zipped.getinfo("test_data.txt").file_size > 8 * _MAX_MEMBER_BYTES:
+                        raise ValueError("MediaSum test_data.txt is too large")
                     with zipped.open("test_data.txt") as stream:
                         selected = _resolve(stream, dataset, wanted)
             else:

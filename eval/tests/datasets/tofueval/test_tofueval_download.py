@@ -118,7 +118,7 @@ def test_failure_publishes_no_partial_data(tmp_path, network, change):
         metadata["expected_sha256"] = {"repo/document_ids_dev_test_split.json": "0" * 64}
     bodies["test.json"] = b"\n".join(json.dumps(row).encode() for row in rows)
     with pytest.raises(
-        (ValueError, AssertionError), match="sha256" if change == "hash" else bad_id
+        ValueError, match="sha256" if change == "hash" else bad_id
     ):
         fetch(tmp_path, network)
     assert not (tmp_path / "tofueval").exists()
@@ -193,7 +193,8 @@ def test_pinned_extracted_file_accepts_repacked_archive_and_reports_progress(tmp
     network[1]["tofueval.zip"] = archive.getvalue()
     second = fetch(tmp_path, network)
     a, b = ({r.filename: r.sha256 for r in records} for records in (first, second))
-    assert a["raw/tofueval.zip"] != b["raw/tofueval.zip"]
+    assert "raw/tofueval.zip" not in a and "raw/tofueval.zip" not in b
+    assert not (tmp_path / "tofueval/raw").exists()
     assert a["derived/transcripts.json"] == b["derived/transcripts.json"]
 
 
@@ -294,3 +295,88 @@ def test_normal_loader_framework_refresh_replaces_adapter_snapshot(tmp_path, net
         {"id": "t0", "speaker": "unlabeled", "text": "New fictional council evidence."}
     ]
     assert other.adapter.to_request(item) == after
+
+
+def test_repacked_archive_and_new_manifest_timestamp_give_no_upstream_warning(tmp_path, network):
+    module = hook()
+    adapter = SimpleNamespace(
+        download=lambda d, p: module.download(d, p, metadata=network[0], transport=network[3])
+    )
+    ds = Dataset(DatasetMeta(name="tofueval", sources=tuple(network[0]["sources"])), adapter)
+    assert framework.download(ds, data_root=tmp_path)["status"] == "ready"
+    archive = io.BytesIO()
+    with (
+        zipfile.ZipFile(io.BytesIO(network[1]["tofueval.zip"])) as old,
+        zipfile.ZipFile(archive, "w") as new,
+    ):
+        new.comment = b"fictional repack"
+        for member in old.infolist():
+            new.writestr(member, old.read(member))
+    network[1]["tofueval.zip"] = archive.getvalue()
+    # Force a refetch so the manifest (timestamped) is rewritten.
+    (tmp_path / "tofueval/derived/transcripts.json").write_text("{}")
+    result = framework.download(ds, data_root=tmp_path)
+    assert result["status"] == "ready"
+    assert not any("changed upstream" in w for w in result.get("warnings", []))
+    assert "raw/tofueval.zip" not in {f["filename"] for f in result["files"]}
+
+
+def _zip_with(*members):
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w") as z:
+        for info, data in members:
+            z.writestr(info, data)
+    path = out.getvalue()
+    return path
+
+
+@pytest.mark.parametrize("name", ["x/../../evil/LICENSE", "/abs/LICENSE", "x\\..\\evil"])
+def test_extract_rejects_traversal_and_absolute_members(tmp_path, name):
+    archive = tmp_path / "a.zip"
+    archive.write_bytes(_zip_with((name, "bad")))
+    dest = tmp_path / "out" / "repo"
+    with pytest.raises(ValueError, match="Unsafe archive member"):
+        hook()._extract(archive, dest)
+    assert not (tmp_path / "evil").exists() and not (tmp_path / "out" / "evil").exists()
+    assert not list((tmp_path / "out").rglob("*")) if (tmp_path / "out").exists() else True
+
+
+def test_extract_rejects_symlink_member(tmp_path):
+    info = zipfile.ZipInfo("x/LICENSE")
+    info.external_attr = (0o120777 << 16)
+    archive = tmp_path / "a.zip"
+    archive.write_bytes(_zip_with((info, "/etc/passwd")))
+    dest = tmp_path / "repo"
+    with pytest.raises(ValueError, match="Ambiguous archive member"):
+        hook()._extract(archive, dest)
+    assert not dest.exists()
+
+
+def test_extract_enforces_member_size_cap(tmp_path, monkeypatch):
+    module = hook()
+    monkeypatch.setattr(module, "_MAX_MEMBER_BYTES", 10)
+    archive = tmp_path / "a.zip"
+    archive.write_bytes(_zip_with(("x/LICENSE", "0123456789ABC")))
+    with pytest.raises(ValueError, match="too large"):
+        module._extract(archive, tmp_path / "repo")
+    assert not (tmp_path / "repo/LICENSE").exists()
+
+
+def test_resolve_rejects_overlong_line(monkeypatch):
+    module = hook()
+    monkeypatch.setattr(module, "_MAX_LINE_BYTES", 16)
+    with pytest.raises(ValueError, match="size limit"):
+        module._resolve(io.BytesIO(b'{"uid": "' + b"a" * 64 + b'"}\n'), "meetingbank", {"a"})
+
+
+def test_adapter_refuses_redirect_to_http(tmp_path, network):
+    metadata, _, _, _ = network
+
+    def respond(request):
+        return httpx.Response(302, headers={"location": "http://evil.test/x"})
+
+    with pytest.raises(ValueError, match="non-https"):
+        hook().download(
+            tmp_path / "tofueval", None, metadata=metadata, transport=httpx.MockTransport(respond)
+        )
+    assert not (tmp_path / "tofueval").exists()
