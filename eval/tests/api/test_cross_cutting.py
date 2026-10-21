@@ -72,7 +72,8 @@ def snapshot(roots):
 
 def assert_safe_logs(caplog):
     assert TEXT not in caplog.text
-    # B2 intentionally logs its filename-safe item_id; B4 must log only route templates.
+    # B2 R12 intentionally logs its filename-safe item_id; B4 AC7 (amended to match) only
+    # forbids item ids in its own http_request logs, which use route templates.
     http_messages = [record.getMessage() for record in caplog.records
                      if record.name == "iaudit_eval" and record.getMessage().startswith("http_request ")]
     assert http_messages
