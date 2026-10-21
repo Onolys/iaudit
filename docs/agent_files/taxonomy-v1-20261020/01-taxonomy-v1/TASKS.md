@@ -12,7 +12,7 @@ Source of truth: [PRD.md](PRD.md). Add `quantity_mismatch` as the 13th enum valu
 | 1 | Mission amendment (gated on owner approval) | owner approval of wording | done |
 | 2 | Backend detection: enum, flag, guards, dedup | 1 | done |
 | 3 | Prompt, few-shot, templates, labelling rules | 2 | done |
-| 4 | Contract 1.2.0, ADR 0015, frontend enum and label | 2 | todo |
+| 4 | Contract 1.2.0, ADR 0015, frontend enum and label | 2 | done |
 | 5 | New mock fixture and boundary-pair tests | 3, 4 | todo |
 | 6 | Docs sweep for "12" references and concepts | 1, 4 | todo |
 | 7 | Offline verification and acceptance sweep | 1-6 | todo |

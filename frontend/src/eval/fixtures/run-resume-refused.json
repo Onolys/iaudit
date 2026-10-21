@@ -6,7 +6,7 @@
   "n_items": 3,
   "seed": 7,
   "created_at": "fixture-created",
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "state": "interrupted",
   "score_state": "failed",
   "totals": {
