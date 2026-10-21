@@ -12,9 +12,9 @@ Source of truth: [PRD.md](PRD.md). Pure, deterministic Python over saved runs th
 | 1 | Frozen mapping.json, loader and sha pin | none | done |
 | 2 | Gold labels | none | done |
 | 3 | Claim-to-sentence projection | 1 | done |
-| 4 | Pairs emission and unresolved policy inputs | 2, 3 | in-progress |
-| 5 | Metric registrations, slices and metadata | 4 | todo |
-| 6 | Per-item rows | 4 | todo |
+| 4 | Pairs emission and unresolved policy inputs | 2, 3 | done |
+| 5 | Metric registrations, slices and metadata | 4 | in-progress |
+| 6 | Per-item rows | 4 | in-progress |
 | 7 | Integrity block and adapter wiring | 1, 5, 6 | todo |
 | 8 | Paper reference rows | none | done |
 | 9 | Worked-example end-to-end test and import hygiene | 7, 8 | todo |

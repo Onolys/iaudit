@@ -17,7 +17,7 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 ## Execution progress
 
 - C1 data and items: complete; all eight source tasks done.
-- C2 projection and metrics: tasks 1–3 and 8 done; task 4 (pair emission) in-progress.
+- C2 projection and metrics: tasks 1–4 and 8 done; tasks 5 (metrics and slices) and 6 (item rows) in-progress independently in separate worktrees.
 - Project D: implementation pending.
 
 ## Run artifacts
