@@ -7,7 +7,7 @@ import "./item-list.css";
 interface ItemListState { runId: string; page: ItemPage | null; loading: boolean; error: EvalError | null }
 
 /** One high-limit request per filter; keep the last rows visible while that filter reloads. */
-export function ItemList({ api, runId, onOpenItem }: { api: EvalApi; runId: string; onOpenItem: (itemId: string) => void }) {
+export function ItemList({ api, runId, onOpenItem, refreshKey = 0 }: { api: EvalApi; runId: string; onOpenItem: (itemId: string) => void; refreshKey?: number }) {
   const filterName = useId();
   const [filter, setFilter] = useState<ItemFilter>("all");
   const [retry, setRetry] = useState(0);
@@ -23,7 +23,7 @@ export function ItemList({ api, runId, onOpenItem }: { api: EvalApi; runId: stri
         : { ...previous, loading: false, error: result.error });
     });
     return () => controller.abort();
-  }, [api, runId, filter, retry]);
+  }, [api, runId, filter, retry, refreshKey]);
 
   const page = state.runId === runId ? state.page : null;
   const loading = state.runId !== runId || state.loading;

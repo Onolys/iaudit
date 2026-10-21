@@ -95,7 +95,7 @@ function RunContent({ api, runId, onOpenItem, onBack }: Props) {
       {scoring ? <p role="status">Scoring...</p> : run.score_state === "failed" ? <p>Scoring failed. Re-score to retry.</p>
         : metricsLoading ? <p role="status">Loading metrics…</p> : report ? <MetricsTable report={report} />
         : !metricError && <p>Metrics missing. Re-score.</p>}
-      <ItemList api={api} runId={runId} onOpenItem={onOpenItem} />
+      <ItemList api={api} runId={runId} onOpenItem={onOpenItem} refreshKey={metricsRevision} />
       <RunInfoBlock run={run} />
     </>}
   </section>;
