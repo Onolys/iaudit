@@ -9,12 +9,12 @@ Source of truth: [PRD.md](PRD.md). One shared contract version bump to 1.1.0 plu
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Schemas 1.1.0 + `run_info` + contract examples and README | none | todo |
-| 2 | Backend version bump (src, tests, `backend/eval` pins) | 1 | todo |
-| 3 | `run_info` builder, attach in `app.py`, backend tests | 2 | todo |
-| 4 | Frontend 1.1.0 pin, types, fixtures | 1 | todo |
-| 5 | Examples, reference docs, checklist, ADR 0014 | 1, 3, 4 | todo |
-| 6 | Full offline verification | 2, 3, 4, 5 | todo |
+| 1 | Schemas 1.1.0 + `run_info` + contract examples and README | none | done |
+| 2 | Backend version bump (src, tests, `backend/eval` pins) | 1 | done |
+| 3 | `run_info` builder, attach in `app.py`, backend tests | 2 | done |
+| 4 | Frontend 1.1.0 pin, types, fixtures | 1 | done |
+| 5 | Examples, reference docs, checklist, ADR 0014 | 1, 3, 4 | done |
+| 6 | Full offline verification | 2, 3, 4, 5 | done |
 
 ## Task 1 — Schemas 1.1.0 + run_info
 What it is / what it means: The contract is the single source of truth, so it moves first (Req 4-6, Decisions 1, 2, 7).

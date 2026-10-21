@@ -75,7 +75,7 @@ class Section(_Model):
 
 
 class AuditRequest(_Model):
-    schema_version: Literal["1.0.0"]
+    schema_version: Literal["1.1.0"]
     request_id: str | None = None
     transcript: list[Turn]
     assessment: list[Section]
@@ -122,12 +122,23 @@ class Warning(_Model):  # noqa: A001 - contract name
     section_index: int | None = None
 
 
+class RunInfo(_Model):
+    models: dict[str, str]
+    prompt_hashes: dict[str, str]
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    cache_read_tokens: int | None = None
+    cache_write_tokens: int | None = None
+    cost_usd: float | None = None
+
+
 class AuditResponse(_Model):
-    schema_version: Literal["1.0.0"] = "1.0.0"
+    schema_version: Literal["1.1.0"] = "1.1.0"
     request_id: str | None = None
     status: Status
     warnings: list[Warning]
     claims: list[Claim]
+    run_info: RunInfo | None = None
 
     def to_json(self) -> dict:
         return self.model_dump(mode="json", exclude_none=True)

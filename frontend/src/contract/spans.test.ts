@@ -4,7 +4,7 @@ import { isSpanValid, walkSpan, segmentSection } from "./spans";
 import type { AuditRequest, Claim, Span } from "./types";
 
 const request: AuditRequest = {
-  schema_version: "1.0.0",
+  schema_version: "1.1.0",
   transcript: [
     { id: "t0", speaker: "a", text: "hello" },
     { id: "t1", speaker: "b", text: "" },

@@ -113,3 +113,5 @@ async def test_s9_sentinel_text_never_reaches_logs_metrics_or_headers(make_ctx, 
     assert "ZEBRASENTINEL" not in caplog.text
     assert "ZEBRASENTINEL" not in json.dumps(dict(r.headers))
     assert "total;dur=" in r.headers["server-timing"]
+    assert "run_info" in r.json()
+    assert "ZEBRASENTINEL" not in json.dumps(r.json()["run_info"])

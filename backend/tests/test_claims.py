@@ -12,7 +12,7 @@ SEC = "The caregiver reported two medication lapses. The patient frequently lose
 def sections(*texts):
     return AuditRequest.model_validate(
         {
-            "schema_version": "1.0.0",
+            "schema_version": "1.1.0",
             "transcript": [{"id": "t", "speaker": "s", "text": "x"}],
             "assessment": [{"id": f"s{i}", "text": t} for i, t in enumerate(texts)],
         }

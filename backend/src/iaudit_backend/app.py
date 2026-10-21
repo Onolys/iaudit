@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 
-from iaudit_backend import contract
+from iaudit_backend import contract, run_info
 from iaudit_backend.api.errors import (
     ApiError,
     DeadlineExceeded,
@@ -33,7 +33,7 @@ from iaudit_backend.pipeline import (
 from iaudit_backend.safe_log import log_event, setup_logging
 
 log = logging.getLogger("iaudit")
-SUPPORTED_VERSION = "1.0.0"
+SUPPORTED_VERSION = "1.1.0"
 MAX_SAFE_DEADLINE_S = 100
 _KEY_VARS = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "LITELLM_API_KEY")  # presence only
 
@@ -234,6 +234,8 @@ def create_app(
                 app.state.pipeline, model, ctx, settings, grace_s=backstop_grace_s
             )
             out = result.to_json()
+            if settings.pipeline == "full":
+                out["run_info"] = run_info.build(settings)
             if out.get("request_id") != request_id or contract.validate_response(out):
                 raise ApiError("internal_error", "Internal server error.", 500, request_id)
             headers = {}

@@ -39,10 +39,12 @@ In this order. The first failure stops the audit.
 
 1. Body is not empty and is valid JSON.
 2. It is a JSON object.
-3. `schema_version` is `1.0.0`.
+3. `schema_version` is `1.1.0`.
 4. It matches the response schema.
 5. `request_id` equals the request's, if the request had one.
 6. Claim ids are unique.
+
+The optional `run_info` block is accepted when it matches the schema and is not displayed. A reply renders the same with or without it.
 
 Then each span is checked against the uploaded text. A bad span flags only its claim or excerpt.
 
@@ -72,6 +74,6 @@ For HTTP errors the service's `error.message` is shown only if the body matches 
 | Request timeout | 120 s |
 | Mock delay | 250 ms |
 | Context step | 3 turns per click |
-| Schema version | `1.0.0` |
+| Schema version | `1.1.0` |
 
 Verdict and evidence styles are in `frontend/src/tokens/index.ts`; concern names in `frontend/src/claim-detail/concernLabels.ts` (mission checks 1–12).

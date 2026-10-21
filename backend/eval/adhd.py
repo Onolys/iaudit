@@ -18,7 +18,7 @@ def canonical_transcript(transcript: list[dict]) -> str:
 
 def make_request(spec: dict, request_id: str, sentences: list[str]) -> dict:
     return {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "request_id": request_id,
         "transcript": [dict(t) for t in spec["transcript"]],
         "assessment": [{**spec["section"], "text": " ".join(sentences)}],
