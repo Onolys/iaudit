@@ -70,3 +70,23 @@ def test_by_reason_counts_native_level_once_and_not_failed_items(tmp_path, datas
     assert rep["items"]["scored"] == 1 and rep["items"]["failed"] == 2
     # Only the scored item's one uncovered sentence, counted once at the native sentence level.
     assert rep["failures"]["by_reason"] == {"item_failed": 2, "unmapped": 0, "unresolved": 1}
+
+
+def test_saved_request_text_mismatch_is_a_distinct_item_failure(tmp_path, dataset):
+    items = dataset.items("all")
+    good, stale = items[0], items[1]
+    stale_request = dataset.adapter.to_request(stale)
+    stale_request["assessment"][0]["text"] += " Edited after the run."
+    n = len(good.payload["sentences"])
+    m = len(stale.payload["sentences"])
+    root = run(tmp_path, dataset, [
+        (good, "ok", response_covering(good, n), None),
+        (stale, "ok", response_covering(stale, m), stale_request),
+    ])
+    rep = score("r1", runs_root=root, data_root=tmp_path)
+    assert rep["items"]["scored"] == 1 and rep["items"]["failed"] == 1
+    assert rep["failures"]["by_reason"]["request_mismatch"] == 1
+    assert rep["failures"]["by_reason"]["unresolved"] == 0
+    rows = {r["item_id"]: r for r in json.loads((root / "r1" / "item_rows.json").read_text())["rows"]}
+    assert rows[stale.id]["status"] == "failed"
+    assert rows[good.id]["status"] == "ok"

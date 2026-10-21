@@ -39,7 +39,7 @@ from .metrics.report import (
 )
 
 PRIMARY_POLICY = "failures_count_wrong"
-_ITEM_REASONS = ("item_failed", "unmapped")
+_ITEM_REASONS = ("item_failed", "unmapped", "request_mismatch")
 _NEEDS_POSITIVE = ("precision", "recall", "f1")
 
 
@@ -199,7 +199,9 @@ def _collect(run_id, dataset, by_id, saved, item_ids) -> _Collected:
     row_hook = getattr(adapter, "item_row", None)
     all_pairs: list[Pair] = []
     rows: list[dict] = []
-    reasons: Counter = Counter({r: 0 for r in (*_ITEM_REASONS, "unresolved")})
+    reasons: Counter = Counter(
+        {r: 0 for r in ("item_failed", "unmapped", "unresolved")}
+    )
     n_scored = n_failed = n_not_run = 0
     primary_level = next(iter(dataset.meta.levels), None) if dataset.meta.levels else None
     for item_id in item_ids:
@@ -221,10 +223,14 @@ def _collect(run_id, dataset, by_id, saved, item_ids) -> _Collected:
         if rec.get("status") == "failed":
             failure = "item_failed"
         else:
-            try:
-                pred = adapter.project(rec.get("response"), item)
-            except Unmapped:
-                failure = "unmapped"
+            check = getattr(adapter, "check_request", None)
+            if check and rec.get("request") is not None and not check(rec["request"], item):
+                failure = "request_mismatch"  # saved request no longer matches local data
+            else:
+                try:
+                    pred = adapter.project(rec.get("response"), item)
+                except Unmapped:
+                    failure = "unmapped"
         if failure in _ITEM_REASONS:
             reasons[failure] += 1
             n_failed += 1
@@ -242,7 +248,8 @@ def _collect(run_id, dataset, by_id, saved, item_ids) -> _Collected:
             ):
                 reasons[p.failure] += 1
         all_pairs.extend(pairs)
-        status = {"item_failed": "failed", "unmapped": "unmapped"}.get(failure, "ok")
+        status = {"item_failed": "failed", "unmapped": "unmapped",
+                  "request_mismatch": "failed"}.get(failure, "ok")  # fmt: skip
         if row_hook:
             row = row_hook(item, gold, pred, failure)
         else:
