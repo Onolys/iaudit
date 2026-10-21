@@ -138,3 +138,63 @@ def test_invalid_per_metric_slice_declaration_rejected(raw):
     meta = DatasetMeta.from_dict({"name": "none", "metrics": [{"name": "recall", "slices": raw}]})
     with pytest.raises(ValueError, match="slices"):
         metrics_config(meta)
+
+
+BACC_ALIASES = (
+    "bacc_sentence", "bacc_summary",
+    "bacc_sentence_meta_unresolved", "bacc_summary_meta_unresolved",
+)
+
+
+def bacc_entries(alias, observations):
+    """Exercise real metadata, policy, aggregation and CI with fictional pairs."""
+    ds = dataset()
+    cfg = metrics_config(ds.meta)
+    metric = next(m for m in cfg.metrics if m.name == alias)
+    cfg = replace(cfg, metrics=(metric,))
+    pairs = [
+        Pair(f"fictional-{i}", f"doc-{i}", metric.level, "", gold, pred,
+             "unresolved" if pred is None else None,
+             {"model_group": "original_five", "group_dataset": "original_five|mediasum"})
+        for i, (gold, pred) in enumerate(observations)
+    ]
+    return _entries(ds, cfg, pairs, DATASETS)
+
+
+@pytest.mark.parametrize("alias", BACC_ALIASES)
+@pytest.mark.parametrize("gold", ["consistent", "inconsistent"])
+@pytest.mark.parametrize("n", [1, 5])
+@pytest.mark.parametrize("policy", ["primary", "secondary"])
+def test_bacc_missing_gold_class_is_undefined_with_observed_n(alias, gold, n, policy):
+    # Even enough clusters for a CI cannot define the missing class's recall.
+    result = entry(bacc_entries(alias, [(gold, gold)] * n), alias, policy=policy)
+    assert (result["value"], result["n"], result["ci"], result["ci_status"]) == (
+        None, n, None, "undefined",
+    )
+
+
+@pytest.mark.parametrize("alias", BACC_ALIASES)
+@pytest.mark.parametrize("resolved, unresolved", [
+    ("consistent", "inconsistent"), ("inconsistent", "consistent"),
+])
+def test_bacc_secondary_exclusion_can_remove_last_gold_class(alias, resolved, unresolved):
+    entries = bacc_entries(alias, [(resolved, resolved), (unresolved, None)])
+    # Primary recalls are 1 and 0; secondary leaves only the correct resolved unit.
+    primary = entry(entries, alias)
+    assert (primary["value"], primary["n"]) == (0.5, 2)
+    secondary = entry(entries, alias, policy="secondary")
+    assert (secondary["value"], secondary["n"], secondary["ci"], secondary["ci_status"]) == (
+        None, 1, None, "undefined",
+    )
+
+
+@pytest.mark.parametrize("alias", BACC_ALIASES)
+@pytest.mark.parametrize("policy", ["primary", "secondary"])
+def test_bacc_both_gold_classes_keep_mean_recall(alias, policy):
+    # Consistent recall 1/2, inconsistent recall 2/2 -> balanced accuracy .75.
+    entries = bacc_entries(alias, [
+        ("consistent", "consistent"), ("consistent", "inconsistent"),
+        ("inconsistent", "inconsistent"), ("inconsistent", "inconsistent"),
+    ])
+    result = entry(entries, alias, policy=policy)
+    assert (result["value"], result["n"]) == (0.75, 4)

@@ -170,7 +170,10 @@
     {
       "name": "bacc_sentence",
       "fn": "balanced_accuracy",
-      "level": "sentence"
+      "level": "sentence",
+      "params": {
+        "require_all_classes": true
+      }
     },
     {
       "name": "prec_inconsistent",
@@ -207,12 +210,18 @@
     {
       "name": "bacc_sentence_meta_unresolved",
       "fn": "balanced_accuracy",
-      "level": "sentence_meta_unresolved"
+      "level": "sentence_meta_unresolved",
+      "params": {
+        "require_all_classes": true
+      }
     },
     {
       "name": "bacc_summary",
       "fn": "balanced_accuracy",
-      "level": "summary"
+      "level": "summary",
+      "params": {
+        "require_all_classes": true
+      }
     },
     {
       "name": "prec_inconsistent",
@@ -249,7 +258,10 @@
     {
       "name": "bacc_summary_meta_unresolved",
       "fn": "balanced_accuracy",
-      "level": "summary_meta_unresolved"
+      "level": "summary_meta_unresolved",
+      "params": {
+        "require_all_classes": true
+      }
     },
     {
       "name": "rec_type_EI",
