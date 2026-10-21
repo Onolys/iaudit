@@ -6,8 +6,10 @@ from iaudit_eval import contracts
 from iaudit_eval.datasets import DatasetError, Item
 
 from . import download as download_module
+from . import integrity, item_rows, labels, pairs, projection
 from .assessment import build_assessment
 from .items import load_items
+from .mapping import FrozenMapping, load_mapping
 from .transcripts import get_transcript_turns, invalidate_transcripts
 
 
@@ -15,6 +17,7 @@ class TofuEvalAdapter:
     def __init__(self, data_dir: Path):
         # Discovery and download must work before local data exists.
         self.data_dir = Path(data_dir)
+        self._mapping: FrozenMapping | None = None
 
     def items(self, split: str) -> list[Item]:
         names = ("dev", "test")
@@ -48,11 +51,28 @@ class TofuEvalAdapter:
         invalidate_transcripts(self.data_dir)
         invalidate_transcripts(data_dir)
 
+    def _frozen_mapping(self) -> FrozenMapping:
+        if self._mapping is None:
+            self._mapping = load_mapping()
+        return self._mapping
+
+    def mapping_version(self) -> str:
+        return self._frozen_mapping().mapping_version
+
     def gold(self, item: Item):
-        raise NotImplementedError("TofuEval gold projection is implemented by C2")
+        return labels.gold(item)
 
     def project(self, response: dict, item: Item):
-        raise NotImplementedError("TofuEval response projection is implemented by C2")
+        return projection.project(response, item, self._frozen_mapping())
+
+    def pairs(self, item: Item, gold, prediction, failure):
+        return pairs.pairs(item, gold, prediction, failure, self._frozen_mapping())
+
+    def item_row(self, item: Item, gold, prediction, failure):
+        return item_rows.build(item, gold, prediction, failure, self._frozen_mapping())
+
+    def report_extra(self, run: dict, runs_root: Path | None = None):
+        return integrity.report_extra(run, runs_root, self._frozen_mapping())
 
 
 def create(data_dir: Path) -> TofuEvalAdapter:

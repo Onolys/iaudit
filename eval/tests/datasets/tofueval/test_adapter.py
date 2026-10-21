@@ -136,3 +136,148 @@ def test_request_version_comes_from_loaded_schema(dataset, tmp_path, monkeypatch
     request = dataset.adapter.to_request(dataset.items("dev")[0])
     assert request["schema_version"] == "9.0.0"
     assert not contracts.validate_request(request)
+
+
+def _saved_run(root, run_id, *, split="test", version="1.0.0", **fields):
+    from iaudit_eval import store
+
+    store.create_run(root, {
+        "run_id": run_id, "dataset": "tofueval", "split": split,
+        "mapping_version": version, "item_ids": [],
+        "created_at": "2026-10-20T10:00:00+00:00", **fields,
+    })
+    return store.load_run(root, run_id)
+
+
+def test_integrity_counts_matching_runs_read_only_in_chronological_order(dataset, tmp_path):
+    from iaudit_eval import store
+
+    root = tmp_path / "runs"
+    current = _saved_run(root, "b-current", split="all")
+    _saved_run(root, "a-same-time")
+    _saved_run(root, "z-earlier", created_at="2026-10-20T10:30:00+01:00")
+    _saved_run(root, "c-later", created_at="2026-10-20T12:00:00Z")
+    for run_id, state in [("running", "running"), ("finished", "finished"),
+                          ("aborted-cost", "aborted_cost"), ("aborted", "aborted"),
+                          ("failed", "failed")]:
+        _saved_run(root, run_id)
+        store.update_run(root, run_id, state=state)
+    dev = _saved_run(root, "dev", split="dev")
+    _saved_run(root, "other-version", version="2.0.0")
+    _saved_run(root, "other-dataset", dataset="synthetic")
+    _saved_run(root, "invalid-split", split="other")
+    _saved_run(root, "invalid-date", created_at="not-a-date")
+    _saved_run(root, "naive-date", created_at="2026-10-20T10:00:00")
+    _saved_run(root, "invalid-id")
+    path = root / "invalid-id/run.json"
+    raw = json.loads(path.read_text())
+    raw["run_id"] = "different-folder"
+    path.write_text(json.dumps(raw))
+    for name, body in [("broken", "{"), ("array", "[]"), ("scalar", "null"),
+                       ("incomplete", '{"dataset":"tofueval"}')]:
+        folder = root / name
+        folder.mkdir()
+        (folder / "run.json").write_text(body)
+    before = {p: (p.read_bytes(), p.stat().st_mtime_ns) for p in root.rglob("*") if p.is_file()}
+    extra = dataset.adapter.report_extra(current, root)
+    assert extra["mapping_version"] == "1.0.0"
+    assert len(extra["mapping_sha256"]) == 64
+    assert extra["test_run_count"] == 9
+    assert extra["test_run_ordinal"] == 5  # z-earlier, a, aborted, aborted-cost, current
+    assert extra["dev_run_count"] == 1
+    assert "0.34" in extra["label_noise_note"] and "0.42" in extra["label_noise_note"]
+    assert "exclud" in extra["secondary_excludes_failures"].lower()
+    assert extra["primary_policy"] == "failures_count_wrong"
+    assert dataset.adapter.report_extra(dev, root)["test_run_ordinal"] is None
+    assert before == {p: (p.read_bytes(), p.stat().st_mtime_ns) for p in root.rglob("*") if p.is_file()}
+
+
+def test_integrity_default_root_and_missing_root(dataset, tmp_path, monkeypatch):
+    monkeypatch.setenv("IAUDIT_EVAL_HOME", str(tmp_path / "home"))
+    run = _saved_run(tmp_path / "home/runs", "current")
+    assert dataset.adapter.report_extra(run)["test_run_count"] == 1
+    empty = dataset.adapter.report_extra(run, tmp_path / "absent")
+    assert empty["test_run_count"] == 0
+    assert empty["test_run_ordinal"] is None
+    assert not (tmp_path / "absent").exists()
+
+
+def test_mapping_is_lazy_cached_and_independent_of_downloaded_data(tmp_path, monkeypatch):
+    dataset = load("tofueval", data_root=tmp_path)
+    original = Path.read_bytes
+    reads = []
+
+    def counted(path):
+        if path.name == "mapping.json":
+            reads.append(path)
+        return original(path)
+
+    monkeypatch.setattr(Path, "read_bytes", counted)
+    assert reads == []
+    assert dataset.adapter.mapping_version() == "1.0.0"
+    assert dataset.adapter.mapping_version() == "1.0.0"
+    assert not list(tmp_path.iterdir())
+    assert len(reads) == 1
+
+
+def test_saved_fixture_scoring_uses_adapter_hooks_and_compare_warns(dataset, tmp_path, monkeypatch):
+    from iaudit_eval import store
+    from iaudit_eval.compare import compare
+    from iaudit_eval.scoring import score
+
+    root = tmp_path / "runs"
+    items = dataset.items("test")
+    item = items[0]
+    sentence = item.payload["sentences"][0]
+    response = {
+        "schema_version": "1.1.0", "status": "complete", "warnings": [],
+        "claims": [{"id": "fictional", "verdict": "supported", "concerns": [],
+                    "explanation": "Fictional support.",
+                    "evidence": [{"id": "e1", "role": "supporting",
+                                  "span": {"start": {"index": 0, "char": 0},
+                                           "end": {"index": 0, "char": 1}}}],
+                    "span": {"start": {"index": 0, "char": sentence["start"]},
+                             "end": {"index": 0, "char": sentence["end"]}}}],
+    }
+    assert not contracts.validate_response(response)
+    original = Path.read_bytes
+    mapping_reads = []
+
+    def counted(path):
+        if path.name == "mapping.json":
+            mapping_reads.append(path)
+        return original(path)
+
+    monkeypatch.setattr(Path, "read_bytes", counted)
+    gold = dataset.adapter.gold(item)
+    prediction = dataset.adapter.project(response, item)
+    assert gold["sentences"][0]["label"] in {"consistent", "inconsistent"}
+    assert prediction["sentences"][0]["label"] == "consistent"
+    assert dataset.adapter.pairs(item, gold, prediction, None)
+    assert dataset.adapter.item_row(item, gold, prediction, None)["item_id"] == item.id
+    for _ in range(3):
+        dataset.adapter.project(response, item)
+        dataset.adapter.pairs(item, gold, prediction, None)
+        dataset.adapter.item_row(item, gold, prediction, None)
+        dataset.adapter.report_extra({"split": "dev"}, root)
+    assert len(mapping_reads) == 1
+    failed = dataset.adapter.item_row(item, gold, None, "item_failed")
+    assert failed["outcome"] == "unresolved"
+    assert all(p.failure == "unresolved" for p in dataset.adapter.pairs(item, gold, None, "item_failed")
+               if p.level in {"sentence", "summary"})
+    for run_id, version in [("first", dataset.adapter.mapping_version()), ("second", "2.0.0")]:
+        _saved_run(root, run_id, version=version, item_ids=[item.id])
+        store.write_item(root, run_id, {"item_id": item.id, "status": "ok", "response": response})
+        store.update_run(root, run_id, state="finished")
+    report = score("first", runs_root=root, data_root=dataset.adapter.data_dir.parent)
+    assert report["dataset_extra"]["test_run_count"] == 1
+    assert report["dataset_extra"]["test_run_ordinal"] == 1
+    assert report["run"]["mapping_version"] == "1.0.0"
+    assert report["entries"]
+    persisted = json.loads((root / "first/item_rows.json").read_text())
+    assert persisted["rows"][0]["item_id"] == item.id
+    assert '"text"' not in json.dumps(persisted)
+    assert '"exp"' not in json.dumps(persisted)
+    result = compare("first", "second", runs_root=root, data_root=dataset.adapter.data_dir.parent)
+    assert any("mapping_version differs" in warning for warning in result["warnings"])
+    assert result["n_shared"] == 1
