@@ -32,6 +32,20 @@ How to read the review screen. Exact settings and error text are in [reference](
 - **An excerpt position that does not fit:** that excerpt is replaced by a note; the rest of the claim is shown.
 - **Anything wrong with the whole reply** (bad JSON, wrong schema version, wrong `request_id`, duplicate claim id): an error screen, and no audit is shown.
 
+## Saved eval items
+
+The [Eval item view](../reference/eval-ui.md#items-and-saved-review) replays a saved
+request and response in the same review panes. Selection, evidence expansion and
+verdict navigation remain available; they neither edit saved results nor call an
+audit service. There is no upload action in this read-only view. Gold annotations
+appear in a separate collapsible panel, without changing assessment highlights.
+
+Failed items show saved error details instead of review panes. Invalid or stale saved
+responses show the normal validation error screen. The current 1.1.0 contract pin
+rejects 1.0.0 responses; A1's planned 1.2.0 pin will also reject saved 1.1.0 responses.
+There is no replay compatibility layer. Lists, metrics and comparisons are separate
+from this validation and remain inspectable.
+
 ## Known limits
 
 - Section numbers differ: the warnings banner counts from 0; unlabelled cards count from 1.

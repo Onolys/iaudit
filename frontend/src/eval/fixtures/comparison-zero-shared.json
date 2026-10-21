@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "run_a": "fictional-finished",
+  "run_b": "fictional-finished-with-failures",
+  "dataset": "fictional-alpha",
+  "warnings": [
+    "Fictional runs have no shared items."
+  ],
+  "n_shared": 0,
+  "n_a_only": 3,
+  "n_b_only": 2,
+  "n_clusters_shared": 0,
+  "deltas": [],
+  "disagreements": []
+}

@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Nine tasks for the TofuEval gold/projection rules, frozen mapping, pairs and metric registrations, slices, item rows, integrity block and paper reference rows; all offline and fixture-tested.
 date: 2026-10-20
 ---
@@ -9,15 +9,15 @@ Source of truth: [PRD.md](PRD.md). Pure, deterministic Python over saved runs th
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Frozen mapping.json, loader and sha pin | none | todo |
-| 2 | Gold labels | none | todo |
-| 3 | Claim-to-sentence projection | 1 | todo |
-| 4 | Pairs emission and unresolved policy inputs | 2, 3 | todo |
-| 5 | Metric registrations, slices and metadata | 4 | todo |
-| 6 | Per-item rows | 4 | todo |
-| 7 | Integrity block and adapter wiring | 1, 5, 6 | todo |
-| 8 | Paper reference rows | none | todo |
-| 9 | Worked-example end-to-end test and import hygiene | 7, 8 | todo |
+| 1 | Frozen mapping.json, loader and sha pin | none | done |
+| 2 | Gold labels | none | done |
+| 3 | Claim-to-sentence projection | 1 | done |
+| 4 | Pairs emission and unresolved policy inputs | 2, 3 | done |
+| 5 | Metric registrations, slices and metadata | 4 | done |
+| 6 | Per-item rows | 4 | done |
+| 7 | Integrity block and adapter wiring | 1, 5, 6 | done |
+| 8 | Paper reference rows | none | done |
+| 9 | Worked-example end-to-end test and import hygiene | 7, 8 | done |
 
 ## Task 1 — Frozen mapping, loader, sha pin
 What it is / what it means: The concern-to-error-type mapping is a versioned, frozen input (R8, D2, D3).

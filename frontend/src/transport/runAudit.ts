@@ -1,7 +1,7 @@
 import { getConfig } from "../config";
 import type { AppConfig } from "../config";
 import { analyzeResponse, validateRequest, validateResponse } from "../contract";
-import type { AuditRequest, Result } from "../contract";
+import type { AuditRequest, AuditResponse, Result } from "../contract";
 import { postAudit } from "./client";
 import type { LoadError, LoadResult } from "./errors";
 import { defaultRegistry, lookupMock } from "./mock/registry";
@@ -42,6 +42,22 @@ export async function readRequestFile(file: Pick<File, "text">): Promise<Result<
   return checked;
 }
 
+/** Validate a parsed response and map contract errors to the shared load errors. */
+export function checkAuditResponse(request: AuditRequest, raw: unknown): Result<AuditResponse, LoadError> {
+  const checked = validateResponse(raw, request);
+  if (!checked.ok) {
+    const e = checked.error;
+    if (e.kind === "request_id_mismatch") return fail(e);
+    if (e.kind === "schema") return fail({ kind: "invalid_response", reason: "schema", issues: e.issues });
+    if (e.kind === "duplicate_claim_id") return fail({ kind: "invalid_response", reason: "duplicate_claim_id", claimId: e.id });
+    if (e.kind === "duplicate_evidence_id") {
+      return fail({ kind: "invalid_response", reason: "duplicate_evidence_id", claimId: e.claimId, evidenceId: e.id });
+    }
+    return fail({ kind: "invalid_response", reason: e.kind });
+  }
+  return checked;
+}
+
 /** Send (or mock-look-up) an already validated request and validate the reply. */
 export async function auditRequest(
   request: AuditRequest,
@@ -69,17 +85,8 @@ export async function auditRequest(
   } catch (e) {
     return fail({ kind: "invalid_response", reason: "not_json", message: e instanceof Error ? e.message : String(e) });
   }
-  const checked = validateResponse(raw, request);
-  if (!checked.ok) {
-    const e = checked.error;
-    if (e.kind === "request_id_mismatch") return fail(e);
-    if (e.kind === "schema") return fail({ kind: "invalid_response", reason: "schema", issues: e.issues });
-    if (e.kind === "duplicate_claim_id") return fail({ kind: "invalid_response", reason: "duplicate_claim_id", claimId: e.id });
-    if (e.kind === "duplicate_evidence_id") {
-      return fail({ kind: "invalid_response", reason: "duplicate_evidence_id", claimId: e.claimId, evidenceId: e.id });
-    }
-    return fail({ kind: "invalid_response", reason: e.kind });
-  }
+  const checked = checkAuditResponse(request, raw);
+  if (!checked.ok) return checked;
   return {
     ok: true,
     value: {

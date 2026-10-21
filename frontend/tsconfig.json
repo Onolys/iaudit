@@ -11,7 +11,10 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "types": ["vite/client", "node"],
-    "paths": { "@contracts/*": ["../docs/contracts/*"] }
+    "paths": {
+      "@contracts/*": ["../docs/contracts/*"],
+      "@eval-api/*": ["../eval/api/*"]
+    }
   },
   "include": ["src", "vite.config.ts"]
 }

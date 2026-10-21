@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "backend_unreachable",
+    "message": "Fictional backend unreachable error.",
+    "detail": {
+      "reason": "fictional offline test"
+    }
+  }
+}

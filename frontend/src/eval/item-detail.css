@@ -1,0 +1,3 @@
+.eval-item-detail { display: flex; flex-direction: column; min-height: 0; }
+.eval-item-back { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 8px 0; }
+.eval-item-detail > .app-main { min-height: 24rem; }

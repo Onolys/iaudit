@@ -257,3 +257,16 @@ async def test_failed_rescore_keeps_old_files_hidden(roots, monkeypatch):
         checked(await http.get(f"/runs/{run_id}/metrics"), "ErrorResponse", 404)
         page = checked(await http.get(f"/runs/{run_id}/items"), "ItemPage")
         assert all(row["gold"] is None and row["pred"] is None for row in page["items"])
+
+
+async def test_detail_preserves_run_error_extra_fields(roots):
+    async with session(roots) as (app, http, _):
+        run_id = await start(http)
+        await terminal(app.state.manager, run_id)
+        path = roots[2] / run_id / "run.json"
+        run = json.loads(path.read_text())
+        run["error"] = {"kind": "fixture_failure", "message": "Exact fixture message",
+                        "versions": {"expected": "1.1.0", "actual": "0.0.0"}}
+        path.write_text(json.dumps(run))
+        detail = checked(await http.get(f"/runs/{run_id}"), "RunDetail")
+        assert detail["error"] == run["error"]

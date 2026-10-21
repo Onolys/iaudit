@@ -159,3 +159,12 @@ def test_all_stats_additive_across_clusters():
             assert isinstance(s, Counter)
             parts = s if parts is None else combine(parts, s)
         assert m.finalize(parts, BIN) == whole, name
+
+
+@pytest.mark.parametrize("spec, gold", [(BIN, False), (BIN, True), (KARY, "a")])
+def test_balanced_accuracy_require_all_declared_classes_is_opt_in(spec, gold):
+    pairs = [P("c1", gold, gold)]
+    default = run("balanced_accuracy", pairs, spec, "primary")
+    assert (default.value, default.n) == (1.0, 1)
+    required = run("balanced_accuracy", pairs, spec, "primary", require_all_classes=True)
+    assert (required.value, required.n) == (None, 1)

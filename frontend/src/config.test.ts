@@ -4,6 +4,16 @@ import { getConfig } from "./config";
 afterEach(() => vi.unstubAllEnvs());
 
 describe("getConfig", () => {
+  it.each([undefined, ""])("evalBase defaults to the local proxy for %j", (v) => {
+    vi.stubEnv("VITE_EVAL_API_BASE", v);
+    expect(getConfig().evalBase).toBe("/eval-api");
+  });
+
+  it("evalBase accepts a configured endpoint", () => {
+    vi.stubEnv("VITE_EVAL_API_BASE", "http://localhost:9100");
+    expect(getConfig().evalBase).toBe("http://localhost:9100");
+  });
+
   it("mock is true only for exactly 'true'", () => {
     vi.stubEnv("VITE_MOCK", "true");
     expect(getConfig().mock).toBe(true);

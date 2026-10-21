@@ -3,6 +3,7 @@
 Failure policy is applied before `stat` (see `policy.apply`), never inside metrics.
 
 Params
+- `balanced_accuracy`: `require_all_classes` makes absent declared gold classes undefined.
 - `positive`: overrides `LevelSpec.positive` for precision/recall/f1/recall_by_type.
 - `recall_by_type`: `tag_key` (meta key to read) and `tag` (value to select); both required.
 - `failure_rate` / `coverage`: optional `reason` restricts failures to `pair.failure == reason`.
@@ -32,7 +33,7 @@ def _ratio(num: int, den: int) -> float | None:
 
 @metric("balanced_accuracy", policy="primary_secondary")
 class BalancedAccuracy:
-    """Mean per-class recall over classes present in gold. n = pairs scored."""
+    """Mean per-class recall; optionally require every declared class. n = pairs scored."""
 
     @staticmethod
     def stat(pairs, spec, **params) -> Counter:
@@ -44,12 +45,13 @@ class BalancedAccuracy:
         return c
 
     @staticmethod
-    def finalize(stats, spec, **params) -> Result:
+    def finalize(stats, spec, *, require_all_classes: bool = False, **params) -> Result:
         golds = [k[1] for k, v in stats.items() if k[0] == "gold" and v > 0]
-        if not golds:
-            return Result(None, 0)
+        n = sum(stats[("gold", g)] for g in golds)
+        if not golds or (require_all_classes and any(g not in golds for g in spec.labels)):
+            return Result(None, n)
         rec = [stats[("hit", g)] / stats[("gold", g)] for g in golds]
-        return Result(sum(rec) / len(rec), sum(stats[("gold", g)] for g in golds))
+        return Result(sum(rec) / len(rec), n)
 
 
 @metric("precision", policy="primary_secondary")

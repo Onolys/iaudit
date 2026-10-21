@@ -1,0 +1,9 @@
+{
+  "basis": "prior_runs",
+  "n_items": 3,
+  "est_input_tokens": 300,
+  "est_output_tokens": 60,
+  "est_cost_usd": 0.12,
+  "rough": true,
+  "note": "Fictional prior-run estimate."
+}

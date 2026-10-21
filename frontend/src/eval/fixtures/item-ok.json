@@ -1,0 +1,339 @@
+{
+  "item_id": "fictional-item-0",
+  "status": "ok",
+  "request": {
+    "schema_version": "1.1.0",
+    "request_id": "example-001",
+    "transcript": [
+      {
+        "id": "t0",
+        "speaker": "clinician1",
+        "role": "interviewer",
+        "text": "Have you been losing your keys lately?",
+        "timestamp": "00:01:02"
+      },
+      {
+        "id": "t1",
+        "speaker": "patient1",
+        "role": "respondent",
+        "text": "No. I don't lose my keys.",
+        "timestamp": "00:01:08"
+      },
+      {
+        "id": "t2",
+        "speaker": "clinician1",
+        "role": "interviewer",
+        "text": "What about appointments?"
+      },
+      {
+        "id": "t3",
+        "speaker": "patient1",
+        "role": "respondent",
+        "text": "I missed one last year, when I was traveling."
+      },
+      {
+        "id": "t4",
+        "speaker": "caretaker1",
+        "role": "informant",
+        "text": "She forgot her medication twice last month."
+      },
+      {
+        "id": "t5",
+        "speaker": "patient1",
+        "text": "That was only while I had the flu. I'm fine now."
+      }
+    ],
+    "assessment": [
+      {
+        "id": "sec-memory",
+        "label": "Memory",
+        "score": 2,
+        "text": "The caregiver reported two medication lapses last month. The patient frequently loses their keys. They missed appointments throughout the past year. The patient has trouble at work. This meets criterion A for a memory disorder."
+      }
+    ]
+  },
+  "response": {
+    "schema_version": "1.1.0",
+    "request_id": "example-001",
+    "status": "complete",
+    "warnings": [],
+    "run_info": {
+      "models": {
+        "cheap": "claude-haiku-5-5",
+        "mid": "claude-sonnet-5-5",
+        "strong": "claude-sonnet-5-5"
+      },
+      "prompt_hashes": {
+        "atomize": "0123456789abcdef",
+        "link": "fedcba9876543210",
+        "check": "00112233445566ff",
+        "prep": "a1b2c3d4e5f60718"
+      }
+    },
+    "claims": [
+      {
+        "id": "c-supported",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 0
+          },
+          "end": {
+            "index": 0,
+            "char": 56
+          }
+        },
+        "verdict": "supported",
+        "explanation": "A caregiver turn reports two recent medication lapses. The respondent later limits those lapses to an illness. That limit does not change what the caregiver reported, which is all this claim asserts.",
+        "suggested_revision": null,
+        "concerns": [],
+        "evidence": [
+          {
+            "id": "e-caregiver",
+            "role": "supporting",
+            "span": {
+              "start": {
+                "index": 4,
+                "char": 0
+              },
+              "end": {
+                "index": 4,
+                "char": 43
+              }
+            }
+          },
+          {
+            "id": "e-illness",
+            "role": "qualifying",
+            "span": {
+              "start": {
+                "index": 5,
+                "char": 0
+              },
+              "end": {
+                "index": 5,
+                "char": 48
+              }
+            },
+            "note": "A later respondent turn limits the same lapses to an illness. It does not deny the caregiver's report."
+          }
+        ]
+      },
+      {
+        "id": "c-contradicted",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 57
+          },
+          "end": {
+            "index": 0,
+            "char": 97
+          }
+        },
+        "verdict": "contradicted",
+        "explanation": "The respondent denied losing keys. The assessment asserts the opposite and presents it as frequent.",
+        "suggested_revision": "The patient denied losing keys.",
+        "concerns": [
+          {
+            "type": "negation_reversal",
+            "explanation": "A denial is written as a positive habit.",
+            "evidence_ids": [
+              "e-denial"
+            ]
+          },
+          {
+            "type": "frequency_severity_inflation",
+            "explanation": "A denied behavior is described as frequent.",
+            "evidence_ids": [
+              "e-denial"
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e-denial",
+            "role": "contradicting",
+            "span": {
+              "start": {
+                "index": 1,
+                "char": 0
+              },
+              "end": {
+                "index": 1,
+                "char": 25
+              }
+            },
+            "note": "The respondent's answer denies the behavior the assessment asserts."
+          }
+        ]
+      },
+      {
+        "id": "c-partial",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 98
+          },
+          "end": {
+            "index": 0,
+            "char": 148
+          }
+        },
+        "verdict": "partially_supported",
+        "explanation": "The respondent reported a single missed appointment last year, tied to travel. The assessment stretches that into missed appointments across the whole year and drops the travel limit.",
+        "suggested_revision": "The patient reported one missed appointment last year, during travel.",
+        "concerns": [
+          {
+            "type": "frequency_severity_inflation",
+            "explanation": "One missed appointment is written as a pattern across the year.",
+            "evidence_ids": [
+              "e-appointments"
+            ]
+          },
+          {
+            "type": "context_stripping",
+            "explanation": "The travel limit on that appointment is omitted.",
+            "evidence_ids": [
+              "e-appointments"
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "id": "e-appointments",
+            "role": "qualifying",
+            "span": {
+              "start": {
+                "index": 2,
+                "char": 0
+              },
+              "end": {
+                "index": 3,
+                "char": 45
+              }
+            },
+            "note": "Read the respondent's answer with the preceding question. One event is described, with a travel limit."
+          }
+        ]
+      },
+      {
+        "id": "c-insufficient",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 149
+          },
+          "end": {
+            "index": 0,
+            "char": 181
+          }
+        },
+        "verdict": "insufficient_evidence",
+        "explanation": "The supplied interview does not discuss work, so this claim is not substantiated. That is not the same as a contradiction.",
+        "suggested_revision": null,
+        "concerns": [
+          {
+            "type": "unsupported_claim",
+            "explanation": "Nothing in the supplied interview establishes a work problem.",
+            "evidence_ids": []
+          }
+        ],
+        "evidence": []
+      },
+      {
+        "id": "c-oos",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 182
+          },
+          "end": {
+            "index": 0,
+            "char": 227
+          }
+        },
+        "verdict": "out_of_scope",
+        "explanation": "This is a diagnostic conclusion. The audit does not check whether behaviors meet a criterion.",
+        "out_of_scope_reason": "Diagnostic criterion, not a factual claim about the interview.",
+        "suggested_revision": null,
+        "concerns": [],
+        "evidence": []
+      }
+    ]
+  },
+  "failure": null,
+  "run_info": {
+    "models": {
+      "cheap": "claude-haiku-5-5",
+      "mid": "claude-sonnet-5-5",
+      "strong": "claude-sonnet-5-5"
+    },
+    "prompt_hashes": {
+      "atomize": "0123456789abcdef",
+      "link": "fedcba9876543210",
+      "check": "00112233445566ff",
+      "prep": "a1b2c3d4e5f60718"
+    }
+  },
+  "gold": {
+    "sentences": [
+      {
+        "sent_idx": 0,
+        "text": "The caregiver reported two medication lapses last month.",
+        "label": "consistent",
+        "types": [],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 0,
+        "end": 56
+      },
+      {
+        "sent_idx": 1,
+        "text": "The patient frequently loses their keys.",
+        "label": "inconsistent",
+        "types": [
+          "Contradiction"
+        ],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 57,
+        "end": 97
+      },
+      {
+        "sent_idx": 2,
+        "text": "They missed appointments throughout the past year.",
+        "label": "inconsistent",
+        "types": [
+          "Nuanced Meaning Shift",
+          "Tense/Modality Error"
+        ],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 98,
+        "end": 148
+      },
+      {
+        "sent_idx": 3,
+        "text": "The patient has trouble at work.",
+        "label": "inconsistent",
+        "types": [
+          "Extrinsic Information"
+        ],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 149,
+        "end": 181
+      },
+      {
+        "sent_idx": 4,
+        "text": "This meets criterion A for a memory disorder.",
+        "label": "inconsistent",
+        "types": [
+          "Reasoning Error"
+        ],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 182,
+        "end": 227
+      }
+    ],
+    "summary": "inconsistent"
+  },
+  "gold_kind": "tofueval_summary_sentences"
+}

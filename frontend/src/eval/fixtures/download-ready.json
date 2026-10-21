@@ -1,0 +1,15 @@
+{
+  "status": "ready",
+  "files": [
+    {
+      "id": "fictional-file",
+      "filename": "fictional.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "size_bytes": 128,
+      "fetched_at": "fixture-time"
+    }
+  ],
+  "warnings": [],
+  "error": null,
+  "updated_at": null
+}

@@ -1,0 +1,5 @@
+doc_id,annotation_id,topic,model_name,sent_idx,summ_sent,sent_label,exp,type,contamination_identifier
+FICTIONAL-MS-DEV,fictional-annotation-10,Fictional kite exhibition,model_A,10,The fictional exhibition closes after dusk.,yes,,,fictional-token-10
+FICTIONAL-MS-DEV,fictional-annotation-1,Fictional kite exhibition,model_A,1,"The fictional café hosts a kite exhibition.
+Paper birds hang above the tables.",yes,,,fictional-token-1
+FICTIONAL-MS-DEV,fictional-annotation-9,Fictional kite exhibition,model_A,9,The fictional exhibition opens before dawn.,no,The fictional speaker says it opens at noon.,"Contradiction, Tense/Modality Error",fictional-token-9

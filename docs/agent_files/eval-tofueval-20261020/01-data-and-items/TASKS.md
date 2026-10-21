@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Eight tasks for the TofuEval adapter data layer: metadata, fictional fixtures, assessment offsets, items, transcript turns, download, adapter assembly, leakage guard.
 date: 2026-10-20
 ---
@@ -9,14 +9,14 @@ Source of truth: [PRD.md](PRD.md). Builds the TofuEval download, 1,777 summary i
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Dataset `metadata.json` | none | todo |
-| 2 | Fictional test fixtures | none | todo |
-| 3 | Assessment builder with offset map | 2 | todo |
-| 4 | Items: grouping, ids, sentence fields | 1, 2, 3 | todo |
-| 5 | Transcript to turns | 2 | todo |
-| 6 | Download hook, manifest, derived cache | 1, 2 | todo |
-| 7 | Adapter assembly and request validation | 4, 5, 6 | todo |
-| 8 | Leakage guard extension | none | todo |
+| 1 | Dataset `metadata.json` | none | done |
+| 2 | Fictional test fixtures | none | done |
+| 3 | Assessment builder with offset map | 2 | done |
+| 4 | Items: grouping, ids, sentence fields | 1, 2, 3 | done |
+| 5 | Transcript to turns | 2 | done |
+| 6 | Download hook, manifest, derived cache | 1, 2 | done |
+| 7 | Adapter assembly and request validation | 4, 5, 6 | done |
+| 8 | Leakage guard extension | none | done |
 
 ## Task 1 — Dataset metadata
 What it is / what it means: The declarative description B2's loader and B4's Download button read (Req 1, Decision 13).

@@ -34,6 +34,12 @@ const titles: [LoadError, string, boolean][] = [
 ];
 
 describe("ErrorScreen", () => {
+  it("shows saved-response errors without a choose-file action", () => {
+    render(<ErrorScreen error={{ kind: "invalid_response", reason: "wrong_version" }} />);
+    expect(screen.getByRole("alert").textContent).toContain("unsupported schema version");
+    expect(screen.queryByRole("button", { name: "Choose another file" })).toBeNull();
+  });
+
   it.each(titles)("%j", (error, title, retry) => {
     const onRetry = vi.fn();
     const onChooseFile = vi.fn();

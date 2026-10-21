@@ -1,0 +1,175 @@
+{
+  "sentences": [
+    {
+      "summ_sent": "The fictional kite is amber.",
+      "sent_label": "no",
+      "type": "Extrinsic Information",
+      "exp": "Fictional private gold explanation 1."
+    },
+    {
+      "summ_sent": "The fictional kite has paper wings.",
+      "sent_label": "yes",
+      "type": "",
+      "exp": "Fictional private gold explanation 2."
+    },
+    {
+      "summ_sent": "The fictional kite rests near a bell.",
+      "sent_label": "yes",
+      "type": "",
+      "exp": "Fictional private gold explanation 3."
+    },
+    {
+      "summ_sent": "The fictional kite flew yesterday.",
+      "sent_label": "no",
+      "type": "Tense/Modality Error",
+      "exp": "Fictional private gold explanation 4."
+    },
+    {
+      "summ_sent": "The fictional kite deserves a prize.",
+      "sent_label": "yes",
+      "type": "",
+      "exp": "Fictional private gold explanation 5."
+    },
+    {
+      "summ_sent": "The fictional kite has a ribbon.",
+      "sent_label": "yes",
+      "type": "",
+      "exp": "Fictional private gold explanation 6."
+    }
+  ],
+  "response": {
+    "schema_version": "1.1.0",
+    "status": "complete",
+    "warnings": [],
+    "claims": [
+      {
+        "id": "fictional-c1",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 0
+          },
+          "end": {
+            "index": 0,
+            "char": 28
+          }
+        },
+        "verdict": "insufficient_evidence",
+        "explanation": "Fictional saved audit finding.",
+        "concerns": [
+          {
+            "type": "unsupported_claim",
+            "explanation": "Fictional concern for acceptance.",
+            "evidence_ids": []
+          }
+        ],
+        "evidence": []
+      },
+      {
+        "id": "fictional-c2",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 29
+          },
+          "end": {
+            "index": 0,
+            "char": 64
+          }
+        },
+        "verdict": "supported",
+        "explanation": "Fictional saved audit finding.",
+        "concerns": [],
+        "evidence": [
+          {
+            "id": "fictional-e2",
+            "role": "supporting",
+            "span": {
+              "start": {
+                "index": 0,
+                "char": 0
+              },
+              "end": {
+                "index": 0,
+                "char": 1
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "fictional-c3",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 65
+          },
+          "end": {
+            "index": 0,
+            "char": 102
+          }
+        },
+        "verdict": "insufficient_evidence",
+        "explanation": "Fictional saved audit finding.",
+        "concerns": [
+          {
+            "type": "unsupported_claim",
+            "explanation": "Fictional concern for acceptance.",
+            "evidence_ids": []
+          }
+        ],
+        "evidence": []
+      },
+      {
+        "id": "fictional-c5",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 138
+          },
+          "end": {
+            "index": 0,
+            "char": 174
+          }
+        },
+        "verdict": "out_of_scope",
+        "explanation": "Fictional saved audit finding.",
+        "concerns": [],
+        "evidence": [],
+        "out_of_scope_reason": "Fictional evaluative opinion."
+      },
+      {
+        "id": "fictional-c6",
+        "span": {
+          "start": {
+            "index": 0,
+            "char": 175
+          },
+          "end": {
+            "index": 0,
+            "char": 207
+          }
+        },
+        "verdict": "supported",
+        "explanation": "Fictional saved audit finding.",
+        "concerns": [],
+        "evidence": [
+          {
+            "id": "fictional-e6",
+            "role": "supporting",
+            "span": {
+              "start": {
+                "index": 0,
+                "char": 0
+              },
+              "end": {
+                "index": 0,
+                "char": 1
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "status": "ok",
+  "eval_api_version": "1.0.0",
+  "backend": {
+    "url": "http://backend.invalid",
+    "reachable": false,
+    "schema_version": null
+  }
+}

@@ -1,0 +1,13 @@
+.eval-gold { box-sizing: border-box; max-height: 30vh; overflow: auto; border: 1px solid #d1d5db; border-radius: 6px; margin: 8px 0; background: #fff; color: #111827; }
+.eval-gold > summary { padding: 8px 12px; cursor: pointer; font-weight: 600; }
+.eval-gold > summary:focus-visible { outline: 2px solid #2563eb; outline-offset: -2px; }
+.eval-gold-content { padding: 0 12px 8px; overflow-wrap: anywhere; }
+.eval-gold-content pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.eval-gold-sentences { list-style: none; margin: 0; padding: 0; }
+.eval-gold-sentences > li { border-top: 1px solid #e5e7eb; padding: 8px 0; }
+.eval-gold-sentences h3 { font-size: 14px; margin: 0 0 6px; }
+.eval-gold-sentences p { margin: 6px 0; }
+.eval-gold-sentences dl { margin: 6px 0; }
+.eval-gold-sentences dt { font-weight: 600; }
+.eval-gold-sentences dd { margin: 0 0 6px; }
+.eval-gold-text { white-space: pre-wrap; }

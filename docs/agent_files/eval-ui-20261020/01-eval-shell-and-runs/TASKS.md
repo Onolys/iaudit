@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Ten tasks: Vite proxy and config, typed evalApi client, schema-validated fixtures, usePolling, EvalApp shell, Audit/Eval toggle, RunPanel form, RunPanel run lifecycle, RunsList, docs.
 date: 2026-10-20
 ---
@@ -9,16 +9,16 @@ Source of truth: docs/agent_files/eval-ui-20261020/01-eval-shell-and-runs/PRD.md
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Proxy, config and schema alias | none | todo |
-| 2 | Eval types and evalApi client | 1 | todo |
-| 3 | Fixtures and schema validation | 2 | todo |
-| 4 | usePolling hook | none | todo |
-| 5 | EvalApp shell and view slot | 2, 4 | todo |
-| 6 | Audit / Eval toggle | 5 | todo |
-| 7 | RunPanel form and estimate | 3, 5 | todo |
-| 8 | RunPanel run lifecycle | 4, 7 | todo |
-| 9 | RunsList | 3, 5, 8 | todo |
-| 10 | Eval UI reference docs | 6, 9 | todo |
+| 1 | Proxy, config and schema alias | none | done |
+| 2 | Eval types and evalApi client | 1 | done |
+| 3 | Fixtures and schema validation | 2 | done |
+| 4 | usePolling hook | none | done |
+| 5 | EvalApp shell and view slot | 2, 4 | done |
+| 6 | Audit / Eval toggle | 5 | done |
+| 7 | RunPanel form and estimate | 3, 5 | done |
+| 8 | RunPanel run lifecycle | 4, 7 | done |
+| 9 | RunsList | 3, 5, 8 | done |
+| 10 | Eval UI reference docs | 6, 9 | done |
 
 ## Task 1 — Proxy, config and schema alias
 What it is / what it means: Dev-server plumbing so the frontend reaches the eval server and tests can import B4's schema (PRD R7; Decision 7; AC 10).

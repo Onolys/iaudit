@@ -84,6 +84,7 @@ class MetricEntry:
     fn: str  # registry key
     level: str
     params: Mapping[str, Any] = field(default_factory=dict)
+    slices: tuple[str, ...] | None = None  # None inherits the dataset's one-way slices
 
 
 @dataclass(frozen=True)
@@ -94,6 +95,7 @@ class MetricsConfig:
     metrics: tuple[MetricEntry, ...]
     references: str | None
     pool_all: bool
+    slice_partition: str | None = None
 
 
 def metrics_config(meta: DatasetMeta) -> MetricsConfig:
@@ -120,7 +122,16 @@ def metrics_config(meta: DatasetMeta) -> MetricsConfig:
             if level not in levels:
                 raise ValueError(f"metric {name!r}: level {level!r} not in {list(levels)}")
             params = dict(raw.get("params") or {})
-            out.append(MetricEntry(name, raw.get("fn") or name, level, params))
+            slices = raw.get("slices")
+            if slices is not None and (
+                not isinstance(slices, (list, tuple))
+                or any(not isinstance(key, str) or not key for key in slices)
+            ):
+                raise ValueError(f"metric {name!r}: slices must be a list of nonempty strings")
+            out.append(MetricEntry(
+                name, raw.get("fn") or name, level, params,
+                None if slices is None else tuple(slices),
+            ))
         entries = tuple(out)
     return MetricsConfig(
         cluster_key=meta.cluster_key,
@@ -129,4 +140,5 @@ def metrics_config(meta: DatasetMeta) -> MetricsConfig:
         metrics=entries,
         references=meta.references,
         pool_all=bool(meta.pool_all),
+        slice_partition=meta.get("slice_partition"),
     )
