@@ -20,7 +20,7 @@ Phase: Project C complete offline with final review PASS; owner checks remain. P
 
 - C1 data and items: complete; all eight source tasks done.
 - C2 projection and metrics: complete; all nine source tasks done.
-- Project D: D1 tasks 1–4 done; task 5 (EvalApp shell) in-progress in its auxiliary worktree. Code review base `2cff97c`.
+- Project D: D1 tasks 1–5 done; tasks 6 (Audit/Eval toggle) and 7 (RunPanel form and estimate) in-progress independently in separate worktrees. Code review base `2cff97c`.
 
 ## Run artifacts
 
