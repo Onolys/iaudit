@@ -12,7 +12,12 @@ from fastapi import FastAPI, Request
 from iaudit_eval import paths
 from iaudit_eval.client import AuditClient
 from iaudit_eval.log import log_event
-from iaudit_eval.server import routes_datasets, routes_health, routes_run_control
+from iaudit_eval.server import (
+    routes_datasets,
+    routes_health,
+    routes_run_control,
+    routes_run_reads,
+)
 from iaudit_eval.server.guards import (
     FORBIDDEN_MESSAGE,
     INTERNAL_MESSAGE,
@@ -23,6 +28,7 @@ from iaudit_eval.server.guards import (
     validate_bind,
 )
 from iaudit_eval.server.manager import RunManager
+from iaudit_eval.server.reads import RunReader
 
 
 def create_app(
@@ -59,10 +65,12 @@ def create_app(
         datasets_root=app.state.datasets_root, data_root=app.state.data_root,
         runs_root=app.state.runs_root,
     )
+    app.state.reader = RunReader(app.state.manager)
     register_error_handlers(app)
     app.include_router(routes_health.router)
     app.include_router(routes_datasets.router)
     app.include_router(routes_run_control.router)
+    app.include_router(routes_run_reads.router)
 
     # No CORS middleware. Added first = inner; the logging middleware below wraps it.
     @app.middleware("http")

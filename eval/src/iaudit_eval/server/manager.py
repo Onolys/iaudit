@@ -18,6 +18,7 @@ from iaudit_eval.server.guards import (
     not_found,
     resolve_under,
     validate_dataset_id,
+    validate_item_id,
     validate_run_id,
 )
 
@@ -152,21 +153,46 @@ class RunManager:
         path = resolve_under(self.runs_root, run_id, "run.json")
         if not path.is_file():
             raise not_found("Run not found.")
+        resolve_under(self.runs_root, run_id, "run.lock")
         return store.load_run(self.runs_root, run_id)
+
+    def _item_paths(self, run_id: str, run: dict) -> list[Path]:
+        directory = resolve_under(self.runs_root, run_id, "items")
+        if not directory.is_dir():
+            return []
+        result = []
+        for path in sorted(directory.glob("*.json")):
+            validate_item_id(path.stem, set(run["item_ids"]))
+            result.append(resolve_under(self.runs_root, run_id, "items", path.name))
+        return result
+
+    def _metrics_current(self, run_id: str, run: dict, state: str) -> bool:
+        report = resolve_under(self.runs_root, run_id, "metrics.json")
+        if state == "running" or self.score_states.get(run_id) in {"pending", "running", "failed"}:
+            return False
+        if not report.is_file():
+            return False
+        # B3 atomically writes reports after run/item writes. A resumed or changed
+        # run invalidates older reports, including after a server restart.
+        sources = [
+            resolve_under(self.runs_root, run_id, "run.json"), *self._item_paths(run_id, run),
+        ]
+        return report.stat().st_mtime_ns >= max(path.stat().st_mtime_ns for path in sources)
 
     def _read_summary(self, run_id: str) -> dict:
         run = self._read_run(run_id)
+        self._item_paths(run_id, run)
         totals = store.compute_totals(self.runs_root, run_id)
-        metrics = resolve_under(self.runs_root, run_id, "metrics.json")
+        state = store.effective_state(self.runs_root, run_id)
         score_state = self.score_states.get(run_id)
         if score_state not in {"running", "failed"}:
-            score_state = "done" if metrics.is_file() else "pending"
+            score_state = "done" if self._metrics_current(run_id, run, state) else "pending"
         return {
             "run_id": run_id, "dataset": run["dataset"], "split": run["split"],
             "n_requested": run.get("n_requested"), "n_items": len(run["item_ids"]),
             "seed": run.get("seed"), "created_at": run["created_at"],
             "finished_at": run.get("finished_at"), "schema_version": run.get("schema_version"),
-            "state": store.effective_state(self.runs_root, run_id), "score_state": score_state,
+            "state": state, "score_state": score_state,
             "totals": {"cost_usd": totals["cost_usd"], "failures": totals["failed"]},
             "git_dirty": run.get("git_dirty"),
         }

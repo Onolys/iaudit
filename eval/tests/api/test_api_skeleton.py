@@ -31,7 +31,7 @@ def make_app(tmp_path, **kw):
         validate_dataset_id(name)
         return {"name": name}
 
-    @r.get("/runs/{run_id}/items/{item_id}")
+    @r.get("/guard-runs/{run_id}/items/{item_id}")
     async def item(run_id: str, item_id: str):
         validate_run_id(run_id)
         validate_item_id(item_id, {"a.1"})
@@ -134,14 +134,14 @@ async def test_good_dataset_id(tmp_path):
 )
 async def test_bad_run_ids_404(tmp_path, run_id):
     async with client(make_app(tmp_path)) as c:
-        assert_error(await c.get(f"/runs/{run_id}/items/a.1"), 404, "not_found")
+        assert_error(await c.get(f"/guard-runs/{run_id}/items/a.1"), 404, "not_found")
 
 
 async def test_item_allowlist(tmp_path):
     async with client(make_app(tmp_path)) as c:
-        assert (await c.get(f"/runs/{RUN_ID}/items/a.1")).status_code == 200
+        assert (await c.get(f"/guard-runs/{RUN_ID}/items/a.1")).status_code == 200
         for bad in ["b", "..", "a.1%2F..", "%2e%2e"]:
-            assert_error(await c.get(f"/runs/{RUN_ID}/items/{bad}"), 404, "not_found")
+            assert_error(await c.get(f"/guard-runs/{RUN_ID}/items/{bad}"), 404, "not_found")
 
 
 def test_validators_direct(tmp_path):
@@ -194,14 +194,14 @@ async def test_error_shapes(tmp_path):
 async def test_logging_safe(tmp_path, caplog):
     async with client(make_app(tmp_path)) as c:
         with caplog.at_level(logging.DEBUG):
-            await c.get(f"/runs/{RUN_ID}/items/a.1?x={SENTINEL}")
+            await c.get(f"/guard-runs/{RUN_ID}/items/a.1?x={SENTINEL}")
             await c.post("/body", json={"t": SENTINEL})
             await c.get("/guard-datasets/" + SENTINEL.lower())
     # httpx's own client logger echoes the URL; only the server's loggers matter here.
     text = "\n".join(r.getMessage() for r in caplog.records if not r.name.startswith("httpx"))
     assert SENTINEL not in text and SENTINEL.lower() not in text
     assert "a.1" not in text and RUN_ID not in text
-    assert "/runs/{run_id}/items/{item_id}" in text
+    assert "/guard-runs/{run_id}/items/{item_id}" in text
     assert "method=" in text and "status=" in text and "duration_ms=" in text
 
 
