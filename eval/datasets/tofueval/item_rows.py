@@ -75,6 +75,7 @@ def build(
             "doc_id": item.doc_id, "dataset": dataset,
             "topic_category": item.meta["topic_category"],
             "model_name": item.meta["model_name"], "model_group": item.meta["model_group"],
+            "has_gaps": bool(item.meta.get("has_gaps", False)),
             "gold": {
                 "summary": gold["summary"], "n_sentences": count,
                 "n_inconsistent": gold_count,
