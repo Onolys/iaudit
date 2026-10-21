@@ -17,7 +17,7 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 ## Execution progress
 
 - C1 data and items: complete; all eight source tasks done.
-- C2 projection and metrics: tasks 1 (frozen mapping) and 2 (gold labels) in-progress independently in separate worktrees.
+- C2 projection and metrics: tasks 1 (frozen mapping) and 2 (gold labels) done; tasks 3 (projection) and 8 (paper references) in-progress independently in separate worktrees.
 - Project D: implementation pending.
 
 ## Run artifacts
