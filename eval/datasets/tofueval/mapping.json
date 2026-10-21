@@ -1,0 +1,14 @@
+{
+  "mapping_version": "1.0.0",
+  "semantics": "gold type matches if ANY predicted concern on a claim mapped to the sentence is in the allowed set",
+  "types": {
+    "Extrinsic Information":    {"allowed": ["unsupported_claim"]},
+    "Mis-Referencing":          {"allowed": ["wrong_attribution"], "datasets": ["mediasum"]},
+    "Tense/Modality":           {"allowed": ["timeframe_mismatch", "certainty_inflation"]},
+    "Stating Opinion as Fact":  {"allowed": ["certainty_inflation", "wrong_attribution"],
+                                "dataset_overrides": {"meetingbank": ["certainty_inflation"]}},
+    "Contradiction":            {"allowed": ["contradictory_evidence", "negation_reversal"]},
+    "Nuanced Meaning Shift":    {"allowed": null, "recall_only": true},
+    "Reasoning Error":          {"allowed": null, "recall_only": true}
+  }
+}
