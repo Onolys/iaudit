@@ -5,10 +5,10 @@ Project B of 4 (B eval-core, C eval-tofueval, D eval-ui, A taxonomy-v1): black-b
 ## Sub-projects
 | Sub-project | PRD | Scope | Depends on | Status |
 |---|---|---|---|---|
-| B1 Contract run_info | [PRD](01-contract-run-info/PRD.md) | Optional `run_info` (models, prompt hashes; optional tokens/`cost_usd` declared but not populated by the backend) in AuditResponse; shared contract 1.1.0 across backend, frontend, validators, docs; ADR 0014 | none | draft |
-| B2 Eval engine | [PRD](02-eval-engine/PRD.md) | `eval/` project: dataset adapter protocol and metadata keys, selection, HTTP client with schema validation, crash-safe run store, resume, optional cost cap, probe, download framework, synthetic dataset | B1 | draft |
-| B3 Metrics & scoring | [PRD](03-metrics-scoring/PRD.md) | Metrics registry, failure policy, clustered bootstrap CIs, `metrics.json`/`compare.json`/`item_rows.json`, compare on shared items | B2 | draft |
-| B4 Eval API + dev script | [PRD](04-eval-api-devscript/PRD.md) | Local FastAPI server (127.0.0.1:8100), `eval-api.schema.json` (bundles B3 schemas), `scripts/dev.sh` | B2, B3 | draft |
+| B1 Contract run_info | [PRD](01-contract-run-info/PRD.md) | Optional `run_info` (models, prompt hashes; optional tokens/`cost_usd` declared but not populated by the backend) in AuditResponse; shared contract 1.1.0 across backend, frontend, validators, docs; ADR 0014 | none | merged (done) |
+| B2 Eval engine | [PRD](02-eval-engine/PRD.md) | `eval/` project: dataset adapter protocol and metadata keys, selection, HTTP client with schema validation, crash-safe run store, resume, optional cost cap, probe, download framework, synthetic dataset | B1 | done |
+| B3 Metrics & scoring | [PRD](03-metrics-scoring/PRD.md) | Metrics registry, failure policy, clustered bootstrap CIs, `metrics.json`/`compare.json`/`item_rows.json`, compare on shared items | B2 | done |
+| B4 Eval API + dev script | [PRD](04-eval-api-devscript/PRD.md) | Local FastAPI server (127.0.0.1:8100), `eval-api.schema.json` (bundles B3 schemas), `scripts/dev.sh` | B2, B3 | done |
 
 Brief: [brainstorming.md](brainstorming.md).
 
@@ -48,3 +48,12 @@ graph LR
 - Owner manual check: real dataset download via the download framework, then a small live pilot run against the real backend; results appear in the UI (B2, B4).
 - Owner manual check: ADR 0013 replay against live recordings, if/when recordings exist (B1).
 - [RESOLVED: verified, `app.py` ~line 175 checks `schema_version` before schema validation] Backend request-version check order (zero-spend probe, B2).
+
+## Implementation and review
+
+B1's six tasks merged in [PR #28](https://github.com/Onolys/iaudit/pull/28); all 30 B2–B4
+tasks are done. Consolidated [code run](../feat-eval-core-b2-b4-20261021-0607/code-2026-10-21-0607.md) and
+[review PASS](../feat-eval-core-b2-b4-20261021-0607/review-2026-10-21-0607.md) record verified source head `e33f1b0`,
+503 offline eval tests and the unchanged owner-only manual checks below the plans.
+Generated [integration notes](../feat-eval-core-b2-b4-20261021-0607/INTEGRATION.md) live in the branch artifact folder.
+C, D and A are not implemented by this branch.

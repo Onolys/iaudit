@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Eight tasks for the local eval FastAPI server (guards, schema export, dataset and run routes, RunManager), offline API tests, scripts/dev.sh and docs.
 date: 2026-10-20
 ---
@@ -9,14 +9,14 @@ Source of truth: [PRD.md](PRD.md). A localhost FastAPI server over B2/B3 with a 
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Server skeleton: app factory, error body, guards, safe logging | none | todo |
-| 2 | Response models and schema export with staleness test | 1 | todo |
-| 3 | Health, datasets and download routes | 1, 2 | todo |
-| 4 | RunManager and run control routes | 2, 3 | todo |
-| 5 | Run read routes: list, detail, metrics, items, compare | 4 | todo |
-| 6 | Cross-cutting offline API tests | 3, 4, 5 | todo |
-| 7 | `scripts/dev.sh` with `--check` and scripts README | 1 | todo |
-| 8 | Docs: reference, implementation, indexes | 5, 7 | todo |
+| 1 | Server skeleton: app factory, error body, guards, safe logging | none | done |
+| 2 | Response models and schema export with staleness test | 1 | done |
+| 3 | Health, datasets and download routes | 1, 2 | done |
+| 4 | RunManager and run control routes | 2, 3 | done |
+| 5 | Run read routes: list, detail, metrics, items, compare | 4 | done |
+| 6 | Cross-cutting offline API tests | 3, 4, 5 | done |
+| 7 | `scripts/dev.sh` with `--check` and scripts README | 1 | done |
+| 8 | Docs: reference, implementation, indexes | 5, 7 | done |
 
 ## Task 1 — Server skeleton
 What it is / what it means: The shell every route sits in (R1, R2, R5, R6, D1, D2, D7, D8).

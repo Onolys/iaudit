@@ -15,3 +15,4 @@ Put PRDs, task lists, reviews, plans, and notes for a branch in `docs/agent_file
 | [eval-tofueval-20261020](eval-tofueval-20261020/README.md) | Project C: TofuEval data/items and gold projection/metrics plug-in (2 PRDs). |
 | [eval-ui-20261020](eval-ui-20261020/README.md) | Project D: Eval tab in the frontend, run shell and results/items views (2 PRDs). |
 | [taxonomy-v1-20261020](taxonomy-v1-20261020/README.md) | Project A: `quantity_mismatch` concern, widened definitions, contract 1.2.0 (1 PRD). |
+| [feat-eval-core-b2-b4-20261021-0607](feat-eval-core-b2-b4-20261021-0607/README.md) | Project B B2–B4 implementation closeout: task commit map, offline verification, integration notes and consolidated review PASS. |

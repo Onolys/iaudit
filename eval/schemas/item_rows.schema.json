@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://iaudit.local/schemas/item_rows.schema.json",
+  "title": "iaudit eval per-item rows (item_rows.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "rows"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "run_id": {"type": "string", "minLength": 1},
+    "rows": {"type": "array", "items": {"$ref": "#/$defs/ItemRow"}}
+  },
+  "$defs": {
+    "ItemRow": {
+      "type": "object", "additionalProperties": false,
+      "required": ["item_id", "status", "gold", "pred", "match"],
+      "properties": {
+        "item_id": {"type": "string", "minLength": 1},
+        "label": {"type": "string"},
+        "status": {"enum": ["ok", "failed", "unmapped"]},
+        "gold": {"type": "string"},
+        "pred": {"type": ["string", "null"]},
+        "match": {"type": ["boolean", "null"]},
+        "outcome": {"type": "string"},
+        "detail": {"type": "object"}
+      }
+    }
+  }
+}
