@@ -39,6 +39,8 @@ import hashlib
 import inspect
 import json
 import logging
+import os
+import shutil
 import subprocess
 import time
 from collections.abc import Awaitable, Callable
@@ -57,6 +59,7 @@ from iaudit_eval.log import log_event
 from iaudit_eval.selection import select
 
 DEFAULT_CONCURRENCY = 4
+KEEP_CAP: Any = object()  # resume(max_cost_usd=KEEP_CAP): keep the stored cap; None clears it
 _FATAL_HTTP = frozenset({401, 403})
 
 
@@ -190,10 +193,20 @@ class RunHandle:
         """Stop dispatching; in-flight items finish; the run ends ``aborted``."""
         self._driver.abort_event.set()
 
+    def drain(self) -> None:
+        """Stop dispatching; in-flight items finish; no terminal state is stored.
+
+        The run stays ``running`` in run.json, so once the lock is released it reads as
+        ``interrupted`` and is resumable (server shutdown). If every item was already
+        processed the run still ends ``finished``.
+        """
+        self._driver.drain_event.set()
+
 
 class _RunDriver:
     def __init__(self, *, run_id, dataset, items, runs_root, data_root, client, owns_client,
-                 concurrency, on_progress, on_finish, lock, max_cost_usd=None):  # fmt: skip
+                 concurrency, on_progress, on_finish, lock, max_cost_usd=None,
+                 datasets_root=None):  # fmt: skip
         self.run_id = run_id
         self.dataset = dataset
         self.items = items
@@ -205,8 +218,11 @@ class _RunDriver:
         self.on_progress = on_progress
         self.on_finish = on_finish
         self.lock = lock
+        self.datasets_root = datasets_root
         self.state = "running"
         self.abort_event = asyncio.Event()
+        self.drain_event = asyncio.Event()
+        self.processed: set[str] = set()
         self.requests: dict[str, dict] = {}
         self.done = 0
         self.failed = 0
@@ -231,6 +247,8 @@ class _RunDriver:
             return "aborted"
         if self.max_cost_usd is not None and self.spent >= self.max_cost_usd:
             return "aborted_cost"
+        if self.drain_event.is_set():
+            return "drained"
         return None
 
     def _after_result(self, item_record: dict) -> None:
@@ -369,6 +387,7 @@ class _RunDriver:
             "failure": None if out.ok else _failure(out),
         }
         store.write_item(self.runs_root, self.run_id, rec)
+        self.processed.add(item.id)
         previous = self._statuses.get(item.id)
         if previous == "failed":
             self.failed -= 1
@@ -420,7 +439,16 @@ class _RunDriver:
                        "reports no cost_usd; the cap cannot be enforced")  # fmt: skip
         elif self.state == "running":
             reason = self._stop_reason()
-            self.state = reason if reason in ("aborted", "aborted_cost") else "finished"
+            if len(self.processed) >= len(self.items):
+                self.state = "finished"  # a stop fired after the last dispatch: nothing left
+            elif reason == "drained":
+                # Leave run.json "running": interrupted once the lock is released.
+                log_event("run_drained", run_id=self.run_id, items_done=self.done,
+                          items_failed=self.failed)  # fmt: skip
+                self._progress()
+                return
+            else:
+                self.state = reason if reason in ("aborted", "aborted_cost") else "finished"
         fields: dict[str, Any] = {"state": self.state, "finished_at": _now()}
         if self.error:
             fields["error"] = self.error
@@ -433,7 +461,8 @@ class _RunDriver:
     def _auto_score(self, run_id: str) -> None:
         from . import scoring  # lazy: scoring imports capture_git from this module
 
-        scoring.score(run_id, runs_root=self.runs_root, data_root=self.data_root)
+        scoring.score(run_id, runs_root=self.runs_root, data_root=self.data_root,
+                      datasets_root=self.datasets_root, dataset=self.dataset)
 
     async def _call_finish(self) -> None:
         if self.on_finish is None:
@@ -504,12 +533,13 @@ def _spawn_prepared(
 
 def _prepare_start(
     dataset, selection, *, base_url, max_cost_usd, tags, concurrency, runs_root, data_root,
+    datasets_root=None,
 ) -> dict:
     if concurrency < 1:
         raise ValueError("concurrency must be >= 1")
     selection = selection or Selection()
     if isinstance(dataset, str):
-        dataset = load(dataset, data_root=data_root)
+        dataset = load(dataset, root=datasets_root, data_root=data_root)
     meta = dataset.meta
     split = selection.split or meta.default_split
     if not split:
@@ -533,11 +563,15 @@ def _prepare_start(
         **capture_git(),
     }
     run_id = store.create_run(runs_root, run_meta)
-    lock = store.RunLock(runs_root, run_id).acquire()
+    try:
+        lock = store.RunLock(runs_root, run_id).acquire()
+    except BaseException:
+        shutil.rmtree(store.run_dir(runs_root, run_id), ignore_errors=True)  # no orphan "running"
+        raise
     return {
         "run_id": run_id, "dataset": dataset, "items": items, "runs_root": runs_root,
         "data_root": data_root, "concurrency": concurrency, "lock": lock,
-        "max_cost_usd": max_cost_usd, "base_url": base_url,
+        "max_cost_usd": max_cost_usd, "base_url": base_url, "datasets_root": datasets_root,
     }
 
 
@@ -555,12 +589,14 @@ def start_run(
     transport=None,
     runs_root: Path | None = None,
     data_root: Path | None = None,
+    datasets_root: Path | None = None,
 ) -> RunHandle:
     """Create and schedule a run; synchronous preparation needs a running loop."""
     asyncio.get_running_loop()
     prepared = _prepare_start(
         dataset, selection, base_url=base_url, max_cost_usd=max_cost_usd, tags=tags,
         concurrency=concurrency, runs_root=runs_root, data_root=data_root,
+        datasets_root=datasets_root,
     )
     return _spawn_prepared(
         prepared, client=client, transport=transport, on_progress=on_progress,
@@ -582,12 +618,13 @@ async def start_run_async(
     transport=None,
     runs_root: Path | None = None,
     data_root: Path | None = None,
+    datasets_root: Path | None = None,
 ) -> RunHandle:
     """Prepare filesystem/adapter/git work in a thread, then spawn on the caller loop."""
     prepared = await _prepare_in_thread(
         _prepare_start, dataset, selection, base_url=base_url,
         max_cost_usd=max_cost_usd, tags=tags, concurrency=concurrency,
-        runs_root=runs_root, data_root=data_root,
+        runs_root=runs_root, data_root=data_root, datasets_root=datasets_root,
     )
     return _spawn_prepared(
         prepared, client=client, transport=transport, on_progress=on_progress,
@@ -606,9 +643,11 @@ class _ResumeDriver(_RunDriver):
     items re-sent before the first valid response may have been rewritten (still failed).
     """
 
-    def __init__(self, *, snapshot: dict, allow_mixed: bool, prior_state: str, **kw):
+    def __init__(self, *, snapshot: dict, allow_mixed: bool, prior_state: str,
+                 snapshot_mtime_ns: int | None = None, **kw):
         super().__init__(**kw)
         self.snapshot = snapshot
+        self.snapshot_mtime_ns = snapshot_mtime_ns
         self.allow_mixed = allow_mixed
         self.prior_state = prior_state
         self.stored_fp = snapshot.get("fingerprint")
@@ -667,9 +706,11 @@ class _ResumeDriver(_RunDriver):
             super()._finish()
             return
         self.state = self.prior_state
-        store.atomic_write_json(
-            store.run_dir(self.runs_root, self.run_id) / "run.json", self.snapshot
-        )
+        path = store.run_dir(self.runs_root, self.run_id) / "run.json"
+        store.atomic_write_json(path, self.snapshot)
+        if self.snapshot_mtime_ns is not None:
+            # Same content as before the resume: keep its mtime so metrics stay current.
+            os.utime(path, ns=(self.snapshot_mtime_ns, self.snapshot_mtime_ns))
         log_event("resume_refused", level=logging.WARNING, run_id=self.run_id,
                   reason=type(self.refused).__name__)  # fmt: skip
         self._progress()
@@ -677,18 +718,20 @@ class _ResumeDriver(_RunDriver):
 
 def _prepare_resume(
     run_id, *, max_cost_usd, allow_mixed, base_url, concurrency, runs_root, data_root, dataset,
+    datasets_root=None,
 ) -> dict:
     lock = store.RunLock(runs_root, run_id).acquire()  # RunLockedError if concurrent
     try:
         run = store.load_run(runs_root, run_id)
         snapshot = json.loads(json.dumps(run))
+        snapshot_mtime_ns = (store.run_dir(runs_root, run_id) / "run.json").stat().st_mtime_ns
         state = run["state"]
         if state not in store.STORED_STATES:
             raise ResumeError(f"cannot resume a run in state {state!r}")
         # We hold the lock, so a stored "running" means interrupted.
         prior_state = state
         if dataset is None:
-            dataset = load(run["dataset"], data_root=data_root)
+            dataset = load(run["dataset"], root=datasets_root, data_root=data_root)
         meta = dataset.meta
         if meta.dataset_version != run.get("dataset_version"):
             raise ResumeError("dataset version changed since the run started")
@@ -721,15 +764,17 @@ def _prepare_resume(
         new = {k: v for k, v in run.items() if k != "error"}
         new.update(state="running", finished_at=None, warnings=list(dict.fromkeys(warnings)),
                    resumes=[*run.get("resumes", []), entry])  # fmt: skip
-        if max_cost_usd is not None:
-            new["max_cost_usd"] = max_cost_usd
+        if max_cost_usd is not KEEP_CAP:
+            new["max_cost_usd"] = max_cost_usd  # None clears the stored cap
         store.atomic_write_json(store.run_dir(runs_root, run_id) / "run.json", new)
 
         totals = store.compute_totals(runs_root, run_id)
         return {
-            "snapshot": snapshot, "allow_mixed": allow_mixed, "prior_state": prior_state,
+            "snapshot": snapshot, "snapshot_mtime_ns": snapshot_mtime_ns,
+            "allow_mixed": allow_mixed, "prior_state": prior_state,
             "run_id": run_id, "dataset": dataset, "items": todo, "runs_root": runs_root,
             "data_root": data_root, "lock": lock, "max_cost_usd": new.get("max_cost_usd"),
+            "datasets_root": datasets_root,
             "concurrency": concurrency or run.get("concurrency") or DEFAULT_CONCURRENCY,
             "base_url": base_url or run["backend_url"], "totals": totals,
             "total": len(run["item_ids"]),
@@ -743,7 +788,7 @@ def _prepare_resume(
 def resume(
     run_id: str,
     *,
-    max_cost_usd: float | None = None,
+    max_cost_usd: float | None = KEEP_CAP,
     allow_mixed: bool = False,
     base_url: str | None = None,
     concurrency: int | None = None,
@@ -754,13 +799,14 @@ def resume(
     runs_root: Path | None = None,
     data_root: Path | None = None,
     dataset: Dataset | None = None,
+    datasets_root: Path | None = None,
 ) -> RunHandle:
     """Resume failed/missing items with synchronous preparation on the caller loop."""
     asyncio.get_running_loop()
     prepared = _prepare_resume(
         run_id, max_cost_usd=max_cost_usd, allow_mixed=allow_mixed,
         base_url=base_url, concurrency=concurrency, runs_root=runs_root,
-        data_root=data_root, dataset=dataset,
+        data_root=data_root, dataset=dataset, datasets_root=datasets_root,
     )
     return _spawn_prepared(
         prepared, client=client, transport=transport, on_progress=on_progress,
@@ -771,7 +817,7 @@ def resume(
 async def resume_async(
     run_id: str,
     *,
-    max_cost_usd: float | None = None,
+    max_cost_usd: float | None = KEEP_CAP,
     allow_mixed: bool = False,
     base_url: str | None = None,
     concurrency: int | None = None,
@@ -782,12 +828,13 @@ async def resume_async(
     runs_root: Path | None = None,
     data_root: Path | None = None,
     dataset: Dataset | None = None,
+    datasets_root: Path | None = None,
 ) -> RunHandle:
     """Prepare a resume in a worker thread, then spawn on the caller loop."""
     prepared = await _prepare_in_thread(
         _prepare_resume, run_id, max_cost_usd=max_cost_usd, allow_mixed=allow_mixed,
         base_url=base_url, concurrency=concurrency, runs_root=runs_root,
-        data_root=data_root, dataset=dataset,
+        data_root=data_root, dataset=dataset, datasets_root=datasets_root,
     )
     return _spawn_prepared(
         prepared, client=client, transport=transport, on_progress=on_progress,

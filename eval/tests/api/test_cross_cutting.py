@@ -227,6 +227,7 @@ async def test_error_enum_is_exercised_over_http_without_sensitive_echo(
             await start(http, split="all", n=8)
         elif code == "bad_state":
             url = f"/runs/{a}/resume"
+            payload = None  # resume takes only an optional max_cost_usd body
         elif code == "data_missing":
             dataset = await app.state.manager.get_dataset("synthetic")
             dataset.meta = replace(dataset.meta, data_required=True)

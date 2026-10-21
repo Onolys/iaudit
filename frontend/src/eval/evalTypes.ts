@@ -43,7 +43,9 @@ export interface RunInfo {
   mixed?: boolean; seed?: number | null; tags?: Record<string, unknown>; warnings?: string[];
 }
 export interface RunError { [key: string]: unknown; kind: string; message: string }
-export interface RunDetail extends RunSummary { progress: Progress; run_info: RunInfo; error?: RunError | null }
+export interface ResumeRefusal { kind: "fingerprint_changed" | "schema_version_changed"; changes: { field: string; was?: unknown; now?: unknown }[] }
+export interface ResumeRequest { max_cost_usd?: number | null }
+export interface RunDetail extends RunSummary { progress: Progress; run_info: RunInfo; error?: RunError | null; resume_refusal?: ResumeRefusal | null }
 export type ItemStatus = "ok" | "failed" | "unmapped";
 export type ItemFilter = "all" | "mismatch" | "failed";
 export interface ItemQuery { filter?: ItemFilter; limit?: number; offset?: number }

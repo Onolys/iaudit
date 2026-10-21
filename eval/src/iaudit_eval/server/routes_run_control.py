@@ -2,7 +2,14 @@
 
 from fastapi import APIRouter, Request
 
-from iaudit_eval.server.models import Estimate, EstimateRequest, RunCreated, RunRequest, RunSummary
+from iaudit_eval.server.models import (
+    Estimate,
+    EstimateRequest,
+    ResumeRequest,
+    RunCreated,
+    RunRequest,
+    RunSummary,
+)
 
 router = APIRouter()
 
@@ -23,8 +30,10 @@ async def abort(id: str, request: Request):
 
 
 @router.post("/runs/{id}/resume", response_model=RunSummary)
-async def resume(id: str, request: Request):
-    return await request.app.state.manager.resume(id)
+async def resume(id: str, request: Request, payload: ResumeRequest | None = None):
+    fields = payload.model_fields_set if payload is not None else set()
+    cap = {"max_cost_usd": payload.max_cost_usd} if "max_cost_usd" in fields else {}
+    return await request.app.state.manager.resume(id, **cap)
 
 
 @router.post("/runs/{id}/rescore", response_model=RunSummary, status_code=202)

@@ -63,14 +63,24 @@ Run state is one of `running`, `finished`, `aborted`, `aborted_cost`, `interrupt
 running run has no held writer lock; restarting the server does not automatically
 resume it or spend money. Resume retries failed or missing results and preserves
 successful results. Allowed states are aborted, aborted_cost, interrupted, failed, and
-finished with failures. Resume has no request body or mixed-fingerprint override.
+finished with failures. Resume has no mixed-fingerprint override. Its optional JSON body
+`ResumeRequest` is `{"max_cost_usd": number > 0 | null}`: no body or an absent key keeps
+the stored cost cap, `null` clears it, a number replaces it. A resume refused because the
+backend's models/prompts or schema version changed ends in the run's prior state; detail
+`resume_refusal` (`kind` `fingerprint_changed` or `schema_version_changed`, `changes` of
+`{field, was, now}`) reports the last refusal, kept in memory only and cleared by the next
+resume. Server shutdown stops dispatching and gives in-flight items a grace period to be
+saved before cancelling; the run stays `interrupted` and resumable.
 
 Only one audit run is active per server. Abort requires that run to be active and lets
 in-flight requests finish. Rescore is refused for a running run or a run already being
 scored. A run and its scoring work outlive the requesting browser connection.
 
-`score_state` is `pending`, `running`, `done`, or `failed`. A current metrics file makes
-it done; reports older than changed run/item files are not current. Failed scoring
+`score_state` is `pending`, `running`, `done`, or `failed`. `pending` means scoring is
+queued or about to start: reading a terminal (including interrupted) run whose metrics are
+missing or older than its run/item files schedules scoring once per run revision per
+process, so it resolves to done or failed (a failed score is not retried until the run
+changes or Rescore). A current metrics file makes it done. Failed scoring
 can be retried explicitly. Download state is `not_downloaded`, `downloading`, `ready`,
 or `failed`; there is at most one download task per dataset. Failed download responses
 use the fixed error message `Download failed.`; private persisted diagnostics are not
