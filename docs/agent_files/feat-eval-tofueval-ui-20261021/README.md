@@ -17,7 +17,7 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 ## Execution progress
 
 - C1 data and items: complete; all eight source tasks done.
-- C2 projection and metrics: tasks 1–6 and 8 done; task 7 (integrity and adapter wiring) in-progress.
+- C2 projection and metrics: tasks 1–8 done; task 9 (worked example and import hygiene) in-progress. Full Project C verification and review follow task 9.
 - Project D: implementation pending.
 
 ## Run artifacts
