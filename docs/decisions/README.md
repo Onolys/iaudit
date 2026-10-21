@@ -19,3 +19,4 @@ Why is it like this? Architecture decision records.
 | [0011](0011-role-optional-never-guessed.md) | Role is optional and never guessed |
 | [0012](0012-failure-policy-no-empty-audit.md) | Stalled claims degrade; an audit with nothing usable fails |
 | [0013](0013-recorded-replay-in-ci.md) | Recorded answers replay in tests; live evaluation is opt-in |
+| [0014](0014-run-info-optional-one-shared-version.md) | `run_info` is optional; one shared contract version |
