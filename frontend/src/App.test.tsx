@@ -3,6 +3,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { afterEach, describe, expect, it } from "vitest";
 import App from "./App";
 import type { AuditDeps } from "./transport/runAudit";
+import { createEvalApi } from "./eval/evalApi";
 
 import requestRaw from "@contracts/examples/request.json?raw";
 import responseRaw from "@contracts/examples/response.json?raw";
@@ -13,6 +14,95 @@ const okDeps = (response = responseRaw, mock = false): AuditDeps => ({
   fetch: (async () => new Response(response, { status: 200 })) as typeof fetch,
   config: { mock, auditUrl: "https://audit.example/api" },
   registry: [],
+});
+
+const healthyEval = { eval_api_version: "1.0.0", backend: { url: "http://backend.invalid", reachable: true } };
+const evalApi = (healthFetch?: typeof fetch) => createEvalApi({ fetch: async (url, options) => {
+  if (String(url).endsWith("/health")) return healthFetch ? healthFetch(url, options) : Response.json(healthyEval);
+  if (String(url).endsWith("/datasets") || String(url).endsWith("/runs")) return Response.json([]);
+  throw new Error(`Unexpected eval URL: ${String(url)}`);
+} });
+
+describe("Audit and Eval switch", () => {
+  it("starts in Audit and exposes the selected mode through pressed buttons", async () => {
+    render(<App deps={okDeps()} evalApi={evalApi()} />);
+    expect(screen.getByRole("button", { name: "Audit", pressed: true })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Eval", pressed: false })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Eval" }));
+    expect(screen.getByRole("button", { name: "Eval", pressed: true })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Audit", pressed: false })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Run" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Runs" })).toBeTruthy();
+    expect(screen.queryByText("Upload a request JSON file to begin.")).toBeNull();
+    await waitFor(() => expect(screen.queryByText("Checking eval server…")).toBeNull());
+  });
+
+  it("discards the loaded audit and review selection when returning from Eval", async () => {
+    const { container } = render(<App deps={okDeps()} evalApi={evalApi()} />);
+    await upload(container);
+    await screen.findByText("example-001");
+    fireEvent.click(screen.getByRole("button", { name: /Contradicted/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Eval" }));
+    fireEvent.click(screen.getByRole("button", { name: "Audit" }));
+    expect(screen.getByText("Upload a request JSON file to begin.")).toBeTruthy();
+    expect(screen.getByText("No request ID")).toBeTruthy();
+    expect(screen.queryByText("req.json")).toBeNull();
+    expect(screen.queryByText("example-001")).toBeNull();
+    await upload(container);
+    await screen.findByText("example-001");
+    expect(container.querySelector('.verdict-count[aria-pressed="true"]')).toBeNull();
+  });
+
+  it("aborts an in-flight audit on switching away and ignores its late result", async () => {
+    let signal: AbortSignal | null | undefined;
+    let finish!: (response: Response) => void;
+    const deps = { ...okDeps(), fetch: (async (_url, options) => {
+      signal = options?.signal;
+      return new Promise<Response>(resolve => { finish = resolve; });
+    }) as typeof fetch };
+    const { container } = render(<App deps={deps} evalApi={evalApi()} />);
+    await upload(container);
+    await waitFor(() => expect(signal?.aborted).toBe(false));
+    fireEvent.click(screen.getByRole("button", { name: "Eval" }));
+    expect(signal?.aborted).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Audit" }));
+    await act(async () => finish(new Response(responseRaw, { status: 200 })));
+    expect(screen.getByText("Upload a request JSON file to begin.")).toBeTruthy();
+    expect(screen.queryByText("example-001")).toBeNull();
+  });
+
+  it("aborts Eval health on switching to Audit and checks health afresh on return", async () => {
+    let signal: AbortSignal | null | undefined;
+    let finish!: (response: Response) => void;
+    let calls = 0;
+    const api = evalApi(async (_url, options) => {
+      calls++;
+      if (calls > 1) return Response.json(healthyEval);
+      signal = options?.signal;
+      return new Promise<Response>(resolve => { finish = resolve; });
+    });
+    render(<App deps={okDeps()} evalApi={api} />);
+    fireEvent.click(screen.getByRole("button", { name: "Eval" }));
+    expect(signal?.aborted).toBe(false);
+    fireEvent.click(screen.getByRole("button", { name: "Audit" }));
+    expect(signal?.aborted).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Eval" }));
+    await waitFor(() => expect(screen.queryByText("Checking eval server…")).toBeNull());
+    expect(calls).toBe(2);
+    await act(async () => finish(new Response("offline", { status: 502 })));
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByRole("region", { name: "Run" })).toBeTruthy();
+  });
+
+  it("keeps Audit usable when the Eval server is unreachable", async () => {
+    const { container } = render(<App deps={okDeps()} evalApi={evalApi(async () => { throw new Error("offline"); })} />);
+    fireEvent.click(screen.getByRole("button", { name: "Eval" }));
+    await screen.findByText("Eval server not reachable");
+    fireEvent.click(screen.getByRole("button", { name: "Audit" }));
+    expect(screen.queryByRole("alert")).toBeNull();
+    await upload(container);
+    await screen.findByText("example-001");
+  });
 });
 
 const input = (c: HTMLElement) => c.querySelector('input[type="file"]') as HTMLInputElement;

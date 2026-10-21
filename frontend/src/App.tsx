@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import "./tokens/tokens.css";
 import "./app/app.css";
 import { Header } from "./app/Header";
@@ -6,8 +6,25 @@ import { ReviewShell } from "./app/ReviewShell";
 import { ErrorScreen, LoadingView, useAuditLoader } from "./transport";
 import type { LoadResult } from "./transport";
 import type { AuditDeps } from "./transport/runAudit";
+import EvalApp from "./eval/EvalApp";
+import type { EvalApi } from "./eval/evalApi";
 
-export default function App({ deps }: { deps?: AuditDeps }) {
+export default function App({ deps, evalApi }: { deps?: AuditDeps; evalApi?: EvalApi }) {
+  const [mode, setMode] = useState<"audit" | "eval">("audit");
+  return (
+    <div className="app-shell">
+      <nav className="app-mode-switch" aria-label="Workspace">
+        <button type="button" aria-pressed={mode === "audit"} onClick={() => setMode("audit")}>Audit</button>
+        <button type="button" aria-pressed={mode === "eval"} onClick={() => setMode("eval")}>Eval</button>
+      </nav>
+      <div className="app-content">
+        {mode === "audit" ? <AuditApp deps={deps} /> : <EvalApp api={evalApi} />}
+      </div>
+    </div>
+  );
+}
+
+function AuditApp({ deps }: { deps?: AuditDeps }) {
   const { state, loadFile, retry, cancel } = useAuditLoader(deps);
   const inputRef = useRef<HTMLInputElement>(null);
   // Each loaded result gets its own id, so a new upload (even of the same file) remounts the review.
