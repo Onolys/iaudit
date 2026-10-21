@@ -1,0 +1,2 @@
+doc_id,annotation_id,topic,model_name,sent_idx,summ_sent,sent_label,exp,type,contamination_identifier
+FICTIONAL-MS-TEST,fictional-annotation-1,Fictional moonseed delivery,model_B,1,The fictional moonseed delivery arrives on a blue cart.,yes,,,fictional-token-1

@@ -1,0 +1,5 @@
+doc_id,annotation_id,topic,model_name,sent_idx,summ_sent,sent_label,exp,type,contamination_identifier
+FictionalCouncil 24-0001,fictional-annotation-1,Fictional lantern schedule,Model-Extra,1,The fictional lanterns will be checked tomorrow.,yes,,,fictional-first
+FictionalCouncil 24-0001,fictional-annotation-1,Fictional lantern schedule,Model-Extra,1,The fictional lanterns will be checked tomorrow.,yes,,,fictional-duplicate
+FictionalCouncil 24-0001,fictional-annotation-3,Fictional lantern schedule,Model-Extra,3,The fictional lantern inspection is already complete.,no,The fictional inspection is scheduled for tomorrow.,Tense/Modality Error,fictional-token-3
+FictionalCouncil 24-0001,fictional-annotation-1,Fictional extended discussion of the clockwork orchard canopy maintenance schedule and the miniature lantern replacement timetable for the imaginary glasshouse,model_A,1,The fictional glasshouse has a clockwork orchard.,yes,,,fictional-token-1
