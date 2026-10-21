@@ -12,6 +12,8 @@ import hashlib
 import json
 import os
 import re
+import shutil
+import tempfile
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
@@ -107,6 +109,23 @@ def _hash_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def _record_path(root: Path, name: str) -> Path | None:
+    """Accept safe relative hook records, without traversing symlinks."""
+    if not isinstance(name, str) or not name or "\\" in name:
+        return None
+    relative = Path(name)
+    if relative.is_absolute() or any(part in {"", ".", ".."} for part in name.split("/")):
+        return None
+    target = root
+    for part in relative.parts:
+        target = target / part
+        if target.is_symlink():
+            return None
+    if not target.resolve().is_relative_to(root.resolve()):
+        return None
+    return target
+
+
 def hash_warnings(dataset: Dataset, *, data_root: Path | None = None) -> list[str]:
     """Warning strings for the engine to add to run warnings (hash drift, trust on first use)."""
     doc = status(dataset, data_root=data_root)
@@ -116,9 +135,10 @@ def hash_warnings(dataset: Dataset, *, data_root: Path | None = None) -> list[st
     d = dataset_dir(dataset, data_root)
     for rec in doc.get("files", []):
         name = rec.get("filename", "")
-        if not _SAFE_NAME.match(name) or not (d / name).is_file():
+        path = _record_path(d, name)
+        if path is None or not path.is_file():
             out.append(f"downloaded file {name!r} is missing")
-        elif _hash_file(d / name) != rec.get("sha256"):
+        elif _hash_file(path) != rec.get("sha256"):
             out.append(f"downloaded file {name!r} changed since it was recorded")
     return out
 
@@ -127,6 +147,23 @@ def _intact(dataset, data_root, doc) -> bool:
     if doc["status"] != "ready":
         return False
     d = dataset_dir(dataset, data_root)
+    if callable(getattr(dataset.adapter, "download", None)):
+        records = doc.get("files", [])
+        if not records:
+            return False
+        by_name = {}
+        for record in records:
+            name = record.get("filename", "")
+            path = _record_path(d, name)
+            if path is None or not path.is_file() or name in by_name:
+                return False
+            if _hash_file(path) != record.get("sha256"):
+                return False
+            by_name[name] = record
+        for name, expected in dataset.meta.get("expected_sha256", {}).items():
+            if by_name.get(name, {}).get("sha256") != expected.lower():
+                return False
+        return True
     recorded = {r.get("id"): r for r in doc.get("files", [])}
     for s in dataset.meta.sources:
         r = recorded.get(s["id"])
@@ -199,19 +236,28 @@ def download(
     """Fetch the dataset's sources. Returns the final download.json document."""
     name = dataset.meta.name
     prior = status(dataset, data_root=data_root)
+    override = getattr(dataset.adapter, "download", None)
     if _intact(dataset, data_root, prior) and dataset.meta.sources:
         log_event("download_noop", dataset=name, status="ready")
         return prior
     d = paths.ensure_private_dir(dataset_dir(dataset, data_root))
     _write_status(dataset, data_root, "downloading")
     log_event("download_start", dataset=name, status="downloading")
+    stage = backup = None
     try:
         sources = [dict(s) for s in dataset.meta.sources]
         for s in sources:
             _validate_source(s)
-        override = getattr(dataset.adapter, "download", None)
         if callable(override):
-            records = list(override(d, progress))
+            stage = Path(tempfile.mkdtemp(prefix=f".{name}-", dir=d.parent))
+            # A custom hook can reuse pinned revisions without copying large raw sources.
+            if (d / "manifest.json").is_file():
+                shutil.copyfile(d / "manifest.json", stage / "manifest.json")
+            records = list(override(stage, progress))
+            for record in records:
+                path = _record_path(stage, record.filename)
+                if path is None or not path.is_file() or _hash_file(path) != record.sha256:
+                    raise ValueError(f"invalid download record {record.filename!r}")
             _check_pins(sources, records)
         else:
             records = []
@@ -228,12 +274,24 @@ def download(
         ]
         post = getattr(dataset.adapter, "post_download", None)
         if callable(post):
-            post(d)
+            post(stage if stage is not None else d)
+        if stage is not None:
+            backup = stage.with_name(stage.name + "-backup")
+            os.replace(d, backup)
+            os.replace(stage, d)
         doc = _write_status(dataset, data_root, "ready", records, warnings=warnings)
         log_event("download_done", dataset=name, status="ready", count=len(records))
         return doc
     except Exception as exc:  # any failure is a recorded, retryable state
+        if backup is not None and backup.exists():
+            if d.exists():
+                shutil.rmtree(d)
+            os.replace(backup, d)
         err = f"{type(exc).__name__}: {str(exc)[:200]}"
         doc = _write_status(dataset, data_root, "failed", error=err)
         log_event("download_failed", dataset=name, status="failed", exc_class=type(exc).__name__)
         return doc
+    finally:
+        for leftover in (stage, backup):
+            if leftover is not None and leftover.exists():
+                shutil.rmtree(leftover, ignore_errors=True)

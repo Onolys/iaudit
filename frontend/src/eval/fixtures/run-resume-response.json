@@ -1,0 +1,18 @@
+{
+  "run_id": "fictional-running",
+  "dataset": "fictional-alpha",
+  "split": "validation",
+  "n_requested": 3,
+  "n_items": 3,
+  "seed": null,
+  "created_at": "fixture-created",
+  "finished_at": null,
+  "schema_version": "1.1.0",
+  "state": "running",
+  "score_state": "running",
+  "totals": {
+    "cost_usd": null,
+    "failures": 0
+  },
+  "git_dirty": false
+}

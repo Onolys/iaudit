@@ -4,6 +4,11 @@ Lookup facts for the review UI in [../../frontend/](../../frontend/). Request an
 
 **Audience:** users.
 
+The top-level **Audit | Eval** switch opens either this upload/review flow or the
+[Eval UI](eval-ui.md). Audit is selected initially. Switching away discards the loaded
+audit and selection and cancels any in-flight audit request; returning starts fresh.
+Eval runs continue on the server when leaving its tab and reattach on return.
+
 ## Environment
 
 Set in `frontend/.env.local` (git-ignored; start from `.env.example`). Values are fixed at build time.

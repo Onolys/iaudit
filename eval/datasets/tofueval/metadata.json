@@ -1,0 +1,590 @@
+{
+  "name": "tofueval",
+  "title": "TofuEval",
+  "description": "Factual consistency of topic-focused dialogue summaries from MediaSum and MeetingBank. Each item is one summary, with source documents defining the dev/test split and clustering. Licensed source text is downloaded locally.",
+  "dataset_version": "17555c5bfc27f95371fd82b2de7014d8e14e1024",
+  "adapter_version": "1.0.0",
+  "kind": "adapter",
+  "item_unit": "summary",
+  "gold_kind": "tofueval_summary_sentences",
+  "splits": [
+    {
+      "name": "dev",
+      "description": "Summaries from the 70 development source documents."
+    },
+    {
+      "name": "test",
+      "description": "Summaries from the 30 held-out source documents."
+    }
+  ],
+  "default_split": "dev",
+  "cluster_key": "source document",
+  "license": {
+    "name": "Mixed: MIT-0 (no-training note); MediaSum research use; MeetingBank CC BY-NC-ND 4.0",
+    "redistributable": false,
+    "contains_licensed_text": true
+  },
+  "data_required": true,
+  "test_split_note": "Held-out test documents are intended for final evaluation. Use the dev split for prompt and adapter development; repeated test evaluation can compromise the holdout.",
+  "sources": [
+    {
+      "id": "tofueval",
+      "repo": "amazon-science/tofueval",
+      "url": "https://github.com/amazon-science/tofueval/archive/17555c5bfc27f95371fd82b2de7014d8e14e1024.zip",
+      "filename": "tofueval.zip",
+      "revision": "17555c5bfc27f95371fd82b2de7014d8e14e1024",
+      "license": "MIT-0 (no-training note)"
+    },
+    {
+      "id": "mediasum",
+      "hf": "ccdv/mediasum",
+      "url": "https://huggingface.co/datasets/ccdv/mediasum/resolve/main/test_data.zip",
+      "filename": "test_data.zip",
+      "revision": "resolve-at-first-download",
+      "license": "research use"
+    },
+    {
+      "id": "meetingbank",
+      "hf": "huuuyeah/meetingbank",
+      "url": "https://huggingface.co/datasets/huuuyeah/meetingbank/resolve/main/test.json",
+      "filename": "test.json",
+      "revision": "resolve-at-first-download",
+      "license": "CC BY-NC-ND 4.0"
+    }
+  ],
+  "references": "references.json",
+  "expected_sha256": {},
+  "mapping": "mapping.json",
+  "pool_all": false,
+  "slice_partition": "model_group",
+  "slices": [
+    "model_group",
+    "dataset",
+    "topic_category",
+    "model_name",
+    "group_dataset",
+    "group_topic",
+    "group_model"
+  ],
+  "levels": {
+    "sentence": {
+      "labels": [
+        "consistent",
+        "inconsistent"
+      ],
+      "positive": "inconsistent"
+    },
+    "summary": {
+      "labels": [
+        "consistent",
+        "inconsistent"
+      ],
+      "positive": "inconsistent"
+    },
+    "sentence_meta_unresolved": {
+      "labels": [
+        "consistent",
+        "inconsistent"
+      ],
+      "positive": "inconsistent"
+    },
+    "summary_meta_unresolved": {
+      "labels": [
+        "consistent",
+        "inconsistent"
+      ],
+      "positive": "inconsistent"
+    },
+    "concern:EI": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern_detected:EI": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern:MR": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern_detected:MR": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern:TAM": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern_detected:TAM": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern:OF": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern_detected:OF": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern:CO": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern_detected:CO": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    }
+  },
+  "metrics": [
+    {
+      "name": "bacc_sentence",
+      "fn": "balanced_accuracy",
+      "level": "sentence",
+      "params": {
+        "require_all_classes": true
+      }
+    },
+    {
+      "name": "prec_inconsistent",
+      "fn": "precision",
+      "level": "sentence",
+      "params": {
+        "positive": "inconsistent"
+      }
+    },
+    {
+      "name": "rec_inconsistent",
+      "fn": "recall",
+      "level": "sentence",
+      "params": {
+        "positive": "inconsistent"
+      }
+    },
+    {
+      "name": "f1_inconsistent",
+      "fn": "f1",
+      "level": "sentence",
+      "params": {
+        "positive": "inconsistent"
+      }
+    },
+    {
+      "name": "unresolved_rate",
+      "fn": "failure_rate",
+      "level": "sentence",
+      "params": {
+        "reason": "unresolved"
+      }
+    },
+    {
+      "name": "bacc_sentence_meta_unresolved",
+      "fn": "balanced_accuracy",
+      "level": "sentence_meta_unresolved",
+      "params": {
+        "require_all_classes": true
+      }
+    },
+    {
+      "name": "bacc_summary",
+      "fn": "balanced_accuracy",
+      "level": "summary",
+      "params": {
+        "require_all_classes": true
+      }
+    },
+    {
+      "name": "prec_inconsistent",
+      "fn": "precision",
+      "level": "summary",
+      "params": {
+        "positive": "inconsistent"
+      }
+    },
+    {
+      "name": "rec_inconsistent",
+      "fn": "recall",
+      "level": "summary",
+      "params": {
+        "positive": "inconsistent"
+      }
+    },
+    {
+      "name": "f1_inconsistent",
+      "fn": "f1",
+      "level": "summary",
+      "params": {
+        "positive": "inconsistent"
+      }
+    },
+    {
+      "name": "unresolved_rate",
+      "fn": "failure_rate",
+      "level": "summary",
+      "params": {
+        "reason": "unresolved"
+      }
+    },
+    {
+      "name": "bacc_summary_meta_unresolved",
+      "fn": "balanced_accuracy",
+      "level": "summary_meta_unresolved",
+      "params": {
+        "require_all_classes": true
+      }
+    },
+    {
+      "name": "rec_type_EI",
+      "fn": "recall_by_type",
+      "level": "sentence",
+      "params": {
+        "tag_key": "type_EI",
+        "tag": true
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "rec_type_MR",
+      "fn": "recall_by_type",
+      "level": "sentence",
+      "params": {
+        "tag_key": "type_MR",
+        "tag": true
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "rec_type_TAM",
+      "fn": "recall_by_type",
+      "level": "sentence",
+      "params": {
+        "tag_key": "type_TAM",
+        "tag": true
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "rec_type_OF",
+      "fn": "recall_by_type",
+      "level": "sentence",
+      "params": {
+        "tag_key": "type_OF",
+        "tag": true
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "rec_type_CO",
+      "fn": "recall_by_type",
+      "level": "sentence",
+      "params": {
+        "tag_key": "type_CO",
+        "tag": true
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "rec_type_NMS",
+      "fn": "recall_by_type",
+      "level": "sentence",
+      "params": {
+        "tag_key": "type_NMS",
+        "tag": true
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "rec_type_RE",
+      "fn": "recall_by_type",
+      "level": "sentence",
+      "params": {
+        "tag_key": "type_RE",
+        "tag": true
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_rate_EI",
+      "fn": "recall_by_type",
+      "level": "concern:EI",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_inconsistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_base_rate_EI",
+      "fn": "recall_by_type",
+      "level": "concern:EI",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_consistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_given_detected_EI",
+      "fn": "recall",
+      "level": "concern_detected:EI",
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_rate_MR",
+      "fn": "recall_by_type",
+      "level": "concern:MR",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_inconsistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_base_rate_MR",
+      "fn": "recall_by_type",
+      "level": "concern:MR",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_consistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_given_detected_MR",
+      "fn": "recall",
+      "level": "concern_detected:MR",
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_rate_TAM",
+      "fn": "recall_by_type",
+      "level": "concern:TAM",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_inconsistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_base_rate_TAM",
+      "fn": "recall_by_type",
+      "level": "concern:TAM",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_consistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_given_detected_TAM",
+      "fn": "recall",
+      "level": "concern_detected:TAM",
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_rate_OF",
+      "fn": "recall_by_type",
+      "level": "concern:OF",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_inconsistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_base_rate_OF",
+      "fn": "recall_by_type",
+      "level": "concern:OF",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_consistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_given_detected_OF",
+      "fn": "recall",
+      "level": "concern_detected:OF",
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_rate_CO",
+      "fn": "recall_by_type",
+      "level": "concern:CO",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_inconsistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_base_rate_CO",
+      "fn": "recall_by_type",
+      "level": "concern:CO",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_consistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_given_detected_CO",
+      "fn": "recall",
+      "level": "concern_detected:CO",
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "claims_per_sentence",
+      "fn": "claims_per_sentence",
+      "level": "sentence"
+    },
+    {
+      "name": "unmapped_claim_rate",
+      "fn": "unmapped_claim_rate",
+      "level": "summary",
+      "params": {
+        "key": "claims_unmapped"
+      }
+    },
+    {
+      "name": "boundary_crossing_rate",
+      "fn": "boundary_crossing_rate",
+      "level": "summary",
+      "params": {
+        "key": "claims_boundary_crossing"
+      }
+    },
+    {
+      "name": "meta_consistent_n",
+      "fn": "meta_consistent_n",
+      "level": "sentence"
+    },
+    {
+      "name": "concern_not_in_mapping",
+      "fn": "concern_not_in_mapping",
+      "level": "summary"
+    },
+    {
+      "name": "concern_not_in_mapping_frequency_severity_inflation",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:frequency_severity_inflation"
+      }
+    },
+    {
+      "name": "concern_not_in_mapping_context_stripping",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:context_stripping"
+      }
+    },
+    {
+      "name": "concern_not_in_mapping_question_as_answer",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:question_as_answer"
+      }
+    },
+    {
+      "name": "concern_not_in_mapping_correction_ignored",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:correction_ignored"
+      }
+    },
+    {
+      "name": "concern_not_in_mapping_conflicting_accounts_flattened",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:conflicting_accounts_flattened"
+      }
+    },
+    {
+      "name": "concern_not_in_mapping_unsupported_causal_link",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:unsupported_causal_link"
+      }
+    }
+  ]
+}

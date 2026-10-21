@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "not_found",
+    "message": "Fictional not found error.",
+    "detail": {
+      "reason": "fictional offline test"
+    }
+  }
+}

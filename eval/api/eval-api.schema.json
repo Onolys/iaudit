@@ -1305,6 +1305,17 @@
           "title": "Dataset",
           "type": "string"
         },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunError"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "finished_at": {
           "anyOf": [
             {
@@ -1424,6 +1435,26 @@
         "run_info"
       ],
       "title": "RunDetail",
+      "type": "object"
+    },
+    "RunError": {
+      "additionalProperties": true,
+      "description": "Engine failure with its kind/message and unmodified diagnostic fields.",
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "message"
+      ],
+      "title": "RunError",
       "type": "object"
     },
     "RunInfo": {

@@ -86,8 +86,36 @@ def _load_references(dataset: Dataset, datasets_root: Path | None) -> tuple[list
     return raw["rows"], caveats
 
 
-def _slice_groups(pairs: list[Pair], slices: tuple[str, ...], pool_all: bool):
-    """Yield (slice dict, pairs): the all entry, then one-way slices in metadata key order."""
+def _slice_groups(
+    pairs: list[Pair], slices: tuple[str, ...], pool_all: bool,
+    *, partition: str | None = None, universe: list[Pair] | None = None,
+):
+    """Yield one-way slices, optionally confined to an explicit metadata partition.
+
+    Partitioned datasets discover slice values across all levels, so a level with
+    no eligible pairs still reports undefined entries for known slices. Statistics
+    always use only the requested level's pairs. Legacy unpartitioned behavior
+    discovers values from that level alone.
+    """
+    if partition is not None:
+        universe = pairs if universe is None else universe
+        if any(partition not in p.meta for p in universe):
+            raise ScoringError(f"pair missing slice partition {partition!r}")
+        values = {p.meta[partition] for p in universe}
+        for value in sorted(values, key=lambda x: (type(x).__name__, str(x))):
+            members = [p for p in pairs if p.meta[partition] == value]
+            known = [p for p in universe if p.meta[partition] == value]
+            if pool_all or partition in slices:
+                yield {partition: value}, members
+            for key in slices:
+                if key == partition:
+                    continue
+                vals = {p.meta[key] for p in known if key in p.meta}
+                for val in sorted(vals, key=lambda x: (type(x).__name__, str(x))):
+                    yield {partition: value, key: val}, [
+                        p for p in members if key in p.meta and p.meta[key] == val
+                    ]
+        return
     if pool_all:
         yield {}, pairs
     for key in slices:
@@ -116,7 +144,11 @@ def _groups(dataset: Dataset, cfg, all_pairs: list[Pair], datasets_root: Path | 
         except (KeyError, ValueError) as e:
             raise ScoringError(f"metric {me.name!r}: {e}") from e
         policies = ("none",) if res.metric.policy == "none" else ("primary", "secondary")
-        for sl, group in _slice_groups(by_level.get(me.level, []), cfg.slices, cfg.pool_all):
+        slices = cfg.slices if me.slices is None else me.slices
+        for sl, group in _slice_groups(
+            by_level.get(me.level, []), slices, cfg.pool_all,
+            partition=cfg.slice_partition, universe=all_pairs,
+        ):
             for pol in policies:
                 yield me, res, spec, sl, pol, policy.apply(group, spec, pol)
 

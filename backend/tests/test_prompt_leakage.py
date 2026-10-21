@@ -98,6 +98,21 @@ def test_config_names_the_eight_word_window_and_includes_the_atomize_fewshot():
     assert "atomize_fewshot.json" in {p.name for p in prompt_files()}
 
 
+def test_root_eval_data_is_scanned_when_present_and_skipped_when_absent(tmp_path, monkeypatch):
+    backend = tmp_path / "backend"
+    backend.mkdir()
+    monkeypatch.setitem(globals(), "EVAL_DIRS", [backend / d for d in CONFIG["scored_dirs"]])
+    assert eval_texts() == []
+
+    transcript = tmp_path / "eval" / "data" / "tofueval" / "derived" / "transcripts.json"
+    transcript.parent.mkdir(parents=True)
+    fictional_text = "Fictional violet robots carried seven silver umbrellas beside the observatory."
+    transcript.write_text(json.dumps({"fictional": {"transcript": fictional_text}}), encoding="utf-8")
+
+    assert fictional_text in eval_texts()
+    assert shared([fictional_text], eval_texts())
+
+
 def speakers(obj):
     if isinstance(obj, dict):
         for k, v in obj.items():

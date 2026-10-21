@@ -1,0 +1,2 @@
+doc_id,annotation_id,topic,model_name,sent_idx,summ_sent,sent_label,exp,type,contamination_identifier
+FictionalCouncil 24-0002,fictional-annotation-1,Fictional orchard map,model_B,1,The fictional orchard map uses silver ink.,yes,,,fictional-token-1

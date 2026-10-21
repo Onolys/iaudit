@@ -162,9 +162,18 @@ class RunInfo(Model):
     warnings: list[str] = Field(default_factory=list)
 
 
+class RunError(Model):
+    """Engine failure with its kind/message and unmodified diagnostic fields."""
+
+    model_config = ConfigDict(extra="allow")
+    kind: str
+    message: str
+
+
 class RunDetail(RunSummary):
     progress: Progress
     run_info: RunInfo
+    error: RunError | None = None
 
 
 @with_config(ConfigDict(extra="forbid"))

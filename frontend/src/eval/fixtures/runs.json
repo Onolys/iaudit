@@ -1,0 +1,146 @@
+[
+  {
+    "run_id": "fictional-running",
+    "dataset": "fictional-alpha",
+    "split": "validation",
+    "n_requested": 3,
+    "n_items": 3,
+    "seed": null,
+    "created_at": "fixture-created",
+    "finished_at": null,
+    "schema_version": "1.1.0",
+    "state": "running",
+    "score_state": "running",
+    "totals": {
+      "cost_usd": null,
+      "failures": 0
+    },
+    "git_dirty": false
+  },
+  {
+    "run_id": "fictional-finished",
+    "dataset": "fictional-alpha",
+    "split": "validation",
+    "n_requested": 3,
+    "n_items": 3,
+    "seed": null,
+    "created_at": "fixture-created",
+    "finished_at": "fixture-finished",
+    "schema_version": "1.1.0",
+    "state": "finished",
+    "score_state": "done",
+    "totals": {
+      "cost_usd": 0.12,
+      "failures": 0
+    },
+    "git_dirty": false
+  },
+  {
+    "run_id": "fictional-aborted",
+    "dataset": "fictional-alpha",
+    "split": "validation",
+    "n_requested": 3,
+    "n_items": 3,
+    "seed": null,
+    "created_at": "fixture-created",
+    "finished_at": "fixture-finished",
+    "schema_version": "1.1.0",
+    "state": "aborted",
+    "score_state": "done",
+    "totals": {
+      "cost_usd": null,
+      "failures": 0
+    },
+    "git_dirty": false
+  },
+  {
+    "run_id": "fictional-aborted_cost",
+    "dataset": "fictional-alpha",
+    "split": "validation",
+    "n_requested": 3,
+    "n_items": 3,
+    "seed": null,
+    "created_at": "fixture-created",
+    "finished_at": "fixture-finished",
+    "schema_version": "1.1.0",
+    "state": "aborted_cost",
+    "score_state": "done",
+    "totals": {
+      "cost_usd": 0.12,
+      "failures": 0
+    },
+    "git_dirty": false
+  },
+  {
+    "run_id": "fictional-interrupted",
+    "dataset": "fictional-alpha",
+    "split": "validation",
+    "n_requested": 3,
+    "n_items": 3,
+    "seed": null,
+    "created_at": "fixture-created",
+    "finished_at": "fixture-finished",
+    "schema_version": "1.1.0",
+    "state": "interrupted",
+    "score_state": "done",
+    "totals": {
+      "cost_usd": null,
+      "failures": 0
+    },
+    "git_dirty": false
+  },
+  {
+    "run_id": "fictional-failed",
+    "dataset": "fictional-alpha",
+    "split": "validation",
+    "n_requested": 3,
+    "n_items": 3,
+    "seed": null,
+    "created_at": "fixture-created",
+    "finished_at": "fixture-finished",
+    "schema_version": "1.1.0",
+    "state": "failed",
+    "score_state": "failed",
+    "totals": {
+      "cost_usd": 0.12,
+      "failures": 1
+    },
+    "git_dirty": false
+  },
+  {
+    "run_id": "fictional-finished-with-failures",
+    "dataset": "fictional-alpha",
+    "split": "validation",
+    "n_requested": 3,
+    "n_items": 3,
+    "seed": null,
+    "created_at": "fixture-created",
+    "finished_at": "fixture-finished",
+    "schema_version": "1.1.0",
+    "state": "finished",
+    "score_state": "done",
+    "totals": {
+      "cost_usd": null,
+      "failures": 1
+    },
+    "git_dirty": false
+  },
+  {
+    "run_id": "fictional-other-dataset",
+    "dataset": "fictional-beta",
+    "split": "validation",
+    "n_requested": 3,
+    "n_items": 3,
+    "seed": null,
+    "created_at": "fixture-created",
+    "finished_at": "fixture-finished",
+    "schema_version": "1.1.0",
+    "state": "finished",
+    "score_state": "done",
+    "totals": {
+      "cost_usd": 0.12,
+      "failures": 0
+    },
+    "git_dirty": false
+  }
+]

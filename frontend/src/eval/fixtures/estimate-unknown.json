@@ -1,0 +1,9 @@
+{
+  "basis": "none",
+  "n_items": 3,
+  "est_input_tokens": null,
+  "est_output_tokens": null,
+  "est_cost_usd": null,
+  "rough": true,
+  "note": "Cost unknown \u2014 run a pilot (e.g. N=5) first"
+}

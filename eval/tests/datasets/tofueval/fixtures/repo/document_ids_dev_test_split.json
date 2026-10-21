@@ -1,0 +1,18 @@
+{
+  "dev": {
+    "mediasum": [
+      "FICTIONAL-MS-DEV"
+    ],
+    "meetingbank": [
+      "FictionalCouncil 24-0001"
+    ]
+  },
+  "test": {
+    "mediasum": [
+      "FICTIONAL-MS-TEST"
+    ],
+    "meetingbank": [
+      "FictionalCouncil 24-0002"
+    ]
+  }
+}

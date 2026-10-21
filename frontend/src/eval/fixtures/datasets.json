@@ -1,0 +1,28 @@
+[
+  {
+    "name": "fictional-alpha",
+    "title": "Fictional Alpha",
+    "data_present": true,
+    "splits": [
+      {
+        "name": "validation",
+        "size": 3
+      },
+      {
+        "name": "test",
+        "size": 2
+      }
+    ]
+  },
+  {
+    "name": "fictional-beta",
+    "title": "Fictional Beta",
+    "data_present": false,
+    "splits": [
+      {
+        "name": "test",
+        "size": null
+      }
+    ]
+  }
+]

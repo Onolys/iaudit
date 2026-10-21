@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import type { AppConfig } from "../config";
 import { defaultRegistry } from "./mock/registry";
-import { auditRequest, readRequestFile, runAudit } from "./runAudit";
+import { auditRequest, checkAuditResponse, readRequestFile, runAudit } from "./runAudit";
 import type { LoadError } from "./errors";
 
 const example = (name: string) =>
@@ -136,5 +136,21 @@ describe("auditRequest", () => {
     await auditRequest(request, { signal: new AbortController().signal, deps });
     await auditRequest(request, { signal: new AbortController().signal, deps });
     expect(fetchSpy).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("checkAuditResponse", () => {
+  it("accepts an already parsed response", () => {
+    const response = JSON.parse(responseText);
+    expect(checkAuditResponse(JSON.parse(requestText), response)).toEqual({ ok: true, value: response });
+  });
+  it("maps duplicate evidence IDs to the shared load error", () => {
+    const response = JSON.parse(responseText);
+    const claim = response.claims[0];
+    claim.evidence.push(structuredClone(claim.evidence[0]));
+    expect(checkAuditResponse(JSON.parse(requestText), response)).toEqual({
+      ok: false,
+      error: { kind: "invalid_response", reason: "duplicate_evidence_id", claimId: "c-supported", evidenceId: "e-caregiver" },
+    });
   });
 });
