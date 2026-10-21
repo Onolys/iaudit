@@ -22,7 +22,7 @@ Each folder holds `request.json` (transcript plus assessment) and `response.json
 
 Across 01–05: all 5 verdicts, all 3 evidence roles, all 12 earlier concern types, and 3 warning codes. `span_out_of_range` and `input_truncated` are left out on purpose, because a valid fixture cannot contain an out-of-range span.
 
-Samples 06–10 are standard input with no edge cases. Every turn has a role and a timestamp, every audit is `complete` with no warnings, and all text is plain. Across those five samples there are 66 claims, 28 of them supported (about 40%). All 5 verdicts and all 3 evidence roles appear, every concern type appears at least twice, and each sample has at least one claim with two concerns.
+Samples 06–10 are standard input with no edge cases. Every turn has a role and a timestamp, every audit is `complete` with no warnings, and all text is plain. Across those five samples there are 66 claims, 28 of them supported (about 40%). All 5 verdicts and all 3 evidence roles appear, each of the 12 concern types before `quantity_mismatch` appears at least twice, and each sample has at least one claim with two concerns.
 
 Sample 11 is the only one with the thirteenth concern type, `quantity_mismatch`, and its boundary cases, so all 13 concern types appear across 01–11. Its audit is `complete` with no warnings, and every turn has a role and a timestamp.
 
