@@ -1,21 +1,16 @@
-# Suggested title
+Adds the TofuEval adapter with pinned local downloads, schema-valid requests, frozen sentence projection, metrics, paper references, and integrity reporting. Original Five and Model-Extra results stay separate; balanced accuracy is undefined when either class is absent.
 
-Add TofuEval evaluation and initial Eval UI
-
-# Draft PR body
-
-Adds the TofuEval evaluation adapter, gold/projection rules, metrics, paper reference cells, and integrity reporting. Project C's 17 implementation tasks are complete and its final three-persona review is PASS after the balanced-accuracy fix.
-
-Adds the initial Eval UI through D1 tasks 1–7: eval proxy/config, typed API client, schema-checked fixtures, sequential polling hook, EvalApp shell, Audit/Eval toggle, and RunPanel form/estimate. This is the user-requested stopping checkpoint and Project D is incomplete.
-
-The default RunPanel button is not yet wired to start/download/progress/abort/resume. D1 tasks 8–10 and all 11 D2 tasks remain todo (14 tasks): run lifecycle, runs list, UI reference docs, and the results/items/replay/comparison work. Task 8 also owns the actual mid-run-toggle test and additive optional run-error eval API integration. Keep this PR draft pending the remaining implementation and review.
+Adds the initial Eval UI: proxy/config, typed API client, schema-checked fixtures, polling hook, shell, Audit/Eval toggle, and run form with estimates. This PR is draft: run lifecycle and the runs/results/items/replay/comparison views remain unimplemented (D1 tasks 8–10 and all D2, 14 tasks). The Run button does not yet start a run.
 
 Validation:
 
-- Final integrated frontend: 437 tests across 30 files passed; `npm run typecheck` passed; `npm run build` passed (160 modules, built in 291ms).
-- Project C final eval gate: 753 tests passed; required Ruff checks clean.
-- Unchanged backend gate at `01a694b`: 1,094 tests passed; required Ruff check passed.
+- Integrated frontend: 437 tests passed; typecheck and production build passed.
+- Eval: 753 tests passed; required Ruff checks passed.
+- Backend: 1,094 tests passed; required Ruff check passed.
+- Project C full review: [all three personas PASS](https://github.com/tejitpabari99/iaudit/blob/feat/eval-tofueval-ui/docs/agent_files/feat-eval-tofueval-ui-20261021/review-C-2026-10-21-final.md).
+- Project D full review pending.
 - `git diff --check` clean.
-- Project C review range `f7a4640...2cff97c`: Bug Hunter, Security, and Architect PASS; the earlier absent-class balanced-accuracy finding is resolved.
 
-No live LLM/provider calls, real dataset downloads, live smoke runs, or real-browser checks were performed. Owner checks remain deferred. Project D code review base is `2cff97c`; the Project C PASS does not claim a completed Project D review.
+Continue from the source [D1 task list](https://github.com/tejitpabari99/iaudit/blob/feat/eval-tofueval-ui/docs/agent_files/eval-ui-20261020/01-eval-shell-and-runs/TASKS.md) and [D2 task list](https://github.com/tejitpabari99/iaudit/blob/feat/eval-tofueval-ui/docs/agent_files/eval-ui-20261020/02-results-and-items/TASKS.md).
+
+No live provider calls, real dataset downloads, real-browser checks or live smokes were performed; owner checks are deferred.

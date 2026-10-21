@@ -38,4 +38,5 @@ Phase: User-requested stopping checkpoint complete. Project C complete offline w
 
 Final integrated frontend: 437 tests across 30 files passed; typecheck and build passed; `git diff --check` clean. RunPanel currently supplies form/estimate only: its default button has no start/download/progress/abort/resume lifecycle wiring. Task 8 owns that wiring, the actual mid-run-toggle test, and optional run-error eval API integration. No live checks performed.
 
-- [Draft PR body](pr-description.md) — concrete checkpoint scope, validation, and 14 deferred Project D tasks. Push and PR creation await principal verification.
+- [Draft PR body](pr-description.md) — reviewer-facing checkpoint scope, validation, and 14 deferred Project D tasks.
+- Publication: push `feat/eval-tofueval-ui` to `origin` and open a draft PR targeting `main`, titled “Add TofuEval evaluation and initial Eval UI”. D1 tasks 8–10 and all D2 remain pending; no further feature work is included.
