@@ -16,11 +16,11 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 
 ## Execution progress
 
-Phase: Project C complete offline with final review PASS; owner checks remain. Project D stopping checkpoint in-progress after the current tasks.
+Phase: User-requested stopping checkpoint complete. Project C complete offline with final review PASS; owner checks remain. Project D remains incomplete.
 
 - C1 data and items: complete; all eight source tasks done.
 - C2 projection and metrics: complete; all nine source tasks done.
-- Project D: D1 tasks 1–6 done; task 7 (RunPanel form and estimate) remains in-progress. D1 tasks 8–10 and all D2 are deferred at the user-requested stopping boundary; Project D remains incomplete. Code review base `2cff97c`.
+- Project D: D1 tasks 1–7 done; D1 tasks 8–10 and all 11 D2 tasks remain todo (14 remaining tasks), deferred at the stopping boundary. Code review base `2cff97c`.
 
 ## Run artifacts
 
@@ -33,3 +33,9 @@ Phase: Project C complete offline with final review PASS; owner checks remain. P
 ## Review fix
 
 - Done: the P2 balanced-accuracy fix is resolved in `2cff97c`; [final Project C review](review-C-2026-10-21-final.md) PASS from all three personas. All 17 source implementation tasks remain done. Owner checks remain deferred.
+
+## Checkpoint handoff
+
+Final integrated frontend: 437 tests across 30 files passed; typecheck and build passed; `git diff --check` clean. RunPanel currently supplies form/estimate only: its default button has no start/download/progress/abort/resume lifecycle wiring. Task 8 owns that wiring, the actual mid-run-toggle test, and optional run-error eval API integration. No live checks performed.
+
+- [Draft PR body](pr-description.md) — concrete checkpoint scope, validation, and 14 deferred Project D tasks. Push and PR creation await principal verification.

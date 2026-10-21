@@ -15,7 +15,7 @@ Source of truth: docs/agent_files/eval-ui-20261020/01-eval-shell-and-runs/PRD.md
 | 4 | usePolling hook | none | done |
 | 5 | EvalApp shell and view slot | 2, 4 | done |
 | 6 | Audit / Eval toggle | 5 | done |
-| 7 | RunPanel form and estimate | 3, 5 | in-progress |
+| 7 | RunPanel form and estimate | 3, 5 | done |
 | 8 | RunPanel run lifecycle | 4, 7 | todo |
 | 9 | RunsList | 3, 5, 8 | todo |
 | 10 | Eval UI reference docs | 6, 9 | todo |
