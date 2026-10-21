@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://iaudit.local/schemas/metrics.schema.json",
+  "title": "iaudit eval metrics report (metrics.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "dataset", "dataset_version", "primary_policy",
+               "scored", "bootstrap", "run", "dataset_extra", "reference_caveats",
+               "items", "failures", "entries", "references"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "run_id": {"type": "string", "minLength": 1},
+    "dataset": {"type": "string", "minLength": 1},
+    "dataset_version": {"type": "string"},
+    "primary_policy": {"type": "string", "minLength": 1},
+    "scored": {
+      "type": "object", "additionalProperties": false,
+      "required": ["at", "metrics_version", "git_commit", "git_dirty"],
+      "properties": {
+        "at": {"type": "string"},
+        "metrics_version": {"type": "string"},
+        "git_commit": {"type": "string"},
+        "git_dirty": {"type": "boolean"}
+      }
+    },
+    "bootstrap": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method", "resamples", "seed", "level"],
+      "properties": {
+        "method": {"type": "string"},
+        "resamples": {"type": "integer", "minimum": 1},
+        "seed": {"type": "integer"},
+        "level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1}
+      }
+    },
+    "run": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "complete", "mapping_version", "tags"],
+      "properties": {
+        "state": {"enum": ["running", "finished", "aborted_cost", "aborted", "failed", "interrupted"]},
+        "complete": {"type": "boolean"},
+        "mapping_version": {"type": ["string", "null"]},
+        "tags": {"type": "object"}
+      }
+    },
+    "dataset_extra": {"type": "object"},
+    "reference_caveats": {"type": "array", "items": {"type": "string"}},
+    "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["selected", "scored", "failed", "not_run"],
+      "properties": {
+        "selected": {"$ref": "#/$defs/count"},
+        "scored": {"$ref": "#/$defs/count"},
+        "failed": {"$ref": "#/$defs/count"},
+        "not_run": {"$ref": "#/$defs/count"}
+      }
+    },
+    "failures": {
+      "type": "object", "additionalProperties": false,
+      "required": ["by_reason"],
+      "properties": {"by_reason": {"type": "object", "additionalProperties": {"$ref": "#/$defs/count"}}}
+    },
+    "entries": {"type": "array", "items": {"$ref": "#/$defs/entry"}},
+    "references": {"type": "array", "items": {"$ref": "#/$defs/reference"}}
+  },
+  "$defs": {
+    "count": {"type": "integer", "minimum": 0},
+    "slice": {
+      "type": "object",
+      "additionalProperties": {"type": ["string", "number", "boolean", "null"]}
+    },
+    "entry": {
+      "type": "object", "additionalProperties": false,
+      "required": ["metric", "level", "policy", "slice", "value", "n", "n_clusters", "ci", "ci_status"],
+      "properties": {
+        "metric": {"type": "string", "minLength": 1},
+        "level": {"type": "string", "minLength": 1},
+        "policy": {"enum": ["primary", "secondary", "none"]},
+        "slice": {"$ref": "#/$defs/slice"},
+        "value": {"type": ["number", "null"]},
+        "n": {"$ref": "#/$defs/count"},
+        "n_clusters": {"$ref": "#/$defs/count"},
+        "ci": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}
+          ]
+        },
+        "ci_status": {"enum": ["ok", "few_clusters", "undefined"]},
+        "impl": {"type": "string"}
+      }
+    },
+    "reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "label", "metric", "level", "slice", "value"],
+      "properties": {
+        "source": {"type": "string"},
+        "label": {"type": "string"},
+        "metric": {"type": "string", "minLength": 1},
+        "level": {"type": "string", "minLength": 1},
+        "slice": {"$ref": "#/$defs/slice"},
+        "value": {"type": "number"},
+        "note": {"type": "string"}
+      }
+    }
+  }
+}

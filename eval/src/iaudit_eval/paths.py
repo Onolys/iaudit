@@ -26,6 +26,11 @@ def eval_home() -> Path:
     return repo_root() / "eval"
 
 
+def schemas_dir() -> Path:
+    # Shipped with the code (eval/schemas), independent of IAUDIT_EVAL_HOME.
+    return repo_root() / "eval" / "schemas"
+
+
 def runs_dir() -> Path:
     return eval_home() / "runs"
 
