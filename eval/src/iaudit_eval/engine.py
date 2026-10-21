@@ -212,7 +212,8 @@ class _RunDriver:
         self.failed = 0
         self.cost: float | None = None
         self.error: dict | None = None
-        self._identity_set = False
+        self._schema_set = False
+        self._fingerprint_set = False
         self.refused: FingerprintChanged | None = None
         self.total = len(items)
         self.max_cost_usd = max_cost_usd
@@ -377,17 +378,19 @@ class _RunDriver:
         return rec, out
 
     def _set_identity(self, resp: dict) -> None:
-        """schema_version and fingerprint from the first valid response."""
-        if self._identity_set:
-            return
-        self._identity_set = True
-        fields: dict[str, Any] = {"schema_version": resp.get("schema_version")}
+        """Capture the first schema and, independently, the first available run_info."""
+        fields: dict[str, Any] = {}
+        if not self._schema_set:
+            fields["schema_version"] = resp.get("schema_version")
+            self._schema_set = True
         info = resp.get("run_info")
-        if info:
+        if not self._fingerprint_set and info:
             fields["fingerprint"] = {
                 "models": info.get("models"), "prompt_hashes": info.get("prompt_hashes"),
             }  # fmt: skip
-        store.update_run(self.runs_root, self.run_id, **fields)
+            self._fingerprint_set = True
+        if fields:
+            store.update_run(self.runs_root, self.run_id, **fields)
 
     def _snapshot(self) -> RunProgress:
         return RunProgress(self.run_id, self.state, self.done, self.failed,
@@ -597,8 +600,9 @@ class _ResumeDriver(_RunDriver):
         self.prior_state = prior_state
         self.stored_fp = snapshot.get("fingerprint")
         self.stored_schema = snapshot.get("schema_version")
-        self._verified = self.stored_fp is None
-        self._identity_set = self.stored_fp is not None
+        self._verified = self.stored_fp is None and self.stored_schema is None
+        self._schema_set = self.stored_schema is not None
+        self._fingerprint_set = self.stored_fp is not None
 
     def _stop_reason(self) -> str | None:
         return "refused" if self.refused is not None else super()._stop_reason()
@@ -622,6 +626,9 @@ class _ResumeDriver(_RunDriver):
                 "backend schema_version changed since the run started",
                 {"schema_version": {"was": self.stored_schema, "now": sv}},
             )
+        if self.stored_fp is None:
+            self._verified = True
+            return
         info = resp.get("run_info")
         if not info:
             return  # nothing to compare; keep guarding
