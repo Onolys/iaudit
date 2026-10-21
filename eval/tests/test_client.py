@@ -100,6 +100,21 @@ async def test_connect_error_retried():
     assert out.kind == "network" and out.http_status is None
 
 
+async def test_connect_timeout_is_network_retried():
+    n = 0
+
+    def handler(request):
+        nonlocal n
+        n += 1
+        raise httpx.ConnectTimeout("slow connect", request=request)
+
+    c = AuditClient("http://fake", transport=httpx.MockTransport(handler), sleep=Sleeps())
+    async with c:
+        out = await c.audit(_req())
+    assert n == 2 and out.attempts == 2
+    assert out.kind == "network"
+
+
 async def test_no_retry_500_504():
     for mode in ("500", "504"):
         fb = FakeBackend(mode)
