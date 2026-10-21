@@ -1,0 +1,247 @@
+{
+  "schema_version": "1.2.0",
+  "request_id": "mock-11",
+  "transcript": [
+    {
+      "id": "t0",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Thanks for coming in. I'd like to go through your medication first, then work, then sleep and mood. What are you taking at the moment?",
+      "timestamp": "00:00:03"
+    },
+    {
+      "id": "t1",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Sertraline. I started it in the spring.",
+      "timestamp": "00:00:08"
+    },
+    {
+      "id": "t2",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "And what dose is that?",
+      "timestamp": "00:00:13"
+    },
+    {
+      "id": "t3",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "One hundred milligrams each morning. I began on fifty and my GP doubled it after a month.",
+      "timestamp": "00:00:18"
+    },
+    {
+      "id": "t4",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you ever miss a dose?",
+      "timestamp": "00:00:23"
+    },
+    {
+      "id": "t5",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Yes. Three or four times a week I forget the morning tablet, usually on days when I leave early.",
+      "timestamp": "00:00:28"
+    },
+    {
+      "id": "t6",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Were you on anything else before the sertraline?",
+      "timestamp": "00:00:33"
+    },
+    {
+      "id": "t7",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Citalopram, twenty milligrams, for about a year. It did nothing for me, so I stopped it last winter.",
+      "timestamp": "00:00:38"
+    },
+    {
+      "id": "t8",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Any side effects from the sertraline?",
+      "timestamp": "00:00:43"
+    },
+    {
+      "id": "t9",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Some nausea in the first fortnight. It has gone now.",
+      "timestamp": "00:00:48"
+    },
+    {
+      "id": "t10",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Do you take anything else regularly?",
+      "timestamp": "00:00:53"
+    },
+    {
+      "id": "t11",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Two vitamin D tablets in the morning and one magnesium tablet at night. That's all.",
+      "timestamp": "00:00:58"
+    },
+    {
+      "id": "t12",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Okay. Let's turn to work. What's your role?",
+      "timestamp": "00:01:03"
+    },
+    {
+      "id": "t13",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I lead an engineering team. About ten people report to me, though the number shifts a bit.",
+      "timestamp": "00:01:08"
+    },
+    {
+      "id": "t14",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Has the team changed in size this year?",
+      "timestamp": "00:01:13"
+    },
+    {
+      "id": "t15",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "It was six people in January and now we're at eleven, because two contractors joined last month.",
+      "timestamp": "00:01:18"
+    },
+    {
+      "id": "t16",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How long have you been in the role?",
+      "timestamp": "00:01:23"
+    },
+    {
+      "id": "t17",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "I took over in March of last year, so about eighteen months now.",
+      "timestamp": "00:01:28"
+    },
+    {
+      "id": "t18",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Is there anyone helping you manage them?",
+      "timestamp": "00:01:33"
+    },
+    {
+      "id": "t19",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No deputy, no. It's just me, which is part of the strain.",
+      "timestamp": "00:01:38"
+    },
+    {
+      "id": "t20",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How many hours are you working in a week?",
+      "timestamp": "00:01:43"
+    },
+    {
+      "id": "t21",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Around forty-seven and a half, if I add up the evenings.",
+      "timestamp": "00:01:48"
+    },
+    {
+      "id": "t22",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "That's a lot. Now sleep. How much do you get on a work night?",
+      "timestamp": "00:01:53"
+    },
+    {
+      "id": "t23",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "About 4.7 hours, according to my watch.",
+      "timestamp": "00:01:58"
+    },
+    {
+      "id": "t24",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "How often do you wake in the night?",
+      "timestamp": "00:02:03"
+    },
+    {
+      "id": "t25",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Most nights, two or three times, then I lie there thinking about the rota.",
+      "timestamp": "00:02:08"
+    },
+    {
+      "id": "t26",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "And your mood?",
+      "timestamp": "00:02:13"
+    },
+    {
+      "id": "t27",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "Low a few days a week. Mostly Mondays and Tuesdays, when the planning meetings are.",
+      "timestamp": "00:02:18"
+    },
+    {
+      "id": "t28",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Have you had any thoughts of harming yourself?",
+      "timestamp": "00:02:23"
+    },
+    {
+      "id": "t29",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "No, nothing like that.",
+      "timestamp": "00:02:28"
+    },
+    {
+      "id": "t30",
+      "speaker": "clinician1",
+      "role": "interviewer",
+      "text": "Is there anything you want to add?",
+      "timestamp": "00:02:33"
+    },
+    {
+      "id": "t31",
+      "speaker": "patient1",
+      "role": "respondent",
+      "text": "The tablets help a bit, I think, but the workload is the real problem.",
+      "timestamp": "00:02:38"
+    }
+  ],
+  "assessment": [
+    {
+      "id": "sec-medication",
+      "label": "Medication",
+      "text": "Takes sertraline 100 mg each morning. Was previously on citalopram 40 mg. Misses the morning dose almost every day. Takes four supplement tablets a day in total. Reports no side effects."
+    },
+    {
+      "id": "sec-work",
+      "label": "Work",
+      "text": "Manages a team of ten engineers. The team grew from six to nine people during the year. Has led the team since March this year. Works about 47 hours a week. Has no deputy."
+    },
+    {
+      "id": "sec-sleep",
+      "label": "Sleep and mood",
+      "text": "Sleeps 4 hours on a work night. Wakes in the night every night. Mood is low a few days a week. The sertraline has resolved the low mood. Denies thoughts of self-harm. Meets criteria for major depression."
+    }
+  ]
+}
