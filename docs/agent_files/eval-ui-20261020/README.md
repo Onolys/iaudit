@@ -5,10 +5,15 @@ Project D of 4: Eval tab in the existing frontend for running and reviewing eval
 ## Sub-projects
 | Sub-project | PRD | Scope | Depends on | Status |
 |---|---|---|---|---|
-| D1 Eval shell & runs | [PRD](01-eval-shell-and-runs/PRD.md) | Audit/Eval toggle, `evalApi`, `usePolling`, run form (estimate, download, progress, abort), runs list (resume, compare pick), Vite `/eval-api` proxy, `docs/reference/eval-ui.md` | B4 (and B1 frontend 1.1.0 validators) | in-progress |
-| D2 Results & items | [PRD](02-results-and-items/PRD.md) | Run detail (metrics, paper rows, re-score, run info), item list, read-only item replay in `ReviewShell` + GoldPanel, failed items, two-run compare | D1, B3, B4, C2 | draft |
+| D1 Eval shell & runs | [PRD](01-eval-shell-and-runs/PRD.md) | Audit/Eval toggle, `evalApi`, `usePolling`, run form (estimate, download, progress, abort), runs list (resume, compare pick), Vite `/eval-api` proxy, `docs/reference/eval-ui.md` | B4 (and B1 frontend 1.1.0 validators) | complete offline |
+| D2 Results & items | [PRD](02-results-and-items/PRD.md) | Run detail (metrics, paper rows, re-score, run info), item list, read-only item replay in `ReviewShell` + GoldPanel, failed items, two-run compare | D1, B3, B4, C2 | complete offline |
 
 Brief: [brainstorming.md](brainstorming.md).
+
+All ten D1 and eleven D2 tasks are implemented and verified offline. The fourteen
+tasks deferred at the earlier checkpoint are now complete; final independent review
+is pending. Execution evidence: [final code run](../feat-eval-tofueval-ui-20261021/code-final-project-d-2026-10-21.md).
+Owner checks below remain deferred.
 
 ## Dependency graph
 ```mermaid

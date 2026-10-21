@@ -1,6 +1,6 @@
 # Frontend testing
 
-How to test the review UI and what to check before a release.
+How to test the Audit and Eval UI and what to check before a release.
 
 **Audience:** contributors.
 
@@ -43,6 +43,35 @@ Transport tests inject `fetch`, config and the mock registry; no test touches a 
 - [ ] Mock mode: all three pairs load and look right.
 - [ ] Against the real service: a valid upload renders; a stopped service shows Retry; Cancel works.
 - [ ] `VITE_AUDIT_URL` points at the real endpoint path (see below).
+- [ ] Owner: open one real eval item after the dataset download and pilot run, compare
+  GoldPanel with its source, and inspect run metrics and two-run comparison.
+- [ ] Owner: reopen Eval mid-run and verify attachment; open the largest saved item.
+- [ ] Owner after A1: saved 1.1.0 items fail replay with the version error, while
+  metrics/list/compare remain available. Current stale 1.0.0 behavior is covered offline.
 - [ ] The [known limits](../concepts/review-ui.md#known-limits) are still accurate.
 
-Open question: `.env.example` uses `/audit`, while the backend plan defines `POST /v1/audit`. Settle which is right before connecting.
+The current `.env.example` points Audit at `http://localhost:8000/v1/audit`.
+`VITE_MOCK` affects Audit only; Eval tests use injected fake fetch, fictional fixtures
+and fake timers. Do not interpret Audit mock mode as an Eval application mock mode.
+
+
+## Eval coverage
+
+All agent verification is offline; live providers, real dataset downloads, live
+smoke and real-browser checks above remain owner-only.
+
+| Tests under `src/` | Proves |
+|---|---|
+| `app/Header.test.tsx`, `transport/screens.test.tsx`, `transport/runAudit.test.ts` | Optional upload/file action and shared response checks preserve Audit behavior. |
+| `eval/evalApi.test.ts`, `eval/fixtures.test.ts`, `eval/d2ApiFixtures.test.ts` | Injected-fetch routes/errors/encoding, metrics-null 404, and every JSON fixture registered and Ajv-valid. |
+| `eval/usePolling.test.tsx`, `eval/RunPanel.lifecycle.test.tsx`, `eval/RunsList.test.tsx`, `eval/EvalApp.runs.test.tsx` | Lifecycle, polling, resume, list navigation and cancellation. |
+| `eval/buildLoadResult.test.ts` | Actual contract pair replay, stale 1.0.0, invalid requests/responses and zero fetch/JSON parsing. |
+| `eval/MetricsTable.test.tsx`, `eval/RunInfoBlock.test.tsx` | Grouping, policies, authoritative item counts, paper evaluator identity, CI hints and provenance. |
+| `eval/ItemList.test.tsx` | Filter requests, raw-ID actions, empty/dim loading, Retry and stale/unmount protection. |
+| `eval/RunDetail.test.tsx` | Scoring/rescore lifecycle, failure/missing metrics, 409, lost contact and cleanup. |
+| `eval/gold/GoldPanel.test.tsx` | Native gold, unknown/malformed JSON fallback and collapse behavior. |
+| `eval/ItemDetail.test.tsx` | Real ReviewShell replay/remount, failed/stale/invalid/unmapped details, no audit/upload, issue cap and Retry. |
+| `eval/CompareView.test.tsx` | Shared/zero comparisons, signed deltas/CI gating, 409/422 and item callbacks. |
+| `eval/mock-flow.test.tsx` | Full run → item → back → comparison → open in A/B → back flow with no global fetch calls. |
+
+Use `npm test -- --maxWorkers=2` when memory limits require at most two Vitest workers.

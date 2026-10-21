@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Eleven tasks: shared-file edits, buildLoadResult, eval API wrappers and fixtures, metrics and run info, item list, run detail, gold panel, item detail, compare, EvalApp wiring, docs.
 date: 2026-10-20
 ---
@@ -19,7 +19,7 @@ Source of truth: docs/agent_files/eval-ui-20261020/02-results-and-items/PRD.md. 
 | 8 | FailedItem and ItemDetail | 1, 2, 3, 7 | done |
 | 9 | CompareView | 3 | done |
 | 10 | EvalApp view wiring and mock-flow test | 6, 8, 9 | done |
-| 11 | Docs | 10 | todo |
+| 11 | Docs | 10 | done |
 
 ## Task 1 — Shared-file edits: Header, ErrorScreen, response-check helper
 What it is / what it means: The three minimal edits to existing audit files that let a saved item reuse the review path (PRD Architecture shared-file table; Decisions D1, D2; R7).

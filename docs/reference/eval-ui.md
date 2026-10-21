@@ -3,7 +3,7 @@
 **Audience:** users.
 
 The **Eval** tab runs local dataset evaluations against the audit backend. It shows
-run setup, progress and the runs list. API endpoints and server configuration are in
+run setup, progress, run results, saved items and comparisons. API endpoints and server configuration are in
 [eval-api.md](eval-api.md); the audit upload flow is in [review-ui.md](review-ui.md).
 
 ## Audit and Eval
@@ -76,8 +76,7 @@ to the existing Run panel's polling.
 Click a row or its date button to open that run. Checkboxes and Resume do not open
 the row. Select at most two runs from the same dataset; incompatible and additional
 unchecked boxes are disabled. **Compare selected (2)** opens the selected comparison.
-Run and comparison navigation currently show D2 placeholders; their result views are
-reserved below.
+Run rows open their results. Comparison selection opens the two-run comparison.
 
 ## Environment and proxy
 
@@ -117,19 +116,79 @@ this UI version. Requests omit cookies. Client timeouts are 10 seconds for reads
 | `schema_mismatch` or `backend_unreachable` | API message and supplied detail/version information displayed as server text. |
 | Run terminates unsuccessfully | State chip and run-level error message when supplied; Resume follows the state rules above. |
 
-## Run detail (D2)
+## Run detail and Re-score
 
-Reserved for run results, metrics and scoring controls. The current run view is a
-placeholder.
+Run detail shows dataset, split, selected N, creation date and state, then failures,
+metrics, items and run information. **Back to runs** returns to the list.
 
-## Item detail (D2)
+**Re-score** recomputes saved results without calling the audit backend or a model.
+It is disabled while the run is running or scoring is pending/running. `Scoring...`
+replaces the metrics table until scoring finishes; the screen polls and then fetches
+fresh metrics. A failed score shows `Scoring failed. Re-score to retry.` Missing metrics
+after scoring finishes show `Metrics missing. Re-score.` A 404 `not_found` on the
+metrics route means missing metrics, rather than a failed run-detail request.
 
-Reserved for per-item results, requests, responses and gold inspection.
+Metrics are grouped by level, then slice, preserving server order. Primary values
+count failures wrong; secondary values exclude failures. Each policy has its own
+value, n and confidence interval. Hover for cluster counts. An unavailable interval
+shows `-` with a `few_clusters` or `undefined` hint. The failure sentence uses item
+counts; policy-none rates appear separately with their level and slice, so sentence
+or summary rates cannot be mistaken for counts of failed items.
 
-## Compare results (D2)
+Paper reference rows follow their matching metric, retain the paper's evaluator
+label and show `paper-reported, different model & date`. They are grey, value-only
+rows with dashes elsewhere; they are never ranked or colored by performance.
+**Reference caveats** is a collapsed note.
 
-Reserved for comparison results. The current comparison view identifies the selected
-runs in a placeholder.
+Run information shows commit/dirty state, models per tier, prompt hashes (eight
+characters with the full hash on hover), mapping version, seed, supplied tags,
+reported cost or `unknown`, and tokens only when supplied. Mixed fingerprints and
+saved warnings remain visible. Test runs add `Test runs are for reporting, not tuning.`
+
+## Items and saved review
+
+The item table filters **all**, **mismatch** or **failed** with one high-limit request.
+Columns show the item's label or ID, Gold, Ours, Match and failed status. Empty filters
+show `No items match this filter.` Prior rows stay visible and dimmed while a new
+filter loads. Click a row or its item button to open it.
+
+A saved item shows a back action, gold annotations and the same assessment/evidence
+review as Audit. This is read-only replay: selecting claims changes the view, and
+neither starts an audit nor edits saved data. There is no upload control. **Back to
+run** returns to the originating run; **Back to comparison** returns to the same
+comparison pair.
+
+Failed items show saved failure kind, HTTP status, error code, message and up to
+50 issues when supplied, followed by `No response was saved. Resume the run to retry.`
+They do not open the review panes. An unmapped item states its scoring limitation;
+it can still replay a valid saved response. If none exists, it says
+`No saved audit response is available.`
+
+Saved requests and responses pass the same validators as Audit. The current audit
+contract pin is **1.1.0**: stale 1.0.0 responses show the unsupported-version error.
+The planned A1 pin change to 1.2.0 will also reject saved 1.1.0 items. This is an
+accepted limitation; there is no replay compatibility layer. Run lists, saved
+metrics and comparisons remain available independently of item replay validation.
+
+### Gold kinds
+
+`tofueval_summary_sentences` shows the supplied summary label and, for each sentence,
+its index, text, consistent/inconsistent label, native error-type strings and
+explanation. Gold is collapsible and scrolls within a 30vh cap. Unknown kinds or
+malformed TofuEval gold fall back to collapsed, pretty-printed JSON. Gold text is
+not highlighted inside the assessment pane.
+
+## Compare results
+
+Select two runs of one dataset in the runs list. The comparison identifies A and B
+and prominently reports `n shared = k`. Its plain table shows metric, level, slice,
+policy, A, B, signed delta **B − A**, and delta CI only when its status is `ok`.
+Values have no better/worse coloring. Zero shared items show `No shared items`.
+
+Disagreements show the item and each differing pair's level, unit, gold, A and B.
+**open in A** and **open in B** inspect that item's saved audit in the chosen run.
+Cross-dataset errors appear inline, including the server's current HTTP 422 response
+and HTTP 409 responses. Network failures use the server banner with **Retry**.
 
 ## Owner manual checks
 
@@ -140,6 +199,11 @@ the proxy against a stub. The following live checks remain for the owner:
   (for example N=5), close and reopen the tab in a real browser, and confirm attachment
   to the same running run.
 - Verify `/eval-api/health` through the Vite dev server against the real eval server.
+- After downloading the real dataset and completing a paid pilot, open one real
+  TofuEval item and compare its gold with the source CSV; inspect run detail and compare.
+- Open the largest saved item and check its load time in a real browser.
+- After A1, verify that older 1.1.0 items show the unsupported-version screen while
+  run lists, metrics and comparisons still work.
 
 Full-stack launches, live provider calls and real dataset downloads are owner checks;
 they are not performed by the automated frontend test suite.
