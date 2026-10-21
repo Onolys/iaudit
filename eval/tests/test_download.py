@@ -127,6 +127,68 @@ def test_bad_url_scheme_fails(tmp_path):
     assert st["status"] == "failed" and c.n == 0
 
 
+def test_http_url_rejected(tmp_path):
+    c = Counter()
+    st = run(make_ds([src(url="http://example.test/f.bin")]), tmp_path, c)
+    assert st["status"] == "failed" and c.n == 0
+
+
+def test_redirect_to_http_rejected(tmp_path):
+    def handler(request):
+        if request.url.scheme == "https":
+            return httpx.Response(302, headers={"location": "http://example.test/f.bin"})
+        raise AssertionError("followed redirect to http")
+
+    st = dl.download(make_ds([src()]), data_root=tmp_path, transport=httpx.MockTransport(handler))
+    assert st["status"] == "failed" and "non-https" in st["error"]
+    assert not (tmp_path / "fake" / "f.bin").exists()
+
+
+def test_https_redirect_followed(tmp_path):
+    def handler(request):
+        if request.url.path == "/f.bin":
+            return httpx.Response(302, headers={"location": "/g.bin"})
+        return httpx.Response(200, content=BODY)
+
+    st = dl.download(make_ds([src()]), data_root=tmp_path, transport=httpx.MockTransport(handler))
+    assert st["status"] == "ready"
+
+
+def test_declared_size_caps_stream(tmp_path):
+    class Endless(httpx.SyncByteStream):
+        def __init__(self):
+            self.sent = 0
+
+        def __iter__(self):
+            while True:
+                self.sent += 1 << 16
+                yield b"x" * (1 << 16)
+
+    stream = Endless()
+    t = httpx.MockTransport(lambda r: httpx.Response(200, stream=stream))
+    st = dl.download(make_ds([src(size_bytes=1000)]), data_root=tmp_path, transport=t)
+    assert st["status"] == "failed" and "limit" in st["error"]
+    assert stream.sent <= 1 << 17
+    assert not list((tmp_path / "fake").glob("f.bin*"))
+
+
+def test_default_cap_when_no_size_declared(tmp_path, monkeypatch):
+    monkeypatch.setattr(dl, "MAX_DOWNLOAD_BYTES", 100)
+    st = run(make_ds([src()]), tmp_path, Counter())
+    assert st["status"] == "failed" and "limit" in st["error"]
+
+
+def test_failed_and_downloading_keep_prior_files_for_drift(tmp_path):
+    ds = make_ds([src()])
+    run(ds, tmp_path, Counter())
+    (tmp_path / "fake" / "f.bin").write_bytes(b"tampered")
+    failed = run(ds, tmp_path, Counter(status=500))
+    assert failed["status"] == "failed" and failed["files"][0]["sha256"] == SHA
+    st = run(ds, tmp_path, Counter(body=b"new upstream bytes"))
+    assert st["status"] == "ready"
+    assert any("changed upstream" in w for w in st["warnings"])
+
+
 def test_progress_callback(tmp_path):
     calls = []
     dl.download(
