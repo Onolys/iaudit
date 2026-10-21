@@ -5,8 +5,10 @@ import schema from "@eval-api/eval-api.schema.json";
 export type FixtureRoute = keyof typeof schema["x-routes"];
 export interface FixtureCase { file: string; route: FixtureRoute; status: number }
 
-// Shared D1/D2 fake-fetch cases. JSON bodies are fictional; no source text is included.
+// Shared D1/D2 fake-fetch cases. Bodies use fictional data and the public contract example.
 export const fixtureCases: FixtureCase[] = [
+  { file: "comparison-zero-shared.json", route: "GET /compare", status: 200 },
+  { file: "error-cross-dataset.json", route: "GET /compare", status: 409 },
   { file: "comparison.json", route: "GET /compare", status: 200 },
   { file: "dataset-detail.json", route: "GET /datasets/{name}", status: 200 },
   { file: "datasets-empty.json", route: "GET /datasets", status: 200 },

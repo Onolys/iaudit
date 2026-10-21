@@ -4,7 +4,7 @@
   "split": "validation",
   "n_requested": 3,
   "n_items": 3,
-  "seed": null,
+  "seed": 7,
   "created_at": "fixture-created",
   "finished_at": "fixture-finished",
   "schema_version": "1.1.0",
@@ -14,7 +14,7 @@
     "cost_usd": 0.12,
     "failures": 0
   },
-  "git_dirty": false,
+  "git_dirty": true,
   "progress": {
     "done": 3,
     "total": 3,
@@ -24,7 +24,28 @@
   "run_info": {
     "concurrency": 4,
     "max_cost_usd": null,
-    "tags": {},
-    "warnings": []
+    "tags": {
+      "contamination": "fictional fixture"
+    },
+    "warnings": [
+      "Fictional mixed fingerprint warning."
+    ],
+    "git_commit": "0123456789abcdef0123456789abcdef01234567",
+    "git_dirty": true,
+    "mapping_version": "fictional-mapping-v1",
+    "seed": 7,
+    "mixed": true,
+    "fingerprint": {
+      "models": {
+        "cheap": "fixture-cheap",
+        "mid": "fixture-mid",
+        "strong": "fixture-strong"
+      },
+      "prompt_hashes": {
+        "atomize": "0123456789abcdef",
+        "link": "fedcba9876543210",
+        "check": "0011223344556677"
+      }
+    }
   }
 }

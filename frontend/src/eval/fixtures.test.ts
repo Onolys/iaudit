@@ -42,7 +42,7 @@ it("covers all download states and both estimate bases", () => {
 
 it("covers every structured API error code", () => {
   const errors = fixtureCases.filter(({ status }) => status >= 400);
-  expect(errors.map(({ file }) => (bodies[`./fixtures/${file}`] as { error: { code: string } }).error.code).sort())
+  expect([...new Set(errors.map(({ file }) => (bodies[`./fixtures/${file}`] as { error: { code: string } }).error.code))].sort())
     .toEqual([...schema.$defs.Error.properties.code.enum].sort());
 });
 

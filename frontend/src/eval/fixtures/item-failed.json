@@ -1,12 +1,129 @@
 {
   "item_id": "fictional-item-1",
   "status": "failed",
-  "request": {},
+  "request": {
+    "schema_version": "1.1.0",
+    "request_id": "example-001",
+    "transcript": [
+      {
+        "id": "t0",
+        "speaker": "clinician1",
+        "role": "interviewer",
+        "text": "Have you been losing your keys lately?",
+        "timestamp": "00:01:02"
+      },
+      {
+        "id": "t1",
+        "speaker": "patient1",
+        "role": "respondent",
+        "text": "No. I don't lose my keys.",
+        "timestamp": "00:01:08"
+      },
+      {
+        "id": "t2",
+        "speaker": "clinician1",
+        "role": "interviewer",
+        "text": "What about appointments?"
+      },
+      {
+        "id": "t3",
+        "speaker": "patient1",
+        "role": "respondent",
+        "text": "I missed one last year, when I was traveling."
+      },
+      {
+        "id": "t4",
+        "speaker": "caretaker1",
+        "role": "informant",
+        "text": "She forgot her medication twice last month."
+      },
+      {
+        "id": "t5",
+        "speaker": "patient1",
+        "text": "That was only while I had the flu. I'm fine now."
+      }
+    ],
+    "assessment": [
+      {
+        "id": "sec-memory",
+        "label": "Memory",
+        "score": 2,
+        "text": "The caregiver reported two medication lapses last month. The patient frequently loses their keys. They missed appointments throughout the past year. The patient has trouble at work. This meets criterion A for a memory disorder."
+      }
+    ]
+  },
   "response": null,
   "failure": {
-    "reason": "Fictional failure"
+    "kind": "http",
+    "http_status": 503,
+    "error_code": "backend_unreachable",
+    "message": "Fictional backend unavailable.",
+    "issues": [
+      {
+        "path": "/",
+        "message": "Fictional offline fixture issue."
+      }
+    ]
   },
   "run_info": null,
-  "gold": null,
-  "gold_kind": null
+  "gold": {
+    "sentences": [
+      {
+        "sent_idx": 0,
+        "text": "The caregiver reported two medication lapses last month.",
+        "label": "consistent",
+        "types": [],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 0,
+        "end": 56
+      },
+      {
+        "sent_idx": 1,
+        "text": "The patient frequently loses their keys.",
+        "label": "inconsistent",
+        "types": [
+          "Contradiction"
+        ],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 57,
+        "end": 97
+      },
+      {
+        "sent_idx": 2,
+        "text": "They missed appointments throughout the past year.",
+        "label": "inconsistent",
+        "types": [
+          "Nuanced Meaning Shift",
+          "Tense/Modality Error"
+        ],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 98,
+        "end": 148
+      },
+      {
+        "sent_idx": 3,
+        "text": "The patient has trouble at work.",
+        "label": "inconsistent",
+        "types": [
+          "Extrinsic Information"
+        ],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 149,
+        "end": 181
+      },
+      {
+        "sent_idx": 4,
+        "text": "This meets criterion A for a memory disorder.",
+        "label": "inconsistent",
+        "types": [
+          "Reasoning Error"
+        ],
+        "exp": "Fictional annotation for the public contract example.",
+        "start": 182,
+        "end": 227
+      }
+    ],
+    "summary": "inconsistent"
+  },
+  "gold_kind": "tofueval_summary_sentences"
 }

@@ -1,0 +1,5 @@
+.eval-item-list { min-width: 0; overflow-x: auto; }
+.eval-item-list fieldset { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 12px; }
+.eval-item-list label { display: inline-flex; gap: 6px; align-items: center; }
+.eval-item-list .is-loading { opacity: 0.5; }
+.eval-item-list tbody tr { cursor: pointer; }

@@ -102,7 +102,7 @@ export function ErrorScreen({
 }: {
   error: LoadError;
   onRetry?: () => void;
-  onChooseFile: () => void;
+  onChooseFile?: () => void;
 }) {
   const { title, detail } = describe(error);
   return (
@@ -115,7 +115,7 @@ export function ErrorScreen({
             Retry
           </button>
         ) : null}
-        {RETRY_ONLY.has(error.kind) ? null : (
+        {!onChooseFile || RETRY_ONLY.has(error.kind) ? null : (
           <button type="button" onClick={onChooseFile}>
             Choose another file
           </button>
