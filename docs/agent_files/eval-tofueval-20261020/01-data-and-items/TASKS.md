@@ -9,8 +9,8 @@ Source of truth: [PRD.md](PRD.md). Builds the TofuEval download, 1,777 summary i
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Dataset `metadata.json` | none | todo |
-| 2 | Fictional test fixtures | none | todo |
+| 1 | Dataset `metadata.json` | none | done |
+| 2 | Fictional test fixtures | none | in-progress |
 | 3 | Assessment builder with offset map | 2 | todo |
 | 4 | Items: grouping, ids, sentence fields | 1, 2, 3 | todo |
 | 5 | Transcript to turns | 2 | todo |

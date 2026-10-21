@@ -16,4 +16,4 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 
 ## Run artifacts
 
-Implementation and review artifacts will be linked here as they are created.
+- [Task evidence log](code-2026-10-21.md) — implementation commits, files, verification, and execution notes.
