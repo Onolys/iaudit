@@ -359,15 +359,18 @@ class RunManager:
             # Cancellation deliberately leaves the stored state running; releasing
             # the engine lock makes B2 report interrupted, rather than user-aborted.
             handle._task.cancel()
+            finished = asyncio.gather(handle._task, return_exceptions=True)
             try:
-                await asyncio.wait_for(asyncio.shield(self._active_task), timeout=grace_s)
+                await asyncio.wait_for(asyncio.shield(finished), timeout=grace_s)
             except TimeoutError:
-                self._active_task.cancel()
+                # The grace period is not permission to abandon transport cleanup.
+                # Reap the actual engine before its observer or owned HTTP client.
+                await asyncio.shield(finished)
+            if self._active_task is not None:
                 await asyncio.gather(self._active_task, return_exceptions=True)
-            if handle._task.done():
-                # A task cancelled before its first step never enters the driver's
-                # try/finally; releasing an already-released RunLock is idempotent.
-                await asyncio.to_thread(handle._driver.lock.release)
+            # A task cancelled before its first step never enters the driver's
+            # try/finally; releasing an already-released RunLock is idempotent.
+            await asyncio.to_thread(handle._driver.lock.release)
         tasks = [*self._score_tasks.values(), *self.download_tasks.values()]
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
