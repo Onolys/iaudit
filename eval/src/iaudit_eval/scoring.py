@@ -201,6 +201,7 @@ def _collect(run_id, dataset, by_id, saved, item_ids) -> _Collected:
     rows: list[dict] = []
     reasons: Counter = Counter({r: 0 for r in (*_ITEM_REASONS, "unresolved")})
     n_scored = n_failed = n_not_run = 0
+    primary_level = next(iter(dataset.meta.levels), None) if dataset.meta.levels else None
     for item_id in item_ids:
         if item_id not in saved:
             n_not_run += 1
@@ -231,7 +232,14 @@ def _collect(run_id, dataset, by_id, saved, item_ids) -> _Collected:
             n_scored += 1
         pairs = (pairs_hook or default_pairs)(item, gold, pred, failure)
         for p in pairs:
-            if p.failure is not None and p.failure not in _ITEM_REASONS:
+            # Item-level failures are already counted; count unit failures once, at the
+            # first declared (native) level, not again at every derived/alternate level.
+            if (
+                failure not in _ITEM_REASONS
+                and p.failure is not None
+                and p.failure not in _ITEM_REASONS
+                and (primary_level is None or p.level == primary_level)
+            ):
                 reasons[p.failure] += 1
         all_pairs.extend(pairs)
         status = {"item_failed": "failed", "unmapped": "unmapped"}.get(failure, "ok")
