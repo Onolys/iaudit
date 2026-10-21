@@ -42,7 +42,7 @@ appear in a separate collapsible panel, without changing assessment highlights.
 
 Failed items show saved error details instead of review panes. Invalid or stale saved
 responses show the normal validation error screen. The current 1.2.0 contract pin
-rejects 1.0.0 responses; A1's planned 1.2.0 pin will also reject saved 1.2.0 responses.
+rejects saved 1.0.0 and 1.1.0 responses.
 There is no replay compatibility layer. Lists, metrics and comparisons are separate
 from this validation and remain inspectable.
 

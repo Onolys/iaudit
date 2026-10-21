@@ -81,4 +81,4 @@ For HTTP errors the service's `error.message` is shown only if the body matches 
 | Context step | 3 turns per click |
 | Schema version | `1.2.0` |
 
-Verdict and evidence styles are in `frontend/src/tokens/index.ts`; concern names in `frontend/src/claim-detail/concernLabels.ts` (mission checks 1–12).
+Verdict and evidence styles are in `frontend/src/tokens/index.ts`; concern names in `frontend/src/claim-detail/concernLabels.ts` (mission checks 1–13).

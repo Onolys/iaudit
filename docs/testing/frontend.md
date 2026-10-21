@@ -46,8 +46,8 @@ Transport tests inject `fetch`, config and the mock registry; no test touches a 
 - [ ] Owner: open one real eval item after the dataset download and pilot run, compare
   GoldPanel with its source, and inspect run metrics and two-run comparison.
 - [ ] Owner: reopen Eval mid-run and verify attachment; open the largest saved item.
-- [ ] Owner after A1: saved 1.2.0 items fail replay with the version error, while
-  metrics/list/compare remain available. Current stale 1.0.0 behavior is covered offline.
+- [ ] Owner: saved 1.1.0 (and older) items fail replay with the version error, while
+  metrics/list/compare remain available. Stale-version behavior is covered offline.
 - [ ] The [known limits](../concepts/review-ui.md#known-limits) are still accurate.
 
 The current `.env.example` points Audit at `http://localhost:8000/v1/audit`.
