@@ -78,7 +78,7 @@ it("starts a run, inspects its saved item, returns to list, compares and returns
 it("cancels each departed progress/scoring poll and reattaches the active server run on returning to list",async()=>{
   const s=setup(true);await tick();s.hold(true);await tick(1000);expect(s.pending).toHaveLength(1);
   s.hold(false);fireEvent.click(row(running.run_id));await tick();expect(s.pending[0].signal.aborted).toBe(true);
-  expect(screen.getByText("Scoring...")).toBeTruthy();s.hold(true);await tick(1000);expect(s.pending).toHaveLength(2);
+  expect(screen.getByText("Run in progress (1/3)")).toBeTruthy();s.hold(true);await tick(1000);expect(s.pending).toHaveLength(2);
   s.hold(false);fireEvent.click(screen.getByRole("button",{name:"Public contract example"}));await tick();expect(s.pending[1].signal.aborted).toBe(true);
   fireEvent.click(screen.getByRole("button",{name:"Back to run"}));await tick();fireEvent.click(screen.getByRole("button",{name:"Back to runs"}));await tick();
   expect(screen.getByRole("progressbar")).toBeTruthy();expect(within(row(running.run_id)).getByText("running")).toBeTruthy();

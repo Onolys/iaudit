@@ -122,18 +122,25 @@ Run detail shows dataset, split, selected N, creation date and state, then failu
 metrics, items and run information. **Back to runs** returns to the list.
 
 **Re-score** recomputes saved results without calling the audit backend or a model.
-It is disabled while the run is running or scoring is pending/running. `Scoring...`
-replaces the metrics table until scoring finishes; the screen polls and then fetches
-fresh metrics. A failed score shows `Scoring failed. Re-score to retry.` Missing metrics
-after scoring finishes show `Metrics missing. Re-score.` A 404 `not_found` on the
+It is disabled while the run is running or scoring is running. While the run is
+running, run detail shows `Run in progress (done/total)` from the run's progress, and
+the items list refreshes whenever progress changes and when the run ends. After the
+run ends, `Scoring...` replaces the metrics table while scoring is pending or running;
+the screen polls and then fetches fresh metrics. A terminal run whose score stays
+`pending` is polled for a short grace period (two polls), then polling stops and the
+screen shows `Metrics missing. Re-score.` with Re-score enabled. A failed score shows
+`Scoring failed. Re-score to retry.` Missing metrics after scoring finishes show
+`Metrics missing. Re-score.` A 404 `not_found` on the
 metrics route means missing metrics, rather than a failed run-detail request.
 
 Metrics are grouped by level, then slice, preserving server order. Primary values
 count failures wrong; secondary values exclude failures. Each policy has its own
 value, n and confidence interval. Hover for cluster counts. An unavailable interval
 shows `-` with a `few_clusters` or `undefined` hint. The failure sentence uses item
-counts; policy-none rates appear separately with their level and slice, so sentence
-or summary rates cannot be mistaken for counts of failed items.
+counts; the policy-none `failure_rate` and `coverage` rates appear on the failure
+line with their level and slice, so sentence or summary rates cannot be mistaken for
+counts of failed items. Any other policy-none metric (for example TofuEval sentence
+diagnostics) appears under **Diagnostics**, one value/n table per level and slice.
 
 Paper reference rows follow their matching metric, retain the paper's evaluator
 label and show `paper-reported, different model & date`. They are grey, value-only
@@ -142,14 +149,14 @@ rows with dashes elsewhere; they are never ranked or colored by performance.
 
 Run information shows commit/dirty state, models per tier, prompt hashes (eight
 characters with the full hash on hover), mapping version, seed, supplied tags,
-reported cost or `unknown`, and tokens only when supplied. Mixed fingerprints and
+reported cost (dollars and cents, e.g. `$0.12`) or `unknown`, and tokens only when supplied. Mixed fingerprints and
 saved warnings remain visible. Test runs add `Test runs are for reporting, not tuning.`
 
 ## Items and saved review
 
 The item table filters **all**, **mismatch** or **failed** with one high-limit request.
 Columns show the item's label or ID, Gold, Ours, Match and failed status. Empty filters
-show `No items match this filter.` Prior rows stay visible and dimmed while a new
+show `No items match this filter.` When fewer rows are returned than exist, `Showing X of Y items` appears. Prior rows stay visible and dimmed while a new
 filter loads. Click a row or its item button to open it.
 
 A saved item shows a back action, gold annotations and the same assessment/evidence
