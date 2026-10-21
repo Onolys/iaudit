@@ -26,7 +26,7 @@ def make_app(tmp_path, **kw):
     async def ping():
         return {"ok": True}
 
-    @r.get("/datasets/{name}")
+    @r.get("/guard-datasets/{name}")
     async def ds(name: str):
         validate_dataset_id(name)
         return {"name": name}
@@ -115,8 +115,8 @@ async def test_no_cors_headers_on_preflight(tmp_path):
 
 @pytest.mark.parametrize(
     "path",
-    ["/datasets/..", "/datasets/Up", "/datasets/-x", "/datasets/%2e%2e", "/datasets/a%2F..%2Fb",
-     "/datasets/" + "a" * 65],
+    ["/guard-datasets/..", "/guard-datasets/Up", "/guard-datasets/-x", "/guard-datasets/%2e%2e", "/guard-datasets/a%2F..%2Fb",
+     "/guard-datasets/" + "a" * 65],
 )
 async def test_bad_dataset_ids_404(tmp_path, path):
     async with client(make_app(tmp_path)) as c:
@@ -125,7 +125,7 @@ async def test_bad_dataset_ids_404(tmp_path, path):
 
 async def test_good_dataset_id(tmp_path):
     async with client(make_app(tmp_path)) as c:
-        assert (await c.get("/datasets/tofueval_x-1")).json() == {"name": "tofueval_x-1"}
+        assert (await c.get("/guard-datasets/tofueval_x-1")).json() == {"name": "tofueval_x-1"}
 
 
 @pytest.mark.parametrize(
@@ -196,7 +196,7 @@ async def test_logging_safe(tmp_path, caplog):
         with caplog.at_level(logging.DEBUG):
             await c.get(f"/runs/{RUN_ID}/items/a.1?x={SENTINEL}")
             await c.post("/body", json={"t": SENTINEL})
-            await c.get("/datasets/" + SENTINEL.lower())
+            await c.get("/guard-datasets/" + SENTINEL.lower())
     # httpx's own client logger echoes the URL; only the server's loggers matter here.
     text = "\n".join(r.getMessage() for r in caplog.records if not r.name.startswith("httpx"))
     assert SENTINEL not in text and SENTINEL.lower() not in text

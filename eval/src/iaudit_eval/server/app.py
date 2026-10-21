@@ -1,4 +1,4 @@
-"""FastAPI app factory. Routes are added by later tasks; this is the guarded shell."""
+"""FastAPI app factory with guarded routes and server-owned background tasks."""
 
 import argparse
 import time
@@ -12,6 +12,7 @@ from fastapi import FastAPI, Request
 from iaudit_eval import paths
 from iaudit_eval.client import AuditClient
 from iaudit_eval.log import log_event
+from iaudit_eval.server import routes_datasets, routes_health
 from iaudit_eval.server.guards import (
     FORBIDDEN_MESSAGE,
     INTERNAL_MESSAGE,
@@ -21,6 +22,7 @@ from iaudit_eval.server.guards import (
     register_error_handlers,
     validate_bind,
 )
+from iaudit_eval.server.manager import RunManager
 
 
 def create_app(
@@ -28,6 +30,7 @@ def create_app(
     backend_client=None,
     runs_root: Path | None = None,
     datasets_root: Path | None = None,
+    data_root: Path | None = None,
 ) -> FastAPI:
     settings = settings or Settings.from_env()
 
@@ -38,6 +41,7 @@ def create_app(
         try:
             yield
         finally:
+            await app.state.manager.shutdown()
             if owned:
                 await app.state.backend_client.aclose()
 
@@ -47,7 +51,14 @@ def create_app(
     app.state.datasets_root = (
         Path(datasets_root) if datasets_root is not None else paths.datasets_dir()
     )
+    app.state.data_root = Path(data_root) if data_root is not None else paths.data_dir()
+    app.state.manager = RunManager(
+        datasets_root=app.state.datasets_root, data_root=app.state.data_root,
+        runs_root=app.state.runs_root,
+    )
     register_error_handlers(app)
+    app.include_router(routes_health.router)
+    app.include_router(routes_datasets.router)
 
     # No CORS middleware. Added first = inner; the logging middleware below wraps it.
     @app.middleware("http")
