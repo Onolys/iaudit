@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { RunDetail } from "./RunDetail";
 import { createEvalApi } from "./evalApi";
 import finished from "./fixtures/run-finished.json";
+import refused from "./fixtures/run-resume-refused.json";
 import metrics from "./fixtures/metrics.json";
 import items from "./fixtures/items.json";
 import type { MetricsReport, RunDetail as Detail } from "./evalTypes";
@@ -127,4 +128,9 @@ it("stops polling a terminal run whose pending score never resolves and enables 
 it("shows run progress instead of Scoring... while the run is running",async()=>{
   setup({...finished,state:"running",score_state:"pending",progress:{done:1,total:3,failures:0,cost_usd:null}} as Detail,{report:null});await tick();
   expect(screen.getByText("Run in progress (1/3)")).toBeTruthy();expect(screen.queryByText("Scoring...")).toBeNull();
+});
+
+it("renders a resume refusal with its kind and changed fields",async()=>{
+  setup(refused as Detail);await tick();
+  expect(screen.getByText(/Resume refused: run settings changed/).textContent).toContain('model: "fictional-model-a" → "fictional-model-b"');
 });

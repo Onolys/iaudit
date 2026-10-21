@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { EvalApi } from "./evalApi";
-import type { EvalError, RunDetail, RunSummary } from "./evalTypes";
+import type { EvalError, ResumeRequest, RunDetail, RunSummary } from "./evalTypes";
 import { EvalErrorMessage } from "./ServerBanner";
 
 interface Props {
@@ -22,6 +22,9 @@ export function RunsList({ api, refreshKey = 0, activeRun, runActive = false, on
   const [refresh, setRefresh] = useState(0);
   const [selected, setSelected] = useState<string[]>([]);
   const [resuming, setResuming] = useState<string | null>(null);
+  // The list rows carry no error; failed rows are looked up once to learn whether the cap was the problem.
+  const [errorKinds, setErrorKinds] = useState<Record<string, string>>({});
+  const lookedUp = useRef(new Set<string>());
   const listController = useRef<AbortController | null>(null);
   const resumeController = useRef<AbortController | null>(null);
   const generation = useRef(0);
@@ -40,6 +43,19 @@ export function RunsList({ api, refreshKey = 0, activeRun, runActive = false, on
     });
     return () => controller.abort();
   }, [api, refreshKey, refresh]);
+  useEffect(() => {
+    const controller = new AbortController();
+    for (const run of runs ?? []) {
+      if (run.state !== "failed" || lookedUp.current.has(run.run_id)) continue;
+      void api.getRun(run.run_id, { signal: controller.signal }).then(result => {
+        if (controller.signal.aborted) return;
+        if (!result.ok) return;
+        lookedUp.current.add(run.run_id);
+        setErrorKinds(previous => ({ ...previous, [run.run_id]: result.value.error?.kind ?? "" }));
+      });
+    }
+    return () => controller.abort();
+  }, [api, runs]);
   useEffect(() => () => { generation.current++; resumeController.current?.abort(); pendingCallback.current?.(false); }, []);
 
   // Progress comes from RunPanel's one poller and overrides a possibly older list snapshot.
@@ -48,13 +64,13 @@ export function RunsList({ api, refreshKey = 0, activeRun, runActive = false, on
   } : run) ?? [];
   const active = runActive || visible.some(run => run.state === "running");
   const selectedDataset = visible.find(run => run.run_id === selected[0])?.dataset;
-  async function resume(run: RunSummary) {
+  async function resume(run: RunSummary, body?: ResumeRequest) {
     if (active || resumePending.current) return;
     resumePending.current = true; pendingCallback.current?.(true);
     generation.current++; listController.current?.abort();
     const controller = new AbortController(); resumeController.current = controller;
     setResuming(run.run_id); setError(null);
-    const result = await api.resumeRun(run.run_id, { signal: controller.signal });
+    const result = await api.resumeRun(run.run_id, body, { signal: controller.signal });
     if (controller.signal.aborted) return;
     resumePending.current = false; pendingCallback.current?.(false); setResuming(null);
     if (!result.ok) { setError(result.error); return; }
@@ -87,7 +103,10 @@ export function RunsList({ api, refreshKey = 0, activeRun, runActive = false, on
           <td><span className="eval-state">{run.state === "aborted_cost" ? "aborted: cost cap" : run.state}</span></td>
           <td>{run.totals.cost_usd === null ? "—" : `$${run.totals.cost_usd.toFixed(2)}`}</td>
           <td>{run.totals.failures}</td>
-          <td>{resumable(run) && <button type="button" disabled={active || resuming !== null} onClick={() => void resume(run)}>{resuming === run.run_id ? "Resuming…" : "Resume"}</button>}</td>
+          <td>{resumable(run) && (run.state === "failed" && (activeRun?.run_id === run.run_id ? activeRun.error?.kind : errorKinds[run.run_id]) === "cost_missing"
+            ? <><button type="button" disabled={active || resuming !== null} onClick={() => void resume(run, { max_cost_usd: null })}>{resuming === run.run_id ? "Resuming…" : "Resume without cap"}</button>
+              <p>The backend doesn't report cost, so the cost cap can't be enforced.</p></>
+            : <button type="button" disabled={active || resuming !== null} onClick={() => void resume(run)}>{resuming === run.run_id ? "Resuming…" : "Resume"}</button>)}</td>
         </tr>)}</tbody>
       </table>}
   </section>;

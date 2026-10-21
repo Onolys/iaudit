@@ -103,6 +103,7 @@ function RunContent({ api, runId, onOpenItem, onBack }: Props) {
     {postError && <RequestError error={postError} onRetry={() => { setPostError(null); void rescore(); }} />}
     {run && <>
       {run.error && <p className="eval-error">{run.error.message}</p>}
+      {run.resume_refusal && <p role="status">Resume refused: {run.resume_refusal.kind === "schema_version_changed" ? "schema version changed" : "run settings changed"}{run.resume_refusal.changes.length > 0 && ` (${run.resume_refusal.changes.map(change => `${change.field}: ${JSON.stringify(change.was ?? null)} → ${JSON.stringify(change.now ?? null)}`).join("; ")})`}.</p>}
       {(scoring || run.score_state !== "done" || !report) && <p>Failures: {run.totals.failures} of {run.n_items}. Primary counts them wrong; secondary excludes them.</p>}
       {scoring ? <p role="status">{run.state === "running" ? `Run in progress (${run.progress.done}/${run.progress.total})` : "Scoring..."}</p> : run.score_state === "failed" ? <p>Scoring failed. Re-score to retry.</p>
         : metricsLoading ? <p role="status">Loading metrics…</p> : report ? <MetricsTable report={report} />
