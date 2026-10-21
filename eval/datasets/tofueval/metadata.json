@@ -46,5 +46,6 @@
       "license": "CC BY-NC-ND 4.0"
     }
   ],
+  "references": "references.json",
   "expected_sha256": {}
 }
