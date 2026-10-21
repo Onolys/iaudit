@@ -1,4 +1,4 @@
-# Audit contract 1.0.0
+# Audit contract 1.1.0
 
 Source of truth for the evidence-audit request and response. The frontend owns this contract. The backend implements it.
 
@@ -26,7 +26,7 @@ The verdict list and the concern-type list mirror [../mission.md](../mission.md)
 - Adding an optional field or an allowed value bumps **minor**.
 - Wording-only changes stay on the same version.
 
-A producer must send `"schema_version": "1.0.0"`. A consumer must reject any other value and must not render a partial audit from an invalid body.
+A producer must send `"schema_version": "1.1.0"`. A consumer must reject any other value and must not render a partial audit from an invalid body.
 
 ## Conventions
 
@@ -66,7 +66,7 @@ A claim uses the same walk inside one section, so only step 3 applies, against `
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"1.0.0"`. |
+| `schema_version` | yes | Always `"1.1.0"`. |
 | `request_id` | no | Caller-chosen id. Echoed on the response. Not a content hash. |
 | `transcript` | yes | Non-empty array of turns, in order. |
 | `transcript[].id` | yes | Log id. Not an evidence anchor. |
@@ -86,11 +86,25 @@ Ids must be unique among turns, and unique among sections.
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"1.0.0"`. |
+| `schema_version` | yes | Always `"1.1.0"`. |
 | `request_id` | when sent | Exact echo of the request id. |
 | `status` | yes | `complete` or `partial`. |
 | `warnings` | yes | May be empty. |
 | `claims` | yes | May be empty only when the reasoning has no classifiable span. |
+| `run_info` | no | Provenance of the run (see below). Omitted by producers that did not run the full pipeline. |
+
+### run_info
+
+Optional. Ids, hashes and counts only; no other keys are allowed (no transcript text).
+
+| Field | Required | Meaning |
+|---|---|---|
+| `models.cheap`, `models.mid`, `models.strong` | yes | Model id used for each tier. |
+| `prompt_hashes.atomize`, `.link`, `.check`, `.prep` | yes | 16 lowercase hex chars (sha256 prefix of the prompt file bytes). |
+| `input_tokens`, `output_tokens`, `cache_read_tokens`, `cache_write_tokens` | no | Integers, 0 or more. |
+| `cost_usd` | no | Number, 0 or more. |
+
+Example: [examples/response.json](examples/response.json). [examples/partial.response.json](examples/partial.response.json) omits it.
 
 ### Claim
 
@@ -180,7 +194,7 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Consumer rules
 
-- If the body fails the schema or `schema_version` is not `1.0.0`, show an error. Do not render half an audit.
+- If the body fails the schema or `schema_version` is not `1.1.0`, show an error. Do not render half an audit.
 - If one span is out of range, still render that claim, with a warning badge. Do not shift the other highlights.
 - Colour and layout are not part of this contract. Verdict drives the left pane. Evidence `role` drives the right pane.
 - The right pane can expand past an excerpt. Expansion uses the same transcript array; it is not a new field.
@@ -188,11 +202,11 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Error response
 
-Any non-2xx reply carries this body instead of an audit. Example: [examples/error.json](examples/error.json). It is an additive new file, so the request/response contract stays at `1.0.0`. HTTP path and CORS stay out of scope.
+Any non-2xx reply carries this body instead of an audit. Example: [examples/error.json](examples/error.json). It shares the contract version: request, response and error bodies all carry `1.1.0`. HTTP path and CORS stay out of scope.
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"1.0.0"`. |
+| `schema_version` | yes | Always `"1.1.0"`. |
 | `request_id` | no | Echo of the request id, when known. |
 | `error.code` | yes | One value from the table below. |
 | `error.message` | yes | Human-readable plain text, shown to the reviewer as-is. |
