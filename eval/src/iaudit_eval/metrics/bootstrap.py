@@ -120,7 +120,8 @@ def ci(
         v = metric.finalize(_sum(cs[i] for i in idx), spec, **params).value
         if v is not None:
             samples.append(v)
-    return CI(full.value, full.n, k, _interval(samples, resamples), "ok")
+    interval = _interval(samples, resamples)
+    return CI(full.value, full.n, k, interval, "ok" if interval else "undefined")
 
 
 def _empty(like: Stats) -> Stats:
@@ -166,4 +167,5 @@ def paired_ci(
         vb = metric.finalize(_sum(cb[i] for i in idx), spec, **params).value
         if va is not None and vb is not None:
             samples.append(vb - va)
-    return PairedCI(ra, rb, delta, k, _interval(samples, resamples), "ok")
+    interval = _interval(samples, resamples)
+    return PairedCI(ra, rb, delta, k, interval, "ok" if interval else "undefined")

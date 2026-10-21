@@ -147,7 +147,14 @@ def test_null_ci_below_90pct_defined():
     # one positive cluster of 10: a resample is defined only if it picks it (~65%)
     rows = [{"cluster": f"c{i}", "gold": i == 0, "pred": True} for i in range(10)]
     r = _run(pairs=_pairs(rows))
-    assert r.value == 1.0 and r.ci is None and r.ci_status == "ok"
+    assert r.value == 1.0 and r.ci is None and r.ci_status == "undefined"
+
+
+def test_paired_null_ci_below_90pct_defined():
+    rows = [{"cluster": f"c{i}", "gold": i == 0, "pred": True} for i in range(10)]
+    cs = cluster_stats(RECALL, _pairs(rows), SPEC)
+    d = paired_ci(RECALL, cs, cs, SPEC, level="item", policy="primary_secondary", slice=None)
+    assert d.ci is None and d.ci_status == "undefined"
 
 
 def test_paired_identical_runs_zero_delta():

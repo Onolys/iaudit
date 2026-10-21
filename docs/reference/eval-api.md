@@ -110,19 +110,22 @@ happen before creating a new run; a failed start probe creates no run directory.
 | `IAUDIT_EVAL_PORT` | `8100` | Port used by the Python server entrypoint |
 | `IAUDIT_BACKEND_URL` | `http://127.0.0.1:8000` | Audit backend URL |
 | `IAUDIT_EVAL_ALLOWED_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Comma-separated exact Origin allowlist |
-| `IAUDIT_EVAL_ALLOW_REMOTE` | unset | `1` allows a non-default `--host` through the Python entrypoint's bind check |
+| `IAUDIT_EVAL_ALLOW_REMOTE` | unset | `1` allows a non-default `--host` through the Python entrypoint's bind check and non-loopback peers |
 | `IAUDIT_EVAL_HOME` | Repository `eval/` | Root for datasets, downloaded data and run outputs |
 | `IAUDIT_CONTRACTS_DIR` | Repository `docs/contracts/` | Shared audit schemas; eval report/API schemas stay with the code |
 
 For a manual launch, use `cd eval && uv run python -m iaudit_eval.server.app`. It accepts
 `--host` and `--port`. It defaults to `127.0.0.1` and disables uvicorn access logs.
-Direct uvicorn invocation bypasses that entrypoint's bind validation; explicitly bind
+Direct uvicorn invocation bypasses that entrypoint's bind validation, but the app still
+rejects (403 `forbidden`) any request whose socket peer address is not loopback
+(127.0.0.0/8, `::1`) unless `IAUDIT_EVAL_ALLOW_REMOTE=1`. Explicitly bind
 `127.0.0.1` and pass `--no-access-log`, as the [development script](../../scripts/README.md)
 does. That script fixes ports at 8000/8100/5173 and supplies its own matching environment.
 
 Host must be `localhost` or `127.0.0.1`, optionally with a port. Requests without Origin
 are accepted; a supplied Origin must match the configured allowlist. There is no CORS
-middleware or authentication. Remote bind permission does not relax these HTTP guards.
+middleware or authentication. Remote bind permission relaxes only the peer-address check,
+not the Host/Origin guards.
 The server is intended for local use, without public hosting. Logs omit raw paths,
 queries, bodies and item ids; HTTP logging uses route templates.
 

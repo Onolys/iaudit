@@ -24,6 +24,7 @@ from iaudit_eval.server.guards import (
     Settings,
     check_request_origin,
     error_response,
+    is_loopback_client,
     register_error_handlers,
     validate_bind,
 )
@@ -75,6 +76,10 @@ def create_app(
     # No CORS middleware. Added first = inner; the logging middleware below wraps it.
     @app.middleware("http")
     async def host_origin_guard(request: Request, call_next):
+        # Peer address is not spoofable like Host; also covers `uvicorn --host 0.0.0.0`.
+        peer = request.client.host if request.client else None
+        if not settings.allow_remote and not is_loopback_client(peer):
+            return error_response("forbidden", 403, FORBIDDEN_MESSAGE)
         if not check_request_origin(
             request.headers.get("host"), request.headers.get("origin"), settings.allowed_origins
         ):
