@@ -2,7 +2,7 @@
 
 **Audience:** contributors.
 
-Quality is measured per bucket (mission checks 1 to 12), never as one score. Data is the worked ADHD example: a faithful assessment plus eight variants with one injected fault each (plus an extra variant with roles removed). Results are labelled split `poc-all`: a smoke check on data the authors have seen, not an estimate for real interviews. No precision claim is made from it.
+Quality is measured per bucket (mission checks 1 to 13), never as one score. Data is the worked ADHD example: a faithful assessment plus eight variants with one injected fault each (plus an extra variant with roles removed). Results are labelled split `poc-all`: a smoke check on data the authors have seen, not an estimate for real interviews. No precision claim is made from it.
 
 ## Commands (from `backend/`)
 
