@@ -14,3 +14,9 @@
 .eval-table { width: 100%; border-collapse: collapse; text-align: left; }
 .eval-table th, .eval-table td { padding: 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
 .eval-table th { background: #f9fafb; font-weight: 600; }
+.eval-run-form { display: grid; gap: 8px; max-width: 460px; }
+.eval-run-form label { font-weight: 600; }
+.eval-run-form input, .eval-run-form select { box-sizing: border-box; width: 100%; padding: 6px 8px; border: 1px solid #9ca3af; border-radius: 6px; font: inherit; background: #fff; color: inherit; }
+.eval-run-form input:focus-visible, .eval-run-form select:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+.eval-run-form p { margin: 0 0 8px; }
+.eval-run-form button { justify-self: start; }
