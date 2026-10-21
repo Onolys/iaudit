@@ -169,13 +169,15 @@ def _entries(dataset: Dataset, cfg, all_pairs: list[Pair], datasets_root: Path |
     return out
 
 
-def _load_run(run_id, runs_root, datasets_root, data_root):
+def _load_run(run_id, runs_root, datasets_root, data_root, dataset=None):
     try:
         run = store.load_run(runs_root, run_id)
     except (OSError, ValueError) as e:
         raise ScoringError(f"cannot read run {run_id!r}: {type(e).__name__}") from e
     try:
-        dataset = dataset_registry.load(run["dataset"], root=datasets_root, data_root=data_root)
+        if dataset is None:
+            dataset = dataset_registry.load(
+                run["dataset"], root=datasets_root, data_root=data_root)
         by_id = {i.id: i for i in dataset.items(run["split"])}
     except (DatasetError, KeyError) as e:
         raise ScoringError(f"cannot load dataset for run {run_id!r}: {e}") from e
@@ -250,11 +252,15 @@ def score(
     runs_root: Path | None = None,
     datasets_root: Path | None = None,
     data_root: Path | None = None,
+    dataset: Dataset | None = None,
 ) -> dict:
-    """Score a saved run; write metrics.json and item_rows.json; return the metrics report."""
+    """Score a saved run; write metrics.json and item_rows.json; return the metrics report.
+
+    ``dataset`` (optional) is used instead of loading the run's dataset by name.
+    """
     from .engine import capture_git  # lazy: engine will import scoring for its on_finish hook
 
-    run, dataset, by_id = _load_run(run_id, runs_root, datasets_root, data_root)
+    run, dataset, by_id = _load_run(run_id, runs_root, datasets_root, data_root, dataset)
     cfg = metrics_config(dataset.meta)
     adapter = dataset.adapter
     saved = {it["item_id"]: it for it in store.iter_items(runs_root, run_id)}

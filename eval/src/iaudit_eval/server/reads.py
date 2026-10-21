@@ -49,6 +49,8 @@ class RunReader:
                          "failures": progress["failed"], "cost_usd": progress["cost_usd"]},
             "run_info": {key: run[key] for key in info_keys if key in run},
             **({"error": run["error"]} if "error" in run else {}),
+            **({"resume_refusal": refusal}
+               if (refusal := self.manager.resume_refusals.get(run_id)) else {}),
         }
 
     def metrics(self, run_id: str) -> dict:
