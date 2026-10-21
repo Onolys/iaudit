@@ -393,16 +393,29 @@ class _RunDriver:
                   items_done=self.done, items_failed=self.failed)  # fmt: skip
         self._progress()
 
+    def _auto_score(self, run_id: str) -> None:
+        from . import scoring  # lazy: scoring imports capture_git from this module
+
+        scoring.score(run_id, runs_root=self.runs_root, data_root=self.data_root)
+
     async def _call_finish(self) -> None:
         if self.on_finish is None:
             return
         try:
+            if self.on_finish is AUTO_SCORE:
+                await asyncio.to_thread(self._auto_score, self.run_id)
+                return
             res = self.on_finish(self.run_id)
             if inspect.isawaitable(res):
                 await res
         except Exception as e:
             log_event("finish_hook_error", level=logging.WARNING, run_id=self.run_id,
                       exc_class=type(e).__name__)  # fmt: skip
+
+
+# Default ``on_finish``: score the run (metrics.json). Pass ``None`` to disable, or a
+# callable to replace it. Scoring errors are logged only and never change run state.
+AUTO_SCORE: Any = object()
 
 
 def start_run(
@@ -414,7 +427,7 @@ def start_run(
     tags: dict | None = None,
     concurrency: int = DEFAULT_CONCURRENCY,
     on_progress: Callable[[RunProgress], None] | None = None,
-    on_finish: Callable[[str], Awaitable[None] | None] | None = None,
+    on_finish: Callable[[str], Awaitable[None] | None] | None = AUTO_SCORE,
     client: AuditClient | None = None,
     transport=None,
     runs_root: Path | None = None,
@@ -549,7 +562,7 @@ def resume(
     base_url: str | None = None,
     concurrency: int | None = None,
     on_progress: Callable[[RunProgress], None] | None = None,
-    on_finish: Callable[[str], Awaitable[None] | None] | None = None,
+    on_finish: Callable[[str], Awaitable[None] | None] | None = AUTO_SCORE,
     client: AuditClient | None = None,
     transport=None,
     runs_root: Path | None = None,

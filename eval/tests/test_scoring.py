@@ -279,3 +279,66 @@ def test_default_set_skips_param_needing_builtins(tmp_path):
 def test_unknown_run_is_scoring_error(tmp_path):
     with pytest.raises(ScoringError):
         score("nope", runs_root=tmp_path)
+
+
+# ---------- auto-score hook (R8) ----------
+
+def test_auto_score_on_finish_writes_metrics(tmp_path):
+    rid = _make_run(tmp_path)
+    assert (tmp_path / rid / "metrics.json").is_file()
+    assert (tmp_path / rid / "item_rows.json").is_file()
+
+
+def test_on_finish_none_disables_auto_score(tmp_path):
+    rid = _make_run(tmp_path, on_finish=None)
+    assert not (tmp_path / rid / "metrics.json").exists()
+
+
+def test_scoring_error_leaves_state_and_rescorable(tmp_path, monkeypatch, caplog):
+    import iaudit_eval.scoring as scoring
+
+    real = scoring.score
+
+    before = []
+
+    def boom(run_id, **kwargs):
+        before.append(store.load_run(kwargs["runs_root"], run_id))
+        raise RuntimeError("secret text")
+
+    monkeypatch.setattr(scoring, "score", boom)
+    rid = _make_run(tmp_path)
+    run = store.load_run(tmp_path, rid)
+    assert run["state"] == "finished"
+    assert before == [run]  # state and all persisted run fields survive the error
+    assert "finish_hook_error" in caplog.text and "RuntimeError" in caplog.text
+    assert "secret text" not in caplog.text
+    assert not (tmp_path / rid / "metrics.json").exists()
+    monkeypatch.setattr(scoring, "score", real)
+    assert real(rid, runs_root=tmp_path)["run_id"] == rid
+    assert (tmp_path / rid / "metrics.json").is_file()
+
+
+def test_auto_score_on_resume(tmp_path):
+    from iaudit_eval.engine import resume
+
+    rid = _make_run(tmp_path, on_finish=None)
+
+    async def go():
+        fb = FakeBackend("ok")
+        client = AuditClient(URL, transport=fb.transport(), sleep=_nosleep)
+        h = resume(rid, runs_root=tmp_path, client=client)
+        await h.wait()
+
+    asyncio.run(go())
+    assert (tmp_path / rid / "metrics.json").is_file()
+
+
+def test_custom_finish_hook_replaces_auto_score(tmp_path):
+    finished = []
+
+    async def finish(run_id):
+        finished.append((run_id, store.load_run(tmp_path, run_id)["state"]))
+
+    rid = _make_run(tmp_path, on_finish=finish)
+    assert finished == [(rid, "finished")]
+    assert not (tmp_path / rid / "metrics.json").exists()
