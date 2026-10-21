@@ -4,23 +4,24 @@
     {
       "item_id": "fictional-item-0",
       "status": "ok",
-      "gold": "positive",
-      "pred": "positive",
-      "match": true
+      "gold": "inconsistent",
+      "pred": "inconsistent",
+      "match": true,
+      "label": "Public contract example"
     },
     {
       "item_id": "fictional-item-1",
       "status": "failed",
-      "gold": null,
+      "gold": "inconsistent",
       "pred": null,
       "match": null
     },
     {
-      "item_id": "fictional-item-2",
-      "status": "unmapped",
-      "gold": null,
-      "pred": null,
-      "match": null
+      "item_id": "fictional.item--2",
+      "status": "ok",
+      "gold": "inconsistent",
+      "pred": "consistent",
+      "match": false
     }
   ]
 }
