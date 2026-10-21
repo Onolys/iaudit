@@ -47,11 +47,11 @@ describe("RunPanel form", () => {
     fireEvent.change(input("N"), { target: { value: "8" } }); fireEvent.blur(input("N"));
     expect(input("N").value).toBe("3"); expect(screen.getByText("N clamped to 3")).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Split"), { target: { value: "all" } });
-    fireEvent.change(input("N"), { target: { value: "8" } }); fireEvent.blur(input("N")); expect(input("N").value).toBe("5");
-    fireEvent.click(run()); expect(onRun).toHaveBeenCalledWith({ dataset: "fictional-alpha", split: "all", n: 5 });
+    fireEvent.change(input("N"), { target: { value: "8" } }); fireEvent.blur(input("N")); expect(input("N").value).toBe("5"); await tick();
+    fireEvent.click(run()); expect(onRun).toHaveBeenCalledWith({ dataset: "fictional-alpha", split: "all", n: 5, max_cost_usd: 0.18 });
   });
   it("shows held-out guidance without blocking", async () => {
-    setup(); await tick(0); fireEvent.change(screen.getByLabelText("Split"), { target: { value: "test" } });
+    setup(); await tick(0); await tick(); fireEvent.change(screen.getByLabelText("Split"), { target: { value: "test" } }); await tick();
     expect(screen.getByText(metadata.test_split_note)).toBeTruthy(); expect(run().disabled).toBe(false);
   });
   it.each([unknown.note, ""])("shows unknown cost note or pilot fallback", async note => {
@@ -78,7 +78,7 @@ describe("RunPanel form", () => {
   it("works with unavailable storage", async () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => { throw Error("denied"); });
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw Error("denied"); });
-    setup(); await tick(0); expect(run().disabled).toBe(false);
+    setup(); await tick(0); await tick(); expect(run().disabled).toBe(false);
   });
   it("explains no datasets", async () => {
     setup(true); await tick(0); expect(screen.getByText("No datasets in eval/datasets/")).toBeTruthy(); expect(screen.queryByRole("button", { name: "Run" })).toBeNull();
@@ -125,7 +125,22 @@ describe("RunPanel request lifetime", () => {
       return Response.json({ ...metadata, splits: [{ name: "test", size: null }], default_split: "test" });
     }) as typeof fetch });
     render(<RunPanel api={api} />); await tick(0);
-    fireEvent.change(input("N"), { target: { value: "100" } }); fireEvent.blur(input("N"));
+    fireEvent.change(input("N"), { target: { value: "100" } }); fireEvent.blur(input("N")); await tick();
     expect(input("N").value).toBe("100"); expect(run().disabled).toBe(false);
+  });
+  it("keeps Run disabled while a cap-prefilling estimate is pending (fail closed)", async () => {
+    const { onRun } = setup(); await tick(0); await tick();
+    expect(input("Max cost (USD)").value).toBe("0.18");
+    fireEvent.change(input("N"), { target: { value: "2" } });
+    expect(run().disabled).toBe(true);
+    fireEvent.submit(run().closest("form")!); expect(onRun).not.toHaveBeenCalled();
+    await tick(); expect(run().disabled).toBe(false); fireEvent.click(run());
+    expect(onRun).toHaveBeenCalledWith(expect.objectContaining({ n: 2, max_cost_usd: 0.18 }));
+  });
+  it("lets an explicit blank cap run without waiting for an estimate", async () => {
+    const { onRun } = setup(); await tick(0); await tick();
+    fireEvent.change(input("Max cost (USD)"), { target: { value: "" } });
+    fireEvent.change(input("N"), { target: { value: "2" } }); expect(run().disabled).toBe(false);
+    fireEvent.click(run()); expect(onRun).toHaveBeenCalledWith({ dataset: "fictional-alpha", split: "validation", n: 2 });
   });
 });

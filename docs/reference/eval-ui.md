@@ -28,7 +28,9 @@ available. Split, N and screen selection reset on remount.
 | Estimate | Updates after 400 ms without input changes. Known cost appears as `~$X.XX for {n_items} items (rough)`. Unknown cost shows the server's note, or `Cost unknown — run a pilot (e.g. N=5) first`. |
 | Max cost (USD) | Optional. Blank sends no cap. A supplied value must be greater than zero. An untouched field is prefilled with 1.5 × a known positive estimate, rounded up to cents; unknown cost leaves it blank. Editing the field, including clearing it, preserves that choice across estimates. |
 
-Invalid N or max cost disables **Run** and shows an inline explanation. Unknown cost
+Invalid N or max cost disables **Run** and shows an inline explanation. Run is also
+disabled while an estimate is pending and the cap is untouched, so a cap that is about
+to be prefilled is never skipped; an explicit edit (including clearing) lifts this. Unknown cost
 alone does not disable Run. Estimates are rough, and in-flight requests can finish
 beyond a cost cap. If a cap is set and the backend does not report cost, the run fails
 closed; the panel shows the `failed` state and the server's actual failure message.
@@ -42,12 +44,15 @@ previous response.
 
 If required data is absent, **Download data** replaces Run. The same happens when a
 start attempt returns `data_missing`. Downloading shows `downloading…` and polls until
-ready or failed. Failure shows the returned error and **Retry download**. Completion
+ready or failed. Failure shows the returned error and **Retry download**. Switching dataset clears the previous dataset's download state, and a retry
+never inherits an earlier attempt's result. Completion
 refreshes dataset metadata and restores Run when the server reports the data present.
 
 **Abort** lets server-side in-flight work finish. The button reads **Aborting…** and
 is disabled while the abort request is pending. Terminal states hide Abort and refresh
-the runs list. The cost-cap state is displayed as `aborted: cost cap`.
+the runs list. The cost-cap state is displayed as `aborted: cost cap`. The abort request
+waits up to 120 seconds; if it times out but progress already shows a stopped run, no
+timeout error is shown.
 
 The server permits one active run. If a start returns `run_active`, the panel shows
 `Run {id} is already active` and **Attach to active run**. Mounting Eval also attaches
@@ -67,6 +72,12 @@ The active row uses the Run panel's progress; it has no separate progress poller
 | `finished`, no failed items | Unavailable |
 | `finished`, at least one failed item | Available |
 | `aborted`, `aborted_cost`, `interrupted`, `failed` | Available |
+
+A `failed` run whose error kind is `cost_missing` (a cap was set but the backend does
+not report cost) shows **Resume without cap** instead, with a note that the backend
+doesn't report cost; it sends `{"max_cost_usd": null}`. Plain Resume sends no body and
+keeps the stored cap. The run detail shows a server-reported `resume_refusal` (kind and
+changed fields) as a plain message.
 
 **Resume** retries failed or missing results while preserving successful ones. Resume
 buttons are disabled while a run is active or starting/attaching, or another resume
@@ -99,7 +110,8 @@ to 8000/8100/5173 and supplies matching environment settings.
 
 This is a local development/preview setup. Hosted deployment configuration is outside
 this UI version. Requests omit cookies. Client timeouts are 10 seconds for reads and
-30 seconds for POST requests.
+30 seconds for POST requests, except `GET /compare` and `POST /runs/{id}/abort` (120 seconds).
+Ids that are empty, `.` or `..` are refused client-side with an `invalid_request` error.
 
 ## Empty and error states
 

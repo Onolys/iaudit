@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { EvalApi } from "./evalApi";
 import type { DatasetMeta, DatasetSummary, Estimate, EvalError, RunRequest } from "./evalTypes";
 import { useRunLifecycle } from "./useRunLifecycle";
+import { RunProgress } from "./RunProgress";
 import type { RunDetail } from "./evalTypes";
 import { EvalErrorMessage } from "./ServerBanner";
 
@@ -24,6 +25,7 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange, attachm
   const [estimate, setEstimate] = useState<Estimate | null>(null);
   const [loadError, setLoadError] = useState<EvalError | null>(null);
   const [metaError, setMetaError] = useState<EvalError | null>(null);
+  const [settledKey, setSettledKey] = useState<string | null>(null);
   const [estimateError, setEstimateError] = useState<EvalError | null>(null);
   const [retry, setRetry] = useState(0);
   const lifecycle = useRunLifecycle({ api, onRunsChanged, onActiveRunChange, attachment, onRunActiveChange, onDownloaded: () => setRetry(value => value + 1) });
@@ -31,6 +33,9 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange, attachm
   const nValid = validN(n);
   const capValid = cap.trim() === "" || (Number.isFinite(Number(cap)) && Number(cap) > 0);
   const selectedMeta = meta?.name === dataset ? meta : null;
+  // Fail closed: an untouched cap is prefilled from the estimate, so Run waits until that estimate has settled.
+  const estimateKey = `${dataset}|${split}|${n.trim()}`;
+  const capPending = !capEdited.current && settledKey !== estimateKey;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -49,6 +54,7 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange, attachm
   useEffect(() => {
     if (!dataset) return;
     const controller = new AbortController();
+    lifecycle.resetDownload();
     setMeta(null); setSplit(""); setMetaError(null); setEstimate(null); setClampNote("");
     if (!capEdited.current) setCap("");
     try { localStorage.setItem(datasetStorageKey, dataset); } catch { /* Storage is optional. */ }
@@ -67,9 +73,11 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange, attachm
     if (!capEdited.current) setCap("");
     if (!selectedMeta || !split || !nValid) return;
     const controller = new AbortController();
+    const key = `${dataset}|${split}|${n.trim()}`;
     const timer = setTimeout(() => {
       void api.estimate({ dataset, split, ...(n.trim() === "" ? {} : { n: Number(n) }) }, { signal: controller.signal }).then(result => {
         if (controller.signal.aborted) return;
+        setSettledKey(key);
         if (!result.ok) { setEstimateError(result.error); return; }
         setEstimate(result.value);
         if (!capEdited.current) {
@@ -91,7 +99,7 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange, attachm
   }
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (blocked || !selectedMeta || !split || !nValid || !capValid) return;
+    if (blocked || !selectedMeta || !split || !nValid || !capValid || capPending) return;
     const request = { dataset, split, ...(n.trim() === "" ? {} : { n: Number(n) }), ...(cap.trim() === "" ? {} : { max_cost_usd: Number(cap) }) };
     onRun?.(request);
     void lifecycle.start(request);
@@ -99,7 +107,7 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange, attachm
 
   return <section className="eval-panel" aria-labelledby="eval-run-title">
     <h2 id="eval-run-title">Run</h2>
-    {lifecycle.display}
+    <RunProgress {...lifecycle.progress} />
     {(loadError || metaError) && <><EvalErrorMessage error={(loadError || metaError)!} /><button type="button" onClick={() => setRetry(value => value + 1)}>Retry run form</button></>}
     {datasets === null ? !loadError && <p>Loading datasets…</p> : datasets.length === 0 ? <p>No datasets in eval/datasets/</p> :
       <form className="eval-run-form" onSubmit={submit} noValidate>
@@ -126,7 +134,7 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange, attachm
         <p id="eval-cap-help">Optional. Blank = no cap.</p>
         {!capValid && <p className="eval-error">Max cost must be greater than 0, or blank for no cap.</p>}
         {needsDownload || lifecycle.downloadError ? <button type="button" disabled={lifecycle.downloading || lifecycle.active} onClick={() => void lifecycle.startDownload(dataset)}>{lifecycle.downloadError ? "Retry download" : "Download data"}</button> :
-          <button type="submit" disabled={blocked || !selectedMeta || !split || !nValid || !capValid || lifecycle.busy || lifecycle.active || lifecycle.downloading}>{lifecycle.busy ? "Starting…" : "Run"}</button>}
+          <button type="submit" disabled={blocked || !selectedMeta || !split || !nValid || !capValid || capPending || lifecycle.busy || lifecycle.active || lifecycle.downloading}>{lifecycle.busy ? "Starting…" : "Run"}</button>}
       </form>}
   </section>;
 }

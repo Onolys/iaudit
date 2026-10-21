@@ -60,7 +60,7 @@ it("resumes into the single poller, disables Resume before first response, share
   await tick(5000);expect(polls()).toBe(3);
 });
 it("disables Resume while a newly started run awaits its first poll",async()=>{
-  const s=setup();await tick();s.hold();fireEvent.click(screen.getByRole("button",{name:"Run"}));await tick();
+  const s=setup();await tick();await tick(400);s.hold();fireEvent.click(screen.getByRole("button",{name:"Run"}));await tick();
   for(const button of screen.getAllByRole("button",{name:"Resume"})) expect((button as HTMLButtonElement).disabled).toBe(true);
 });
 it("opens run detail from a row",async()=>{

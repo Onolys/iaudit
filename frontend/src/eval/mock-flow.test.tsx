@@ -56,7 +56,7 @@ function setup(active=false, resumable=false) {
 }
 const row=(id:string)=>screen.getByRole("checkbox",{name:`Select ${id}`}).closest("tr")!;
 it("starts a run, inspects its saved item, returns to list, compares and returns from both A/B items",async()=>{
-  const s=setup();await tick();fireEvent.click(screen.getByRole("button",{name:"Run"}));await tick();
+  const s=setup();await tick();await tick(400);fireEvent.click(screen.getByRole("button",{name:"Run"}));await tick();
   expect(screen.getByRole("progressbar")).toBeTruthy();s.finish();await tick(1000);
   fireEvent.click(row("fictional-new"));await tick();expect(screen.getByRole("region",{name:"Run detail"})).toBeTruthy();
   fireEvent.click(screen.getByRole("button",{name:"Public contract example"}));await tick();

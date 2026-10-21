@@ -138,3 +138,40 @@ it.each([
   const api = createEvalApi({ fetch: vi.fn<typeof fetch>().mockResolvedValue(json(body)) });
   expect(await (kind === "metrics" ? api.getMetrics("r") : api.compare("a", "b"))).toMatchObject({ ok: false, error: { kind: "bad_body" } });
 });
+
+it("gives GET /compare 120 s and leaves other GET routes at 10 s", async () => {
+  vi.useFakeTimers();
+  const hang = () => vi.fn<typeof fetch>(() => new Promise<Response>(() => {}));
+  const compareResult = createEvalApi({ fetch: hang() }).compare("a", "b");
+  const healthResult = createEvalApi({ fetch: hang() }).health();
+  await vi.advanceTimersByTimeAsync(10_001);
+  expect(await healthResult).toEqual({ ok: false, error: { kind: "timeout", seconds: 10 } });
+  await vi.advanceTimersByTimeAsync(100_000);
+  await vi.advanceTimersByTimeAsync(10_000);
+  expect(await compareResult).toEqual({ ok: false, error: { kind: "timeout", seconds: 120 } });
+});
+it("gives abort 120 s and other POST routes 30 s", async () => {
+  vi.useFakeTimers();
+  const hang = () => vi.fn<typeof fetch>(() => new Promise<Response>(() => {}));
+  const abortResult = createEvalApi({ fetch: hang() }).abortRun("r");
+  const rescoreResult = createEvalApi({ fetch: hang() }).rescore("r");
+  await vi.advanceTimersByTimeAsync(30_001);
+  expect(await rescoreResult).toEqual({ ok: false, error: { kind: "timeout", seconds: 30 } });
+  await vi.advanceTimersByTimeAsync(90_000);
+  expect(await abortResult).toEqual({ ok: false, error: { kind: "timeout", seconds: 120 } });
+});
+it.each(["", ".", ".."])("refuses id %j before any request, without throwing", async bad => {
+  const f = vi.fn<typeof fetch>();
+  const api = createEvalApi({ fetch: f });
+  const refused = { ok: false, error: { kind: "api", status: 400, code: "invalid_request", message: expect.stringContaining("id") } };
+  for (const call of [api.getRun(bad), api.abortRun(bad), api.resumeRun(bad), api.getMetrics(bad), api.listItems(bad), api.getItem("r", bad), api.getItem(bad, "i"), api.rescore(bad), api.getDataset(bad), api.getDownload(bad), api.startDownload(bad)])
+    expect(await call).toMatchObject(refused);
+  expect(f).not.toHaveBeenCalled();
+});
+it("sends an optional resume body: absent keeps cap, null clears it", async () => {
+  const f = vi.fn<typeof fetch>().mockImplementation(async () => json(summary));
+  const api = createEvalApi({ fetch: f });
+  await api.resumeRun("r"); await api.resumeRun("r", { max_cost_usd: null }, {});
+  expect(f.mock.calls[0][1]?.body).toBeUndefined();
+  expect(f.mock.calls[1][1]?.body).toBe(JSON.stringify({ max_cost_usd: null }));
+});
