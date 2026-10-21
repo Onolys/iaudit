@@ -18,7 +18,7 @@ Source of truth: docs/agent_files/eval-ui-20261020/01-eval-shell-and-runs/PRD.md
 | 7 | RunPanel form and estimate | 3, 5 | done |
 | 8 | RunPanel run lifecycle | 4, 7 | done |
 | 9 | RunsList | 3, 5, 8 | done |
-| 10 | Eval UI reference docs | 6, 9 | todo |
+| 10 | Eval UI reference docs | 6, 9 | done |
 
 ## Task 1 — Proxy, config and schema alias
 What it is / what it means: Dev-server plumbing so the frontend reaches the eval server and tests can import B4's schema (PRD R7; Decision 7; AC 10).
