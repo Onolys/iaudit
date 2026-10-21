@@ -16,11 +16,11 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 
 ## Execution progress
 
-Phase: Project C review fix in-progress (initial review NEEDS_CHANGES); D not started.
+Phase: Project C complete offline with final review PASS; owner checks remain. Project D starting.
 
 - C1 data and items: complete; all eight source tasks done.
 - C2 projection and metrics: complete; all nine source tasks done.
-- Project D: implementation pending.
+- Project D: D1 tasks 1 (proxy/config) and 4 (`usePolling`) in-progress independently in separate worktrees; code review base `2cff97c`.
 
 ## Run artifacts
 
@@ -32,4 +32,4 @@ Phase: Project C review fix in-progress (initial review NEEDS_CHANGES); D not st
 
 ## Review fix
 
-- In-progress: one P2 balanced-accuracy absent-class fix from the [initial Project C review](review-C-2026-10-21-initial.md). All 17 source implementation tasks remain done; the settled PRD remains unchanged.
+- Done: the P2 balanced-accuracy fix is resolved in `2cff97c`; [final Project C review](review-C-2026-10-21-final.md) PASS from all three personas. All 17 source implementation tasks remain done. Owner checks remain deferred.

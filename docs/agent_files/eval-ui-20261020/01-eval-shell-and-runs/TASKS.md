@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in-progress
 summary: Ten tasks: Vite proxy and config, typed evalApi client, schema-validated fixtures, usePolling, EvalApp shell, Audit/Eval toggle, RunPanel form, RunPanel run lifecycle, RunsList, docs.
 date: 2026-10-20
 ---
@@ -9,10 +9,10 @@ Source of truth: docs/agent_files/eval-ui-20261020/01-eval-shell-and-runs/PRD.md
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Proxy, config and schema alias | none | todo |
+| 1 | Proxy, config and schema alias | none | in-progress |
 | 2 | Eval types and evalApi client | 1 | todo |
 | 3 | Fixtures and schema validation | 2 | todo |
-| 4 | usePolling hook | none | todo |
+| 4 | usePolling hook | none | in-progress |
 | 5 | EvalApp shell and view slot | 2, 4 | todo |
 | 6 | Audit / Eval toggle | 5 | todo |
 | 7 | RunPanel form and estimate | 3, 5 | todo |
