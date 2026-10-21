@@ -258,9 +258,11 @@ class _RunDriver:
                 self._fail("engine_error", f"unexpected {type(e).__name__}")
             self._finish()
         finally:
-            if self.owns_client:
-                await self.client.aclose()
-            self.lock.release()
+            try:
+                if self.owns_client:
+                    await self.client.aclose()
+            finally:
+                self.lock.release()
         await self._call_finish()
 
     def _fail(self, kind: str, message: str, **extra: Any) -> None:

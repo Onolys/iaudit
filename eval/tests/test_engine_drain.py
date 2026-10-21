@@ -4,6 +4,7 @@ import asyncio
 import json
 
 import httpx
+import pytest
 from fakes.fake_backend import FakeBackend
 
 from iaudit_eval import store
@@ -113,3 +114,46 @@ async def test_cancellation_drains_worker_cleanup_before_unlock(tmp_path):
         assert store.effective_state(tmp_path, run.run_id) == "interrupted"
         assert set(sent) == set(ids[:3])
         assert [it["item_id"] for it in store.iter_items(tmp_path, run.run_id)] == ids[:1]
+
+
+async def test_owned_client_close_error_still_releases_lock(tmp_path):
+    class BrokenClose(httpx.MockTransport):
+        async def aclose(self):
+            raise RuntimeError("close failed")
+
+    backend = FakeBackend()
+    run = start_run(load("synthetic"), Selection(split="all"), base_url="http://fake",
+                    runs_root=tmp_path, transport=BrokenClose(backend.handle), on_finish=None)
+    with pytest.raises(RuntimeError, match="close failed"):
+        await run.wait()
+    assert not store.is_locked(tmp_path, run.run_id)
+    assert store.load_run(tmp_path, run.run_id)["totals"]["ok"] == 8
+
+
+async def test_cancellation_during_owned_client_close_still_releases_lock(tmp_path):
+    request_started, close_started, release = asyncio.Event(), asyncio.Event(), asyncio.Event()
+
+    async def blocked_request(request):
+        request_started.set()
+        await asyncio.Event().wait()
+
+    class BlockedClose(httpx.MockTransport):
+        async def aclose(self):
+            close_started.set()
+            await release.wait()
+
+    run = start_run(load("synthetic"), Selection(split="all"), base_url="http://fake",
+                    runs_root=tmp_path, transport=BlockedClose(blocked_request), on_finish=None)
+    try:
+        await asyncio.wait_for(request_started.wait(), 2)
+        run._task.cancel()
+        await asyncio.wait_for(close_started.wait(), 2)
+        assert store.is_locked(tmp_path, run.run_id)
+        run._task.cancel()
+        await asyncio.gather(run._task, return_exceptions=True)
+        assert run._task.cancelled()
+        assert not store.is_locked(tmp_path, run.run_id)
+        assert store.effective_state(tmp_path, run.run_id) == "interrupted"
+    finally:
+        release.set()
+        await asyncio.gather(run._task, return_exceptions=True)
