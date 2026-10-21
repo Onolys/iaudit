@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "invalid_request",
+    "message": "Fictional invalid request error.",
+    "detail": {
+      "reason": "fictional offline test"
+    }
+  }
+}

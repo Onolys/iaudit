@@ -1,0 +1,10 @@
+{
+  "item_id": "fictional-item-0",
+  "status": "ok",
+  "request": {},
+  "response": {},
+  "failure": null,
+  "run_info": null,
+  "gold": "positive",
+  "gold_kind": "label"
+}

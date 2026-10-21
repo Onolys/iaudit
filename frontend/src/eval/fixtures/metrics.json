@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "fictional-finished",
+  "dataset": "fictional-alpha",
+  "dataset_version": "fixture-1",
+  "primary_policy": "primary",
+  "scored": {
+    "at": "fixture-scored",
+    "metrics_version": "fixture-1",
+    "git_commit": "fixture-commit",
+    "git_dirty": false
+  },
+  "bootstrap": {
+    "method": "cluster",
+    "resamples": 100,
+    "seed": 7,
+    "level": 0.95
+  },
+  "run": {
+    "state": "finished",
+    "complete": true,
+    "mapping_version": null,
+    "tags": {}
+  },
+  "dataset_extra": {},
+  "reference_caveats": [],
+  "items": {
+    "selected": 3,
+    "scored": 3,
+    "failed": 0,
+    "not_run": 0
+  },
+  "failures": {
+    "by_reason": {}
+  },
+  "entries": [
+    {
+      "metric": "accuracy",
+      "level": "item",
+      "policy": "primary",
+      "slice": {},
+      "value": 1,
+      "n": 3,
+      "n_clusters": 3,
+      "ci": [
+        1,
+        1
+      ],
+      "ci_status": "few_clusters"
+    }
+  ],
+  "references": []
+}

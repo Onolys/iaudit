@@ -1,0 +1,12 @@
+{
+  "item_id": "fictional-item-1",
+  "status": "failed",
+  "request": {},
+  "response": null,
+  "failure": {
+    "reason": "Fictional failure"
+  },
+  "run_info": null,
+  "gold": null,
+  "gold_kind": null
+}

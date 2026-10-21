@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "internal_error",
+    "message": "Fictional internal error error.",
+    "detail": {
+      "reason": "fictional offline test"
+    }
+  }
+}

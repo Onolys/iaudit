@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "run_a": "fictional-finished",
+  "run_b": "fictional-finished-with-failures",
+  "dataset": "fictional-alpha",
+  "warnings": [
+    "Fictional partial comparison."
+  ],
+  "n_shared": 2,
+  "n_a_only": 1,
+  "n_b_only": 0,
+  "n_clusters_shared": 2,
+  "deltas": [
+    {
+      "metric": "accuracy",
+      "level": "item",
+      "policy": "primary",
+      "slice": {},
+      "a": {
+        "value": 1,
+        "n": 2,
+        "ci": null
+      },
+      "b": {
+        "value": 0.5,
+        "n": 2,
+        "ci": null
+      },
+      "delta": -0.5,
+      "delta_ci": null,
+      "ci_status": "few_clusters",
+      "n_clusters": 2
+    }
+  ],
+  "disagreements": [
+    {
+      "item_id": "fictional-item-0",
+      "cluster": "fictional-cluster",
+      "pairs": [
+        {
+          "level": "item",
+          "unit": "fictional-unit",
+          "gold": "positive",
+          "a": "positive",
+          "b": "negative"
+        }
+      ]
+    }
+  ]
+}

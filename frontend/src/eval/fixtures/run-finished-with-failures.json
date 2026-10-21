@@ -1,0 +1,30 @@
+{
+  "run_id": "fictional-finished-with-failures",
+  "dataset": "fictional-alpha",
+  "split": "validation",
+  "n_requested": 3,
+  "n_items": 3,
+  "seed": null,
+  "created_at": "fixture-created",
+  "finished_at": "fixture-finished",
+  "schema_version": "1.1.0",
+  "state": "finished",
+  "score_state": "done",
+  "totals": {
+    "cost_usd": null,
+    "failures": 1
+  },
+  "git_dirty": false,
+  "progress": {
+    "done": 3,
+    "total": 3,
+    "failures": 1,
+    "cost_usd": null
+  },
+  "run_info": {
+    "concurrency": 4,
+    "max_cost_usd": null,
+    "tags": {},
+    "warnings": []
+  }
+}

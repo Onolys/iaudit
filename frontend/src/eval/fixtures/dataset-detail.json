@@ -1,0 +1,34 @@
+{
+  "name": "fictional-alpha",
+  "title": "Fictional Alpha",
+  "kind": "adapter",
+  "description": "Fictional metadata for offline UI tests.",
+  "dataset_version": "fixture-1",
+  "default_split": "validation",
+  "splits": [
+    {
+      "name": "validation",
+      "size": 3,
+      "description": "Fictional split metadata."
+    },
+    {
+      "name": "test",
+      "size": 2,
+      "description": "Fictional split metadata."
+    }
+  ],
+  "test_split_note": "Fictional held-out split; inspect pilot results first.",
+  "data_required": true,
+  "cluster_key": "fixture_cluster",
+  "pool_all": true,
+  "gold_kind": "label",
+  "mapping": null,
+  "references": null,
+  "levels": {},
+  "license": {
+    "label": "Fictional test license"
+  },
+  "sources": [],
+  "slices": [],
+  "metrics": []
+}

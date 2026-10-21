@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "forbidden",
+    "message": "Fictional forbidden error.",
+    "detail": {
+      "reason": "fictional offline test"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "total": 3,
+  "items": [
+    {
+      "item_id": "fictional-item-0",
+      "status": "ok",
+      "gold": "positive",
+      "pred": "positive",
+      "match": true
+    },
+    {
+      "item_id": "fictional-item-1",
+      "status": "failed",
+      "gold": null,
+      "pred": null,
+      "match": null
+    },
+    {
+      "item_id": "fictional-item-2",
+      "status": "unmapped",
+      "gold": null,
+      "pred": null,
+      "match": null
+    }
+  ]
+}
