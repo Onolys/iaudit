@@ -149,3 +149,10 @@ def test_pairs_snapshot_inputs_without_mutation(monkeypatch):
     assert (item, gold, pred) == original
     item.meta["custom"]["labels"].append("later")
     assert result[0].meta["custom"] == {"labels": ["fictional"]}
+
+
+def test_unknown_gold_type_raises_like_item_rows(monkeypatch):
+    item, gold, _ = fixture()
+    gold["sentences"][0]["types"] = ["Fictional Bogus Type"]
+    with pytest.raises(ValueError, match="Unknown TofuEval error type"):
+        emit(monkeypatch, item, gold, None, "item_failed")
