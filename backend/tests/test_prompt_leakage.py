@@ -1,5 +1,6 @@
 """03 optional: no 8-word window of the few-shot / prompt examples may appear in eval data."""
 
+import csv
 import json
 import re
 import tomllib
@@ -50,19 +51,39 @@ def prompt_texts():
     return texts
 
 
+def csv_texts(path):
+    """Every non-empty cell of a CSV (e.g. TofuEval summ_sent / exp), as scored text."""
+    csv.field_size_limit(2**30)
+    with path.open(newline="", encoding="utf-8") as stream:
+        return [
+            cell
+            for row in csv.DictReader(stream)
+            for cell in row.values()
+            if isinstance(cell, str) and cell.strip()
+        ]
+
+
+def dir_texts(d):
+    texts = []
+    for p in sorted(d.rglob("*.json*")) if d.exists() else []:
+        for line in p.read_text(encoding="utf-8").splitlines() or [""]:
+            try:
+                texts += list(strings(json.loads(line)))
+            except ValueError:
+                pass
+        try:
+            texts += list(strings(json.loads(p.read_text(encoding="utf-8"))))
+        except ValueError:
+            pass
+    for p in sorted(d.rglob("*.csv")) if d.exists() else []:
+        texts += csv_texts(p)
+    return texts
+
+
 def eval_texts():
     texts = []
     for d in EVAL_DIRS:
-        for p in sorted(d.rglob("*.json*")) if d.exists() else []:
-            for line in p.read_text(encoding="utf-8").splitlines() or [""]:
-                try:
-                    texts += list(strings(json.loads(line)))
-                except ValueError:
-                    pass
-            try:
-                texts += list(strings(json.loads(p.read_text(encoding="utf-8"))))
-            except ValueError:
-                pass
+        texts += dir_texts(d)
     return texts
 
 
@@ -133,3 +154,15 @@ def test_example_speakers_never_use_the_scored_ids():
 
 def test_a_seeded_scored_speaker_id_is_caught():
     assert set(speakers({"turns": [{"speaker": "alex1"}]})) & set(CONFIG["scored_speaker_ids"])
+
+
+def test_csv_eval_data_is_scanned(tmp_path):
+    sentence = "The fictional kite exhibition closes after dusk near the quiet harbour"
+    csv_dir = tmp_path / "factual_consistency"
+    csv_dir.mkdir()
+    (csv_dir / "x.csv").write_text(
+        f'doc_id,summ_sent,exp\nFICTIONAL,"{sentence}",\n', encoding="utf-8"
+    )
+    texts = dir_texts(tmp_path)
+    assert sentence in texts
+    assert shared([sentence], texts) != set()
