@@ -304,13 +304,38 @@ class _RunDriver:
             return
         sem = asyncio.Semaphore(self.concurrency)
 
-        async def one(item):
-            async with sem:
-                if self._stop_reason():
-                    return
-                await self._process(item)
+        stopped = False
 
-        await asyncio.gather(*(one(i) for i in rest))
+        async def one(item):
+            nonlocal stopped
+            async with sem:
+                if stopped or self._stop_reason():
+                    return
+                try:
+                    await self._process(item)
+                except BaseException:
+                    stopped = True  # set before releasing the semaphore to queued workers
+                    raise
+
+        workers = [asyncio.create_task(one(item)) for item in rest]
+        drained = asyncio.gather(*workers, return_exceptions=True)
+        try:
+            results = await asyncio.shield(drained)
+        except asyncio.CancelledError:
+            stopped = True
+            for worker in workers:
+                worker.cancel()
+            # Cancellation can itself be repeated while a transport cleans up. Keep
+            # owning the run until every child has stopped accessing its client/files.
+            while not drained.done():
+                try:
+                    await asyncio.shield(drained)
+                except asyncio.CancelledError:
+                    continue
+            raise
+        for result in results:
+            if isinstance(result, BaseException):
+                raise result
 
     def _accept(self, out: Outcome) -> bool:
         """Hook: False discards the outcome before anything is written (resume guard)."""
