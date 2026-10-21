@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Eight tasks for the TofuEval adapter data layer: metadata, fictional fixtures, assessment offsets, items, transcript turns, download, adapter assembly, leakage guard.
 date: 2026-10-20
 ---

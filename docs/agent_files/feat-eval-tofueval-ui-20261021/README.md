@@ -16,8 +16,10 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 
 ## Execution progress
 
+Phase: Project C full review pending; D not started.
+
 - C1 data and items: complete; all eight source tasks done.
-- C2 projection and metrics: tasks 1–8 done; task 9 (worked example and import hygiene) in-progress. Full Project C verification and review follow task 9.
+- C2 projection and metrics: complete; all nine source tasks done.
 - Project D: implementation pending.
 
 ## Run artifacts

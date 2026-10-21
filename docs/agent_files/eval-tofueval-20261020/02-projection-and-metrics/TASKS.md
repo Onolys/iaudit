@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Nine tasks for the TofuEval gold/projection rules, frozen mapping, pairs and metric registrations, slices, item rows, integrity block and paper reference rows; all offline and fixture-tested.
 date: 2026-10-20
 ---
@@ -17,7 +17,7 @@ Source of truth: [PRD.md](PRD.md). Pure, deterministic Python over saved runs th
 | 6 | Per-item rows | 4 | done |
 | 7 | Integrity block and adapter wiring | 1, 5, 6 | done |
 | 8 | Paper reference rows | none | done |
-| 9 | Worked-example end-to-end test and import hygiene | 7, 8 | in-progress |
+| 9 | Worked-example end-to-end test and import hygiene | 7, 8 | done |
 
 ## Task 1 — Frozen mapping, loader, sha pin
 What it is / what it means: The concern-to-error-type mapping is a versioned, frozen input (R8, D2, D3).
