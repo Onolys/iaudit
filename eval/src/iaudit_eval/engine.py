@@ -20,7 +20,8 @@ Flow: ``start_run`` (sync, needs a running loop) selects items, writes run.json
 Terminal states: ``finished`` (may include failed items), ``aborted`` (``abort()``:
 dispatch stops, in-flight items finish), ``failed`` (run-level error, recorded in
 run.json as ``error {kind, message, code?}``). ``aborted_cost`` and resume belong to
-later tasks; ``_RunDriver._stop_reason`` and ``_after_result`` are the extension points.
+later tasks; ``resume`` (below) re-sends failed/missing items. ``_RunDriver._stop_reason``
+and ``_after_result`` are the extension points.
 
 Nothing here logs or stores request/response text beyond the item files themselves.
 """
@@ -66,6 +67,22 @@ class RunProgress:
     failed: int
     total: int
     cost_usd: float | None
+
+
+class ResumeError(Exception):
+    """The run cannot be resumed (unknown state, dataset changed or still missing)."""
+
+
+class FingerprintChanged(Exception):
+    """The first new response differs from the run fingerprint (models / prompt hashes)."""
+
+    def __init__(self, message: str, changes: dict | None = None):
+        super().__init__(message)
+        self.changes = changes or {}
+
+
+class SchemaVersionChanged(FingerprintChanged):
+    """Backend schema_version differs from the run's; always refused, even with allow_mixed."""
 
 
 class _Preflight(Exception):
@@ -155,7 +172,10 @@ class RunHandle:
         return self._driver.state
 
     async def wait(self) -> str:
+        """Wait for the run; a refused resume raises ``FingerprintChanged`` here."""
         await asyncio.shield(self._task)
+        if self._driver.refused is not None:
+            raise self._driver.refused
         return self.state
 
     def abort(self) -> None:
@@ -185,6 +205,8 @@ class _RunDriver:
         self.cost: float | None = None
         self.error: dict | None = None
         self._identity_set = False
+        self.refused: FingerprintChanged | None = None
+        self.total = len(items)
 
     # ----- extension points for cost cap / resume (later tasks) -----
 
@@ -254,6 +276,8 @@ class _RunDriver:
         if self._stop_reason():
             return
         rec, out = await self._process(first)
+        if rec is None:  # refused by _accept
+            return
         if _canary_fatal(out):
             self._fail("canary_failed", f"canary failed ({out.kind})",
                        code=out.error_code, http_status=out.http_status)  # fmt: skip
@@ -268,12 +292,18 @@ class _RunDriver:
 
         await asyncio.gather(*(one(i) for i in rest))
 
-    async def _process(self, item) -> tuple[dict, Outcome]:
+    def _accept(self, out: Outcome) -> bool:
+        """Hook: False discards the outcome before anything is written (resume guard)."""
+        return True
+
+    async def _process(self, item) -> tuple[dict | None, Outcome]:
         req = self.requests[item.id]
         started = _now()
         t0 = time.monotonic()
         out = await self.client.audit(req)
         latency_ms = int((time.monotonic() - t0) * 1000)
+        if not self._accept(out):
+            return None, out
         resp = out.response if out.ok else None
         rec: dict[str, Any] = {
             "item_id": item.id,
@@ -316,7 +346,7 @@ class _RunDriver:
 
     def _snapshot(self) -> RunProgress:
         return RunProgress(self.run_id, self.state, self.done, self.failed,
-                           len(self.items), self.cost)  # fmt: skip
+                           self.total, self.cost)  # fmt: skip
 
     def _progress(self) -> None:
         if self.on_progress is None:
@@ -409,3 +439,167 @@ def start_run(
     )  # fmt: skip
     task = loop.create_task(driver.run())
     return RunHandle(run_id, driver, task)
+
+
+# ---------- resume (R8, D7, D8) ----------
+
+class _ResumeDriver(_RunDriver):
+    """Re-sends failed/missing items; guards the first new response against the fingerprint.
+
+    On ``FingerprintChanged`` nothing from the refused response is written, dispatch
+    stops and run.json is restored to its pre-resume content (so the run stays in its
+    earlier state, ``interrupted`` if it was running, and is resumable again). Failed
+    items re-sent before the first valid response may have been rewritten (still failed).
+    """
+
+    def __init__(self, *, snapshot: dict, allow_mixed: bool, prior_state: str, **kw):
+        super().__init__(**kw)
+        self.snapshot = snapshot
+        self.allow_mixed = allow_mixed
+        self.prior_state = prior_state
+        self.stored_fp = snapshot.get("fingerprint")
+        self.stored_schema = snapshot.get("schema_version")
+        self._verified = self.stored_fp is None
+        self._identity_set = self.stored_fp is not None
+
+    def _stop_reason(self) -> str | None:
+        return "refused" if self.refused is not None else super()._stop_reason()
+
+    def _accept(self, out: Outcome) -> bool:
+        if self.refused is not None:
+            return False
+        if not out.ok or self._verified:
+            return True
+        try:
+            self._check(out.response)
+        except FingerprintChanged as e:
+            self.refused = e
+            return False
+        return True
+
+    def _check(self, resp: dict) -> None:
+        sv = resp.get("schema_version")
+        if self.stored_schema and sv != self.stored_schema:
+            raise SchemaVersionChanged(
+                "backend schema_version changed since the run started",
+                {"schema_version": {"was": self.stored_schema, "now": sv}},
+            )
+        info = resp.get("run_info")
+        if not info:
+            return  # nothing to compare; keep guarding
+        self._verified = True
+        new = {"models": info.get("models"), "prompt_hashes": info.get("prompt_hashes")}
+        changes = {
+            k: {"was": self.stored_fp.get(k), "now": new[k]}
+            for k in new
+            if new[k] != self.stored_fp.get(k)
+        }
+        if not changes:
+            return
+        if not self.allow_mixed:
+            raise FingerprintChanged("models or prompts changed since the run started", changes)
+        run = store.load_run(self.runs_root, self.run_id)
+        run["resumes"][-1]["fingerprint"] = new
+        run["mixed"] = True
+        run["warnings"] = [*run.get("warnings", []), "resume mixed fingerprints (allow_mixed)"]
+        store.atomic_write_json(store.run_dir(self.runs_root, self.run_id) / "run.json", run)
+
+    def _finish(self) -> None:
+        if self.refused is None:
+            super()._finish()
+            return
+        self.state = self.prior_state
+        store.atomic_write_json(
+            store.run_dir(self.runs_root, self.run_id) / "run.json", self.snapshot
+        )
+        log_event("resume_refused", level=logging.WARNING, run_id=self.run_id,
+                  reason=type(self.refused).__name__)  # fmt: skip
+        self._progress()
+
+
+def resume(
+    run_id: str,
+    *,
+    max_cost_usd: float | None = None,
+    allow_mixed: bool = False,
+    base_url: str | None = None,
+    concurrency: int | None = None,
+    on_progress: Callable[[RunProgress], None] | None = None,
+    on_finish: Callable[[str], Awaitable[None] | None] | None = None,
+    client: AuditClient | None = None,
+    transport=None,
+    runs_root: Path | None = None,
+    data_root: Path | None = None,
+    dataset: Dataset | None = None,
+) -> RunHandle:
+    """Resume a run in the running event loop: re-send failed or missing items only.
+
+    Accepts any stored state (including ``running`` whose lock is free = interrupted).
+    Raises ``RunLockedError`` if another writer holds the run, ``ResumeError`` if the
+    dataset changed or a dataset-missing ``failed`` run is still unfixed. Fingerprint
+    problems surface from ``await handle.wait()`` as ``FingerprintChanged``.
+    """
+    loop = asyncio.get_running_loop()
+    lock = store.RunLock(runs_root, run_id).acquire()  # RunLockedError if concurrent
+    try:
+        run = store.load_run(runs_root, run_id)
+        snapshot = json.loads(json.dumps(run))
+        state = run["state"]
+        if state not in store.STORED_STATES:
+            raise ResumeError(f"cannot resume a run in state {state!r}")
+        # We hold the lock, so a stored "running" means interrupted.
+        prior_state = state
+        if dataset is None:
+            dataset = load(run["dataset"], data_root=data_root)
+        meta = dataset.meta
+        if meta.dataset_version != run.get("dataset_version"):
+            raise ResumeError("dataset version changed since the run started")
+        if state == "failed" and (run.get("error") or {}).get("kind") == "dataset_not_ready":
+            try:
+                _dataset_ready(meta, data_root)
+            except _Preflight as e:
+                raise ResumeError(e.message) from e
+        have = {it["item_id"]: it for it in store.iter_items(runs_root, run_id)}
+        by_id = {i.id: i for i in dataset.items(run["split"])}
+        try:
+            todo = [
+                by_id[iid] for iid in run["item_ids"]
+                if iid not in have or have[iid].get("status") == "failed"
+            ]  # fmt: skip
+        except KeyError as e:
+            raise ResumeError("dataset no longer contains a run item") from e
+
+        store.clean_stale_tmp(runs_root, run_id)
+        git = capture_git()
+        last = (run.get("resumes") or [None])[-1] or run
+        warnings = list(run.get("warnings", []))
+        if (git["git_commit"], git["git_dirty"]) != (last.get("git_commit"), last.get("git_dirty")):
+            warnings.append("git commit or dirty state changed since the previous run/resume")
+        entry = {
+            "at": _now(), "git_commit": git["git_commit"], "git_dirty": git["git_dirty"],
+            "fingerprint": run.get("fingerprint"), "allow_mixed": allow_mixed,
+        }  # fmt: skip
+        new = {k: v for k, v in run.items() if k != "error"}
+        new.update(state="running", finished_at=None, warnings=warnings,
+                   resumes=[*run.get("resumes", []), entry])  # fmt: skip
+        if max_cost_usd is not None:
+            new["max_cost_usd"] = max_cost_usd
+        store.atomic_write_json(store.run_dir(runs_root, run_id) / "run.json", new)
+
+        totals = store.compute_totals(runs_root, run_id)
+        owns = client is None
+        audit_client = client or AuditClient(base_url or run["backend_url"], transport=transport)
+        driver = _ResumeDriver(
+            snapshot=snapshot, allow_mixed=allow_mixed, prior_state=prior_state,
+            run_id=run_id, dataset=dataset, items=todo, runs_root=runs_root,
+            data_root=data_root, client=audit_client, owns_client=owns,
+            concurrency=concurrency or run.get("concurrency") or DEFAULT_CONCURRENCY,
+            on_progress=on_progress, on_finish=on_finish, lock=lock,
+        )  # fmt: skip
+        driver.done = totals["ok"] + totals["partial"]
+        driver.cost = totals["cost_usd"]
+        driver.total = len(run["item_ids"])
+        return RunHandle(run_id, driver, loop.create_task(driver.run()))
+    except BaseException:
+        lock.release()
+        raise
