@@ -1,0 +1,250 @@
+{
+ "description": "10 clusters, binary gold/pred; metric=recall (positive=True)",
+ "pairs": [
+  {
+   "cluster": "doc00",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc00",
+   "gold": true,
+   "pred": false
+  },
+  {
+   "cluster": "doc00",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc00",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc00",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc01",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc01",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc01",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc01",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc02",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc02",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc02",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc02",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc02",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc02",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc03",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc03",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc03",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc04",
+   "gold": true,
+   "pred": false
+  },
+  {
+   "cluster": "doc04",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc04",
+   "gold": true,
+   "pred": false
+  },
+  {
+   "cluster": "doc04",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc04",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc05",
+   "gold": true,
+   "pred": false
+  },
+  {
+   "cluster": "doc05",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc05",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc05",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc05",
+   "gold": false,
+   "pred": true
+  },
+  {
+   "cluster": "doc05",
+   "gold": true,
+   "pred": false
+  },
+  {
+   "cluster": "doc06",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc06",
+   "gold": true,
+   "pred": false
+  },
+  {
+   "cluster": "doc06",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc06",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc06",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc07",
+   "gold": false,
+   "pred": true
+  },
+  {
+   "cluster": "doc07",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc07",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc07",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc07",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc08",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc08",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc08",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc09",
+   "gold": true,
+   "pred": true
+  },
+  {
+   "cluster": "doc09",
+   "gold": false,
+   "pred": true
+  },
+  {
+   "cluster": "doc09",
+   "gold": false,
+   "pred": false
+  },
+  {
+   "cluster": "doc09",
+   "gold": true,
+   "pred": true
+  }
+ ],
+ "golden": {
+  "metric": "recall",
+  "level": "item",
+  "policy": "primary_secondary",
+  "slice": null,
+  "seed": 0,
+  "resamples": 1000,
+  "value": 0.8125,
+  "n": 32,
+  "n_clusters": 10,
+  "ci": [
+   0.6875,
+   0.9629960317460317
+  ]
+ }
+}

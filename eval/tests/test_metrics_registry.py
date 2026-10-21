@@ -67,13 +67,11 @@ def test_unregistered_core_name_clear_error(clean_registry):
 
 
 def test_alias_needs_no_code(clean_registry):
-    metric("balanced_accuracy", policy="primary_secondary")(_cls())
     r = resolve("balanced_accuracy", "ds")  # entry fn; entry name 'bacc_sentence' is only reported
     assert r.impl == "core"
 
 
 def test_dataset_override_wins(clean_registry, tmp_path):
-    metric("recall", policy="primary_secondary")(_cls())
     root = _make(
         tmp_path,
         "ds1",
