@@ -16,7 +16,7 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 
 ## Execution progress
 
-Phase: Project C full review pending; D not started.
+Phase: Project C review fix in-progress (initial review NEEDS_CHANGES); D not started.
 
 - C1 data and items: complete; all eight source tasks done.
 - C2 projection and metrics: complete; all nine source tasks done.
@@ -29,3 +29,7 @@ Phase: Project C full review pending; D not started.
 - [Paper-reference task evidence](../feat-eval-tofueval-references-20261021-1430/README.md) — preserved auxiliary branch execution artifacts.
 
 - [Item-row task evidence](../feat-eval-tofueval-item-rows-20261021-1500/README.md) — preserved auxiliary branch execution artifacts.
+
+## Review fix
+
+- In-progress: one P2 balanced-accuracy absent-class fix from the [initial Project C review](review-C-2026-10-21-initial.md). All 17 source implementation tasks remain done; the settled PRD remains unchanged.
