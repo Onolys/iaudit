@@ -14,7 +14,7 @@ const span = (si: number, sc: number, ei: number, ec: number) => ({
 });
 const N = 20;
 const req: AuditRequest = {
-  schema_version: "1.0.0",
+  schema_version: "1.1.0",
   transcript: Array.from({ length: N }, (_, i) => ({ id: `t${i}`, speaker: "S", text: `turn ${i}` })),
   assessment: [{ id: "s", text: "Some assessment text." }],
 };

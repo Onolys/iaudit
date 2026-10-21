@@ -114,7 +114,7 @@ describe("LoadingView", () => {
 });
 
 describe("WarningsBanner", () => {
-  const base: AuditResponse = { schema_version: "1.0.0", status: "complete", warnings: [], claims: [] };
+  const base: AuditResponse = { schema_version: "1.1.0", status: "complete", warnings: [], claims: [] };
 
   it("is absent for a clean complete response", () => {
     const { container } = render(<WarningsBanner response={base} />);

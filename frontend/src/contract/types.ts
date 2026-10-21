@@ -58,7 +58,7 @@ export interface Section {
 }
 
 export interface AuditRequest {
-  schema_version: "1.0.0";
+  schema_version: "1.1.0";
   request_id?: string;
   transcript: Turn[];
   assessment: Section[];
@@ -105,12 +105,24 @@ export interface Claim {
   evidence: Evidence[];
 }
 
+export interface RunInfo {
+  models: { cheap: string; mid: string; strong: string };
+  /** 16 lowercase hex chars each */
+  prompt_hashes: { atomize: string; link: string; check: string; prep: string };
+  input_tokens?: number;
+  output_tokens?: number;
+  cache_read_tokens?: number;
+  cache_write_tokens?: number;
+  cost_usd?: number;
+}
+
 export interface AuditResponse {
-  schema_version: "1.0.0";
+  schema_version: "1.1.0";
   request_id?: string;
   status: Status;
   warnings: Warning[];
   claims: Claim[];
+  run_info?: RunInfo;
 }
 
 export interface ClaimCheck {

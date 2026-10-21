@@ -53,7 +53,7 @@ describe("readRequestFile", () => {
 });
 
 describe("invalid files never reach fetch", () => {
-  it.each(["", "{nope", "{}", '{"schema_version":"1.0.0"}'])("%j", async (t) => {
+  it.each(["", "{nope", "{}", '{"schema_version":"1.1.0"}'])("%j", async (t) => {
     const { run, fetchSpy } = setup(real);
     expect((await errorOf(run(t))).kind).toBe("invalid_request_file");
     expect(fetchSpy).not.toHaveBeenCalled();

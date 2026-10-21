@@ -15,13 +15,19 @@ The request and response bodies are defined by the [contract](../contracts/READM
 
 One call is synchronous. The audit has a hard time cap (`IAUDIT_AUDIT_DEADLINE_S`, default 100 s); the review UI waits up to 120 s.
 
+## Run info
+
+With the `full` pipeline, a successful reply carries `run_info` (contract: [run_info](../contracts/README.md#run_info)): the model id used for each tier (`models.cheap`, `.mid`, `.strong`) and a hash per prompt group (`prompt_hashes.atomize`, `.link`, `.check`, `.prep`; first 16 hex chars of the sha256 of the prompt file bytes, the same as the eval manifest). The `stub` pipeline omits `run_info`, because it would name models and prompts that were not used.
+
+`input_tokens`, `output_tokens`, `cache_read_tokens`, `cache_write_tokens` and `cost_usd` are optional in the contract. The backend does not do token accounting or pricing, so it never sets them, and never sends zeros in their place. `run_info` holds ids, hashes and counts only, never transcript or assessment text.
+
 ## How a request is checked
 
 `POST /v1/audit` checks in this order and stops at the first failure.
 
 1. Body size, from `Content-Length` and again while the body is read (reading stops as soon as the cap is passed).
 2. The body parses as a JSON object.
-3. `schema_version` equals `1.0.0` (checked before the schema, so an old client gets `unsupported_version`).
+3. `schema_version` equals `1.1.0` (checked before the schema, so an old client gets `unsupported_version`).
 4. Turn count and section count.
 5. The body matches the request schema.
 6. Turn ids and section ids are unique.
@@ -34,7 +40,7 @@ Every non-2xx reply has the contract error body (`error.code`, `error.message`, 
 | HTTP | `error.code` | When |
 |---|---|---|
 | 400 | `invalid_request` | Not JSON, not an object, fails the request schema, or has duplicate ids. |
-| 400 | `unsupported_version` | `schema_version` is present and is not `1.0.0`. |
+| 400 | `unsupported_version` | `schema_version` is present and is not `1.1.0`. |
 | 413 | `payload_too_large` | Body over `IAUDIT_MAX_BODY_BYTES`, turns over `IAUDIT_MAX_TURNS`, or sections over `IAUDIT_MAX_SECTIONS`. |
 | 415 | `invalid_request` | `Content-Type` is present and is not `application/json`. |
 | 422 | `invalid_request` | Framework fallback for malformed request parameters. |

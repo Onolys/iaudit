@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "audit-response.schema.json",
   "title": "AuditResponse",
-  "description": "Body of one evidence-consistency audit response, schema 1.0.0. Positions only: do not copy transcript text or timestamps. One request yields one response. No streaming and no background job.",
+  "description": "Body of one evidence-consistency audit response, schema 1.1.0. Positions only: do not copy transcript text or timestamps. One request yields one response. No streaming and no background job.",
   "type": "object",
   "required": ["schema_version", "status", "warnings", "claims"],
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.0.0"
+      "const": "1.1.0"
     },
     "request_id": {
       "type": "string",
@@ -27,7 +27,8 @@
       "type": "array",
       "description": "One entry per classified span of reasoning, including out_of_scope. Spans must not overlap.",
       "items": { "$ref": "#/$defs/Claim" }
-    }
+    },
+    "run_info": { "$ref": "#/$defs/RunInfo" }
   },
   "allOf": [
     {
@@ -50,6 +51,45 @@
     }
   ],
   "$defs": {
+    "RunInfo": {
+      "type": "object",
+      "description": "Optional provenance of the run: model ids, prompt hashes, and optional usage totals. Ids, hashes and counts only; never transcript text.",
+      "required": ["models", "prompt_hashes"],
+      "additionalProperties": false,
+      "properties": {
+        "models": {
+          "type": "object",
+          "required": ["cheap", "mid", "strong"],
+          "additionalProperties": false,
+          "properties": {
+            "cheap": { "type": "string", "minLength": 1 },
+            "mid": { "type": "string", "minLength": 1 },
+            "strong": { "type": "string", "minLength": 1 }
+          }
+        },
+        "prompt_hashes": {
+          "type": "object",
+          "required": ["atomize", "link", "check", "prep"],
+          "additionalProperties": false,
+          "properties": {
+            "atomize": { "$ref": "#/$defs/PromptHash" },
+            "link": { "$ref": "#/$defs/PromptHash" },
+            "check": { "$ref": "#/$defs/PromptHash" },
+            "prep": { "$ref": "#/$defs/PromptHash" }
+          }
+        },
+        "input_tokens": { "type": "integer", "minimum": 0 },
+        "output_tokens": { "type": "integer", "minimum": 0 },
+        "cache_read_tokens": { "type": "integer", "minimum": 0 },
+        "cache_write_tokens": { "type": "integer", "minimum": 0 },
+        "cost_usd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "PromptHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$",
+      "description": "First 16 hex chars of the sha256 of the prompt file bytes."
+    },
     "Pointer": {
       "type": "object",
       "required": ["index", "char"],

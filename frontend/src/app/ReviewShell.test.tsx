@@ -35,7 +35,7 @@ const claim = (id: string, verdict: Claim["verdict"], index: number, start: numb
 });
 
 const request: AuditRequest = {
-  schema_version: "1.0.0",
+  schema_version: "1.1.0",
   transcript: [{ id: "t0", speaker: "A", text: "hello" }],
   assessment: [
     { id: "s0", label: "Alpha", score: 2, text: "one two three four" },
@@ -44,7 +44,7 @@ const request: AuditRequest = {
   ],
 };
 const multi = (claims: Claim[], warnings: AuditResponse["warnings"] = []) =>
-  build(request, { schema_version: "1.0.0", status: "complete", warnings, claims });
+  build(request, { schema_version: "1.1.0", status: "complete", warnings, claims });
 
 const claimEl = (c: HTMLElement, id: string) => c.querySelector(`.left-pane [data-claim-id="${id}"]`) as HTMLElement;
 
@@ -238,5 +238,18 @@ describe("menu stacking", () => {
     const card = container.querySelector(".section-card")!;
     fireEvent.click(within(card as HTMLElement).getByRole("button", { name: "Section menu" }));
     expect(card.classList.contains("menu-open")).toBe(true);
+  });
+});
+
+describe("run_info", () => {
+  it("renders identically with and without run_info", () => {
+    const withInfo = exampleResponse as AuditResponse;
+    expect(withInfo.run_info).toBeDefined();
+    const { run_info: _omit, ...rest } = withInfo;
+    const a = mount(build(exampleRequest as AuditRequest, withInfo));
+    const htmlWith = a.container.innerHTML;
+    cleanup();
+    const b = mount(build(exampleRequest as AuditRequest, rest as AuditResponse));
+    expect(b.container.innerHTML).toBe(htmlWith);
   });
 });
