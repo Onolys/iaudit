@@ -5,8 +5,8 @@ date: 2026-10-21
 ---
 # D2 API and fixtures evidence
 
-Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`  
-Branch: `feat/eval-ui-replay-foundation`  
+Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`
+Branch: `feat/eval-ui-replay-foundation`
 Task base: `a49c19dfef1874a792b79c6816a2557111ed8fa8`
 
 ## Implementation and acceptance

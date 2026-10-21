@@ -1,6 +1,6 @@
 ---
 status: done
-summary: All fourteen previously deferred Project D tasks implemented and verified offline; final independent review pending.
+summary: All fourteen previously deferred Project D tasks complete; final integrated 553-test frontend gate and all three review personas PASS.
 date: 2026-10-21
 ---
 # Final Project D code run — deferred task completion
@@ -9,12 +9,15 @@ Branch: `feat/eval-tofueval-ui`
 Worktree: `/root/projects/iaudit/.worktrees/feat/eval-tofueval-ui`
 Original branch base: `f7a4640466611d4d3576775c2bd0403b9600de9a`
 Earlier stopping checkpoint: `5a17804fec486115a28ef4e1bd922166d883de66`
-Integrated code verified before docs: `34041b4ea70e25aee9dde06c9537bd8da03baf6e`
+Historical code verified before task-11 docs: `34041b4ea70e25aee9dde06c9537bd8da03baf6e`
+
+Final integrated code after review correction: `6fc97f8fd8d67ed1d9a24a18ca04cb06a9a083b4`
 
 All ten D1 and eleven D2 source tasks are now done offline. The earlier checkpoint
 had already completed D1 tasks 1–7; this run completed its remaining fourteen tasks.
-Final independent Project D review is pending. Project C's earlier final PASS remains
-historical and does not substitute for that review.
+Final independent Project D review is PASS from all three personas after the
+item-refresh correction; see the [final review](review-D-2026-10-21-final.md).
+Project C retains its earlier independent final PASS.
 
 ## Fourteen completed tasks
 
@@ -58,9 +61,9 @@ The governing mission and protected review components remain unchanged. There ar
 new diagnosis/scoring/protocol/file-format features. Model scoring behavior was not
 changed by the UI work; Re-score operates on saved eval results.
 
-## Final offline gate
+## Historical task-10 offline gate
 
-Frontend evidence is the integrated task-10 run at `34041b4`, recorded in
+Before the review correction, frontend evidence was the integrated task-10 run at `34041b4`, recorded in
 [d2-navigation-evidence.md](d2-navigation-evidence.md):
 
 ```text
@@ -140,5 +143,50 @@ statements; current indexes point here for the superseding status.
 - After A1, confirm old 1.1.0 item replay fails while lists/metrics/compare remain usable.
 
 No live providers, real dataset downloads, real browser checks or live smoke ran.
-No push or PR metadata changes accompany this documentation task. Final independent
-review and any resulting corrections remain before a final publication update.
+No push or PR metadata changes accompany the final documentation/review task.
+The completed independent review and integrated correction are recorded below;
+publication remains separate work.
+
+
+## Final integrated review correction and gate
+
+Bug Hunter identified one must-fix after the initial completed UI: mounted item rows
+were not refreshed when scoring finished or Re-score produced new results. Fix
+`e511245286ab96cecd5d44e8ec87d5552be689d1` passes the existing scoring revision to
+ItemList's refresh dependency, preserving its filter and request protections. Three
+new regressions failed before correction; focused coverage then passed 21 tests.
+The correction was integrated with merge `6fc97f8fd8d67ed1d9a24a18ca04cb06a9a083b4`.
+
+All three independent `gpt-6.1-sol`/medium reviewer personas explicitly reviewed the
+correction and returned PASS; no must-fix findings remain. Full scope/provenance is
+in [review-D-2026-10-21-final.md](review-D-2026-10-21-final.md), with regression details
+in [d2-review-fixes-evidence.md](d2-review-fixes-evidence.md).
+
+Fresh checks on the integrated code, superseding the historical 550-test gate:
+
+```text
+# frontend/
+npm test && npm run typecheck && npm run build
+Test Files 45 passed (45)
+Tests 553 passed (553)
+Duration 19.75s
+> tsc --noEmit -p .
+> tsc --noEmit -p . && vite build
+180 modules transformed.
+✓ built in 363ms
+(exit 0)
+
+# Repository root
+git diff --exit-code 2cff97c -- frontend/src/app/ReviewShell.tsx frontend/src/app/LeftPane.tsx frontend/src/app/RightPane.tsx frontend/src/app/reviewState.ts frontend/src/claim-detail/ClaimDetail.tsx
+(no output; exit 0)
+
+git diff --name-only 3c890af -- backend eval
+(no output; backend/eval verification above remains current)
+```
+
+All D1/D2 statuses remain done. The final docs/review commit additionally normalizes
+Markdown trailing hard-break spaces in six earlier evidence files so the complete PR
+range passes whitespace validation; historical contents/results remain intact. The
+prepared [PR body](pr-description.md) now describes the completed C/D implementation.
+Proposed title: `Add TofuEval evaluation and complete Eval UI`. PR #30 remains draft;
+no push, metadata edit or comment is performed by this run.

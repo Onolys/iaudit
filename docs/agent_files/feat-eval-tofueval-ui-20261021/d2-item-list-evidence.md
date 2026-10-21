@@ -5,8 +5,8 @@ date: 2026-10-21
 ---
 # D2 item list evidence
 
-Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`  
-Branch: `feat/eval-ui-replay-foundation`  
+Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`
+Branch: `feat/eval-ui-replay-foundation`
 Task base: `407e075c5cf7514cc4ba2202e49780d632a715d1`
 
 ## Delivered and acceptance

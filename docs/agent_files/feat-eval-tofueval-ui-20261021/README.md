@@ -16,11 +16,12 @@ lists remain the implementation contracts; tracking stays in those source lists.
 
 Project C is complete offline with final review PASS. Project D is now implemented
 and verified offline: all ten D1 and eleven D2 tasks are done, including the fourteen
-tasks deferred at the earlier stopping checkpoint. Final independent Project D review
-is pending; no final review verdict is implied by the implementation status.
+tasks deferred at the earlier stopping checkpoint. Final independent Project D review is now PASS from Bug Hunter, Security and
+Architect after the item-refresh correction; no must-fix findings remain.
 
-The integrated frontend at `34041b4` passed 550 tests across 44 files, typecheck and
-production build. Fresh Python validation passed 754 eval tests and 1,094 backend
+The final integrated code at `6fc97f8` passed 553 frontend tests across 45 files,
+typecheck and production build. The scoring-refresh correction `e511245` ensures
+item rows update with scoring/rescore while retaining their filter. Fresh Python validation passed 754 eval tests and 1,094 backend
 tests, plus required Ruff checks. Broader eval dataset lint retains three pre-existing
 synthetic-adapter E501 findings. The [final Project D code run](code-final-project-d-2026-10-21.md)
 contains commit references, validation and approved integration decisions.
@@ -33,6 +34,7 @@ PR metadata update accompanies this final documentation task.
 
 - [Historical execution log](code-2026-10-21.md) — append-only implementation and earlier checkpoint evidence.
 - [Final Project D code run](code-final-project-d-2026-10-21.md) — fourteen deferred tasks completed, final offline gate and owner checks.
+- [Final Project D review](review-D-2026-10-21-final.md) — PASS from all three personas, including the [item-refresh correction](d2-review-fixes-evidence.md).
 - [Replay foundation](d2-replay-foundation-evidence.md), [API/fixtures](d2-api-fixtures-evidence.md), [metrics/provenance and review fix](d2-metrics-evidence.md), [item list](d2-item-list-evidence.md).
 - [Run detail](d2-run-detail-evidence.md), [gold](d2-gold-evidence.md), [item detail](d2-item-detail-evidence.md), [comparison](d2-comparison-evidence.md), [navigation flow](d2-navigation-evidence.md).
 - [Paper-reference auxiliary task evidence](../feat-eval-tofueval-references-20261021-1430/README.md).
@@ -47,7 +49,7 @@ and RunPanel only supplied the form/estimate. That boundary and its fourteen-tas
 count are historical; the current implementation above supersedes them. Historical
 logs are preserved without rewriting their point-in-time statements.
 
-- [Historical checkpoint PR body](pr-description.md) — the earlier published scope and validation; final review/publication updates are separate work.
+- [Prepared final PR body](pr-description.md) — concrete C/D scope and final validation; publication remains separate work.
 - Existing [draft PR #30](https://github.com/Onolys/iaudit/pull/30), originally titled
   “Add TofuEval evaluation and initial Eval UI,” targets `Onolys/iaudit:main` from
   `feat/eval-tofueval-ui`. The earlier checkpoint was pushed to origin. This docs task

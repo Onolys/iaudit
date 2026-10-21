@@ -5,8 +5,8 @@ date: 2026-10-21
 ---
 # D2 comparison evidence
 
-Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`  
-Branch: `feat/eval-ui-replay-foundation`  
+Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`
+Branch: `feat/eval-ui-replay-foundation`
 Task base: `9eb730a49cff15e86ce4af0450d3525a7fbfd196`
 
 `CompareView({ api, aRunId, bRunId, onOpenItem, onBack })` requests the encoded compare route, displays run A/B labels and prominent `n shared = k`, and shows plain delta/disagreement tables. Delta rows include metric, level, slice, policy, A/B values, signed B-minus-A delta and CI only with `ci_status: ok`; unavailable CIs show status hints. No value-based styling, ranking or judgement. Each disagreement shows its item and differing pairs (level/unit/gold/A/B), plus `open in A` and `open in B` passing raw run/item IDs. Zero shared displays exact `No shared items` and no tables. Saved warnings are shown.

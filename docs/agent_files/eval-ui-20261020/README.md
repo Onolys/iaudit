@@ -12,7 +12,7 @@ Brief: [brainstorming.md](brainstorming.md).
 
 All ten D1 and eleven D2 tasks are implemented and verified offline. The fourteen
 tasks deferred at the earlier checkpoint are now complete; final independent review
-is pending. Execution evidence: [final code run](../feat-eval-tofueval-ui-20261021/code-final-project-d-2026-10-21.md).
+is PASS from all three personas after the scoring/item-refresh correction. Execution evidence: [final code run](../feat-eval-tofueval-ui-20261021/code-final-project-d-2026-10-21.md).
 Owner checks below remain deferred.
 
 ## Dependency graph

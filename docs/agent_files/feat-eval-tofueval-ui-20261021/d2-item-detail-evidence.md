@@ -5,8 +5,8 @@ date: 2026-10-21
 ---
 # D2 item detail evidence
 
-Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`  
-Branch: `feat/eval-ui-replay-foundation`  
+Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`
+Branch: `feat/eval-ui-replay-foundation`
 Task base: `690b5dbb4f55f4c5b9d8873c470b5f2e44936488` (fast-forwarded from main feature before task 8; includes GoldPanel task 7).
 
 ## Delivered

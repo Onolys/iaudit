@@ -5,8 +5,8 @@ date: 2026-10-21
 ---
 # D2 replay foundation
 
-Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`  
-Branch: `feat/eval-ui-replay-foundation`  
+Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`
+Branch: `feat/eval-ui-replay-foundation`
 Base: `5a17804fec486115a28ef4e1bd922166d883de66`
 
 ## Task 1

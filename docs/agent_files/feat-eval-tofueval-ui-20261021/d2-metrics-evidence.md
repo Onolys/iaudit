@@ -5,8 +5,8 @@ date: 2026-10-21
 ---
 # D2 metrics and run information
 
-Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`  
-Branch: `feat/eval-ui-replay-foundation`  
+Worktree: `/root/projects/iaudit/.worktrees/feat/eval-ui-replay-foundation`
+Branch: `feat/eval-ui-replay-foundation`
 Task base: `19a298fe4e507f63ba660847fe39339d0624ce9c`
 
 ## Delivered

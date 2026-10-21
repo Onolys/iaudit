@@ -68,7 +68,7 @@ smoke and real-browser checks above remain owner-only.
 | `eval/buildLoadResult.test.ts` | Actual contract pair replay, stale 1.0.0, invalid requests/responses and zero fetch/JSON parsing. |
 | `eval/MetricsTable.test.tsx`, `eval/RunInfoBlock.test.tsx` | Grouping, policies, authoritative item counts, paper evaluator identity, CI hints and provenance. |
 | `eval/ItemList.test.tsx` | Filter requests, raw-ID actions, empty/dim loading, Retry and stale/unmount protection. |
-| `eval/RunDetail.test.tsx` | Scoring/rescore lifecycle, failure/missing metrics, 409, lost contact and cleanup. |
+| `eval/RunDetail.test.tsx`, `eval/RunDetail.item-refresh.test.tsx` | Scoring/rescore lifecycle, item refresh with filter preserved, failure/missing metrics, 409, lost contact and cleanup. |
 | `eval/gold/GoldPanel.test.tsx` | Native gold, unknown/malformed JSON fallback and collapse behavior. |
 | `eval/ItemDetail.test.tsx` | Real ReviewShell replay/remount, failed/stale/invalid/unmapped details, no audit/upload, issue cap and Retry. |
 | `eval/CompareView.test.tsx` | Shared/zero comparisons, signed deltas/CI gating, 409/422 and item callbacks. |
