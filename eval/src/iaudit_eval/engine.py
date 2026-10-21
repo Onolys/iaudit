@@ -49,7 +49,7 @@ from typing import Any
 
 import httpx
 
-from iaudit_eval import contracts, paths, store
+from iaudit_eval import contracts, download, paths, store
 from iaudit_eval.client import AuditClient, Outcome
 from iaudit_eval.datasets import Dataset, load
 from iaudit_eval.datasets.base import DatasetError
@@ -527,6 +527,7 @@ def _prepare_start(
         "tags": dict(tags or {}),
         "mapping_version": mapping_version() if callable(mapping_version) else None,
         "backend_url": base_url,
+        "warnings": list(dict.fromkeys(download.hash_warnings(dataset, data_root=data_root))),
         **capture_git(),
     }
     run_id = store.create_run(runs_root, run_meta)
@@ -707,7 +708,8 @@ def _prepare_resume(
         store.clean_stale_tmp(runs_root, run_id)
         git = capture_git()
         last = (run.get("resumes") or [None])[-1] or run
-        warnings = list(run.get("warnings", []))
+        warnings = [*run.get("warnings", []),
+                    *download.hash_warnings(dataset, data_root=data_root)]
         if (git["git_commit"], git["git_dirty"]) != (last.get("git_commit"), last.get("git_dirty")):
             warnings.append("git commit or dirty state changed since the previous run/resume")
         entry = {
@@ -715,7 +717,7 @@ def _prepare_resume(
             "fingerprint": run.get("fingerprint"), "allow_mixed": allow_mixed,
         }  # fmt: skip
         new = {k: v for k, v in run.items() if k != "error"}
-        new.update(state="running", finished_at=None, warnings=warnings,
+        new.update(state="running", finished_at=None, warnings=list(dict.fromkeys(warnings)),
                    resumes=[*run.get("resumes", []), entry])  # fmt: skip
         if max_cost_usd is not None:
             new["max_cost_usd"] = max_cost_usd
