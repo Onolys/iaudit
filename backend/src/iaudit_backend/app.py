@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 
-from iaudit_backend import contract
+from iaudit_backend import contract, run_info
 from iaudit_backend.api.errors import (
     ApiError,
     DeadlineExceeded,
@@ -234,6 +234,8 @@ def create_app(
                 app.state.pipeline, model, ctx, settings, grace_s=backstop_grace_s
             )
             out = result.to_json()
+            if settings.pipeline == "full":
+                out["run_info"] = run_info.build(settings)
             if out.get("request_id") != request_id or contract.validate_response(out):
                 raise ApiError("internal_error", "Internal server error.", 500, request_id)
             headers = {}

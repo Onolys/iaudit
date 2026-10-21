@@ -140,7 +140,9 @@ def test_reproduces_example_response(example_request, example_response):
     internal = fill_text(drafts(), example_response)
     out = assemble(AuditRequest.model_validate(example_request), internal, Settings())
     assert validate_response(out.response) == []
-    assert canonical(out.response) == canonical(example_response)
+    # run_info is attached by the app, not the assembler (which stays pure)
+    expected = {k: v for k, v in example_response.items() if k != "run_info"}
+    assert canonical(out.response) == canonical(expected)
 
 
 def test_named_spans_from_acceptance(example_request, example_response):
