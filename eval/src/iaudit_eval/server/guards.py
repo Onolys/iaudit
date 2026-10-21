@@ -11,6 +11,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from iaudit_eval.datasets.base import ID_RE
+
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8100
 DEFAULT_BACKEND_URL = "http://127.0.0.1:8000"
@@ -21,7 +23,6 @@ FORBIDDEN_MESSAGE = "Request not allowed."
 
 DATASET_ID = re.compile(r"^[a-z0-9][a-z0-9_-]{0,63}$")
 RUN_ID = re.compile(r"^\d{8}T\d{6}Z-[a-z0-9][a-z0-9_-]{0,63}-[0-9a-f]{6}$")
-ITEM_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,254}$")
 _HOST = re.compile(r"^(localhost|127\.0\.0\.1)(:\d{1,5})?$")
 
 
@@ -136,8 +137,7 @@ def validate_item_id(value: str, allowed: set[str] | frozenset[str]) -> str:
     """Accept only ids in the run's own item_ids that are also filename-safe."""
     if (
         not isinstance(value, str)
-        or not ITEM_ID.match(value)
-        or ".." in value
+        or not ID_RE.fullmatch(value)
         or value not in allowed
     ):
         raise not_found("Item not found.")

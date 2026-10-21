@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from iaudit_eval import paths
+from iaudit_eval.datasets.base import ID_RE
 
 STORE_VERSION = 1
 STORED_STATES = ("running", "finished", "aborted_cost", "aborted", "failed")
@@ -187,7 +188,9 @@ def effective_state(root: Path | None, run_id: str) -> str:
 # ---------- items ----------
 
 def write_item(root: Path | None, run_id: str, item: dict) -> None:
-    item_id = _check_id(item["item_id"], "item_id")
+    item_id = item["item_id"]
+    if not isinstance(item_id, str) or not ID_RE.fullmatch(item_id):
+        raise ValueError("unsafe item_id")
     atomic_write_json(run_dir(root, run_id) / "items" / f"{item_id}.json", item)
 
 
@@ -196,8 +199,6 @@ def iter_items(root: Path | None, run_id: str) -> Iterator[dict]:
     if not items.is_dir():
         return
     for p in sorted(items.glob("*.json")):
-        if p.name.startswith("."):
-            continue
         yield json.loads(p.read_text(encoding="utf-8"))
 
 
