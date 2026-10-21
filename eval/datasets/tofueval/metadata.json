@@ -1,0 +1,49 @@
+{
+  "name": "tofueval",
+  "title": "TofuEval",
+  "description": "Factual consistency of topic-focused dialogue summaries from MediaSum and MeetingBank. Each item is one summary, with source documents defining the dev/test split and clustering. Licensed source text is downloaded locally.",
+  "dataset_version": "17555c5bfc27f95371fd82b2de7014d8e14e1024",
+  "adapter_version": "1.0.0",
+  "kind": "adapter",
+  "item_unit": "summary",
+  "splits": [
+    {"name": "dev", "description": "Summaries from the 70 development source documents."},
+    {"name": "test", "description": "Summaries from the 30 held-out source documents."}
+  ],
+  "default_split": "dev",
+  "cluster_key": "source document",
+  "license": {
+    "name": "Mixed: MIT-0 (no-training note); MediaSum research use; MeetingBank CC BY-NC-ND 4.0",
+    "redistributable": false,
+    "contains_licensed_text": true
+  },
+  "data_required": true,
+  "test_split_note": "Held-out test documents are intended for final evaluation. Use the dev split for prompt and adapter development; repeated test evaluation can compromise the holdout.",
+  "sources": [
+    {
+      "id": "tofueval",
+      "repo": "amazon-science/tofueval",
+      "url": "https://github.com/amazon-science/tofueval/archive/17555c5bfc27f95371fd82b2de7014d8e14e1024.zip",
+      "filename": "tofueval.zip",
+      "revision": "17555c5bfc27f95371fd82b2de7014d8e14e1024",
+      "license": "MIT-0 (no-training note)"
+    },
+    {
+      "id": "mediasum",
+      "hf": "ccdv/mediasum",
+      "url": "https://huggingface.co/datasets/ccdv/mediasum/resolve/main/test_data.zip",
+      "filename": "test_data.zip",
+      "revision": "resolve-at-first-download",
+      "license": "research use"
+    },
+    {
+      "id": "meetingbank",
+      "hf": "huuuyeah/meetingbank",
+      "url": "https://huggingface.co/datasets/huuuyeah/meetingbank/resolve/main/test.json",
+      "filename": "test.json",
+      "revision": "resolve-at-first-download",
+      "license": "CC BY-NC-ND 4.0"
+    }
+  ],
+  "expected_sha256": {}
+}
