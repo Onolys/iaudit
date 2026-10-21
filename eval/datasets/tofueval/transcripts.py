@@ -15,8 +15,10 @@ def build_mediasum_turns(
     speakers: Sequence[str], utterances: Sequence[str],
 ) -> list[dict[str, str]]:
     """Keep every supplied label and utterance verbatim, including repeated labels."""
-    assert len(speakers) == len(utterances), "MediaSum speaker/utterance lengths differ"
-    assert all(speaker.strip() for speaker in speakers), "MediaSum has an empty speaker"
+    if len(speakers) != len(utterances):
+        raise ValueError("MediaSum speaker/utterance lengths differ")
+    if not all(speaker.strip() for speaker in speakers):
+        raise ValueError("MediaSum has an empty speaker")
     return [
         {"id": f"t{index}", "speaker": speaker, "text": text}
         for index, (speaker, text) in enumerate(zip(speakers, utterances, strict=True))

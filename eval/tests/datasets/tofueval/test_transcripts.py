@@ -59,7 +59,7 @@ def test_mediasum_unicode_whitespace_and_repeated_labels_are_not_changed():
 @pytest.mark.parametrize("speakers,utterances", [(["A"], []), ([""], ["text"]), ([" \t"], ["text"])])
 def test_mediasum_rejects_unpaired_or_empty_speakers(speakers, utterances):
     transcripts = load_transcripts()
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         transcripts.build_mediasum_turns(speakers, utterances)
 
 
