@@ -1,0 +1,1067 @@
+{
+  "rows": [
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Baseline — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.5,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Baseline — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.5,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Baseline — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.5,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Baseline — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.5,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Baseline — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.5,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Baseline — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.5,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Baseline — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.5,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Baseline — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.5,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-ZS — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.661,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-ZS — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.739,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-ZS — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.639,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-ZS — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.806,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-ZS — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.627,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-ZS — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.641,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-ZS — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.581,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-ZS — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.724,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-CV — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.676,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-CV — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.73,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-CV — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.626,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-CV — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.773,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-CV — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.612,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-CV — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.665,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-CV — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.524,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "SummaC-CV — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.729,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "QAFactEval — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.539,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "QAFactEval — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.74,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "QAFactEval — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.58,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "QAFactEval — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.758,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "QAFactEval — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.614,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "QAFactEval — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.742,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "QAFactEval — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.551,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "QAFactEval — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.682,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "AlignScore — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.692,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "AlignScore — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.762,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "AlignScore — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.612,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "AlignScore — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.786,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "AlignScore — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.655,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "AlignScore — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.721,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "AlignScore — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.634,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "AlignScore — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.718,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.54,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.548,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.496,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.619,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.556,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.591,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.512,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.592,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-33B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.51,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-33B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.511,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-33B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.536,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-33B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.484,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-33B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.525,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-33B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.534,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-33B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.532,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "Vicuna-33B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.51,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.598,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.535,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.588,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.566,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.57,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.545,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.546,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-13B — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.58,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-30B* — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.545,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-30B* — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.539,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-30B* — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.535,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-30B* — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.534,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-30B* — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.533,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-30B* — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.544,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-30B* — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.53,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "WizardLM-30B* — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.532,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-3.5-Turbo — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.616,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-3.5-Turbo — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.689,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-3.5-Turbo — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.56,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-3.5-Turbo — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.65,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-3.5-Turbo — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.596,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-3.5-Turbo — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.658,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-3.5-Turbo — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.632,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-3.5-Turbo — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.657,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-4 — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.649,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-4 — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.802,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-4 — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.675,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-4 — test split; paper-reported, different model & date",
+      "metric": "bacc_sentence",
+      "level": "sentence",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.903,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-4 — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|main"
+      },
+      "value": 0.637,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-4 — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|mediasum|marginal"
+      },
+      "value": 0.789,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-4 — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|main"
+      },
+      "value": 0.747,
+      "note": "paper-reported, different model & date"
+    },
+    {
+      "source": "TofuEval paper, Table 3",
+      "label": "GPT-4 — test split; paper-reported, different model & date",
+      "metric": "bacc_summary",
+      "level": "summary",
+      "slice": {
+        "model_group": "original_five",
+        "group_topic": "original_five|meetingbank|marginal"
+      },
+      "value": 0.831,
+      "note": "paper-reported, different model & date"
+    }
+  ],
+  "caveats": [
+    "LLM rows are the mean of 3 runs; GPT-4 uses gpt-4-0613.",
+    "Test split, original five models only; Model-Extra results are not comparable.",
+    "Paper evaluation is per-document with source supplied and no atomization.",
+    "Human annotation has label noise (kappa 0.34 / 0.42); these rows are contextual references, never ranked against live runs.",
+    "WizardLM-30B* preserves the Table 3 label; Table 4 prints 33B."
+  ]
+}
