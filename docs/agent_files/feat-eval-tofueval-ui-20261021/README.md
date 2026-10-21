@@ -16,11 +16,11 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 
 ## Execution progress
 
-Phase: Project C complete offline with final review PASS; owner checks remain. Project D starting.
+Phase: Project C complete offline with final review PASS; owner checks remain. Project D stopping checkpoint in-progress after the current tasks.
 
 - C1 data and items: complete; all eight source tasks done.
 - C2 projection and metrics: complete; all nine source tasks done.
-- Project D: D1 tasks 1–5 done; tasks 6 (Audit/Eval toggle) and 7 (RunPanel form and estimate) in-progress independently in separate worktrees. Code review base `2cff97c`.
+- Project D: D1 tasks 1–6 done; task 7 (RunPanel form and estimate) remains in-progress. D1 tasks 8–10 and all D2 are deferred at the user-requested stopping boundary; Project D remains incomplete. Code review base `2cff97c`.
 
 ## Run artifacts
 
