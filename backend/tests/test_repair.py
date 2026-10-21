@@ -40,7 +40,7 @@ def go(verdict="supported", ev=None, concerns=(), **kw):
     r = AssembleReport()
     out = repair_claim(LocatedClaim(draft, 0, 0, 3, id="c1"), ev, r)
     full = {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "status": "complete",
         "warnings": [],
         "claims": [

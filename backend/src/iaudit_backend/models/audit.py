@@ -75,7 +75,7 @@ class Section(_Model):
 
 
 class AuditRequest(_Model):
-    schema_version: Literal["1.0.0"]
+    schema_version: Literal["1.1.0"]
     request_id: str | None = None
     transcript: list[Turn]
     assessment: list[Section]
@@ -123,7 +123,7 @@ class Warning(_Model):  # noqa: A001 - contract name
 
 
 class AuditResponse(_Model):
-    schema_version: Literal["1.0.0"] = "1.0.0"
+    schema_version: Literal["1.1.0"] = "1.1.0"
     request_id: str | None = None
     status: Status
     warnings: list[Warning]

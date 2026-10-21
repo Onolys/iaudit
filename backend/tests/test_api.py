@@ -245,3 +245,8 @@ def test_startup_fails_without_contracts(tmp_path, monkeypatch):
 
 def test_deeply_nested_json_is_400(client):
     assert_error(post(client, b"[" * 200_000), 400, "invalid_request")
+
+
+def test_previous_version_1_0_0_is_unsupported(client, example_request):
+    example_request["schema_version"] = "1.0.0"
+    assert_error(post(client, example_request), 400, "unsupported_version", "example-001")

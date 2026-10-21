@@ -33,7 +33,7 @@ from iaudit_backend.pipeline import (
 from iaudit_backend.safe_log import log_event, setup_logging
 
 log = logging.getLogger("iaudit")
-SUPPORTED_VERSION = "1.0.0"
+SUPPORTED_VERSION = "1.1.0"
 MAX_SAFE_DEADLINE_S = 100
 _KEY_VARS = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "LITELLM_API_KEY")  # presence only
 

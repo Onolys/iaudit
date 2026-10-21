@@ -11,7 +11,7 @@ from iaudit_backend.llm.errors import LLMUnavailable
 
 log = logging.getLogger("iaudit")
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 
 
 class ApiError(Exception):
