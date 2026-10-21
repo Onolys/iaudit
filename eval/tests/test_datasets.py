@@ -149,3 +149,25 @@ def test_select_all():
     assert select(its, None, 0) == its
     assert select(list(reversed(its)), 99, 0) == its
     assert select(its, 0, 0) == []
+
+
+def test_multifile_adapter_relative_imports_and_same_name_different_roots(tmp_path):
+    adapter = '''
+from .helper import make_adapter
+
+def create(data_dir):
+    return make_adapter(data_dir)
+'''
+    for root_name, value in [("first", "first evidence"), ("second", "second evidence")]:
+        root = tmp_path / root_name
+        folder = make(root, name="multifile", adapter=adapter)
+        (folder / "helper.py").write_text(
+            "from types import SimpleNamespace\n"
+            f"def make_adapter(data_dir): return SimpleNamespace(value={value!r})\n"
+        )
+    first = load("multifile", root=tmp_path / "first")
+    again = load("multifile", root=tmp_path / "first")
+    second = load("multifile", root=tmp_path / "second")
+    assert first.adapter.value == again.adapter.value == "first evidence"
+    assert second.adapter.value == "second evidence"
+    assert load("multifile", root=tmp_path / "first").adapter.value == "first evidence"

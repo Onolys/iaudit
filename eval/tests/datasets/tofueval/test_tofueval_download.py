@@ -263,3 +263,34 @@ def test_framework_post_hook_failure_preserves_previous_dataset(tmp_path, networ
     saved = framework.status(ds, data_root=tmp_path)
     assert saved["status"] == "failed"
     assert "fictional post validation failure" in saved["error"]
+
+
+def test_normal_loader_framework_refresh_replaces_adapter_snapshot(tmp_path, network, monkeypatch):
+    from iaudit_eval.datasets import load
+
+    dataset = load("tofueval", data_root=tmp_path)
+    module = sys.modules[type(dataset.adapter).__module__]
+    real_download = module.download_module.download
+
+    def offline_download(data_dir, progress):
+        return real_download(data_dir, progress, metadata=network[0], transport=network[3])
+
+    monkeypatch.setattr(module.download_module, "download", offline_download)
+    assert framework.download(dataset, data_root=tmp_path)["status"] == "ready"
+    item = next(i for i in dataset.items("dev") if i.meta["dataset"] == "meetingbank")
+    before = dataset.adapter.to_request(item)
+    other = load("tofueval", data_root=tmp_path)
+    assert other.adapter.to_request(item) == before
+    # Force a refresh and change one document in the fictional upstream body.
+    (tmp_path / "tofueval/meetingbank/test.json").write_text("tampered")
+    rows = [json.loads(line) for line in network[1]["test.json"].splitlines()]
+    for row in rows:
+        if row["uid"] == item.doc_id:
+            row["transcript"] = "New fictional council evidence."
+    network[1]["test.json"] = b"\n".join(json.dumps(row).encode() for row in rows)
+    assert framework.download(dataset, data_root=tmp_path)["status"] == "ready"
+    after = dataset.adapter.to_request(item)
+    assert after["transcript"] == [
+        {"id": "t0", "speaker": "unlabeled", "text": "New fictional council evidence."}
+    ]
+    assert other.adapter.to_request(item) == after

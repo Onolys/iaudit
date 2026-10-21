@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.machinery
 import importlib.util
 import json
 import re
@@ -40,7 +41,18 @@ def _load_adapter(folder: Path, data_dir: Path):
     path = folder / "adapter.py"
     if not path.is_file():
         raise DatasetError(f"missing adapter.py in {folder}")
-    modname = f"iaudit_eval_dataset_{folder.name.replace('-', '_')}.adapter"
+    package = f"iaudit_eval_dataset_{folder.name.replace('-', '_')}"
+    location = str(folder.resolve())
+    parent = sys.modules.get(package)
+    if parent is None or list(getattr(parent, "__path__", [])) != [location]:
+        # The same dataset name may be loaded from separate plugin roots.
+        for name in list(sys.modules):
+            if name == package or name.startswith(package + "."):
+                del sys.modules[name]
+        package_spec = importlib.machinery.ModuleSpec(package, loader=None, is_package=True)
+        package_spec.submodule_search_locations = [location]
+        sys.modules[package] = importlib.util.module_from_spec(package_spec)
+    modname = f"{package}.adapter"
     spec = importlib.util.spec_from_file_location(modname, path)
     if spec is None or spec.loader is None:
         raise DatasetError(f"cannot load {path}")

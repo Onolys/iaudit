@@ -94,3 +94,11 @@ def get_transcript_turns(data_dir: Path, dataset: str, doc_id: str) -> list[dict
     """
     path = (Path(data_dir) / "derived/transcripts.json").resolve()
     return _cache_for_path(path).turns(dataset, doc_id)
+
+
+def invalidate_transcripts(data_dir: Path) -> None:
+    """Discard a refreshed directory's process snapshot without evicting others."""
+    path = (Path(data_dir) / "derived/transcripts.json").resolve()
+    snapshot = _cache_for_path(path)
+    snapshot._records = None
+    snapshot._turns.clear()
