@@ -205,7 +205,7 @@ async def test_failed_download_is_visible_and_retryable(roots):
         adapter.release.set()
         checked(await http.post("/datasets/local/download"), "DownloadStatus", 202)
         failed = await wait_status(http, "failed")
-        assert "ValueError" in failed["error"]
+        assert failed["error"] == "Download failed."
         adapter.fail = False
         checked(await http.post("/datasets/local/download"), "DownloadStatus", 202)
         await wait_status(http, "ready")

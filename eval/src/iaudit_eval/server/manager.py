@@ -110,11 +110,17 @@ class RunManager:
     async def download_status(self, dataset: Dataset) -> dict:
         name = dataset.meta.name
         if name in self._download_errors:
-            return self._download_errors[name]
-        task = self.download_tasks.get(name)
-        if task is not None and not task.done():
-            return {"status": "downloading", "files": []}
-        return await asyncio.to_thread(download.status, dataset, data_root=self.data_root)
+            status = self._download_errors[name]
+        else:
+            task = self.download_tasks.get(name)
+            if task is not None and not task.done():
+                return {"status": "downloading", "files": []}
+            status = await asyncio.to_thread(download.status, dataset, data_root=self.data_root)
+        if status["status"] == "failed":
+            # Persisted B2 diagnostics may include adapter/source content. Keep them
+            # private and return a copy with a fixed public message, including restart.
+            return {**status, "error": "Download failed."}
+        return status
 
     async def start_download(self, dataset: Dataset) -> dict:
         name = dataset.meta.name
