@@ -19,9 +19,15 @@ Flow: ``start_run`` (sync, needs a running loop) selects items, writes run.json
 
 Terminal states: ``finished`` (may include failed items), ``aborted`` (``abort()``:
 dispatch stops, in-flight items finish), ``failed`` (run-level error, recorded in
-run.json as ``error {kind, message, code?}``). ``aborted_cost`` and resume belong to
-later tasks; ``resume`` (below) re-sends failed/missing items. ``_RunDriver._stop_reason``
-and ``_after_result`` are the extension points.
+run.json as ``error {kind, message, code?}``), ``aborted_cost`` (optional ``max_cost_usd``
+cap reached: spent this invocation = sum of ``run_info.cost_usd`` >= cap; dispatch stops,
+in-flight items finish). With a cap set, a response lacking ``cost_usd`` fails closed:
+dispatch stops, in-flight items finish, run ends ``failed`` with error kind ``cost_missing``.
+No cap = no cost handling at all. ``resume`` (below) re-sends failed/missing items and takes
+its own cap. ``_RunDriver._stop_reason`` and ``_after_result`` are the extension points.
+
+``probe`` (bottom) is the zero-spend reachability/version check; ``estimate`` lives in
+``estimate.py``.
 
 Nothing here logs or stores request/response text beyond the item files themselves.
 """
@@ -40,6 +46,8 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+import httpx
 
 from iaudit_eval import contracts, paths, store
 from iaudit_eval.client import AuditClient, Outcome
@@ -185,7 +193,7 @@ class RunHandle:
 
 class _RunDriver:
     def __init__(self, *, run_id, dataset, items, runs_root, data_root, client, owns_client,
-                 concurrency, on_progress, on_finish, lock):  # fmt: skip
+                 concurrency, on_progress, on_finish, lock, max_cost_usd=None):  # fmt: skip
         self.run_id = run_id
         self.dataset = dataset
         self.items = items
@@ -207,12 +215,21 @@ class _RunDriver:
         self._identity_set = False
         self.refused: FingerprintChanged | None = None
         self.total = len(items)
+        self.max_cost_usd = max_cost_usd
+        self.spent = 0.0  # cost reported in this invocation only
+        self.cost_missing = False
 
-    # ----- extension points for cost cap / resume (later tasks) -----
+    # ----- extension points (cost cap, resume) -----
 
     def _stop_reason(self) -> str | None:
-        """Non-None stops dispatch. Only abort for now."""
-        return "aborted" if self.abort_event.is_set() else None
+        """Non-None stops dispatch."""
+        if self.cost_missing:
+            return "cost_missing"
+        if self.abort_event.is_set():
+            return "aborted"
+        if self.max_cost_usd is not None and self.spent >= self.max_cost_usd:
+            return "aborted_cost"
+        return None
 
     def _after_result(self, item_record: dict) -> None:
         """Called after each stored item (cost accounting hooks in here)."""
@@ -220,6 +237,9 @@ class _RunDriver:
         cost = info.get("cost_usd")
         if isinstance(cost, int | float) and not isinstance(cost, bool):
             self.cost = (self.cost or 0.0) + cost
+            self.spent += cost
+        elif self.max_cost_usd is not None and item_record.get("response") is not None:
+            self.cost_missing = True  # fail closed: a cap we cannot enforce
 
     # ----- driver -----
 
@@ -358,8 +378,12 @@ class _RunDriver:
                       exc_class=type(e).__name__)  # fmt: skip
 
     def _finish(self) -> None:
-        if self.state == "running":
-            self.state = "aborted" if self.abort_event.is_set() else "finished"
+        if self.state == "running" and self.cost_missing:
+            self._fail("cost_missing", "a cost cap is set but the backend response "
+                       "reports no cost_usd; the cap cannot be enforced")  # fmt: skip
+        elif self.state == "running":
+            reason = self._stop_reason()
+            self.state = reason if reason in ("aborted", "aborted_cost") else "finished"
         fields: dict[str, Any] = {"state": self.state, "finished_at": _now()}
         if self.error:
             fields["error"] = self.error
@@ -435,7 +459,7 @@ def start_run(
     driver = _RunDriver(
         run_id=run_id, dataset=dataset, items=items, runs_root=runs_root, data_root=data_root,
         client=audit_client, owns_client=owns, concurrency=concurrency,
-        on_progress=on_progress, on_finish=on_finish, lock=lock,
+        on_progress=on_progress, on_finish=on_finish, lock=lock, max_cost_usd=max_cost_usd,
     )  # fmt: skip
     task = loop.create_task(driver.run())
     return RunHandle(run_id, driver, task)
@@ -595,6 +619,7 @@ def resume(
             data_root=data_root, client=audit_client, owns_client=owns,
             concurrency=concurrency or run.get("concurrency") or DEFAULT_CONCURRENCY,
             on_progress=on_progress, on_finish=on_finish, lock=lock,
+            max_cost_usd=new.get("max_cost_usd"),
         )  # fmt: skip
         driver.done = totals["ok"] + totals["partial"]
         driver.cost = totals["cost_usd"]
@@ -603,3 +628,52 @@ def resume(
     except BaseException:
         lock.release()
         raise
+
+
+# ---------- probe (D9) ----------
+
+@dataclass(frozen=True)
+class ProbeResult:
+    reachable: bool
+    backend_schema_version: str | None
+    accepts_version: bool
+
+
+async def probe(
+    base_url: str, *, transport=None, timeout_s: float = 10
+) -> ProbeResult:
+    """Zero-spend reachability and version check.
+
+    ``GET /healthz`` then one ``POST /v1/audit`` whose body is only
+    ``{"schema_version": <loaded>}``. The backend checks the version before the schema,
+    so ``unsupported_version`` = mismatch; any other 4xx = accepted (the body is rejected
+    as invalid, no audit work). 2xx also counts as accepted; 5xx or an unreadable answer
+    is reachable but not a version verdict (``accepts_version`` False). A failed GET or
+    POST means ``reachable`` False. Lives here (not in client.py) because it composes
+    the client with the loaded contract version for the engine's callers.
+    """
+    client = AuditClient(base_url, timeout_s=timeout_s, transport=transport)
+    try:
+        if not await client.healthz():
+            return ProbeResult(False, None, False)
+        try:
+            async with asyncio.timeout(timeout_s):
+                resp = await client._http.post(
+                    "/v1/audit", json={"schema_version": contracts.schema_version()}
+                )
+        except (httpx.HTTPError, TimeoutError):
+            return ProbeResult(False, None, False)
+    finally:
+        await client.aclose()
+    try:
+        body = resp.json()
+    except ValueError:
+        body = None
+    version = body.get("schema_version") if isinstance(body, dict) else None
+    version = version if isinstance(version, str) else None
+    code = None
+    if isinstance(body, dict) and isinstance(body.get("error"), dict):
+        code = body["error"].get("code")
+    status = resp.status_code
+    accepts = (200 <= status < 300) or (400 <= status < 500 and code != "unsupported_version")
+    return ProbeResult(True, version, accepts)

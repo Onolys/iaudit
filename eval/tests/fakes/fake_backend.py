@@ -63,6 +63,7 @@ class FakeBackend:
         self.retry_after = retry_after
         self.cost_usd = cost_usd
         self.count = 0  # POST /v1/audit requests received
+        self.audit_work = 0  # responses built (real audit work); probes must leave it 0
         self.in_flight = 0
         self.max_in_flight = 0
         self.requests: list[httpx.Request] = []
@@ -141,6 +142,7 @@ class FakeBackend:
         return httpx.Response(200, json=body)
 
     def build_response(self, raw: dict[str, Any], mode: str = "ok") -> dict[str, Any]:
+        self.audit_work += 1
         models = dict(BASE_MODELS)
         hashes = dict(BASE_HASHES)
         if mode == "changed_models":
