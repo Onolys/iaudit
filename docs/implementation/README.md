@@ -12,3 +12,4 @@ How is this implemented? Private implementation details.
 - [check.md](check.md): the verifier and the decision table.
 - [assembler.md](assembler.md): positions, repairs and final validation.
 - [logging-and-phi.md](logging-and-phi.md): what may be logged.
+- [eval-server.md](eval-server.md): evaluation API lifecycle, guards, read projections and schema export.

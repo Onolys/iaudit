@@ -13,7 +13,7 @@ Why is it like this? Architecture decision records.
 | [0005](0005-models-propose-code-decides.md) | Models propose, code decides |
 | [0006](0006-excerpts-not-offsets.md) | Models return verbatim excerpts; code computes offsets |
 | [0007](0007-bm25-and-fuzzy-retrieval.md) | BM25 and fuzzy matching for retrieval, no embeddings |
-| [0008](0008-synchronous-call-sixty-second-cap.md) | One synchronous call with a 60 second cap |
+| [0008](0008-synchronous-call-sixty-second-cap.md) | One synchronous call with a 100 second cap |
 | [0009](0009-litellm-three-tiers.md) | LiteLLM with cheap, mid and strong tiers |
 | [0010](0010-understatement-reuses-inflation-concern.md) | Understatement is reported under frequency or severity inflation |
 | [0011](0011-role-optional-never-guessed.md) | Role is optional and never guessed |

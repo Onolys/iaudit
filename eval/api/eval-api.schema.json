@@ -1,0 +1,1850 @@
+{
+  "$defs": {
+    "BackendHealth": {
+      "additionalProperties": false,
+      "properties": {
+        "reachable": {
+          "title": "Reachable",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Schema Version"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url",
+        "reachable"
+      ],
+      "title": "BackendHealth",
+      "type": "object"
+    },
+    "Comparison": {
+      "$defs": {
+        "count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "delta": {
+          "additionalProperties": false,
+          "properties": {
+            "a": {
+              "$ref": "#/$defs/side"
+            },
+            "b": {
+              "$ref": "#/$defs/side"
+            },
+            "ci_status": {
+              "enum": [
+                "ok",
+                "few_clusters",
+                "undefined"
+              ]
+            },
+            "delta": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "delta_ci": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                }
+              ]
+            },
+            "level": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "metric": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "n_clusters": {
+              "$ref": "#/$defs/count"
+            },
+            "policy": {
+              "enum": [
+                "primary",
+                "secondary",
+                "none"
+              ]
+            },
+            "slice": {
+              "$ref": "#/$defs/slice"
+            }
+          },
+          "required": [
+            "metric",
+            "level",
+            "policy",
+            "slice",
+            "a",
+            "b",
+            "delta",
+            "delta_ci",
+            "ci_status",
+            "n_clusters"
+          ],
+          "type": "object"
+        },
+        "disagreement": {
+          "additionalProperties": false,
+          "properties": {
+            "cluster": {
+              "type": "string"
+            },
+            "item_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "pairs": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "a": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "b": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "gold": {
+                    "type": "string"
+                  },
+                  "level": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "unit": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "level",
+                  "unit",
+                  "gold",
+                  "a",
+                  "b"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          },
+          "required": [
+            "item_id",
+            "cluster",
+            "pairs"
+          ],
+          "type": "object"
+        },
+        "side": {
+          "additionalProperties": false,
+          "properties": {
+            "ci": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                }
+              ]
+            },
+            "n": {
+              "$ref": "#/$defs/count"
+            },
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "value",
+            "n",
+            "ci"
+          ],
+          "type": "object"
+        },
+        "slice": {
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          },
+          "type": "object"
+        }
+      },
+      "$id": "https://iaudit.local/schemas/compare.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "deltas": {
+          "items": {
+            "$ref": "#/$defs/delta"
+          },
+          "type": "array"
+        },
+        "disagreements": {
+          "items": {
+            "$ref": "#/$defs/disagreement"
+          },
+          "type": "array"
+        },
+        "n_a_only": {
+          "$ref": "#/$defs/count"
+        },
+        "n_b_only": {
+          "$ref": "#/$defs/count"
+        },
+        "n_clusters_shared": {
+          "$ref": "#/$defs/count"
+        },
+        "n_shared": {
+          "$ref": "#/$defs/count"
+        },
+        "run_a": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "run_b": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0.0"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "run_a",
+        "run_b",
+        "dataset",
+        "warnings",
+        "n_shared",
+        "n_a_only",
+        "n_b_only",
+        "n_clusters_shared",
+        "deltas",
+        "disagreements"
+      ],
+      "title": "iaudit eval run comparison (compare())",
+      "type": "object"
+    },
+    "DatasetMeta": {
+      "additionalProperties": true,
+      "properties": {
+        "cluster_key": {
+          "default": "",
+          "title": "Cluster Key",
+          "type": "string"
+        },
+        "data_required": {
+          "default": false,
+          "title": "Data Required",
+          "type": "boolean"
+        },
+        "dataset_version": {
+          "default": "",
+          "title": "Dataset Version",
+          "type": "string"
+        },
+        "default_split": {
+          "default": "",
+          "title": "Default Split",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "gold_kind": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gold Kind"
+        },
+        "kind": {
+          "default": "adapter",
+          "title": "Kind",
+          "type": "string"
+        },
+        "levels": {
+          "additionalProperties": true,
+          "title": "Levels",
+          "type": "object"
+        },
+        "license": {
+          "additionalProperties": true,
+          "title": "License",
+          "type": "object"
+        },
+        "mapping": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mapping"
+        },
+        "metrics": {
+          "anyOf": [
+            {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Metrics"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "pool_all": {
+          "default": true,
+          "title": "Pool All",
+          "type": "boolean"
+        },
+        "references": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "References"
+        },
+        "slices": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Slices",
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "splits": {
+          "items": {
+            "$ref": "#/$defs/SplitMeta"
+          },
+          "title": "Splits",
+          "type": "array"
+        },
+        "test_split_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Test Split Note"
+        },
+        "title": {
+          "default": "",
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "splits"
+      ],
+      "title": "DatasetMeta",
+      "type": "object"
+    },
+    "DatasetSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "data_present": {
+          "title": "Data Present",
+          "type": "boolean"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "splits": {
+          "items": {
+            "$ref": "#/$defs/SplitSummary"
+          },
+          "title": "Splits",
+          "type": "array"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "title",
+        "data_present",
+        "splits"
+      ],
+      "title": "DatasetSummary",
+      "type": "object"
+    },
+    "DownloadFile": {
+      "additionalProperties": false,
+      "properties": {
+        "fetched_at": {
+          "title": "Fetched At",
+          "type": "string"
+        },
+        "filename": {
+          "title": "Filename",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "sha256": {
+          "title": "Sha256",
+          "type": "string"
+        },
+        "size_bytes": {
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "filename",
+        "sha256",
+        "size_bytes",
+        "fetched_at"
+      ],
+      "title": "DownloadFile",
+      "type": "object"
+    },
+    "DownloadStatus": {
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        },
+        "files": {
+          "items": {
+            "$ref": "#/$defs/DownloadFile"
+          },
+          "title": "Files",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "not_downloaded",
+            "downloading",
+            "ready",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "updated_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Updated At"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "DownloadStatus",
+      "type": "object"
+    },
+    "Error": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "invalid_request",
+            "not_found",
+            "run_active",
+            "bad_state",
+            "data_missing",
+            "backend_unreachable",
+            "schema_mismatch",
+            "forbidden",
+            "internal_error"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "detail": {
+          "default": null,
+          "title": "Detail"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Error",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/Error"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "title": "ErrorResponse",
+      "type": "object"
+    },
+    "Estimate": {
+      "additionalProperties": false,
+      "description": "B2 Estimate, without field renames, invented figures, or extra fields.",
+      "properties": {
+        "basis": {
+          "enum": [
+            "prior_runs",
+            "none"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "est_cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Est Cost Usd"
+        },
+        "est_input_tokens": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Est Input Tokens"
+        },
+        "est_output_tokens": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Est Output Tokens"
+        },
+        "n_items": {
+          "minimum": 0,
+          "title": "N Items",
+          "type": "integer"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        },
+        "rough": {
+          "const": true,
+          "title": "Rough",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "basis",
+        "n_items",
+        "est_input_tokens",
+        "est_output_tokens",
+        "est_cost_usd",
+        "rough",
+        "note"
+      ],
+      "title": "Estimate",
+      "type": "object"
+    },
+    "EstimateRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "n": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "N"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "split": {
+          "minLength": 1,
+          "title": "Split",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset",
+        "split"
+      ],
+      "title": "EstimateRequest",
+      "type": "object"
+    },
+    "Health": {
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "$ref": "#/$defs/BackendHealth"
+        },
+        "eval_api_version": {
+          "title": "Eval Api Version",
+          "type": "string"
+        },
+        "status": {
+          "const": "ok",
+          "default": "ok",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "eval_api_version",
+        "backend"
+      ],
+      "title": "Health",
+      "type": "object"
+    },
+    "ItemDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "failure": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Failure"
+        },
+        "gold": {
+          "title": "Gold"
+        },
+        "gold_kind": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Gold Kind"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "request": {
+          "additionalProperties": true,
+          "title": "Request",
+          "type": "object"
+        },
+        "response": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Response"
+        },
+        "run_info": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Run Info"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "failed",
+            "unmapped"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "status",
+        "request",
+        "response",
+        "failure",
+        "run_info",
+        "gold",
+        "gold_kind"
+      ],
+      "title": "ItemDetail",
+      "type": "object"
+    },
+    "ItemPage": {
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/$defs/ItemRow"
+          },
+          "title": "Items",
+          "type": "array"
+        },
+        "total": {
+          "minimum": 0,
+          "title": "Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total",
+        "items"
+      ],
+      "title": "ItemPage",
+      "type": "object"
+    },
+    "ItemRow": {
+      "additionalProperties": false,
+      "description": "B3 row, widened only for pre-score gold=null per the HTTP contract.",
+      "properties": {
+        "detail": {
+          "additionalProperties": true,
+          "title": "Detail",
+          "type": "object"
+        },
+        "gold": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Gold"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "match": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Match"
+        },
+        "outcome": {
+          "title": "Outcome",
+          "type": "string"
+        },
+        "pred": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pred"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "failed",
+            "unmapped"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "status",
+        "gold",
+        "pred",
+        "match"
+      ],
+      "title": "ItemRow",
+      "type": "object"
+    },
+    "MetricsReport": {
+      "$defs": {
+        "count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "entry": {
+          "additionalProperties": false,
+          "properties": {
+            "ci": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "items": {
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                }
+              ]
+            },
+            "ci_status": {
+              "enum": [
+                "ok",
+                "few_clusters",
+                "undefined"
+              ]
+            },
+            "impl": {
+              "type": "string"
+            },
+            "level": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "metric": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "n": {
+              "$ref": "#/$defs/count"
+            },
+            "n_clusters": {
+              "$ref": "#/$defs/count"
+            },
+            "policy": {
+              "enum": [
+                "primary",
+                "secondary",
+                "none"
+              ]
+            },
+            "slice": {
+              "$ref": "#/$defs/slice"
+            },
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "metric",
+            "level",
+            "policy",
+            "slice",
+            "value",
+            "n",
+            "n_clusters",
+            "ci",
+            "ci_status"
+          ],
+          "type": "object"
+        },
+        "reference": {
+          "additionalProperties": false,
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "level": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "metric": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "note": {
+              "type": "string"
+            },
+            "slice": {
+              "$ref": "#/$defs/slice"
+            },
+            "source": {
+              "type": "string"
+            },
+            "value": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "source",
+            "label",
+            "metric",
+            "level",
+            "slice",
+            "value"
+          ],
+          "type": "object"
+        },
+        "slice": {
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          },
+          "type": "object"
+        }
+      },
+      "$id": "https://iaudit.local/schemas/metrics.schema.json",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
+        "bootstrap": {
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "exclusiveMaximum": 1,
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            "method": {
+              "type": "string"
+            },
+            "resamples": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "seed": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "method",
+            "resamples",
+            "seed",
+            "level"
+          ],
+          "type": "object"
+        },
+        "dataset": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "dataset_extra": {
+          "type": "object"
+        },
+        "dataset_version": {
+          "type": "string"
+        },
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/entry"
+          },
+          "type": "array"
+        },
+        "failures": {
+          "additionalProperties": false,
+          "properties": {
+            "by_reason": {
+              "additionalProperties": {
+                "$ref": "#/$defs/count"
+              },
+              "type": "object"
+            }
+          },
+          "required": [
+            "by_reason"
+          ],
+          "type": "object"
+        },
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "failed": {
+              "$ref": "#/$defs/count"
+            },
+            "not_run": {
+              "$ref": "#/$defs/count"
+            },
+            "scored": {
+              "$ref": "#/$defs/count"
+            },
+            "selected": {
+              "$ref": "#/$defs/count"
+            }
+          },
+          "required": [
+            "selected",
+            "scored",
+            "failed",
+            "not_run"
+          ],
+          "type": "object"
+        },
+        "primary_policy": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reference_caveats": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "references": {
+          "items": {
+            "$ref": "#/$defs/reference"
+          },
+          "type": "array"
+        },
+        "run": {
+          "additionalProperties": false,
+          "properties": {
+            "complete": {
+              "type": "boolean"
+            },
+            "mapping_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "state": {
+              "enum": [
+                "running",
+                "finished",
+                "aborted_cost",
+                "aborted",
+                "failed",
+                "interrupted"
+              ]
+            },
+            "tags": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "state",
+            "complete",
+            "mapping_version",
+            "tags"
+          ],
+          "type": "object"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0.0"
+        },
+        "scored": {
+          "additionalProperties": false,
+          "properties": {
+            "at": {
+              "type": "string"
+            },
+            "git_commit": {
+              "type": "string"
+            },
+            "git_dirty": {
+              "type": "boolean"
+            },
+            "metrics_version": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "at",
+            "metrics_version",
+            "git_commit",
+            "git_dirty"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "schema_version",
+        "run_id",
+        "dataset",
+        "dataset_version",
+        "primary_policy",
+        "scored",
+        "bootstrap",
+        "run",
+        "dataset_extra",
+        "reference_caveats",
+        "items",
+        "failures",
+        "entries",
+        "references"
+      ],
+      "title": "iaudit eval metrics report (metrics.json)",
+      "type": "object"
+    },
+    "Progress": {
+      "additionalProperties": false,
+      "properties": {
+        "cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Cost Usd"
+        },
+        "done": {
+          "minimum": 0,
+          "title": "Done",
+          "type": "integer"
+        },
+        "failures": {
+          "minimum": 0,
+          "title": "Failures",
+          "type": "integer"
+        },
+        "total": {
+          "minimum": 0,
+          "title": "Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "done",
+        "total",
+        "failures",
+        "cost_usd"
+      ],
+      "title": "Progress",
+      "type": "object"
+    },
+    "RunCreated": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id"
+      ],
+      "title": "RunCreated",
+      "type": "object"
+    },
+    "RunDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "dataset": {
+          "title": "Dataset",
+          "type": "string"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finished At"
+        },
+        "git_dirty": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Git Dirty"
+        },
+        "n_items": {
+          "minimum": 0,
+          "title": "N Items",
+          "type": "integer"
+        },
+        "n_requested": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "N Requested"
+        },
+        "progress": {
+          "$ref": "#/$defs/Progress"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "run_info": {
+          "$ref": "#/$defs/RunInfo"
+        },
+        "schema_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Schema Version"
+        },
+        "score_state": {
+          "enum": [
+            "pending",
+            "running",
+            "done",
+            "failed"
+          ],
+          "title": "Score State",
+          "type": "string"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Seed"
+        },
+        "split": {
+          "title": "Split",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "running",
+            "finished",
+            "aborted",
+            "aborted_cost",
+            "interrupted",
+            "failed"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "totals": {
+          "$ref": "#/$defs/RunTotals"
+        }
+      },
+      "required": [
+        "run_id",
+        "dataset",
+        "split",
+        "n_requested",
+        "n_items",
+        "seed",
+        "created_at",
+        "schema_version",
+        "state",
+        "score_state",
+        "totals",
+        "git_dirty",
+        "progress",
+        "run_info"
+      ],
+      "title": "RunDetail",
+      "type": "object"
+    },
+    "RunInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "concurrency": {
+          "minimum": 1,
+          "title": "Concurrency",
+          "type": "integer"
+        },
+        "fingerprint": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fingerprint"
+        },
+        "git_commit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Git Commit"
+        },
+        "git_dirty": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Git Dirty"
+        },
+        "mapping_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mapping Version"
+        },
+        "max_cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Cost Usd"
+        },
+        "mixed": {
+          "default": false,
+          "title": "Mixed",
+          "type": "boolean"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "tags": {
+          "additionalProperties": true,
+          "title": "Tags",
+          "type": "object"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "concurrency"
+      ],
+      "title": "RunInfo",
+      "type": "object"
+    },
+    "RunRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$",
+          "title": "Dataset",
+          "type": "string"
+        },
+        "max_cost_usd": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Cost Usd"
+        },
+        "n": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "N"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "split": {
+          "minLength": 1,
+          "title": "Split",
+          "type": "string"
+        },
+        "tags": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tags"
+        }
+      },
+      "required": [
+        "dataset",
+        "split"
+      ],
+      "title": "RunRequest",
+      "type": "object"
+    },
+    "RunSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "dataset": {
+          "title": "Dataset",
+          "type": "string"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finished At"
+        },
+        "git_dirty": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Git Dirty"
+        },
+        "n_items": {
+          "minimum": 0,
+          "title": "N Items",
+          "type": "integer"
+        },
+        "n_requested": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "N Requested"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Schema Version"
+        },
+        "score_state": {
+          "enum": [
+            "pending",
+            "running",
+            "done",
+            "failed"
+          ],
+          "title": "Score State",
+          "type": "string"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Seed"
+        },
+        "split": {
+          "title": "Split",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "running",
+            "finished",
+            "aborted",
+            "aborted_cost",
+            "interrupted",
+            "failed"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "totals": {
+          "$ref": "#/$defs/RunTotals"
+        }
+      },
+      "required": [
+        "run_id",
+        "dataset",
+        "split",
+        "n_requested",
+        "n_items",
+        "seed",
+        "created_at",
+        "schema_version",
+        "state",
+        "score_state",
+        "totals",
+        "git_dirty"
+      ],
+      "title": "RunSummary",
+      "type": "object"
+    },
+    "RunTotals": {
+      "additionalProperties": false,
+      "properties": {
+        "cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Cost Usd"
+        },
+        "failures": {
+          "minimum": 0,
+          "title": "Failures",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "cost_usd",
+        "failures"
+      ],
+      "title": "RunTotals",
+      "type": "object"
+    },
+    "SplitMeta": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Size"
+        }
+      },
+      "required": [
+        "name",
+        "size"
+      ],
+      "title": "SplitMeta",
+      "type": "object"
+    },
+    "SplitSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Size"
+        }
+      },
+      "required": [
+        "name",
+        "size"
+      ],
+      "title": "SplitSummary",
+      "type": "object"
+    }
+  },
+  "$id": "https://iaudit.local/schemas/eval-api.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "iaudit eval HTTP API",
+  "x-errors": {
+    "403": "ErrorResponse",
+    "404": "ErrorResponse",
+    "409": "ErrorResponse",
+    "422": "ErrorResponse",
+    "500": "ErrorResponse",
+    "502": "ErrorResponse"
+  },
+  "x-requests": {
+    "POST /runs": "RunRequest",
+    "POST /runs/estimate": "EstimateRequest"
+  },
+  "x-routes": {
+    "GET /compare": "Comparison",
+    "GET /datasets": "DatasetSummary[]",
+    "GET /datasets/{name}": "DatasetMeta",
+    "GET /datasets/{name}/download": "DownloadStatus",
+    "GET /health": "Health",
+    "GET /runs": "RunSummary[]",
+    "GET /runs/{id}": "RunDetail",
+    "GET /runs/{id}/items": "ItemPage",
+    "GET /runs/{id}/items/{item_id}": "ItemDetail",
+    "GET /runs/{id}/metrics": "MetricsReport",
+    "POST /datasets/{name}/download": "DownloadStatus",
+    "POST /runs": "RunCreated",
+    "POST /runs/estimate": "Estimate",
+    "POST /runs/{id}/abort": "RunSummary",
+    "POST /runs/{id}/rescore": "RunSummary",
+    "POST /runs/{id}/resume": "RunSummary"
+  }
+}

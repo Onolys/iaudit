@@ -1,0 +1,21 @@
+{
+  "name": "synthetic",
+  "title": "Synthetic (fictional)",
+  "description": "Small fictional dataset for zero-spend tests. All people, speaker ids, statements and timestamps are invented; none is a real quotation or a real person. Gold is one label per item: 'flagged' when the summary holds a claim the conversation does not support, else 'clean'.",
+  "dataset_version": "1",
+  "kind": "adapter",
+  "splits": [
+    {"name": "dev", "description": "Two documents: a garden-club meeting and a physiotherapy follow-up."},
+    {"name": "test", "description": "One document: a sleep check-in."}
+  ],
+  "default_split": "dev",
+  "cluster_key": "source conversation",
+  "license": {"name": "CC0-1.0", "redistributable": true, "contains_licensed_text": false},
+  "data_required": false,
+  "sources": [],
+  "slices": ["topic"],
+  "levels": {
+    "item": {"labels": ["clean", "flagged"], "positive": "flagged"},
+    "section": {"labels": [false, true], "positive": true}
+  }
+}
