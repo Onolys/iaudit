@@ -6,6 +6,7 @@
   "adapter_version": "1.0.0",
   "kind": "adapter",
   "item_unit": "summary",
+  "gold_kind": "tofueval_summary_sentences",
   "splits": [
     {"name": "dev", "description": "Summaries from the 70 development source documents."},
     {"name": "test", "description": "Summaries from the 30 held-out source documents."}
