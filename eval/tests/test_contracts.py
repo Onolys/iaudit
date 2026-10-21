@@ -1,3 +1,4 @@
+import ast
 import json
 from pathlib import Path
 
@@ -76,3 +77,64 @@ def test_no_schema_copy_under_eval():
         p for p in eval_dir.rglob("*.schema.json") if ".venv" not in p.parts and p.name not in own
     ]
     assert found == []
+
+
+def _py_files(*rel):
+    eval_dir = Path(__file__).resolve().parents[1]
+    for r in rel:
+        for p in (eval_dir / r).rglob("*.py"):
+            if ".venv" not in p.parts and "__pycache__" not in p.parts:
+                yield p
+
+
+def _backend_imports(path):
+    found = []
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Import):
+            found += [a.name for a in node.names if a.name.split(".")[0] == "iaudit_backend"]
+        elif isinstance(node, ast.ImportFrom):
+            if node.level == 0 and (node.module or "").split(".")[0] == "iaudit_backend":
+                found.append(node.module)
+    return found
+
+
+def test_no_backend_import_in_eval():
+    files = list(_py_files("src", "datasets", "tests"))
+    assert files
+    bad = {str(p): _backend_imports(p) for p in files if _backend_imports(p)}
+    assert bad == {}
+
+
+def test_backend_import_detector_catches_violation(tmp_path):
+    f = tmp_path / "x.py"
+    f.write_text("import iaudit_backend.config\nfrom iaudit_backend import app\n")
+    assert _backend_imports(f) == ["iaudit_backend.config", "iaudit_backend"]
+
+
+def _audit_contract_copies(eval_dir):
+    shared = [
+        json.loads(p.read_text(encoding="utf-8"))
+        for p in contracts_dir().glob("*.schema.json")
+    ]
+    found = []
+    for path in eval_dir.rglob("*.json"):
+        if ".venv" in path.parts:
+            continue
+        try:
+            candidate = json.loads(path.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeError):
+            continue
+        if candidate in shared:
+            found.append(path)
+    return found
+
+
+def test_no_audit_contract_content_copied_under_eval():
+    assert _audit_contract_copies(Path(__file__).resolve().parents[1]) == []
+
+
+def test_schema_copy_detector_catches_renamed_contract(tmp_path):
+    copied = tmp_path / "renamed.json"
+    shared = contracts_dir() / "audit-request.schema.json"
+    copied.write_text(shared.read_text(encoding="utf-8"), encoding="utf-8")
+    assert _audit_contract_copies(tmp_path) == [copied]
