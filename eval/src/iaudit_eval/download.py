@@ -30,6 +30,9 @@ STATUS_FILE = "download.json"
 STATUSES = ("not_downloaded", "downloading", "ready", "failed")
 _SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,254}$")
 _CHUNK = 1 << 16
+MAX_DOWNLOAD_BYTES = 2 << 30  # cap when a source declares no size_bytes
+# Records whose bytes embed a fetch timestamp; never compared for upstream drift.
+_DRIFT_EXEMPT_IDS = frozenset({"manifest"})
 
 Progress = Callable[[str, int, int | None], None]  # (filename, bytes_done, total or None)
 
@@ -182,8 +185,8 @@ def _validate_source(s: dict) -> None:
         raise ValueError(f"unsafe source filename for source {s.get('id')!r}")
     if not isinstance(s.get("id"), str) or not s["id"]:
         raise ValueError("source missing id")
-    if not str(s.get("url", "")).startswith(("https://", "http://")):
-        raise ValueError(f"source {s['id']!r}: url must be http(s)")
+    if not str(s.get("url", "")).startswith("https://"):
+        raise ValueError(f"source {s['id']!r}: url must be https")
 
 
 def _check_pins(sources, records) -> None:
@@ -198,22 +201,46 @@ def _check_pins(sources, records) -> None:
             raise ValueError(f"size mismatch for {s['filename']!r}")
 
 
+def _require_https_redirect(response: httpx.Response) -> None:
+    if response.is_redirect:
+        target = response.url.join(response.headers.get("location", ""))
+        if target.scheme != "https":
+            raise ValueError(f"refusing redirect to non-https URL (scheme {target.scheme!r})")
+
+
+def https_client(
+    transport: httpx.BaseTransport | None = None, timeout: float = 60.0
+) -> httpx.Client:
+    """Client that follows redirects but only while they stay on https."""
+    return httpx.Client(
+        transport=transport,
+        follow_redirects=True,
+        timeout=httpx.Timeout(timeout),
+        event_hooks={"response": [_require_https_redirect]},
+    )
+
+
 def _fetch(client, s, d: Path, progress) -> FileRecord:
     final = d / s["filename"]
     part = d / (s["filename"] + ".part")
     h = hashlib.sha256()
     n = 0
+    limit = int(s["size_bytes"]) if s.get("size_bytes") is not None else MAX_DOWNLOAD_BYTES
     try:
         with client.stream("GET", s["url"]) as resp:
             resp.raise_for_status()
             total = resp.headers.get("content-length")
             total = int(total) if total and total.isdigit() else None
+            if total is not None and total > limit:
+                raise ValueError(f"{s['filename']!r} exceeds the {limit}-byte limit")
             fd = os.open(part, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, paths.FILE_MODE)
             with os.fdopen(fd, "wb") as f:
                 for chunk in resp.iter_bytes(_CHUNK):
                     f.write(chunk)
                     h.update(chunk)
                     n += len(chunk)
+                    if n > limit:
+                        raise ValueError(f"{s['filename']!r} exceeds the {limit}-byte limit")
                     if progress:
                         progress(s["filename"], n, total)
                 f.flush()
@@ -241,7 +268,7 @@ def download(
         log_event("download_noop", dataset=name, status="ready")
         return prior
     d = paths.ensure_private_dir(dataset_dir(dataset, data_root))
-    _write_status(dataset, data_root, "downloading")
+    _write_status(dataset, data_root, "downloading", prior.get("files", ()))
     log_event("download_start", dataset=name, status="downloading")
     stage = backup = None
     try:
@@ -261,16 +288,14 @@ def download(
             _check_pins(sources, records)
         else:
             records = []
-            with httpx.Client(
-                transport=transport, follow_redirects=True, timeout=httpx.Timeout(60.0)
-            ) as client:
+            with https_client(transport) as client:
                 for s in sources:
                     records.append(_fetch(client, s, d, progress))
         old = {r.get("id"): r.get("sha256") for r in prior.get("files", [])}
         warnings = [
             f"downloaded file {r.filename!r} changed upstream since first recorded"
             for r in records
-            if old.get(r.id) and old[r.id] != r.sha256
+            if r.id not in _DRIFT_EXEMPT_IDS and old.get(r.id) and old[r.id] != r.sha256
         ]
         post = getattr(dataset.adapter, "post_download", None)
         if callable(post):
@@ -288,7 +313,7 @@ def download(
                 shutil.rmtree(d)
             os.replace(backup, d)
         err = f"{type(exc).__name__}: {str(exc)[:200]}"
-        doc = _write_status(dataset, data_root, "failed", error=err)
+        doc = _write_status(dataset, data_root, "failed", prior.get("files", ()), error=err)
         log_event("download_failed", dataset=name, status="failed", exc_class=type(exc).__name__)
         return doc
     finally:
