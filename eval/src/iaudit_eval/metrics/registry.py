@@ -139,3 +139,6 @@ def resolve(name: str, dataset: Any, root: Path | None = None) -> Resolved:
     if name in _CORE:
         return Resolved(_CORE[name], "core")
     raise KeyError(f"unknown metric {name!r} (core: {sorted(_CORE)})")
+
+
+from . import builtins as _builtins  # noqa: E402,F401  (registers the built-in metrics)
