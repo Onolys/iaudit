@@ -14,6 +14,12 @@ The original PRDs and task lists remain the implementation contracts. Task track
 
 Owner steps remain deferred: real dataset downloads, live LLM/provider calls, live smoke runs, and real-browser checks. Agent verification uses fictional fixtures and offline tests.
 
+## Execution progress
+
+- C1 data and items: complete; all eight source tasks done.
+- C2 projection and metrics: tasks 1 (frozen mapping) and 2 (gold labels) in-progress independently in separate worktrees.
+- Project D: implementation pending.
+
 ## Run artifacts
 
 - [Task evidence log](code-2026-10-21.md) — implementation commits, files, verification, and execution notes.

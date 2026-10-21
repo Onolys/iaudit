@@ -9,8 +9,8 @@ Source of truth: [PRD.md](PRD.md). Pure, deterministic Python over saved runs th
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Frozen mapping.json, loader and sha pin | none | todo |
-| 2 | Gold labels | none | todo |
+| 1 | Frozen mapping.json, loader and sha pin | none | in-progress |
+| 2 | Gold labels | none | in-progress |
 | 3 | Claim-to-sentence projection | 1 | todo |
 | 4 | Pairs emission and unresolved policy inputs | 2, 3 | todo |
 | 5 | Metric registrations, slices and metadata | 4 | todo |
