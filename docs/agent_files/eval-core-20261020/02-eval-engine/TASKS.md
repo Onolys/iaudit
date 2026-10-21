@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Twelve tasks building the root eval/ library (paths, contracts, dataset plug-in, synthetic data, run store, client, engine with resume and cost cap, download) tested offline on a fake backend, plus the ADR 0008 fix.
 date: 2026-10-20
 ---

@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Ten tasks for the pair/metric registry, failure policy, built-ins, clustered bootstrap, metrics and compare schemas, idempotent scoring, engine hook and run-vs-run compare.
 date: 2026-10-20
 ---
