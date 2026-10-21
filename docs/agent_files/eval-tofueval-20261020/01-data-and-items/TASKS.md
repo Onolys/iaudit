@@ -11,8 +11,8 @@ Source of truth: [PRD.md](PRD.md). Builds the TofuEval download, 1,777 summary i
 |---|---|---|---|
 | 1 | Dataset `metadata.json` | none | done |
 | 2 | Fictional test fixtures | none | done |
-| 3 | Assessment builder with offset map | 2 | in-progress |
-| 4 | Items: grouping, ids, sentence fields | 1, 2, 3 | todo |
+| 3 | Assessment builder with offset map | 2 | done |
+| 4 | Items: grouping, ids, sentence fields | 1, 2, 3 | in-progress |
 | 5 | Transcript to turns | 2 | todo |
 | 6 | Download hook, manifest, derived cache | 1, 2 | todo |
 | 7 | Adapter assembly and request validation | 4, 5, 6 | todo |
