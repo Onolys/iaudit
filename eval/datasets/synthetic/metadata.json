@@ -15,6 +15,7 @@
   "sources": [],
   "slices": ["topic"],
   "levels": {
-    "item": {"labels": ["clean", "flagged"], "positive": "flagged"}
+    "item": {"labels": ["clean", "flagged"], "positive": "flagged"},
+    "section": {"labels": [false, true], "positive": true}
   }
 }

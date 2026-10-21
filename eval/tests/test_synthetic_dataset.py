@@ -28,7 +28,7 @@ def test_metadata():
     assert "fictional" in m.description.lower()
     assert m.dataset_version and m.cluster_key
     assert m.slices == ("topic",)
-    assert set(m.levels) == {"item"}
+    assert set(m.levels) == {"item", "section"}
     assert m.levels["item"]["positive"] in m.levels["item"]["labels"]
 
 

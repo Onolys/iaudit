@@ -7,6 +7,7 @@ project() maps an AuditResponse onto the same labels.
 from __future__ import annotations
 
 from iaudit_eval.datasets import Item, Unmapped
+from iaudit_eval.metrics.pair import Pair, default_pairs
 
 _SCHEMA_VERSION = "1.1.0"
 _FLAGGING = {"contradicted", "partially_supported", "insufficient_evidence"}
@@ -119,6 +120,19 @@ class SyntheticAdapter:
                 raise Unmapped("unrecognised claim verdict")
             verdicts.append(v)
         return "flagged" if any(v in _FLAGGING for v in verdicts) else "clean"
+
+    def pairs(self, item: Item, gold, pred, failure) -> list[Pair]:
+        """Two levels: the item label, and a boolean per assessment section (unit "s0").
+
+        The synthetic assessment has one section, so the section pair restates the item label
+        as flagged True/False; it exists to exercise the multi-level scoring path.
+        """
+        out = default_pairs(item, gold, pred, failure)
+        out.append(
+            Pair(item.id, item.doc_id, "section", "s0", gold == "flagged",
+                 None if pred is None else pred == "flagged", failure, item.meta)
+        )  # fmt: skip
+        return out
 
 
 def create(data_dir):
