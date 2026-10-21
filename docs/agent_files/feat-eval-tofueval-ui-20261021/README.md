@@ -17,7 +17,7 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 ## Execution progress
 
 - C1 data and items: complete; all eight source tasks done.
-- C2 projection and metrics: tasks 1–4 and 8 done; tasks 5 (metrics and slices) and 6 (item rows) in-progress independently in separate worktrees.
+- C2 projection and metrics: tasks 1–6 and 8 done; task 7 (integrity and adapter wiring) in-progress.
 - Project D: implementation pending.
 
 ## Run artifacts
@@ -25,3 +25,5 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 - [Task evidence log](code-2026-10-21.md) — implementation commits, files, verification, and execution notes.
 
 - [Paper-reference task evidence](../feat-eval-tofueval-references-20261021-1430/README.md) — preserved auxiliary branch execution artifacts.
+
+- [Item-row task evidence](../feat-eval-tofueval-item-rows-20261021-1500/README.md) — preserved auxiliary branch execution artifacts.

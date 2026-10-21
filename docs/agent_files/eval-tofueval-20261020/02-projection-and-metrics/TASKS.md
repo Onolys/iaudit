@@ -13,9 +13,9 @@ Source of truth: [PRD.md](PRD.md). Pure, deterministic Python over saved runs th
 | 2 | Gold labels | none | done |
 | 3 | Claim-to-sentence projection | 1 | done |
 | 4 | Pairs emission and unresolved policy inputs | 2, 3 | done |
-| 5 | Metric registrations, slices and metadata | 4 | in-progress |
-| 6 | Per-item rows | 4 | in-progress |
-| 7 | Integrity block and adapter wiring | 1, 5, 6 | todo |
+| 5 | Metric registrations, slices and metadata | 4 | done |
+| 6 | Per-item rows | 4 | done |
+| 7 | Integrity block and adapter wiring | 1, 5, 6 | in-progress |
 | 8 | Paper reference rows | none | done |
 | 9 | Worked-example end-to-end test and import hygiene | 7, 8 | todo |
 
