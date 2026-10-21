@@ -12,7 +12,7 @@ Source of truth: [PRD.md](PRD.md). A localhost FastAPI server over B2/B3 with a 
 | 1 | Server skeleton: app factory, error body, guards, safe logging | none | todo |
 | 2 | Response models and schema export with staleness test | 1 | done |
 | 3 | Health, datasets and download routes | 1, 2 | done |
-| 4 | RunManager and run control routes | 2, 3 | todo |
+| 4 | RunManager and run control routes | 2, 3 | done |
 | 5 | Run read routes: list, detail, metrics, items, compare | 4 | todo |
 | 6 | Cross-cutting offline API tests | 3, 4, 5 | todo |
 | 7 | `scripts/dev.sh` with `--check` and scripts README | 1 | todo |

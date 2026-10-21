@@ -12,7 +12,7 @@ from fastapi import FastAPI, Request
 from iaudit_eval import paths
 from iaudit_eval.client import AuditClient
 from iaudit_eval.log import log_event
-from iaudit_eval.server import routes_datasets, routes_health
+from iaudit_eval.server import routes_datasets, routes_health, routes_run_control
 from iaudit_eval.server.guards import (
     FORBIDDEN_MESSAGE,
     INTERNAL_MESSAGE,
@@ -38,6 +38,9 @@ def create_app(
     async def lifespan(app: FastAPI):
         owned = backend_client is None
         app.state.backend_client = AuditClient(settings.backend_url) if owned else backend_client
+        await app.state.manager.startup(
+            app.state.backend_client, backend_url=settings.backend_url, injected=not owned,
+        )
         try:
             yield
         finally:
@@ -59,6 +62,7 @@ def create_app(
     register_error_handlers(app)
     app.include_router(routes_health.router)
     app.include_router(routes_datasets.router)
+    app.include_router(routes_run_control.router)
 
     # No CORS middleware. Added first = inner; the logging middleware below wraps it.
     @app.middleware("http")
