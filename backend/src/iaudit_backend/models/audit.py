@@ -76,7 +76,7 @@ class Section(_Model):
 
 
 class AuditRequest(_Model):
-    schema_version: Literal["1.1.0"]
+    schema_version: Literal["1.2.0"]
     request_id: str | None = None
     transcript: list[Turn]
     assessment: list[Section]
@@ -134,7 +134,7 @@ class RunInfo(_Model):
 
 
 class AuditResponse(_Model):
-    schema_version: Literal["1.1.0"] = "1.1.0"
+    schema_version: Literal["1.2.0"] = "1.2.0"
     request_id: str | None = None
     status: Status
     warnings: list[Warning]

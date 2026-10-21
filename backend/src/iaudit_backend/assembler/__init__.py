@@ -89,7 +89,7 @@ def assemble(request: AuditRequest, internal: InternalAudit, cfg: Settings) -> A
     warnings = section_warnings + claim_warnings + aggregates
 
     response: dict = {
-        "schema_version": "1.1.0",
+        "schema_version": "1.2.0",
         "status": (
             "partial" if any(x["code"] == "section_not_processed" for x in warnings) else "complete"
         ),

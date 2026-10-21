@@ -1,4 +1,4 @@
-"""Contract 1.1.0 schema rules, loaded directly (independent of backend version constant)."""
+"""Contract 1.2.0 schema rules, loaded directly (independent of backend version constant)."""
 
 import copy
 import json
@@ -36,7 +36,7 @@ def test_every_example_validates(path):
 
 @pytest.mark.parametrize("name", ["audit-request", "audit-response", "error-response"])
 def test_schema_version_is_1_1_0(name):
-    assert _schema(name)["properties"]["schema_version"]["const"] == "1.1.0"
+    assert _schema(name)["properties"]["schema_version"]["const"] == "1.2.0"
 
 
 def test_response_example_carries_run_info_and_partial_omits_it():

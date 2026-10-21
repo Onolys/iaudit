@@ -9,7 +9,7 @@ from __future__ import annotations
 from iaudit_eval.datasets import Item, Unmapped
 from iaudit_eval.metrics.pair import Pair, default_pairs
 
-_SCHEMA_VERSION = "1.1.0"
+_SCHEMA_VERSION = "1.2.0"
 _FLAGGING = {"contradicted", "partially_supported", "insufficient_evidence"}
 _NEUTRAL = {"supported", "out_of_scope"}
 

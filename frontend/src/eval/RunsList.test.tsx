@@ -20,7 +20,7 @@ it("renders every column, nullable values and the cost-cap label", async () => {
   setup(); await screen.findByText("aborted: cost cap");
   for (const name of ["Select","Date","Dataset","Split","N","Schema","State","Cost","Failures"]) expect(screen.getByRole("columnheader",{name})).toBeTruthy();
   const row=screen.getByRole("checkbox",{name:"Select fictional-aborted"}).closest("tr")!;
-  expect(within(row).getByText("fixture-created")).toBeTruthy(); expect(within(row).getByText("1.1.0")).toBeTruthy();
+  expect(within(row).getByText("fixture-created")).toBeTruthy(); expect(within(row).getByText("1.2.0")).toBeTruthy();
   expect(within(row).getByText("—")).toBeTruthy(); expect(within(row).getByText("3")).toBeTruthy();
 });
 it("implements the complete resume matrix and attaches the returned run", async () => {

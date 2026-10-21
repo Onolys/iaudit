@@ -44,11 +44,11 @@ describe("validateResponse", () => {
     bad.schema_version = "1.0.0";
     expect(validateResponse(bad, req())).toEqual({ ok: false, error: { kind: "wrong_version" } });
   });
-  it("accepts a 1.1.0 response with run_info", () => {
+  it("accepts a 1.2.0 response with run_info", () => {
     expect(res().run_info).toBeDefined();
     expect(validateResponse(res(), req()).ok).toBe(true);
   });
-  it("accepts a 1.1.0 response without run_info", () => {
+  it("accepts a 1.2.0 response without run_info", () => {
     const ok = res();
     delete ok.run_info;
     expect(validateResponse(ok, req()).ok).toBe(true);

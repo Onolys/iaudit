@@ -121,9 +121,9 @@ describe("shared eval error presentation", () => {
   });
   it("renders API message and structured detail as plain text", () => {
     const message = '<img src=x onerror="alert(1)">';
-    const { container } = render(<EvalErrorMessage error={{ kind: "api", status: 409, code: "schema_mismatch", message, detail: { expected: "1.1.0", actual: "1.0.0", note: "<script>oops</script>" } }} />);
+    const { container } = render(<EvalErrorMessage error={{ kind: "api", status: 409, code: "schema_mismatch", message, detail: { expected: "1.2.0", actual: "1.0.0", note: "<script>oops</script>" } }} />);
     expect(screen.getByText(message)).toBeTruthy();
-    expect(container.textContent).toContain('"expected": "1.1.0"');
+    expect(container.textContent).toContain('"expected": "1.2.0"');
     expect(container.querySelector("img, script")).toBeNull();
   });
 });

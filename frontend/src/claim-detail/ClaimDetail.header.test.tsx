@@ -64,9 +64,9 @@ describe("suggestion", () => {
 });
 
 describe("concerns", () => {
-  it("labels all 12 mission checks and falls back to the raw value", () => {
+  it("labels all 13 mission checks and falls back to the raw value", () => {
     expect(Object.keys(CONCERN_LABELS)).toEqual([...CONCERN_TYPES]);
-    expect(new Set(Object.values(CONCERN_LABELS)).size).toBe(12);
+    expect(new Set(Object.values(CONCERN_LABELS)).size).toBe(13);
     expect(concernLabel("something_new")).toBe("something_new");
   });
 

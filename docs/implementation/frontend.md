@@ -102,8 +102,8 @@ actual cross-dataset HTTP 422 remain inline API errors.
 ItemList, ItemDetail and CompareView abort old requests and ignore stale callbacks
 on identity changes/unmount. Styling is isolated in their component stylesheets and
 metrics/gold stylesheets. The review shell, panes, reducer and ClaimDetail remain
-unchanged. The current response pin is 1.1.0; 1.0.0 replay fails now, and A1's future
-1.2.0 pin will reject saved 1.1.0 responses without compatibility conversion.
+unchanged. The current response pin is 1.2.0; 1.0.0 replay fails now, and A1's future
+1.2.0 pin will reject saved 1.2.0 responses without compatibility conversion.
 
 See [Eval UI reference](../reference/eval-ui.md) and
 [frontend tests](../testing/frontend.md) for behavior and verification.
