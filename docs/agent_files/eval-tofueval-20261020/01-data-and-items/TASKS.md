@@ -13,8 +13,8 @@ Source of truth: [PRD.md](PRD.md). Builds the TofuEval download, 1,777 summary i
 | 2 | Fictional test fixtures | none | done |
 | 3 | Assessment builder with offset map | 2 | done |
 | 4 | Items: grouping, ids, sentence fields | 1, 2, 3 | done |
-| 5 | Transcript to turns | 2 | in-progress |
-| 6 | Download hook, manifest, derived cache | 1, 2 | todo |
+| 5 | Transcript to turns | 2 | done |
+| 6 | Download hook, manifest, derived cache | 1, 2 | in-progress |
 | 7 | Adapter assembly and request validation | 4, 5, 6 | todo |
 | 8 | Leakage guard extension | none | todo |
 
