@@ -1,7 +1,7 @@
 # Evaluation harness
 
 Run from `backend/`. Results are labelled split `poc-all`: a smoke check on data the authors have
-seen, not a generalization estimate. Reports are per bucket (mission check 1-12); there is no
+seen, not a generalization estimate. Reports are per bucket (mission check 1-13); there is no
 overall score.
 
 | Command | What it does |
