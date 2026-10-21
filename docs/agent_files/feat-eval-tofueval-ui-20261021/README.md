@@ -17,9 +17,11 @@ Owner steps remain deferred: real dataset downloads, live LLM/provider calls, li
 ## Execution progress
 
 - C1 data and items: complete; all eight source tasks done.
-- C2 projection and metrics: tasks 1 (frozen mapping) and 2 (gold labels) done; tasks 3 (projection) and 8 (paper references) in-progress independently in separate worktrees.
+- C2 projection and metrics: tasks 1–3 and 8 done; task 4 (pair emission) in-progress.
 - Project D: implementation pending.
 
 ## Run artifacts
 
 - [Task evidence log](code-2026-10-21.md) — implementation commits, files, verification, and execution notes.
+
+- [Paper-reference task evidence](../feat-eval-tofueval-references-20261021-1430/README.md) — preserved auxiliary branch execution artifacts.
