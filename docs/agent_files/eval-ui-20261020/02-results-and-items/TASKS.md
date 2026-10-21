@@ -9,7 +9,7 @@ Source of truth: docs/agent_files/eval-ui-20261020/02-results-and-items/PRD.md. 
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Shared-file edits: Header, ErrorScreen, response-check helper | none | todo |
+| 1 | Shared-file edits: Header, ErrorScreen, response-check helper | none | done |
 | 2 | buildLoadResult | 1 | todo |
 | 3 | Eval API wrappers and schema-validated fixtures | none | todo |
 | 4 | MetricsTable and RunInfoBlock | 3 | todo |
