@@ -259,3 +259,13 @@ def test_failed_load_does_not_publish_partial_duplicate_records(repo):
     with pytest.raises(ValueError, match="sent_label"):
         loader().load_items(repo, duplicate_records=duplicates)
     assert duplicates == []
+
+
+def test_unknown_gold_error_type_fails_at_load_naming_file_and_row(repo):
+    def mutate(rows):
+        rows[0]["type"] = "Fictional Bogus Type"
+
+    rewrite_rows(repo, mutate)
+    with pytest.raises(ValueError, match=r"Unknown gold error type 'Fictional Bogus Type'.*"
+                                         r"meetingbank_factual_eval_dev\.csv row 2"):
+        loader().load_items(repo)

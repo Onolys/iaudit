@@ -42,3 +42,30 @@ def test_tofueval_metadata_is_discoverable_without_local_data():
         # The framework validates even custom-hook sources as single safe filenames.
         assert "/" not in source["filename"]
         assert ".." not in source["filename"]
+
+
+def test_per_type_concern_not_in_mapping_metrics_cover_enum_minus_mapped():
+    import json
+
+    contract = json.loads(
+        (DATASETS.parents[1] / "docs/contracts/audit-response.schema.json").read_text()
+    )
+    enum = set(contract["$defs"]["Concern"]["properties"]["type"]["enum"])
+    mapping = json.loads((DATASETS / "tofueval/mapping.json").read_text())
+    mapped = set()
+    for rule in mapping["types"].values():
+        mapped.update(rule["allowed"] or ())
+        for values in rule.get("dataset_overrides", {}).values():
+            mapped.update(values)
+    meta = json.loads((DATASETS / "tofueval/metadata.json").read_text())
+    prefix = "concern_not_in_mapping:"
+    reported = {
+        m["params"]["key"].removeprefix(prefix)
+        for m in meta["metrics"]
+        if m.get("fn") == "concern_not_in_mapping" and "params" in m
+    }
+    assert reported == enum - mapped
+    assert all(
+        m["name"] == f"concern_not_in_mapping_{m['params']['key'].removeprefix(prefix)}"
+        for m in meta["metrics"] if m.get("fn") == "concern_not_in_mapping" and "params" in m
+    )
