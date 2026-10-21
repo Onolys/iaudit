@@ -14,9 +14,9 @@ Source of truth: [PRD.md](PRD.md). Builds the TofuEval download, 1,777 summary i
 | 3 | Assessment builder with offset map | 2 | done |
 | 4 | Items: grouping, ids, sentence fields | 1, 2, 3 | done |
 | 5 | Transcript to turns | 2 | done |
-| 6 | Download hook, manifest, derived cache | 1, 2 | in-progress |
-| 7 | Adapter assembly and request validation | 4, 5, 6 | todo |
-| 8 | Leakage guard extension | none | in-progress |
+| 6 | Download hook, manifest, derived cache | 1, 2 | done |
+| 7 | Adapter assembly and request validation | 4, 5, 6 | in-progress |
+| 8 | Leakage guard extension | none | done |
 
 ## Task 1 — Dataset metadata
 What it is / what it means: The declarative description B2's loader and B4's Download button read (Req 1, Decision 13).
