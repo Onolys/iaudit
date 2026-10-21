@@ -105,6 +105,10 @@ def concern_text(c: Concern, s: Slots) -> str:
             "The claim states a cause-and-effect link that the supplied interview does not "
             "establish."
         ),
+        t.quantity_mismatch: (
+            "The claim states an amount, count or value that may differ from the supplied "
+            "interview; a reviewer may wish to confirm the figure."
+        ),
     }
     return texts[c.type]
 

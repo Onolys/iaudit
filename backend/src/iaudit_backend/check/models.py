@@ -21,6 +21,7 @@ FlagType = Literal[
     "conflicting_accounts_flattened",
     "unsupported_causal_link",
     "element_gap",
+    "quantity_mismatch",
 ]
 StallReason = Literal["timeout", "unavailable", "bad_output"]
 

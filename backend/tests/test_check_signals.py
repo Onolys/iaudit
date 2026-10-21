@@ -122,3 +122,41 @@ def test_inference_judgment_below_floor_counts_as_failed():
 def test_inference_item_itself_is_not_a_judged_item():
     items, _ = run(claim("x"), inference_link(), {"items": [item("c0.1:e1"), item("c0.1:e2")]})
     assert [it.key for it in items] == ["c0.1:e1", "c0.1:e2"]
+
+
+def _qflag(keys=("c0.1:e1",)):
+    return {"type": "quantity_mismatch", "keys": list(keys), "conf": "high"}
+
+
+# PREP turn 3 gives figures ("three or four times"); turn 5 gives none.
+def test_quantity_flag_needs_a_number_in_claim_and_in_a_cited_turn():
+    out = {"items": [item()], "flags": [_qflag()]}
+    items, sig = run(claim("The team had 12 people."), link(ev(turn=3)), out)
+    assert [f.type for f in sig.flags] == ["quantity_mismatch"] and items[0].cited
+    assert "flags_suppressed" not in sig.counts
+    # claim without a number token: suppressed and counted
+    _, sig = run(claim("The team was large."), link(ev(turn=3)), out)
+    assert sig.flags == [] and sig.counts["flags_suppressed"] == 1
+    # cited turn without a number token: suppressed and counted
+    _, sig = run(claim("The team had 12 people."), link(ev(turn=5)), out)
+    assert sig.flags == [] and sig.counts["flags_suppressed"] == 1
+
+
+def test_quantity_flag_guard_reads_only_cited_items_turns():
+    lk = link(ev(n=1, turn=5), ev(n=2, turn=3))
+    out = {"items": [item("c0.1:e1"), item("c0.1:e2")], "flags": [_qflag(["c0.1:e1"])]}
+    _, sig = run(claim("The team had 12 people."), lk, out)
+    assert sig.flags == [] and sig.counts["flags_suppressed"] == 1
+    out["flags"] = [_qflag(["c0.1:e2"])]
+    _, sig = run(claim("The team had 12 people."), lk, out)
+    assert len(sig.flags) == 1
+
+
+def test_quantity_flag_is_subject_to_the_p1_floor():
+    from iaudit_backend.check.models import VerifierOutput
+    from iaudit_backend.check.verifier import apply_floors
+    from iaudit_backend.config import Settings
+
+    v = VerifierOutput.model_validate({"items": [item()], "flags": [{**_qflag(), "conf": "low"}]})
+    out, counts = apply_floors(v, Settings())
+    assert out.flags == [] and counts["flags_below_floor"] == 1
