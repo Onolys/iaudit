@@ -10,10 +10,10 @@ Source of truth: docs/agent_files/eval-ui-20261020/01-eval-shell-and-runs/PRD.md
 | # | Task | Depends on | Status |
 |---|---|---|---|
 | 1 | Proxy, config and schema alias | none | done |
-| 2 | Eval types and evalApi client | 1 | in-progress |
-| 3 | Fixtures and schema validation | 2 | todo |
+| 2 | Eval types and evalApi client | 1 | done |
+| 3 | Fixtures and schema validation | 2 | in-progress |
 | 4 | usePolling hook | none | done |
-| 5 | EvalApp shell and view slot | 2, 4 | todo |
+| 5 | EvalApp shell and view slot | 2, 4 | in-progress |
 | 6 | Audit / Eval toggle | 5 | todo |
 | 7 | RunPanel form and estimate | 3, 5 | todo |
 | 8 | RunPanel run lifecycle | 4, 7 | todo |
