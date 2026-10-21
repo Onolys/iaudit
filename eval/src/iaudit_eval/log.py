@@ -26,6 +26,8 @@ ALLOWED_FIELDS = frozenset(
         "exc_class",
         "dataset",
         "split",
+        "method",
+        "route",
     }
 )
 _BLOCKED_PARTS = ("text", "body", "transcript", "excerpt", "message", "payload", "response")
