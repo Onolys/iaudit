@@ -20,7 +20,7 @@ Phase: Project C complete offline with final review PASS; owner checks remain. P
 
 - C1 data and items: complete; all eight source tasks done.
 - C2 projection and metrics: complete; all nine source tasks done.
-- Project D: D1 tasks 1 (proxy/config) and 4 (`usePolling`) in-progress independently in separate worktrees; code review base `2cff97c`.
+- Project D: D1 tasks 1 (proxy/config) and 4 (`usePolling`) done; task 2 (types and API client) in-progress. Code review base `2cff97c`.
 
 ## Run artifacts
 
