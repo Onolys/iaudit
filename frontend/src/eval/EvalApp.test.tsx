@@ -8,7 +8,7 @@ import type { EvalError, Health } from "./evalTypes";
 import type { Result } from "../contract";
 
 const healthy = { eval_api_version: "1.0.0", backend: { url: "http://backend.invalid", reachable: true } };
-const fakeApi = (fetcher: typeof fetch = async () => Response.json(healthy)) => createEvalApi({ fetch: async (url, opts) => String(url).endsWith("/datasets") ? Response.json([]) : fetcher(url, opts) });
+const fakeApi = (fetcher: typeof fetch = async () => Response.json(healthy)) => createEvalApi({ fetch: async (url, opts) => (String(url).endsWith("/datasets") || String(url).endsWith("/runs")) ? Response.json([]) : fetcher(url, opts) });
 const deferred = <T,>() => {
   let resolve!: (value: T) => void;
   const promise = new Promise<T>(done => { resolve = done; });
@@ -27,7 +27,7 @@ describe("EvalApp", () => {
   it("uses the configured eval base for its default client's health request", async () => {
     vi.stubEnv("VITE_EVAL_API_BASE", "/custom-eval");
     vi.stubGlobal("fetch", (async (url: string | URL | Request) => {
-      if (url === "/custom-eval/datasets") return Response.json([]);
+      if (url === "/custom-eval/datasets" || url === "/custom-eval/runs") return Response.json([]);
       if (url !== "/custom-eval/health") throw new Error("unexpected URL");
       return Response.json(healthy);
     }) as typeof fetch);

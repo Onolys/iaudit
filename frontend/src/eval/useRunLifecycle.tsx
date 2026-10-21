@@ -9,10 +9,13 @@ interface Options {
   onRunsChanged?: () => void;
   onActiveRunChange?: (run: RunDetail | null) => void;
   onDownloaded: () => void;
+  attachment?: { runId: string };
+  onRunActiveChange?: (active: boolean) => void;
 }
 /** Owns all run/download requests; unmount cancels local work without aborting the server run. */
-export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownloaded }: Options) {
+export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownloaded, attachment, onRunActiveChange }: Options) {
   const [runId, setRunId] = useState<string | null>(null);
+  const [epoch, setEpoch] = useState(0);
   const [busy, setBusy] = useState(false);
   const [aborting, setAborting] = useState(false);
   const [error, setError] = useState<EvalError | null>(null);
@@ -25,9 +28,12 @@ export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownl
   const interaction = useRef(0);
   const callbacks = useRef({ onRunsChanged, onActiveRunChange, onDownloaded });
   callbacks.current = { onRunsChanged, onActiveRunChange, onDownloaded };
-  const pollRun = useCallback((signal: AbortSignal) => api.getRun(runId!, { signal }), [api, runId]);
-  const runPoll = usePolling(pollRun, { enabled: runId !== null, isTerminal: run => run.state !== "running" });
-  const run = runPoll.data?.run_id === runId ? runPoll.data : null;
+  const pollRun = useCallback(async (signal: AbortSignal) => {
+    const result = await api.getRun(runId!, { signal });
+    return result.ok ? { ok: true as const, value: { run: result.value, epoch } } : result;
+  }, [api, runId, epoch]);
+  const runPoll = usePolling(pollRun, { enabled: runId !== null, isTerminal: value => value.run.state !== "running" });
+  const run = runPoll.data?.epoch === epoch && runPoll.data.run.run_id === runId ? runPoll.data.run : null;
   const pollDownload = useCallback((signal: AbortSignal) => api.getDownload(download!.dataset, { signal }), [api, download]);
   const downloadPoll = usePolling(pollDownload, { enabled: download !== null, isTerminal: value => value.status === "ready" || value.status === "failed" });
 
@@ -43,6 +49,12 @@ export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownl
     });
     return () => { controller.abort(); requests.current.forEach(request => request.abort()); requests.current.clear(); };
   }, [api]);
+
+  useEffect(() => {
+    if (!attachment) return;
+    interaction.current++;
+    setError(null); setConflict(null); setRunId(attachment.runId); setEpoch(value => value + 1);
+  }, [attachment]);
 
   useEffect(() => {
     if (!run) return;
@@ -69,7 +81,7 @@ export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownl
     requests.current.delete(controller);
     if (controller.signal.aborted) return;
     setBusy(false);
-    if (result.ok) { setRunId(result.value.run_id); callbacks.current.onRunsChanged?.(); return; }
+    if (result.ok) { setRunId(result.value.run_id); setEpoch(value => value + 1); callbacks.current.onRunsChanged?.(); return; }
     if (result.error.kind === "api" && result.error.code === "data_missing") setMissingDataset(request.dataset);
     else if (result.error.kind === "api" && result.error.code === "run_active") {
       const detail = result.error.detail;
@@ -101,9 +113,10 @@ export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownl
   }
   const downloading = downloadStarting || (!!download && !downloadError);
   const active = !!runId && (!run || run.state === "running");
+  useEffect(() => { onRunActiveChange?.(active || busy); }, [active, busy, onRunActiveChange]);
   const display = <>
     {error && <EvalErrorMessage error={error} />}
-    {conflict && <div><p>Run {conflict} is already active</p><button type="button" onClick={() => { interaction.current++; setRunId(conflict); setConflict(null); }}>Attach to active run</button></div>}
+    {conflict && <div><p>Run {conflict} is already active</p><button type="button" onClick={() => { interaction.current++; setRunId(conflict); setEpoch(value => value + 1); setConflict(null); }}>Attach to active run</button></div>}
     {(runPoll.stale && active || downloadPoll.stale && downloading) && <ServerBanner lostContact />}
     {downloading && <p role="status">downloading…</p>}
     {downloadError && <div role="alert">{typeof downloadError === "string" ? <p>{downloadError}</p> : <EvalErrorMessage error={downloadError} />}</div>}

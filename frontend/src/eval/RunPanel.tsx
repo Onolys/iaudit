@@ -8,9 +8,10 @@ import { EvalErrorMessage } from "./ServerBanner";
 const datasetStorageKey = "iaudit.eval.dataset";
 const validN = (value: string) => value.trim() === "" || (/^\d+$/.test(value) && Number.isSafeInteger(Number(value)) && Number(value) >= 1);
 
-export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange }: {
+export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange, attachment, onRunActiveChange, blocked = false }: {
   api: EvalApi; onRun?: (request: RunRequest) => void;
   onRunsChanged?: () => void; onActiveRunChange?: (run: RunDetail | null) => void;
+  blocked?: boolean; attachment?: { runId: string }; onRunActiveChange?: (active: boolean) => void;
 }) {
   const [datasets, setDatasets] = useState<DatasetSummary[] | null>(null);
   const [dataset, setDataset] = useState("");
@@ -25,7 +26,7 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange }: {
   const [metaError, setMetaError] = useState<EvalError | null>(null);
   const [estimateError, setEstimateError] = useState<EvalError | null>(null);
   const [retry, setRetry] = useState(0);
-  const lifecycle = useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownloaded: () => setRetry(value => value + 1) });
+  const lifecycle = useRunLifecycle({ api, onRunsChanged, onActiveRunChange, attachment, onRunActiveChange, onDownloaded: () => setRetry(value => value + 1) });
   const needsDownload = lifecycle.missingDataset === dataset || datasets?.find(item => item.name === dataset)?.data_present === false;
   const nValid = validN(n);
   const capValid = cap.trim() === "" || (Number.isFinite(Number(cap)) && Number(cap) > 0);
@@ -90,7 +91,7 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange }: {
   }
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (!selectedMeta || !split || !nValid || !capValid) return;
+    if (blocked || !selectedMeta || !split || !nValid || !capValid) return;
     const request = { dataset, split, ...(n.trim() === "" ? {} : { n: Number(n) }), ...(cap.trim() === "" ? {} : { max_cost_usd: Number(cap) }) };
     onRun?.(request);
     void lifecycle.start(request);
@@ -125,7 +126,7 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange }: {
         <p id="eval-cap-help">Optional. Blank = no cap.</p>
         {!capValid && <p className="eval-error">Max cost must be greater than 0, or blank for no cap.</p>}
         {needsDownload || lifecycle.downloadError ? <button type="button" disabled={lifecycle.downloading || lifecycle.active} onClick={() => void lifecycle.startDownload(dataset)}>{lifecycle.downloadError ? "Retry download" : "Download data"}</button> :
-          <button type="submit" disabled={!selectedMeta || !split || !nValid || !capValid || lifecycle.busy || lifecycle.active || lifecycle.downloading}>{lifecycle.busy ? "Starting…" : "Run"}</button>}
+          <button type="submit" disabled={blocked || !selectedMeta || !split || !nValid || !capValid || lifecycle.busy || lifecycle.active || lifecycle.downloading}>{lifecycle.busy ? "Starting…" : "Run"}</button>}
       </form>}
   </section>;
 }
