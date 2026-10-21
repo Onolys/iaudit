@@ -7,6 +7,9 @@ import running from "./fixtures/run-running.json";
 import datasets from "./fixtures/datasets.json";
 import metadata from "./fixtures/dataset-detail.json";
 import estimate from "./fixtures/estimate-unknown.json";
+import comparison from "./fixtures/comparison.json";
+import metrics from "./fixtures/metrics.json";
+import items from "./fixtures/items.json";
 import type { RunDetail } from "./evalTypes";
 const tick=async(ms=0)=>{await act(async()=>{await vi.advanceTimersByTimeAsync(ms);});};
 beforeEach(()=>{localStorage.clear();vi.useFakeTimers();});
@@ -22,6 +25,9 @@ function setup() {
     if(path.endsWith("/datasets")) return Response.json(datasets);
     if(path.includes("/datasets/")) return Response.json(metadata);
     if(path.endsWith("/estimate")) return Response.json(estimate);
+    if(path.includes("/compare?")) return Response.json({...comparison,run_a:running.run_id,run_b:"other-aborted"});
+    if(path.endsWith("/metrics")) return Response.json(metrics);
+    if(path.includes("/items?")) return Response.json(items);
     if(path.endsWith("/resume") || path.endsWith("/runs") && opts?.method === "POST") {
       if (holdResume) await new Promise<void>(done=>{release=done;});
       run={...run,state:"running"};
@@ -57,19 +63,19 @@ it("disables Resume while a newly started run awaits its first poll",async()=>{
   const s=setup();await tick();s.hold();fireEvent.click(screen.getByRole("button",{name:"Run"}));await tick();
   for(const button of screen.getAllByRole("button",{name:"Resume"})) expect((button as HTMLButtonElement).disabled).toBe(true);
 });
-it("opens the run placeholder from a row",async()=>{
+it("opens run detail from a row",async()=>{
   setup();await tick();
   fireEvent.click(screen.getByRole("checkbox",{name:`Select ${running.run_id}`}).closest("tr")!);
-  expect(screen.getByRole("heading",{name:"Run detail — coming in D2"})).toBeTruthy();
+  await tick();expect(screen.getByRole("region",{name:"Run detail"})).toBeTruthy();
 });
 
-it("opens the compare placeholder with the two selected identifiers",async()=>{
+it("opens comparison with the two selected identifiers",async()=>{
   setup();await tick();
   fireEvent.click(screen.getByRole("checkbox",{name:`Select ${running.run_id}`}));
   fireEvent.click(screen.getByRole("checkbox",{name:"Select other-aborted"}));
   fireEvent.click(screen.getByRole("button",{name:"Compare selected (2)"}));
-  expect(screen.getByRole("heading",{name:"Compare — coming in D2"})).toBeTruthy();
-  expect(screen.getByText(`Runs: ${running.run_id} and other-aborted`)).toBeTruthy();
+  await tick();expect(screen.getByRole("heading",{name:"Compare runs"})).toBeTruthy();
+  expect(screen.getByText(`A: ${running.run_id}`)).toBeTruthy();expect(screen.getByText("B: other-aborted")).toBeTruthy();
 });
 it("restarts polling when the same run is resumed again after a terminal result",async()=>{
   const s=setup();await tick();

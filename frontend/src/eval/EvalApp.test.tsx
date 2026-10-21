@@ -6,6 +6,11 @@ import { ServerBanner, EvalErrorMessage } from "./ServerBanner";
 import { createEvalApi } from "./evalApi";
 import type { EvalError, Health } from "./evalTypes";
 import type { Result } from "../contract";
+import finished from "./fixtures/run-finished.json";
+import metrics from "./fixtures/metrics.json";
+import items from "./fixtures/items.json";
+import saved from "./fixtures/item-ok.json";
+import comparison from "./fixtures/comparison.json";
 
 const healthy = { eval_api_version: "1.0.0", backend: { url: "http://backend.invalid", reachable: true } };
 const fakeApi = (fetcher: typeof fetch = async () => Response.json(healthy)) => createEvalApi({ fetch: async (url, opts) => (String(url).endsWith("/datasets") || String(url).endsWith("/runs")) ? Response.json([]) : fetcher(url, opts) });
@@ -48,16 +53,25 @@ describe("EvalApp", () => {
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
     await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
   });
-  it.each<{ view: EvalView; heading: string; context: string[] }>([
-    { view: { view: "run", runId: "run-one" }, heading: "Run detail — coming in D2", context: ["Run: run-one"] },
-    { view: { view: "item", runId: "run-one", itemId: "item-two" }, heading: "Item detail — coming in D2", context: ["Run: run-one", "Item: item-two"] },
-    { view: { view: "compare", a: "run-one", b: "run-two" }, heading: "Compare — coming in D2", context: ["Runs: run-one and run-two"] },
-  ])("renders the $view.view slot with its selected identifiers", async ({ view, heading, context }) => {
-    render(<EvalApp api={fakeApi()} initialView={view} />);
-    expect(screen.getByRole("heading", { name: heading })).toBeTruthy();
-    for (const text of context) expect(screen.getByText(text)).toBeTruthy();
+  it.each<{ view: EvalView; back: string; context: string[] }>([
+    { view: { view: "run", runId: finished.run_id }, back: "Back to runs", context: ["fixture-created"] },
+    { view: { view: "item", runId: finished.run_id, itemId: saved.item_id, from: "run" }, back: "Back to run", context: [`${finished.run_id} - ${saved.item_id}`] },
+    { view: { view: "compare", a: comparison.run_a, b: comparison.run_b }, back: "Back", context: [`A: ${comparison.run_a}`, `B: ${comparison.run_b}`] },
+  ])("renders the real $view.view view with its selected identifiers", async ({ view, back, context }) => {
+    const api = createEvalApi({ fetch: async url => {
+      const path = String(url);
+      if (path.endsWith("/health")) return Response.json(healthy);
+      if (path.includes("/compare?")) return Response.json(comparison);
+      if (path.endsWith("/metrics")) return Response.json(metrics);
+      if (path.includes("/items?")) return Response.json(items);
+      if (path.includes("/items/")) return Response.json(saved);
+      return Response.json(finished);
+    } });
+    render(<EvalApp api={api} initialView={view} />);
+    for (const text of context) expect(await screen.findByText(text)).toBeTruthy();
+    expect(screen.getByRole("button", { name: back })).toBeTruthy();
     expect(screen.queryByRole("region", { name: "Run" })).toBeNull();
-    await waitFor(() => expect(screen.queryByRole("status")).toBeNull());
+    await waitFor(() => expect(screen.queryByText("Checking eval server…")).toBeNull());
   });
   it("aborts the health request on unmount", () => {
     let signal: AbortSignal | null | undefined;

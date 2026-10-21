@@ -18,7 +18,7 @@ Source of truth: docs/agent_files/eval-ui-20261020/02-results-and-items/PRD.md. 
 | 7 | GoldPanel and renderers | none | done |
 | 8 | FailedItem and ItemDetail | 1, 2, 3, 7 | done |
 | 9 | CompareView | 3 | done |
-| 10 | EvalApp view wiring and mock-flow test | 6, 8, 9 | todo |
+| 10 | EvalApp view wiring and mock-flow test | 6, 8, 9 | done |
 | 11 | Docs | 10 | todo |
 
 ## Task 1 — Shared-file edits: Header, ErrorScreen, response-check helper
