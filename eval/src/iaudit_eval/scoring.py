@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -98,12 +99,12 @@ def _slice_groups(pairs: list[Pair], slices: tuple[str, ...], pool_all: bool):
             yield {key: v}, vals[v]
 
 
-def _entries(dataset: Dataset, cfg, all_pairs: list[Pair], datasets_root: Path | None) -> list:
+def _groups(dataset: Dataset, cfg, all_pairs: list[Pair], datasets_root: Path | None):
+    """Yield (metric entry, resolved metric, level spec, slice, policy, policy-applied pairs)."""
     by_level: dict[str, list[Pair]] = {}
     for p in all_pairs:
         by_level.setdefault(p.level, []).append(p)
     defaulted = dataset.meta.metrics is None
-    out = []
     for me in cfg.metrics:
         spec = cfg.levels[me.level]
         if defaulted and (
@@ -114,33 +115,29 @@ def _entries(dataset: Dataset, cfg, all_pairs: list[Pair], datasets_root: Path |
             res = resolve(me.fn, dataset, datasets_root)
         except (KeyError, ValueError) as e:
             raise ScoringError(f"metric {me.name!r}: {e}") from e
-        m = res.metric
-        policies = ("none",) if m.policy == "none" else ("primary", "secondary")
+        policies = ("none",) if res.metric.policy == "none" else ("primary", "secondary")
         for sl, group in _slice_groups(by_level.get(me.level, []), cfg.slices, cfg.pool_all):
             for pol in policies:
-                subset = policy.apply(group, spec, pol)
-                stats = bootstrap.cluster_stats(m, subset, spec, **me.params)
-                c = bootstrap.ci(m, stats, spec, level=me.level, policy=pol, slice=sl,
-                                 params=me.params)  # fmt: skip
-                out.append({
-                    "metric": me.name, "level": me.level, "policy": pol, "slice": sl,
-                    "value": c.value, "n": c.n, "n_clusters": c.n_clusters,
-                    "ci": list(c.ci) if c.ci else None, "ci_status": c.ci_status,
-                    "impl": res.impl,
-                })  # fmt: skip
+                yield me, res, spec, sl, pol, policy.apply(group, spec, pol)
+
+
+def _entries(dataset: Dataset, cfg, all_pairs: list[Pair], datasets_root: Path | None) -> list:
+    out = []
+    for me, res, spec, sl, pol, subset in _groups(dataset, cfg, all_pairs, datasets_root):
+        m = res.metric
+        stats = bootstrap.cluster_stats(m, subset, spec, **me.params)
+        c = bootstrap.ci(m, stats, spec, level=me.level, policy=pol, slice=sl,
+                         params=me.params)  # fmt: skip
+        out.append({
+            "metric": me.name, "level": me.level, "policy": pol, "slice": sl,
+            "value": c.value, "n": c.n, "n_clusters": c.n_clusters,
+            "ci": list(c.ci) if c.ci else None, "ci_status": c.ci_status,
+            "impl": res.impl,
+        })  # fmt: skip
     return out
 
 
-def score(
-    run_id: str,
-    *,
-    runs_root: Path | None = None,
-    datasets_root: Path | None = None,
-    data_root: Path | None = None,
-) -> dict:
-    """Score a saved run; write metrics.json and item_rows.json; return the metrics report."""
-    from .engine import capture_git  # lazy: engine will import scoring for its on_finish hook
-
+def _load_run(run_id, runs_root, datasets_root, data_root):
     try:
         run = store.load_run(runs_root, run_id)
     except (OSError, ValueError) as e:
@@ -150,17 +147,29 @@ def score(
         by_id = {i.id: i for i in dataset.items(run["split"])}
     except (DatasetError, KeyError) as e:
         raise ScoringError(f"cannot load dataset for run {run_id!r}: {e}") from e
-    cfg = metrics_config(dataset.meta)
+    return run, dataset, by_id
+
+
+@dataclass
+class _Collected:
+    pairs: list[Pair]
+    rows: list[dict]
+    reasons: Counter
+    n_scored: int
+    n_failed: int
+    n_not_run: int
+
+
+def _collect(run_id, dataset, by_id, saved, item_ids) -> _Collected:
+    """Project saved results of `item_ids` into pairs and item rows (shared by score/compare)."""
     adapter = dataset.adapter
     pairs_hook = getattr(adapter, "pairs", None)
     row_hook = getattr(adapter, "item_row", None)
-    saved = {it["item_id"]: it for it in store.iter_items(runs_root, run_id)}
-
     all_pairs: list[Pair] = []
     rows: list[dict] = []
     reasons: Counter = Counter({r: 0 for r in (*_ITEM_REASONS, "unresolved")})
     n_scored = n_failed = n_not_run = 0
-    for item_id in run["item_ids"]:
+    for item_id in item_ids:
         if item_id not in saved:
             n_not_run += 1
             continue
@@ -200,6 +209,26 @@ def score(
             row = _generic_row(item, status, pairs)
         rows.append(dict(row))
     rows.sort(key=lambda r: r["item_id"])
+    return _Collected(all_pairs, rows, reasons, n_scored, n_failed, n_not_run)
+
+
+def score(
+    run_id: str,
+    *,
+    runs_root: Path | None = None,
+    datasets_root: Path | None = None,
+    data_root: Path | None = None,
+) -> dict:
+    """Score a saved run; write metrics.json and item_rows.json; return the metrics report."""
+    from .engine import capture_git  # lazy: engine will import scoring for its on_finish hook
+
+    run, dataset, by_id = _load_run(run_id, runs_root, datasets_root, data_root)
+    cfg = metrics_config(dataset.meta)
+    adapter = dataset.adapter
+    saved = {it["item_id"]: it for it in store.iter_items(runs_root, run_id)}
+    col = _collect(run_id, dataset, by_id, saved, run["item_ids"])
+    all_pairs, rows, reasons = col.pairs, col.rows, col.reasons
+    n_scored, n_failed, n_not_run = col.n_scored, col.n_failed, col.n_not_run
 
     ref_rows, caveats = _load_references(dataset, datasets_root)
     extra_hook = getattr(adapter, "report_extra", None)

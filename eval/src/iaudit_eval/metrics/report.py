@@ -16,6 +16,7 @@ from ..paths import schemas_dir
 
 METRICS_SCHEMA_VERSION = "1.0.0"
 ITEM_ROWS_SCHEMA_VERSION = "1.0.0"
+COMPARE_SCHEMA_VERSION = "1.0.0"
 
 
 class ItemRow(TypedDict):
@@ -62,3 +63,7 @@ def validate_metrics(obj: Any) -> None:
 
 def validate_item_rows(obj: Any) -> None:
     _check("item_rows.schema.json", "item rows", obj)
+
+
+def validate_compare(obj: Any) -> None:
+    _check("compare.schema.json", "comparison", obj)
