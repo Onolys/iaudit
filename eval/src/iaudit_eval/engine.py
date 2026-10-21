@@ -210,6 +210,7 @@ class _RunDriver:
         self.requests: dict[str, dict] = {}
         self.done = 0
         self.failed = 0
+        self._statuses: dict[str, str] = {}
         self.cost: float | None = None
         self.error: dict | None = None
         self._schema_set = False
@@ -366,6 +367,12 @@ class _RunDriver:
             "failure": None if out.ok else _failure(out),
         }
         store.write_item(self.runs_root, self.run_id, rec)
+        previous = self._statuses.get(item.id)
+        if previous == "failed":
+            self.failed -= 1
+        elif previous == "ok":
+            self.done -= 1
+        self._statuses[item.id] = out.status
         if out.ok:
             self.done += 1
             self._set_identity(resp)
@@ -472,6 +479,7 @@ def _spawn_prepared(
     base_url = values.pop("base_url")
     totals = values.pop("totals", None)
     total = values.pop("total", None)
+    statuses = values.pop("statuses", {})
     try:
         audit_client = client or AuditClient(base_url, transport=transport)
         driver_type = _ResumeDriver if resume_run else _RunDriver
@@ -480,7 +488,9 @@ def _spawn_prepared(
             on_progress=on_progress, on_finish=on_finish,
         )
         if totals is not None:
+            driver._statuses = statuses
             driver.done = totals["ok"] + totals["partial"]
+            driver.failed = totals["failed"]
             driver.cost = totals["cost_usd"]
             driver.total = total
         task = asyncio.get_running_loop().create_task(driver.run())
@@ -719,6 +729,7 @@ def _prepare_resume(
             "concurrency": concurrency or run.get("concurrency") or DEFAULT_CONCURRENCY,
             "base_url": base_url or run["backend_url"], "totals": totals,
             "total": len(run["item_ids"]),
+            "statuses": {iid: record["status"] for iid, record in have.items()},
         }
     except BaseException:
         lock.release()
