@@ -9,16 +9,16 @@ Source of truth: [PRD.md](PRD.md). Turns a saved B2 run into `metrics.json` and 
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Pair, level and result types | none | todo |
-| 2 | Metric registry, aliases and dataset override | 1 | todo |
-| 3 | Failure policy | 1 | todo |
-| 4 | Built-in metrics | 2, 3 | todo |
-| 5 | Clustered bootstrap CIs | 2 | todo |
-| 6 | `metrics.schema.json` and `ItemRow` | 1 | todo |
-| 7 | Scoring step | 4, 5, 6 | todo |
-| 8 | Auto-score hook in engine | 7 | todo |
-| 9 | Compare schema and `compare()` | 7 | todo |
-| 10 | Offline and scope guard tests | 8, 9 | todo |
+| 1 | Pair, level and result types | none | done |
+| 2 | Metric registry, aliases and dataset override | 1 | done |
+| 3 | Failure policy | 1 | done |
+| 4 | Built-in metrics | 2, 3 | done |
+| 5 | Clustered bootstrap CIs | 2 | done |
+| 6 | `metrics.schema.json` and `ItemRow` | 1 | done |
+| 7 | Scoring step | 4, 5, 6 | done |
+| 8 | Auto-score hook in engine | 7 | done |
+| 9 | Compare schema and `compare()` | 7 | done |
+| 10 | Offline and scope guard tests | 8, 9 | done |
 
 ## Task 1 — Pair, level and result types
 What it is / what it means: The dataset-agnostic input every metric receives (R1, R3, D1, D2).

@@ -9,18 +9,18 @@ Source of truth: [PRD.md](PRD.md). A standalone `eval/` uv project: library only
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Project skeleton, paths, gitignore, safe logging | none | todo |
-| 2 | Contract loader with value-free issues | 1 | todo |
-| 3 | Dataset plug-in: Item, Adapter, metadata, registry, selection | 1 | todo |
-| 4 | Synthetic dataset | 3 | todo |
-| 5 | Fake backend test harness | 2 | todo |
-| 6 | Audit client | 2, 5 | todo |
-| 7 | Run store: atomic writes, lock, reads | 1 | todo |
-| 8 | Engine core: preflight, canary, dispatch, abort, progress | 4, 6, 7 | todo |
-| 9 | Resume and fingerprint guard | 8 | todo |
-| 10 | Cost cap, estimate, probe | 8 | todo |
-| 11 | Download framework | 3, 4, 7 | todo |
-| 12 | README, ADR 0008 fix, boundary checks | all | todo |
+| 1 | Project skeleton, paths, gitignore, safe logging | none | done |
+| 2 | Contract loader with value-free issues | 1 | done |
+| 3 | Dataset plug-in: Item, Adapter, metadata, registry, selection | 1 | done |
+| 4 | Synthetic dataset | 3 | done |
+| 5 | Fake backend test harness | 2 | done |
+| 6 | Audit client | 2, 5 | done |
+| 7 | Run store: atomic writes, lock, reads | 1 | done |
+| 8 | Engine core: preflight, canary, dispatch, abort, progress | 4, 6, 7 | done |
+| 9 | Resume and fingerprint guard | 8 | done |
+| 10 | Cost cap, estimate, probe | 8 | done |
+| 11 | Download framework | 3, 4, 7 | done |
+| 12 | README, ADR 0008 fix, boundary checks | all | done |
 
 ## Task 1 — Project skeleton, paths, gitignore, logging
 What it is / what it means: The own-project home and the shared plumbing (R1, R2, R12, R13, D1, D3, D14).
