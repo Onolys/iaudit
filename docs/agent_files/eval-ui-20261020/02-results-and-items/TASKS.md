@@ -13,7 +13,7 @@ Source of truth: docs/agent_files/eval-ui-20261020/02-results-and-items/PRD.md. 
 | 2 | buildLoadResult | 1 | done |
 | 3 | Eval API wrappers and schema-validated fixtures | none | done |
 | 4 | MetricsTable and RunInfoBlock | 3 | done |
-| 5 | ItemList | 3 | todo |
+| 5 | ItemList | 3 | done |
 | 6 | RunDetail with scoring state and Re-score | 4, 5 | todo |
 | 7 | GoldPanel and renderers | none | todo |
 | 8 | FailedItem and ItemDetail | 1, 2, 3, 7 | todo |
