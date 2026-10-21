@@ -11,7 +11,7 @@ export interface MetricRow {
   metric: string;
   primary?: MetricValue;
   secondary?: MetricValue;
-  references: { value: number; source: string }[];
+  references: { value: number; source: string; label: string; note?: string }[];
 }
 export interface MetricGroup { level: string; slice: string; rows: MetricRow[] }
 export interface MetricRows {
@@ -43,7 +43,7 @@ export function toMetricRows(report: MetricsReport): MetricRows {
   }
   for (const reference of report.references) {
     const group = levels.get(reference.level)?.get(sliceKey(reference.slice));
-    group?.rows.find(row => row.metric === reference.metric)?.references.push({ value: reference.value, source: reference.source });
+    group?.rows.find(row => row.metric === reference.metric)?.references.push({ value: reference.value, source: reference.source, label: reference.label, note: reference.note });
   }
   const rates = report.entries.filter(entry => entry.policy === "none").map(entry => ({
     level: entry.level, slice: sliceLabel(entry.slice), metric: entry.metric, value: entry.value,

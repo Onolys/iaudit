@@ -63,3 +63,18 @@ it("never presents sentence-pair failures as item counts", () => {
   expect(screen.getByText("sentence (All items) failure_rate: 0.5")).toBeTruthy();
   expect(screen.queryByRole("table")).toBeNull();
 });
+
+it("keeps evaluator identities distinct when paper references share metric, slice and source", () => {
+  const base = report.references[0];
+  const references = [
+    { ...base, source: "Same paper table", label: "Evaluator A", note: "Model A settings", value: 0.2 },
+    { ...base, source: "Same paper table", label: "Evaluator B", note: "Model B settings", value: 0.8 },
+  ];
+  render(<MetricsTable report={{ ...report, references }} />);
+  for (const [index, label] of ["Evaluator A", "Evaluator B"].entries()) {
+    const row = screen.getByText(label).closest("tr")!;
+    expect(row.textContent).toContain("paper-reported, different model & date");
+    expect(within(row).getAllByRole("cell").map(node => node.textContent)).toEqual([index === 0 ? "0.2" : "0.8", "-", "-", "-", "-", "-"]);
+    expect(within(row).getByRole("rowheader").title).toContain(references[index].note);
+  }
+});

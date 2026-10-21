@@ -4,6 +4,7 @@ import { toMetricRows } from "./toMetricRows";
 import type { MetricValue } from "./toMetricRows";
 import "./metrics.css";
 
+const referenceDisclaimer = "paper-reported, different model & date";
 const format = (value: number | null) => value === null ? "-" : String(Number(value.toFixed(4)));
 
 function Values({ entry }: { entry?: MetricValue }) {
@@ -31,7 +32,9 @@ export function MetricsTable({ report }: { report: MetricsReport }) {
         <tbody>{group.rows.map(row => <Fragment key={row.metric}>
           <tr><th scope="row">{row.metric}</th><Values entry={row.primary} /><Values entry={row.secondary} /></tr>
           {row.references.map((reference, referenceIndex) => <tr className="is-reference" key={referenceIndex}>
-            <th scope="row" title={reference.source}>{row.metric} — paper-reported, different model &amp; date</th>
+            <th scope="row" title={[reference.source, reference.note].filter(Boolean).join(" — ")}>
+              {row.metric} — <span>{reference.label}</span>{reference.label.includes(referenceDisclaimer) ? null : ` — ${referenceDisclaimer}`}
+            </th>
             <td>{format(reference.value)}</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
           </tr>)}
         </Fragment>)}</tbody>

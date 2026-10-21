@@ -66,3 +66,37 @@ New files: `MetricsTable.tsx`, `MetricsTable.test.tsx`, `RunInfoBlock.tsx`, `Run
 One task commit: `02-results-and-items: Task 4 — render metrics and run provenance`. Resolve SHA with `git log -1 --format=%H -- frontend/src/eval/MetricsTable.tsx`.
 
 All checks offline; no providers, downloads, real browser checks, pushes or merges. No owner-only actions for this task. Components remain intentionally unwired until later D2 tasks.
+
+
+## Task 4 review fix — paper evaluator identity
+
+Principal review identified that real `eval/datasets/tofueval/references.json` reuses source `TofuEval paper, Table 3` for evaluator-specific rows. Verified the source file and the normalizer: reference labels/notes were being discarded, making distinct evaluators indistinguishable. Applied the receiving-code-review workflow and a test-first correction.
+
+Added a regression with two references sharing source/metric/level/slice and differing evaluator labels, notes and values. It failed before the fix: 1 failed, 6 passed in MetricsTable tests, because `Evaluator A` was absent. The normalizer now preserves `label` and optional `note`; reference row headers show evaluator labels plus the required paper disclaimer (avoiding duplicate disclaimer text when the source label already includes it). Source and optional note remain in the row-header hover title. Value-only cells/dashes, grey styling and order remain intact.
+
+```text
+npm test -- --maxWorkers=2 src/eval/MetricsTable.test.tsx
+Test Files 1 failed (1)
+Tests 1 failed | 6 passed (7)
+(exit 1, before correction)
+
+npm test -- --maxWorkers=2
+Test Files 37 passed (37)
+Tests 488 passed (488)
+(exit 0, corrected implementation)
+
+npm run typecheck
+> tsc --noEmit -p .
+(exit 0)
+
+npm run build
+> tsc --noEmit -p . && vite build
+160 modules transformed.
+✓ built in 378ms
+(exit 0)
+
+git diff --check
+(exit 0)
+```
+
+Separate correction commit: `02-results-and-items: Task 4 fix — preserve paper evaluator labels`; resolve with `git log -1 --format=%H -- frontend/src/eval/toMetricRows.ts`. Only MetricsTable, its regression test, toMetricRows and this evidence changed. No task status changes, schema/backend changes, live checks, push or merge.
