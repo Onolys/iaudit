@@ -78,3 +78,21 @@ it("keeps evaluator identities distinct when paper references share metric, slic
     expect(within(row).getByRole("rowheader").title).toContain(references[index].note);
   }
 });
+
+it("groups TofuEval-like policy-none diagnostics by level and slice, apart from failures", () => {
+  const none = (metric: string, level: string, slice: Record<string, string>, value: number) =>
+    ({ ...report.entries[0], metric, policy: "none" as const, level, slice, value, n: 10 });
+  render(<MetricsTable report={{ ...report, entries: [
+    ...report.entries,
+    none("failure_rate", "item", {}, 0.1),
+    none("sentence_balanced_accuracy", "sentence", { topic: "news" }, 0.7),
+    none("sentence_n_pairs", "sentence", { topic: "news" }, 42),
+    none("sentence_balanced_accuracy", "sentence", { topic: "meeting" }, 0.6),
+  ] }} />);
+  expect(screen.getByText("item (All items) failure_rate: 0.1")).toBeTruthy();
+  expect(screen.queryByText(/sentence_balanced_accuracy:/)).toBeNull();
+  expect(screen.getByRole("heading", { name: "Diagnostics" })).toBeTruthy();
+  const news = screen.getByRole("table", { name: "Diagnostics: sentence, topic: news" });
+  expect(within(news).getAllByRole("row").map(row => row.textContent)).toEqual(["MetricValuen", "sentence_balanced_accuracy0.710", "sentence_n_pairs4210"]);
+  expect(screen.getByRole("table", { name: "Diagnostics: sentence, topic: meeting" })).toBeTruthy();
+});

@@ -116,3 +116,15 @@ it("blocks duplicate rescore clicks and aborts its POST on unmount",async()=>{
   const signal=s.signals.at(-1)!;expect(signal.aborted).toBe(false);s.unmount();expect(signal.aborted).toBe(true);
   const count=s.fetch.mock.calls.length;await tick(60000);expect(s.fetch.mock.calls.length).toBe(count);
 });
+
+it("stops polling a terminal run whose pending score never resolves and enables Re-score",async()=>{
+  const s=setup({...finished,score_state:"pending"} as Detail,{report:null});await tick();
+  expect(screen.getByText("Scoring...")).toBeTruthy();expect(rescore().disabled).toBe(true);
+  await tick(3000);
+  expect(screen.queryByText("Scoring...")).toBeNull();expect(screen.getByText("Metrics missing. Re-score.")).toBeTruthy();expect(rescore().disabled).toBe(false);
+  const calls=s.fetch.mock.calls.length;await tick(10000);expect(s.fetch).toHaveBeenCalledTimes(calls);
+});
+it("shows run progress instead of Scoring... while the run is running",async()=>{
+  setup({...finished,state:"running",score_state:"pending",progress:{done:1,total:3,failures:0,cost_usd:null}} as Detail,{report:null});await tick();
+  expect(screen.getByText("Run in progress (1/3)")).toBeTruthy();expect(screen.queryByText("Scoring...")).toBeNull();
+});
