@@ -71,10 +71,12 @@ def test_invalid_schema_file(tmp_path):
 
 def test_no_schema_copy_under_eval():
     eval_dir = Path(__file__).resolve().parents[1]
-    # eval/schemas/ holds eval's own report schemas (metrics, item_rows); only audit copies are banned.
+    # Eval owns report schemas and the API bundle; audit schemas stay in docs/contracts/.
     own = {"metrics.schema.json", "item_rows.schema.json", "compare.schema.json"}
     found = [
-        p for p in eval_dir.rglob("*.schema.json") if ".venv" not in p.parts and p.name not in own
+        p for p in eval_dir.rglob("*.schema.json")
+        if ".venv" not in p.parts and p.name not in own
+        and p != eval_dir / "api" / "eval-api.schema.json"
     ]
     assert found == []
 
