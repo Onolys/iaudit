@@ -246,7 +246,7 @@ class _RunDriver:
     async def run(self) -> None:
         try:
             try:
-                self._preflight()
+                await asyncio.to_thread(self._preflight)
                 await self._dispatch()
             except _Preflight as e:
                 self._fail(e.kind, e.message)
@@ -418,29 +418,55 @@ class _RunDriver:
 AUTO_SCORE: Any = object()
 
 
-def start_run(
-    dataset: Dataset | str,
-    selection: Selection | None = None,
-    *,
-    base_url: str,
-    max_cost_usd: float | None = None,
-    tags: dict | None = None,
-    concurrency: int = DEFAULT_CONCURRENCY,
-    on_progress: Callable[[RunProgress], None] | None = None,
-    on_finish: Callable[[str], Awaitable[None] | None] | None = AUTO_SCORE,
-    client: AuditClient | None = None,
-    transport=None,
-    runs_root: Path | None = None,
-    data_root: Path | None = None,
-) -> RunHandle:
-    """Create a run and drive it in a background task of the running event loop.
+async def _prepare_in_thread(prepare, *args, **kwargs) -> dict:
+    task = asyncio.create_task(asyncio.to_thread(prepare, *args, **kwargs))
+    try:
+        return await asyncio.shield(task)
+    except asyncio.CancelledError:
+        # A thread cannot be cancelled. Reap its result before releasing a lock it
+        # may already own; a created run then remains safely resumable/interrupted.
+        while not task.done():
+            try:
+                await asyncio.shield(task)
+            except asyncio.CancelledError:
+                continue
+            except Exception:
+                break
+        if not task.cancelled() and task.exception() is None:
+            task.result()["lock"].release()
+        raise
 
-    ``client``/``transport``/``runs_root``/``data_root`` are injection points for tests
-    and the UI server. Raises ``DatasetError`` for an unknown split (nothing is created).
-    """
+
+def _spawn_prepared(
+    prepared, *, client, transport, on_progress, on_finish, resume_run,
+) -> RunHandle:
+    values = dict(prepared)
+    base_url = values.pop("base_url")
+    totals = values.pop("totals", None)
+    total = values.pop("total", None)
+    try:
+        audit_client = client or AuditClient(base_url, transport=transport)
+        driver_type = _ResumeDriver if resume_run else _RunDriver
+        driver = driver_type(
+            **values, client=audit_client, owns_client=client is None,
+            on_progress=on_progress, on_finish=on_finish,
+        )
+        if totals is not None:
+            driver.done = totals["ok"] + totals["partial"]
+            driver.cost = totals["cost_usd"]
+            driver.total = total
+        task = asyncio.get_running_loop().create_task(driver.run())
+        return RunHandle(values["run_id"], driver, task)
+    except BaseException:
+        values["lock"].release()
+        raise
+
+
+def _prepare_start(
+    dataset, selection, *, base_url, max_cost_usd, tags, concurrency, runs_root, data_root,
+) -> dict:
     if concurrency < 1:
         raise ValueError("concurrency must be >= 1")
-    loop = asyncio.get_running_loop()
     selection = selection or Selection()
     if isinstance(dataset, str):
         dataset = load(dataset, data_root=data_root)
@@ -467,15 +493,65 @@ def start_run(
     }
     run_id = store.create_run(runs_root, run_meta)
     lock = store.RunLock(runs_root, run_id).acquire()
-    owns = client is None
-    audit_client = client or AuditClient(base_url, transport=transport)
-    driver = _RunDriver(
-        run_id=run_id, dataset=dataset, items=items, runs_root=runs_root, data_root=data_root,
-        client=audit_client, owns_client=owns, concurrency=concurrency,
-        on_progress=on_progress, on_finish=on_finish, lock=lock, max_cost_usd=max_cost_usd,
-    )  # fmt: skip
-    task = loop.create_task(driver.run())
-    return RunHandle(run_id, driver, task)
+    return {
+        "run_id": run_id, "dataset": dataset, "items": items, "runs_root": runs_root,
+        "data_root": data_root, "concurrency": concurrency, "lock": lock,
+        "max_cost_usd": max_cost_usd, "base_url": base_url,
+    }
+
+
+def start_run(
+    dataset: Dataset | str,
+    selection: Selection | None = None,
+    *,
+    base_url: str,
+    max_cost_usd: float | None = None,
+    tags: dict | None = None,
+    concurrency: int = DEFAULT_CONCURRENCY,
+    on_progress: Callable[[RunProgress], None] | None = None,
+    on_finish: Callable[[str], Awaitable[None] | None] | None = AUTO_SCORE,
+    client: AuditClient | None = None,
+    transport=None,
+    runs_root: Path | None = None,
+    data_root: Path | None = None,
+) -> RunHandle:
+    """Create and schedule a run; synchronous preparation needs a running loop."""
+    asyncio.get_running_loop()
+    prepared = _prepare_start(
+        dataset, selection, base_url=base_url, max_cost_usd=max_cost_usd, tags=tags,
+        concurrency=concurrency, runs_root=runs_root, data_root=data_root,
+    )
+    return _spawn_prepared(
+        prepared, client=client, transport=transport, on_progress=on_progress,
+        on_finish=on_finish, resume_run=False,
+    )
+
+
+async def start_run_async(
+    dataset: Dataset | str,
+    selection: Selection | None = None,
+    *,
+    base_url: str,
+    max_cost_usd: float | None = None,
+    tags: dict | None = None,
+    concurrency: int = DEFAULT_CONCURRENCY,
+    on_progress: Callable[[RunProgress], None] | None = None,
+    on_finish: Callable[[str], Awaitable[None] | None] | None = AUTO_SCORE,
+    client: AuditClient | None = None,
+    transport=None,
+    runs_root: Path | None = None,
+    data_root: Path | None = None,
+) -> RunHandle:
+    """Prepare filesystem/adapter/git work in a thread, then spawn on the caller loop."""
+    prepared = await _prepare_in_thread(
+        _prepare_start, dataset, selection, base_url=base_url,
+        max_cost_usd=max_cost_usd, tags=tags, concurrency=concurrency,
+        runs_root=runs_root, data_root=data_root,
+    )
+    return _spawn_prepared(
+        prepared, client=client, transport=transport, on_progress=on_progress,
+        on_finish=on_finish, resume_run=False,
+    )
 
 
 # ---------- resume (R8, D7, D8) ----------
@@ -554,29 +630,9 @@ class _ResumeDriver(_RunDriver):
         self._progress()
 
 
-def resume(
-    run_id: str,
-    *,
-    max_cost_usd: float | None = None,
-    allow_mixed: bool = False,
-    base_url: str | None = None,
-    concurrency: int | None = None,
-    on_progress: Callable[[RunProgress], None] | None = None,
-    on_finish: Callable[[str], Awaitable[None] | None] | None = AUTO_SCORE,
-    client: AuditClient | None = None,
-    transport=None,
-    runs_root: Path | None = None,
-    data_root: Path | None = None,
-    dataset: Dataset | None = None,
-) -> RunHandle:
-    """Resume a run in the running event loop: re-send failed or missing items only.
-
-    Accepts any stored state (including ``running`` whose lock is free = interrupted).
-    Raises ``RunLockedError`` if another writer holds the run, ``ResumeError`` if the
-    dataset changed or a dataset-missing ``failed`` run is still unfixed. Fingerprint
-    problems surface from ``await handle.wait()`` as ``FingerprintChanged``.
-    """
-    loop = asyncio.get_running_loop()
+def _prepare_resume(
+    run_id, *, max_cost_usd, allow_mixed, base_url, concurrency, runs_root, data_root, dataset,
+) -> dict:
     lock = store.RunLock(runs_root, run_id).acquire()  # RunLockedError if concurrent
     try:
         run = store.load_run(runs_root, run_id)
@@ -624,23 +680,72 @@ def resume(
         store.atomic_write_json(store.run_dir(runs_root, run_id) / "run.json", new)
 
         totals = store.compute_totals(runs_root, run_id)
-        owns = client is None
-        audit_client = client or AuditClient(base_url or run["backend_url"], transport=transport)
-        driver = _ResumeDriver(
-            snapshot=snapshot, allow_mixed=allow_mixed, prior_state=prior_state,
-            run_id=run_id, dataset=dataset, items=todo, runs_root=runs_root,
-            data_root=data_root, client=audit_client, owns_client=owns,
-            concurrency=concurrency or run.get("concurrency") or DEFAULT_CONCURRENCY,
-            on_progress=on_progress, on_finish=on_finish, lock=lock,
-            max_cost_usd=new.get("max_cost_usd"),
-        )  # fmt: skip
-        driver.done = totals["ok"] + totals["partial"]
-        driver.cost = totals["cost_usd"]
-        driver.total = len(run["item_ids"])
-        return RunHandle(run_id, driver, loop.create_task(driver.run()))
+        return {
+            "snapshot": snapshot, "allow_mixed": allow_mixed, "prior_state": prior_state,
+            "run_id": run_id, "dataset": dataset, "items": todo, "runs_root": runs_root,
+            "data_root": data_root, "lock": lock, "max_cost_usd": new.get("max_cost_usd"),
+            "concurrency": concurrency or run.get("concurrency") or DEFAULT_CONCURRENCY,
+            "base_url": base_url or run["backend_url"], "totals": totals,
+            "total": len(run["item_ids"]),
+        }
     except BaseException:
         lock.release()
         raise
+
+
+def resume(
+    run_id: str,
+    *,
+    max_cost_usd: float | None = None,
+    allow_mixed: bool = False,
+    base_url: str | None = None,
+    concurrency: int | None = None,
+    on_progress: Callable[[RunProgress], None] | None = None,
+    on_finish: Callable[[str], Awaitable[None] | None] | None = AUTO_SCORE,
+    client: AuditClient | None = None,
+    transport=None,
+    runs_root: Path | None = None,
+    data_root: Path | None = None,
+    dataset: Dataset | None = None,
+) -> RunHandle:
+    """Resume failed/missing items with synchronous preparation on the caller loop."""
+    asyncio.get_running_loop()
+    prepared = _prepare_resume(
+        run_id, max_cost_usd=max_cost_usd, allow_mixed=allow_mixed,
+        base_url=base_url, concurrency=concurrency, runs_root=runs_root,
+        data_root=data_root, dataset=dataset,
+    )
+    return _spawn_prepared(
+        prepared, client=client, transport=transport, on_progress=on_progress,
+        on_finish=on_finish, resume_run=True,
+    )
+
+
+async def resume_async(
+    run_id: str,
+    *,
+    max_cost_usd: float | None = None,
+    allow_mixed: bool = False,
+    base_url: str | None = None,
+    concurrency: int | None = None,
+    on_progress: Callable[[RunProgress], None] | None = None,
+    on_finish: Callable[[str], Awaitable[None] | None] | None = AUTO_SCORE,
+    client: AuditClient | None = None,
+    transport=None,
+    runs_root: Path | None = None,
+    data_root: Path | None = None,
+    dataset: Dataset | None = None,
+) -> RunHandle:
+    """Prepare a resume in a worker thread, then spawn on the caller loop."""
+    prepared = await _prepare_in_thread(
+        _prepare_resume, run_id, max_cost_usd=max_cost_usd, allow_mixed=allow_mixed,
+        base_url=base_url, concurrency=concurrency, runs_root=runs_root,
+        data_root=data_root, dataset=dataset,
+    )
+    return _spawn_prepared(
+        prepared, client=client, transport=transport, on_progress=on_progress,
+        on_finish=on_finish, resume_run=True,
+    )
 
 
 # ---------- probe (D9) ----------
