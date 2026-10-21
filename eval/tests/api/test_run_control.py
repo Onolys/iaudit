@@ -168,6 +168,8 @@ async def test_cap_with_missing_cost_fails_closed(roots):
         assert result["totals"]["cost_usd"] is None
         assert store.load_run(roots[2], run_id)["error"]["kind"] == "cost_missing"
         assert backend.audit_work == 1
+        detail = checked(await http.get(f"/runs/{run_id}"), "RunDetail")
+        assert detail["error"] == store.load_run(roots[2], run_id)["error"]
 
 
 async def test_unlocked_running_run_is_interrupted_and_resumable(roots):

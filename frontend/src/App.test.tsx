@@ -1,6 +1,10 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import evalDatasets from "./eval/fixtures/datasets.json";
+import evalMetadata from "./eval/fixtures/dataset-detail.json";
+import evalEstimate from "./eval/fixtures/estimate-unknown.json";
+import evalRunning from "./eval/fixtures/run-running.json";
 import App from "./App";
 import type { AuditDeps } from "./transport/runAudit";
 import { createEvalApi } from "./eval/evalApi";
@@ -92,6 +96,44 @@ describe("Audit and Eval switch", () => {
     await act(async () => finish(new Response("offline", { status: 502 })));
     expect(screen.queryByRole("alert")).toBeNull();
     expect(screen.getByRole("region", { name: "Run" })).toBeTruthy();
+  });
+
+  it("stops every Eval fetch when toggled to Audit mid-run, including an in-flight poll", async () => {
+    vi.useFakeTimers();
+    try {
+      let pollSignal: AbortSignal | null | undefined;
+      let polls = 0;
+      const fetch = vi.fn(async (url: RequestInfo | URL, options?: RequestInit): Promise<Response> => {
+        const path = String(url);
+        if (path.endsWith("/health")) return Response.json(healthyEval);
+        if (path.endsWith("/datasets")) return Response.json(evalDatasets);
+        if (path.includes("/datasets/")) return Response.json(evalMetadata);
+        if (path.endsWith("/estimate")) return Response.json(evalEstimate);
+        if (path.endsWith("/runs")) return options?.method === "POST"
+          ? Response.json({ run_id: evalRunning.run_id }, {status: 202}) : Response.json([]);
+        if (path.endsWith(`/runs/${evalRunning.run_id}`)) {
+          polls++;
+          if (polls === 1) return Response.json(evalRunning);
+          pollSignal = options?.signal;
+          return new Promise<Response>(() => {});
+        }
+        throw Error(`Unexpected offline request ${path}`);
+      });
+      render(<App deps={okDeps()} evalApi={createEvalApi({ fetch: fetch as typeof globalThis.fetch })} />);
+      fireEvent.click(screen.getByRole("button", {name: "Eval"}));
+      await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+      fireEvent.click(screen.getByRole("button", {name: "Run"}));
+      await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+      expect(screen.getByRole("progressbar")).toBeTruthy();
+      await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+      expect(pollSignal?.aborted).toBe(false);
+      fireEvent.click(screen.getByRole("button", {name: "Audit"}));
+      expect(pollSignal?.aborted).toBe(true);
+      const before = fetch.mock.calls.length;
+      await act(async () => { await vi.advanceTimersByTimeAsync(60000); });
+      expect(fetch).toHaveBeenCalledTimes(before);
+      expect(screen.getByText("Upload a request JSON file to begin.")).toBeTruthy();
+    } finally { cleanup(); vi.useRealTimers(); }
   });
 
   it("keeps Audit usable when the Eval server is unreachable", async () => {

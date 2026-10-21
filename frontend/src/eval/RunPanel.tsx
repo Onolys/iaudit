@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { EvalApi } from "./evalApi";
 import type { DatasetMeta, DatasetSummary, Estimate, EvalError, RunRequest } from "./evalTypes";
+import { useRunLifecycle } from "./useRunLifecycle";
+import type { RunDetail } from "./evalTypes";
 import { EvalErrorMessage } from "./ServerBanner";
 
 const datasetStorageKey = "iaudit.eval.dataset";
 const validN = (value: string) => value.trim() === "" || (/^\d+$/.test(value) && Number.isSafeInteger(Number(value)) && Number(value) >= 1);
 
-/** Pre-run inputs. The lifecycle layer supplies onRun to start and monitor runs. */
-export function RunPanel({ api, onRun }: { api: EvalApi; onRun?: (request: RunRequest) => void }) {
+export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange }: {
+  api: EvalApi; onRun?: (request: RunRequest) => void;
+  onRunsChanged?: () => void; onActiveRunChange?: (run: RunDetail | null) => void;
+}) {
   const [datasets, setDatasets] = useState<DatasetSummary[] | null>(null);
   const [dataset, setDataset] = useState("");
   const [meta, setMeta] = useState<DatasetMeta | null>(null);
@@ -21,6 +25,8 @@ export function RunPanel({ api, onRun }: { api: EvalApi; onRun?: (request: RunRe
   const [metaError, setMetaError] = useState<EvalError | null>(null);
   const [estimateError, setEstimateError] = useState<EvalError | null>(null);
   const [retry, setRetry] = useState(0);
+  const lifecycle = useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownloaded: () => setRetry(value => value + 1) });
+  const needsDownload = lifecycle.missingDataset === dataset || datasets?.find(item => item.name === dataset)?.data_present === false;
   const nValid = validN(n);
   const capValid = cap.trim() === "" || (Number.isFinite(Number(cap)) && Number(cap) > 0);
   const selectedMeta = meta?.name === dataset ? meta : null;
@@ -85,11 +91,14 @@ export function RunPanel({ api, onRun }: { api: EvalApi; onRun?: (request: RunRe
   function submit(event: FormEvent) {
     event.preventDefault();
     if (!selectedMeta || !split || !nValid || !capValid) return;
-    onRun?.({ dataset, split, ...(n.trim() === "" ? {} : { n: Number(n) }), ...(cap.trim() === "" ? {} : { max_cost_usd: Number(cap) }) });
+    const request = { dataset, split, ...(n.trim() === "" ? {} : { n: Number(n) }), ...(cap.trim() === "" ? {} : { max_cost_usd: Number(cap) }) };
+    onRun?.(request);
+    void lifecycle.start(request);
   }
 
   return <section className="eval-panel" aria-labelledby="eval-run-title">
     <h2 id="eval-run-title">Run</h2>
+    {lifecycle.display}
     {(loadError || metaError) && <><EvalErrorMessage error={(loadError || metaError)!} /><button type="button" onClick={() => setRetry(value => value + 1)}>Retry run form</button></>}
     {datasets === null ? !loadError && <p>Loading datasets…</p> : datasets.length === 0 ? <p>No datasets in eval/datasets/</p> :
       <form className="eval-run-form" onSubmit={submit} noValidate>
@@ -115,7 +124,8 @@ export function RunPanel({ api, onRun }: { api: EvalApi; onRun?: (request: RunRe
         <input id="eval-cap" inputMode="decimal" value={cap} aria-invalid={!capValid} aria-describedby="eval-cap-help" onChange={event => { capEdited.current = true; setCap(event.target.value); }} />
         <p id="eval-cap-help">Optional. Blank = no cap.</p>
         {!capValid && <p className="eval-error">Max cost must be greater than 0, or blank for no cap.</p>}
-        <button type="submit" disabled={!selectedMeta || !split || !nValid || !capValid}>Run</button>
+        {needsDownload || lifecycle.downloadError ? <button type="button" disabled={lifecycle.downloading || lifecycle.active} onClick={() => void lifecycle.startDownload(dataset)}>{lifecycle.downloadError ? "Retry download" : "Download data"}</button> :
+          <button type="submit" disabled={!selectedMeta || !split || !nValid || !capValid || lifecycle.busy || lifecycle.active || lifecycle.downloading}>{lifecycle.busy ? "Starting…" : "Run"}</button>}
       </form>}
   </section>;
 }

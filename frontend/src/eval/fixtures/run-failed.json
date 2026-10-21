@@ -28,5 +28,12 @@
     "warnings": [
       "Fictional missing cost failure."
     ]
+  },
+  "error": {
+    "kind": "cost_missing",
+    "message": "Fictional missing cost failure.",
+    "backend": {
+      "cost_usd": null
+    }
   }
 }
