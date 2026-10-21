@@ -59,22 +59,23 @@ The idea is also independent of the original source format. The interview might 
 
 ## What the tool checks
 
-The following twelve checks define the scope of this build. The examples are illustrative.
+The following thirteen checks define the scope of this build. The examples are illustrative.
 
 | Check | What it checks | Example potential discrepancy |
 |---|---|---|
 | **1. Claim support** | Whether a factual assertion is substantiated by the supplied interview. | The assessment says the person repeatedly missed appointments, but the interview establishes only one missed appointment. |
 | **2. Contradictory evidence** | Whether explicit interview evidence conflicts with an assessment claim. | The person denies difficulty managing finances, but the assessment says they reported that difficulty. |
-| **3. Wrong person or source attribution** | Who experienced something, who reported it, and whether those sources are represented correctly. | A parent describes their own forgetfulness, but the assessment attributes it to the participant. |
+| **3. Wrong person, source, or entity attribution** | Who or what experienced something, who reported it, and which person, source, or entity a fact belongs to. | A parent describes their own forgetfulness, but the assessment attributes it to the participant. Side effects the patient attributed to a previous medication are recorded against the current one. |
 | **4. Timeframe mismatch** | Whether past, current, future, and hypothetical statements retain their original timing. | Childhood difficulty is presented as a current problem. |
 | **5. Negation reversal** | Whether a denial, absence, or exception becomes an affirmative statement, or the reverse. | “I don’t lose my keys” becomes a claim that the person frequently loses their keys. |
 | **6. Certainty inflation** | Whether tentative statements, estimates, or secondhand information become definite facts. | “I think this happened twice” becomes a confirmed, consistent pattern. |
 | **7. Frequency or severity inflation** | Whether the assessment exaggerates or understates frequency, duration, intensity, or impact. | Occasional difficulty becomes daily difficulty, or inconvenience becomes inability. |
-| **8. Context stripping** | Whether an omitted qualification materially changes the meaning of a claim. | Difficulty occurring only after several nights without sleep becomes an unrestricted claim about everyday functioning. |
+| **8. Context stripping** | Whether an omitted qualification, or a broadened scope, materially changes the meaning of a claim. | Difficulty occurring only after several nights without sleep becomes an unrestricted claim about everyday functioning. “Some members of the panel raised concerns” becomes “the panel raised concerns.” |
 | **9. Question mistaken for an answer** | Whether the interviewer’s question, suggestion, or hypothetical is treated as respondent evidence. | “Do you often forget things?” is used as proof without an affirmative response. |
 | **10. Correction ignored** | Whether later clarification or retraction changes an earlier statement used in the assessment. | The person corrects “every week” to “twice last year,” but the original frequency remains in the assessment. |
 | **11. Conflicting accounts flattened** | Whether unresolved disagreement between sources is presented as agreement. | Participant and caregiver disagree, but the assessment says both describe the same experience. |
 | **12. Unsupported causal links** | Whether the assessment presents a cause-and-effect relationship as established by the interview when the source does not substantiate it. | Two events occurred around the same time; the assessment says the interview establishes that one caused the other. |
+| **13. Quantity mismatch** | Whether an amount, count, value, or total the assessment states about the interview matches the interview: money, doses, ages, counts, tallies, and sums of figures the interview itself gives. | The patient reports taking 20 mg; the assessment records 10 mg. |
 
 ### How these checks should be interpreted
 
@@ -89,6 +90,8 @@ The following twelve checks define the scope of this build. The examples are ill
 **Not every omission is a concern.** An assessment can summarize selectively. An omission matters here when it changes the meaning of a claim that the assessment does make.
 
 **Reported explanations and assessor inferences are different.** “The participant believes X caused Y” is different from “X caused Y.” The tool should preserve that distinction.
+
+**A stated figure is a claim like any other.** The tool compares figures with what the interview gives. It does not judge whether a figure is clinically right, and ordinary rounding is not a discrepancy. A total is checked only against figures the interview supplies.
 
 ## What the reviewer receives
 
@@ -144,7 +147,7 @@ This build does not check:
 - Consent procedures.
 - Administrative fields.
 - Protocol compliance.
-- Numerical score calculations.
+- Numerical score calculations: scoring rules, rubric totals, and rating arithmetic. Figures the assessment states about what the interview contained (counts, totals, doses, amounts) are checked under check 13.
 - Specialty-specific diagnostic or rating criteria.
 
 Those are separate builds and should not expand today’s scope.

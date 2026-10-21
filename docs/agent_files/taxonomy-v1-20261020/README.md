@@ -5,7 +5,7 @@ Project A of 4, built last so the eval gives a clean "before" measurement.
 ## Sub-projects
 | Sub-project | PRD | Scope | Depends on | Status |
 |---|---|---|---|---|
-| A1 Taxonomy v1 | [PRD](01-taxonomy-v1/PRD.md) | `quantity_mismatch` as mission check 13 (13th enum value), widened `wrong_attribution` and `context_stripping`, two labelling rules, mission amendment, contract 1.2.0, ADR 0015, TofuEval dev before/after | B1-B4, C1-C2, D1-D2 | draft |
+| A1 Taxonomy v1 | [PRD](01-taxonomy-v1/PRD.md) | `quantity_mismatch` as mission check 13 (13th enum value), widened `wrong_attribution` and `context_stripping`, two labelling rules, mission amendment, contract 1.2.0, ADR 0015, TofuEval dev before/after | B1-B4, C1-C2, D1-D2 | in-progress |
 
 Brief: [brainstorming.md](brainstorming.md).
 
