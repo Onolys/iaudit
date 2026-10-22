@@ -18,6 +18,7 @@ One mid-tier call per claim that needs one. Output: per evidence item a relation
 
 - **Timeframe.** An item from the wrong period is demoted: it no longer supports or contradicts.
 - **Amounts (`amounts.py`).** Claim and evidence amounts become buckets and are compared in both directions; the `inflates` or `understates` direction and an escalation to contradiction come from here. Vague lower-bound cues suppress "understates".
+- **Quantity mismatch.** The model raises `quantity_mismatch` as a quick-pass flag. Code drops it unless both the claim and a cited item's turn contain a figure (a numeral, or a number word such as "thousands" or "half"; 4-digit years and the pronoun "one" are ignored on the turn side). On the same items it yields to `certainty_inflation`, `correction_ignored`, `conflicting_accounts_flattened` and `timeframe_mismatch`.
 - **Conflicting accounts.** Fired by the verifier flag, or in code when two speakers' weekly rates differ by `check_rate_ratio`.
 - **Dedup.** One concern per type; a specific concern suppresses a generic one on the same items; conflicting accounts outranks correction ignored outranks contradictory evidence.
 - **Explanations** come from `templates.py`, filled with counts and roles, not model text.

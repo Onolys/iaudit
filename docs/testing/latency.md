@@ -2,7 +2,7 @@
 
 **Audience:** contributors.
 
-Target 30 to 45 seconds for a typical audit, hard cap 60 (`IAUDIT_AUDIT_DEADLINE_S`), UI timeout 120. The service sends a `Server-Timing` header on 200 replies with `total` and one entry per stage that ran (`prep`, `atomize`, `link`, `check`, `assemble`), durations only. In browser devtools it shows in the network tab for the audit request; turn it off with `IAUDIT_SERVER_TIMING=false`.
+Target 30 to 45 seconds for a typical audit, hard cap 100 (`IAUDIT_AUDIT_DEADLINE_S`), UI timeout 120. The service sends a `Server-Timing` header on 200 replies with `total` and one entry per stage that ran (`prep`, `atomize`, `link`, `check`, `assemble`), durations only. In browser devtools it shows in the network tab for the audit request; turn it off with `IAUDIT_SERVER_TIMING=false`.
 
 ## Offline scenarios
 

@@ -12,7 +12,7 @@ v1 is one synchronous JSON exchange. The frontend owns the contract in [contract
 
 The backend ([../backend/](../backend/)) serves `POST /v1/audit` and calls model providers through LiteLLM. It reads the schemas in [contracts/](contracts/) in place. For each claim in the assessment, a model proposes evidence and a verdict, and code decides what is reported. The model never returns positions. Code computes them. Endpoint, errors, settings and warnings: [reference/backend-api.md](reference/backend-api.md).
 
-One call, one reply. The target is 30 to 45 seconds, the hard cap is 60 (`IAUDIT_AUDIT_DEADLINE_S`), and the review UI waits up to 120.
+One call, one reply. The target is 30 to 45 seconds, the hard cap is 100 (`IAUDIT_AUDIT_DEADLINE_S`), and the review UI waits up to 120.
 
 ```
 review UI --POST /v1/audit--> backend --LiteLLM--> model providers
