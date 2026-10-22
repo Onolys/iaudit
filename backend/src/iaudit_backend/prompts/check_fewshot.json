@@ -585,8 +585,8 @@
     "items": [
      {
       "key": "c0.1:e1",
-      "relation": "entails",
-      "polarity": "affirmed",
+      "relation": "contradicts",
+      "polarity": "negated",
       "frequency": [],
       "severity": [],
       "timeframe": "current",

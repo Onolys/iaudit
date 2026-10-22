@@ -167,3 +167,27 @@ async def test_figure_only_claim_with_different_figure_is_contradicted(make_ctx)
         "contradicted",
         ["quantity_mismatch"],
     )
+
+
+async def test_previous_medication_fewshot_matches_the_boundary_pair(make_ctx):
+    """The few-shot and the `previous-medication` pair read the explicit conflict the same way."""
+    from iaudit_backend.check.verifier import load_fewshot
+
+    (shot,) = [
+        s
+        for s in load_fewshot()
+        if s["claim"]["proposition"] == "Jordan reports side effects from Odamet."
+    ]
+    out = shot["output"]
+    assert (out["items"][0]["relation"], out["items"][0]["polarity"]) == ("contradicts", "negated")
+    replies = [t["text"] for t in shot["turns"] if t["role"] == "respondent"][-1:]
+    prep = prep_for(*replies)
+    c = claim(shot["claim"]["proposition"], reported_by=UNSPEC)
+    lk = link(ev(n=1, turn=1, text=replies[0]))
+    stub = StubClient()
+    stub.register("check", lambda req: VerifierOutput.model_validate(out))
+    (d,) = await check_claims([c], [lk], prep, prep.turns, make_ctx(llm=stub))
+    assert (d.verdict.value, [x.type.value for x in d.concerns]) == (
+        PAIRS["previous-medication"][4],
+        PAIRS["previous-medication"][5],
+    )
