@@ -30,7 +30,8 @@ _CAUSAL_CUE = re.compile(
 _NUMBER_WORDS = (
     r"zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen"
     r"|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy"
-    r"|eighty|ninety|hundred|thousand|million|billion|dozen|dozens"
+    r"|eighty|ninety|hundred|thousand|million|billion|dozen|dozens|hundreds|thousands|millions"
+    r"|billions|tens|half|halves|couple|pair|single|double(?!-check)|triple|quarter"
 )
 _NUMBER_TOKEN = re.compile(rf"\d|\b(?:{_NUMBER_WORDS})\b", re.IGNORECASE)
 

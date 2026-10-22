@@ -1,3 +1,4 @@
+import pytest
 from check_helpers import adhd_prep, claim, ev, link
 
 from iaudit_backend.check.group_a import run_group_a
@@ -6,6 +7,7 @@ from iaudit_backend.check.synth import (
     certainty_keys,
     flag_concerns,
     has_causal_cue,
+    has_number_token,
     judge,
 )
 from iaudit_backend.models import ConcernType
@@ -160,3 +162,23 @@ def test_quantity_flag_is_subject_to_the_p1_floor():
     v = VerifierOutput.model_validate({"items": [item()], "flags": [{**_qflag(), "conf": "low"}]})
     out, counts = apply_floors(v, Settings())
     assert out.flags == [] and counts["flags_below_floor"] == 1
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "10 pills", "$5", "50%", "five", "Twelve", "a dozen", "dozens of times", "one hundred",
+        "hundreds of times", "thousands", "millions", "billions", "tens of", "half the day",
+        "halves", "a couple of", "a pair of", "a single dose", "double the dose",
+        "triple the dose", "a quarter of them", "double the dose, double-check it",
+    ],
+)  # fmt: skip
+def test_has_number_token_true(text):
+    assert has_number_token(text)
+
+
+@pytest.mark.parametrize(
+    "text", ["", "often", "someone", "the dose is high", "halfway", "I double-check everything"]
+)
+def test_has_number_token_false(text):
+    assert not has_number_token(text)
