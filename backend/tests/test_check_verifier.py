@@ -198,3 +198,11 @@ def test_prompt_and_fewshot_cover_quantity_taxonomy():
     )
     # unscored speaker ids only
     assert {t["speaker"] for s in shots for t in s["turns"]} <= {"dr_vale", "jordan1"}
+
+
+def test_prompt_rounding_example_is_not_a_duration():
+    from iaudit_backend.check.verifier import PROMPTS
+
+    sysmd = (PROMPTS / "check_system.md").read_text(encoding="utf-8")
+    assert '"4.7 hours"' not in sysmd
+    assert '"2.3 miles" written as "2 miles"' in sysmd
