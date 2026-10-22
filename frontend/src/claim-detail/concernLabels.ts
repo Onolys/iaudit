@@ -4,7 +4,7 @@ import type { ConcernType } from "../contract";
 export const CONCERN_LABELS: Record<ConcernType, string> = {
   unsupported_claim: "Claim support",
   contradictory_evidence: "Contradictory evidence",
-  wrong_attribution: "Wrong person or source attribution",
+  wrong_attribution: "Wrong person, source, or entity attribution",
   timeframe_mismatch: "Timeframe mismatch",
   negation_reversal: "Negation reversal",
   certainty_inflation: "Certainty inflation",

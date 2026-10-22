@@ -145,7 +145,7 @@ A claim may have several. Explain the discrepancy once; do not repeat the same f
 |---|---|
 | `unsupported_claim` | 1. Claim support |
 | `contradictory_evidence` | 2. Contradictory evidence |
-| `wrong_attribution` | 3. Wrong person or source attribution |
+| `wrong_attribution` | 3. Wrong person, source, or entity attribution |
 | `timeframe_mismatch` | 4. Timeframe mismatch |
 | `negation_reversal` | 5. Negation reversal |
 | `certainty_inflation` | 6. Certainty inflation |

@@ -70,6 +70,10 @@ describe("concerns", () => {
     expect(concernLabel("something_new")).toBe("something_new");
   });
 
+  it("names check 3 per the approved mission wording", () => {
+    expect(CONCERN_LABELS.wrong_attribution).toBe("Wrong person, source, or entity attribution");
+  });
+
   it("renders a toggle button for a concern that cites a placed excerpt", () => {
     render(<ClaimDetail {...exampleProps("c-contradicted")} />);
     const buttons = within(screen.getByLabelText("Potential concerns")).getAllByRole("button");
