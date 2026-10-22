@@ -17,8 +17,10 @@ over HTTP, never imported.
 - `tests/` - offline tests; no API key or network needed.
 - `runs/`, `data/` - run output and downloaded data (under `IAUDIT_EVAL_HOME`, default `eval/`).
 
-Scoring (metrics, `scoring`, `compare`) and the HTTP server (`server/`) are covered by their own
-specs under `docs/specs/`; see the module docstrings. The engine is a library; it has no CLI.
+Scoring (metrics, `scoring`, `compare`) and the HTTP server (`server/`) are documented in the
+[eval API reference](../docs/reference/eval-api.md) and
+[server internals](../docs/implementation/eval-server.md); see also the module docstrings. The
+engine is a library with no CLI; `server/` is its local HTTP API.
 
 Paths are resolved from the installed module's repository location, independent of the working
 directory. `IAUDIT_EVAL_HOME` overrides the root for **datasets, data and runs**; populate its

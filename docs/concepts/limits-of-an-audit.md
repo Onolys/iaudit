@@ -4,8 +4,8 @@ What a result does and does not tell you.
 
 **Audience:** users and contributors.
 
-- **No concern does not mean correct.** A claim with no concern was not found to differ from the interview. The audit can miss things. There is no coverage field in contract 1.0.0, so an omitted concern means "not found", not "checked and clear".
-- **Some checks are quick passes.** Context stripping, certainty inflation, correction ignored, conflicting accounts and unsupported causal links come from a model's observation with a lower confidence bar, so they can be missed or over-flagged. Frequency, attribution, negation and timeframe are stronger because code does the comparison.
+- **No concern does not mean correct.** A claim with no concern was not found to differ from the interview. The audit can miss things. There is no coverage field in the contract, so an omitted concern means "not found", not "checked and clear".
+- **Some checks are quick passes.** Context stripping, certainty inflation, correction ignored, conflicting accounts, unsupported causal links and quantity mismatch come from a model's observation with a lower confidence bar, so they can be missed or over-flagged. Frequency, attribution, negation and timeframe are stronger because code does the comparison.
 - **`insufficient_evidence` is not "wrong".** The interview simply does not establish the claim. That is different from `contradicted`.
 - **Fidelity is to the supplied interview only.** The audit does not verify that what a participant said is true, and the assessor may know things that were not supplied.
 - **Wording is a prompt for review.** Explanations point at a possible discrepancy for a human to inspect. They are not allegations.
