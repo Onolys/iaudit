@@ -33,7 +33,7 @@ Tests at review time: eval 754 pass, ruff clean; frontend 553 pass, typecheck cl
 
 ## Resolution
 Owner decision: fix all findings (must-fix and notes). Every ID is fixed on branch feat/eval-review-taxonomy-v1, except where noted.
-B-1..B-6, B-9 (be67f70), B-7, B-13 (c2abaed), B-8 (b81b3cb), B-10 (3afa25a, ca7b62f), B-12 (9be08ed). B-11 (doc conflict between B4 AC7 and B2 R12): no commit on the branch touches it; no code change was made, left as a documentation note.
+B-1..B-6, B-9 (be67f70), B-7, B-13 (c2abaed), B-8 (b81b3cb), B-10 (3afa25a, ca7b62f), B-12 (9be08ed). B-11 (doc conflict between B4 AC7 and B2 R12) was fixed in 9be08ed: B4 PRD AC7 amended to allow B2's filename-safe item ids in engine logs; the `test_cross_cutting.py` carve-out comment cites it.
 
 Merge commits on the branch (`git log --oneline --merges main..HEAD`):
 ```
