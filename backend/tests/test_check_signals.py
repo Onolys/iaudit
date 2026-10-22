@@ -1,3 +1,5 @@
+import dataclasses
+
 import pytest
 from check_helpers import adhd_prep, claim, ev, link
 
@@ -182,3 +184,32 @@ def test_has_number_token_true(text):
 )
 def test_has_number_token_false(text):
     assert not has_number_token(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "I lead the platform group, the one in Austin.",
+        "No one else came.",
+        "Any one of them, every one, some one.",
+        "I moved in 2019 and again in 1998.",
+    ],
+)
+def test_turn_side_guard_ignores_pronoun_one_and_years(text):
+    assert not has_number_token(text, turn_side=True)
+    assert has_number_token("one of them, 3 times, in 2019", turn_side=True)
+    assert has_number_token("I have one child.", turn_side=True)
+
+
+def test_claim_side_guard_still_counts_one_and_years():
+    assert has_number_token("the one in Austin") and has_number_token("in 2019")
+
+
+def test_quantity_flag_suppressed_when_turn_only_has_pronoun_one():
+    turns = list(PREP.turns)
+    turns[5] = dataclasses.replace(turns[5], text="I lead the platform group, the one in Austin.")
+    out = {"items": [item()], "flags": [_qflag()]}
+    c = claim("The team had 12 people.")
+    v = VerifierOutput.model_validate(out)
+    _, sig = judge(c, link(ev(turn=5)), run_group_a(c, link(ev(turn=5)), turns), turns, v)
+    assert sig.flags == [] and sig.counts["flags_suppressed"] == 1

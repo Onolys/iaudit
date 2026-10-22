@@ -35,6 +35,9 @@ _NUMBER_WORDS = (
 )
 _NUMBER_TOKEN = re.compile(rf"\d|\b(?:{_NUMBER_WORDS})\b", re.IGNORECASE)
 
+_YEAR = re.compile(r"\b(?:19|20)\d{2}\b")
+_PRONOUN_ONE = re.compile(r"\b(?:the|no|any|every|some|that|this|which|each)\s+one\b", re.I)
+
 # --- timeframe (bucket 4) -------------------------------------------------------------------
 
 
@@ -125,8 +128,13 @@ def has_causal_cue(claim: AtomicClaim) -> bool:
     return bool(_CAUSAL_CUE.search(claim.proposition))
 
 
-def has_number_token(text: str) -> bool:
-    """A numeral, number word or amount token (currency and percent signs sit next to digits)."""
+def has_number_token(text: str, turn_side: bool = False) -> bool:
+    """A numeral, number word or amount token (currency and percent signs sit next to digits).
+
+    turn_side: also ignore 4-digit years and the pronoun "one" ("the one in Austin", "no one").
+    """
+    if turn_side:
+        text = _PRONOUN_ONE.sub(" ", _YEAR.sub(" ", text))
     return bool(_NUMBER_TOKEN.search(text))
 
 
@@ -137,7 +145,7 @@ def _quantity_flag_grounded(
     if not has_number_token(claim.proposition):
         return False
     cited = [it for it in items if not keys or it.key in keys]
-    return any(has_number_token(turns[i].text) for it in cited for i in it.turns)
+    return any(has_number_token(turns[i].text, turn_side=True) for it in cited for i in it.turns)
 
 
 def counts_as_support_base(it: JudgedEvidence) -> bool:
