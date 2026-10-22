@@ -2,7 +2,8 @@
 
 Each pair scripts the verifier output (no LLM, no network) and asserts the exact concern set the
 pipeline settles on. The scripted outputs are what a careful verifier returns; the first and
-sixth also carry a stray `quantity_mismatch` flag to pin the precedence and grounding rules.
+sixth, and the date, "about ten" and previous-medication pairs also carry a stray
+`quantity_mismatch` flag to pin the precedence and grounding rules.
 """
 
 import pytest
@@ -58,7 +59,7 @@ PAIRS = {
         "Priya has taken 20 mg since last March.",
         {"timeframe": "past"},
         ["I take 20 mg. I started it this June."],
-        {"items": [o(timeframe="current")]},
+        {"items": [o(timeframe="current")], "flags": [flag("quantity_mismatch", E1)]},
         "insufficient_evidence",
         ["timeframe_mismatch"],
     ),
@@ -66,7 +67,7 @@ PAIRS = {
         "Ten people report to Marcus.",
         {},
         ["About ten, I think. It shifts from month to month."],
-        {"items": [o(certainty="hedged_strong")]},
+        {"items": [o(certainty="hedged_strong")], "flags": [flag("quantity_mismatch", E1)]},
         "partially_supported",
         ["certainty_inflation"],
     ),
@@ -104,7 +105,10 @@ PAIRS = {
         "Lena takes 20 mg of sertraline.",
         {},
         ["That was my old medication, citalopram. I took 20 mg of that."],
-        {"items": [o(rel="contradicts", polarity="negated", experiencer="other_person")]},
+        {
+            "items": [o(rel="contradicts", polarity="negated", experiencer="other_person")],
+            "flags": [flag("quantity_mismatch", E1)],
+        },
         "contradicted",
         ["wrong_attribution"],
     ),
