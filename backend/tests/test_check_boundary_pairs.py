@@ -151,3 +151,19 @@ async def test_boundary_pair(make_ctx, name):
     got = [x.type.value for x in d.concerns]
     assert (d.verdict.value, got) == (verdict, expected), name
     assert not {"frequency_severity_inflation", "quantity_mismatch"} <= set(got)
+
+
+async def test_figure_only_claim_with_different_figure_is_contradicted(make_ctx):
+    """Req 4: a claim whose only content is the figure, against a different figure, is D4."""
+    replies = ["Twelve people report to me."]
+    prep = prep_for(*replies)
+    c = claim("Eight people report to Marcus.", reported_by=UNSPEC)
+    lk = link(ev(n=1, turn=1, text=replies[0]))
+    out = {"items": [o(rel="contradicts")], "flags": [flag("quantity_mismatch", E1)]}
+    stub = StubClient()
+    stub.register("check", lambda req: VerifierOutput.model_validate(out))
+    (d,) = await check_claims([c], [lk], prep, prep.turns, make_ctx(llm=stub))
+    assert (d.verdict.value, [x.type.value for x in d.concerns]) == (
+        "contradicted",
+        ["quantity_mismatch"],
+    )

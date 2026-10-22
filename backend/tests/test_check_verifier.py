@@ -206,3 +206,14 @@ def test_prompt_rounding_example_is_not_a_duration():
     sysmd = (PROMPTS / "check_system.md").read_text(encoding="utf-8")
     assert '"4.7 hours"' not in sysmd
     assert '"2.3 miles" written as "2 miles"' in sysmd
+
+
+def test_prompt_has_figure_only_contradiction_rule():
+    from iaudit_backend.check.verifier import PROMPTS
+
+    sysmd = (PROMPTS / "check_system.md").read_text(encoding="utf-8")
+    rule = (
+        "If the claim's only content is the figure and the item states a different figure, "
+        "use `contradicts` and raise quantity_mismatch."
+    )
+    assert rule in sysmd

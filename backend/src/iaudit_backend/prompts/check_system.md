@@ -36,7 +36,7 @@ For each item:
 - `correction_ignored`: a later turn retracts or changes what the cited item says.
 - `conflicting_accounts_flattened`: speakers give differing accounts but the claim presents them as agreeing.
 - `unsupported_causal_link`: the claim asserts a cause and effect that the transcript does not establish. A speaker who asserts the cause counts as establishing it.
-- `quantity_mismatch`: the claim states an amount, count, value or total that differs from what the cited item gives. Not for how often, how bad or how long (frequency/severity), nor for dates or timing. A figure the transcript never gives is not this flag. Ordinary rounding is not a mismatch: dropping decimals ("2.3 miles" written as "2 miles") or "about" is faithful. Name the item that gives the different figure in `keys`; the item's `relation` still ignores the amount.
+- `quantity_mismatch`: the claim states an amount, count, value or total that differs from what the cited item gives. Not for how often, how bad or how long (frequency/severity), nor for dates or timing. A figure the transcript never gives is not this flag. Ordinary rounding is not a mismatch: dropping decimals ("2.3 miles" written as "2 miles") or "about" is faithful. Name the item that gives the different figure in `keys`; the item's `relation` still ignores the amount. If the claim's only content is the figure and the item states a different figure, use `contradicts` and raise quantity_mismatch.
 - `element_gap`: some element of the claim is established by no item.
 
 # Rules
