@@ -1,5 +1,6 @@
 import random
 
+import pytest
 from check_helpers import claim, ev
 
 from iaudit_backend.check.models import Concern, FlagObs, ItemObs, JudgedEvidence, Signals
@@ -383,3 +384,33 @@ def test_quantity_concern_sorts_last_and_template_has_no_digits_or_banned_words(
     assert types(d) == [CT.context_stripping, CT.quantity_mismatch]
     text = concern_text(d.concerns[-1], Slots())
     assert not any(ch.isdigit() for ch in text) and not BANNED.search(text)
+
+
+_STACK_PARTNERS = [
+    CT.certainty_inflation,
+    CT.correction_ignored,
+    CT.conflicting_accounts_flattened,
+    CT.timeframe_mismatch,
+]
+
+
+@pytest.mark.parametrize("other", _STACK_PARTNERS)
+def test_dedup_quantity_mismatch_yields_to_overlapping_partner(other):
+    got = dedup([Concern(CT.quantity_mismatch, ["a"]), Concern(other, ["a", "b"])])
+    assert [c.type for c in got] == [other]
+
+
+@pytest.mark.parametrize("other", _STACK_PARTNERS)
+def test_dedup_quantity_mismatch_yields_when_either_side_has_no_keys(other):
+    assert [c.type for c in dedup([Concern(CT.quantity_mismatch, []), Concern(other, ["b"])])] == [
+        other
+    ]
+    assert [c.type for c in dedup([Concern(CT.quantity_mismatch, ["a"]), Concern(other, [])])] == [
+        other
+    ]
+
+
+@pytest.mark.parametrize("other", _STACK_PARTNERS)
+def test_dedup_quantity_mismatch_kept_on_different_items(other):
+    got = dedup([Concern(CT.quantity_mismatch, ["a"]), Concern(other, ["b"])])
+    assert {c.type for c in got} == {CT.quantity_mismatch, other}

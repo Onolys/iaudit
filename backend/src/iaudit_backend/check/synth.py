@@ -297,6 +297,12 @@ _CHAIN = (
     ConcernType.quantity_mismatch,
     ConcernType.contradictory_evidence,
 )
+_QUANTITY_YIELDS_TO = (
+    ConcernType.certainty_inflation,
+    ConcernType.correction_ignored,
+    ConcernType.conflicting_accounts_flattened,
+    ConcernType.timeframe_mismatch,
+)
 _ORDER = {t: n for n, t in enumerate(ConcernType)}
 _Role = EvidenceRole
 
@@ -348,6 +354,14 @@ def dedup(concerns: list[Concern]) -> list[Concern]:
                 if not lc.keys or not hc.keys or set(lc.keys) & set(hc.keys):
                     del cs[low]
                     break
+    # One discrepancy, one concern: a more specific cause explains an amount gap on the same items.
+    qm = cs.get(ConcernType.quantity_mismatch)
+    if qm is not None:
+        for other in _QUANTITY_YIELDS_TO:
+            oc = cs.get(other)
+            if oc is not None and (not qm.keys or not oc.keys or set(qm.keys) & set(oc.keys)):
+                del cs[ConcernType.quantity_mismatch]
+                break
     # D5 precedence: conflicting accounts > correction ignored > generic contradiction
     if ConcernType.conflicting_accounts_flattened in cs:
         cs.pop(ConcernType.correction_ignored, None)
