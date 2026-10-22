@@ -45,6 +45,9 @@ class FrozenMapping:
     _rules: Mapping[str, _Rule]
     mapped_concerns: frozenset[str]
 
+    def is_known_type(self, error_type: str) -> bool:
+        return normalize_type(error_type) in self._rules
+
     def applicable_allowed(self, error_type: str, dataset: str) -> frozenset[str] | None:
         """None means recall-only or no concern agreement for this dataset."""
         if dataset not in _DATASETS:

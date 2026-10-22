@@ -113,3 +113,17 @@ it("retries the selected filter and replaces an inline error with rows", async (
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(String(fetch.mock.calls[1][0])).toContain("filter=all");
 });
+
+it("says when the server holds more items than were returned", async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => json({ ...fixture, total: fixture.items.length + 5 }));
+  render(<ItemList api={createEvalApi({ fetch })} runId="r" onOpenItem={() => {}} />);
+  await screen.findByRole("button", { name: "Public contract example" });
+  expect(screen.getByText(`Showing ${fixture.items.length} of ${fixture.items.length + 5} items`)).toBeTruthy();
+});
+
+it("shows no truncation note when every item is shown", async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => json(fixture));
+  render(<ItemList api={createEvalApi({ fetch })} runId="r" onOpenItem={() => {}} />);
+  await screen.findByRole("button", { name: "Public contract example" });
+  expect(screen.queryByText(/Showing \d+ of/)).toBeNull();
+});

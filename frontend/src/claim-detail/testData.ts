@@ -21,6 +21,6 @@ export function exampleProps(id: string): Props {
 
 /** Props for a hand-built claim over a given request, run through the real analysis. */
 export function inlineProps(req: AuditRequest, claim: Claim): Props {
-  const a = analyzeResponse(req, { schema_version: "1.1.0", status: "complete", warnings: [], claims: [claim] });
+  const a = analyzeResponse(req, { schema_version: "1.2.0", status: "complete", warnings: [], claims: [claim] });
   return { claim, request: req, check: a.checks[claim.id] };
 }

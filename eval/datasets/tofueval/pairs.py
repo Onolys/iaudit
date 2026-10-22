@@ -69,6 +69,8 @@ def pairs(
         is_meta = bool(sentence and sentence["meta"])
         alternate = "unresolved" if is_meta else label
         alternate_labels.append(alternate)
+        for name in source["types"]:
+            mapping.applicable_allowed(name, dataset)  # unknown type raises, as in item_rows
         types = {normalize_type(name) for name in source["types"]}
         meta = {
             **base, "sent_idx": index, "meta": is_meta,

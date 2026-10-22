@@ -28,7 +28,9 @@ available. Split, N and screen selection reset on remount.
 | Estimate | Updates after 400 ms without input changes. Known cost appears as `~$X.XX for {n_items} items (rough)`. Unknown cost shows the server's note, or `Cost unknown — run a pilot (e.g. N=5) first`. |
 | Max cost (USD) | Optional. Blank sends no cap. A supplied value must be greater than zero. An untouched field is prefilled with 1.5 × a known positive estimate, rounded up to cents; unknown cost leaves it blank. Editing the field, including clearing it, preserves that choice across estimates. |
 
-Invalid N or max cost disables **Run** and shows an inline explanation. Unknown cost
+Invalid N or max cost disables **Run** and shows an inline explanation. Run is also
+disabled while an estimate is pending and the cap is untouched, so a cap that is about
+to be prefilled is never skipped; an explicit edit (including clearing) lifts this. Unknown cost
 alone does not disable Run. Estimates are rough, and in-flight requests can finish
 beyond a cost cap. If a cap is set and the backend does not report cost, the run fails
 closed; the panel shows the `failed` state and the server's actual failure message.
@@ -42,12 +44,15 @@ previous response.
 
 If required data is absent, **Download data** replaces Run. The same happens when a
 start attempt returns `data_missing`. Downloading shows `downloading…` and polls until
-ready or failed. Failure shows the returned error and **Retry download**. Completion
+ready or failed. Failure shows the returned error and **Retry download**. Switching dataset clears the previous dataset's download state, and a retry
+never inherits an earlier attempt's result. Completion
 refreshes dataset metadata and restores Run when the server reports the data present.
 
 **Abort** lets server-side in-flight work finish. The button reads **Aborting…** and
 is disabled while the abort request is pending. Terminal states hide Abort and refresh
-the runs list. The cost-cap state is displayed as `aborted: cost cap`.
+the runs list. The cost-cap state is displayed as `aborted: cost cap`. The abort request
+waits up to 120 seconds; if it times out but progress already shows a stopped run, no
+timeout error is shown.
 
 The server permits one active run. If a start returns `run_active`, the panel shows
 `Run {id} is already active` and **Attach to active run**. Mounting Eval also attaches
@@ -67,6 +72,12 @@ The active row uses the Run panel's progress; it has no separate progress poller
 | `finished`, no failed items | Unavailable |
 | `finished`, at least one failed item | Available |
 | `aborted`, `aborted_cost`, `interrupted`, `failed` | Available |
+
+A `failed` run whose error kind is `cost_missing` (a cap was set but the backend does
+not report cost) shows **Resume without cap** instead, with a note that the backend
+doesn't report cost; it sends `{"max_cost_usd": null}`. Plain Resume sends no body and
+keeps the stored cap. The run detail shows a server-reported `resume_refusal` (kind and
+changed fields) as a plain message.
 
 **Resume** retries failed or missing results while preserving successful ones. Resume
 buttons are disabled while a run is active or starting/attaching, or another resume
@@ -99,7 +110,8 @@ to 8000/8100/5173 and supplies matching environment settings.
 
 This is a local development/preview setup. Hosted deployment configuration is outside
 this UI version. Requests omit cookies. Client timeouts are 10 seconds for reads and
-30 seconds for POST requests.
+30 seconds for POST requests, except `GET /compare` and `POST /runs/{id}/abort` (120 seconds).
+Ids that are empty, `.` or `..` are refused client-side with an `invalid_request` error.
 
 ## Empty and error states
 
@@ -122,18 +134,25 @@ Run detail shows dataset, split, selected N, creation date and state, then failu
 metrics, items and run information. **Back to runs** returns to the list.
 
 **Re-score** recomputes saved results without calling the audit backend or a model.
-It is disabled while the run is running or scoring is pending/running. `Scoring...`
-replaces the metrics table until scoring finishes; the screen polls and then fetches
-fresh metrics. A failed score shows `Scoring failed. Re-score to retry.` Missing metrics
-after scoring finishes show `Metrics missing. Re-score.` A 404 `not_found` on the
+It is disabled while the run is running or scoring is running. While the run is
+running, run detail shows `Run in progress (done/total)` from the run's progress, and
+the items list refreshes whenever progress changes and when the run ends. After the
+run ends, `Scoring...` replaces the metrics table while scoring is pending or running;
+the screen polls and then fetches fresh metrics. A terminal run whose score stays
+`pending` is polled for a short grace period (two polls), then polling stops and the
+screen shows `Metrics missing. Re-score.` with Re-score enabled. A failed score shows
+`Scoring failed. Re-score to retry.` Missing metrics after scoring finishes show
+`Metrics missing. Re-score.` A 404 `not_found` on the
 metrics route means missing metrics, rather than a failed run-detail request.
 
 Metrics are grouped by level, then slice, preserving server order. Primary values
 count failures wrong; secondary values exclude failures. Each policy has its own
 value, n and confidence interval. Hover for cluster counts. An unavailable interval
 shows `-` with a `few_clusters` or `undefined` hint. The failure sentence uses item
-counts; policy-none rates appear separately with their level and slice, so sentence
-or summary rates cannot be mistaken for counts of failed items.
+counts; the policy-none `failure_rate` and `coverage` rates appear on the failure
+line with their level and slice, so sentence or summary rates cannot be mistaken for
+counts of failed items. Any other policy-none metric (for example TofuEval sentence
+diagnostics) appears under **Diagnostics**, one value/n table per level and slice.
 
 Paper reference rows follow their matching metric, retain the paper's evaluator
 label and show `paper-reported, different model & date`. They are grey, value-only
@@ -142,14 +161,14 @@ rows with dashes elsewhere; they are never ranked or colored by performance.
 
 Run information shows commit/dirty state, models per tier, prompt hashes (eight
 characters with the full hash on hover), mapping version, seed, supplied tags,
-reported cost or `unknown`, and tokens only when supplied. Mixed fingerprints and
+reported cost (dollars and cents, e.g. `$0.12`) or `unknown`, and tokens only when supplied. Mixed fingerprints and
 saved warnings remain visible. Test runs add `Test runs are for reporting, not tuning.`
 
 ## Items and saved review
 
 The item table filters **all**, **mismatch** or **failed** with one high-limit request.
 Columns show the item's label or ID, Gold, Ours, Match and failed status. Empty filters
-show `No items match this filter.` Prior rows stay visible and dimmed while a new
+show `No items match this filter.` When fewer rows are returned than exist, `Showing X of Y items` appears. Prior rows stay visible and dimmed while a new
 filter loads. Click a row or its item button to open it.
 
 A saved item shows a back action, gold annotations and the same assessment/evidence
@@ -165,9 +184,8 @@ it can still replay a valid saved response. If none exists, it says
 `No saved audit response is available.`
 
 Saved requests and responses pass the same validators as Audit. The current audit
-contract pin is **1.1.0**: stale 1.0.0 responses show the unsupported-version error.
-The planned A1 pin change to 1.2.0 will also reject saved 1.1.0 items. This is an
-accepted limitation; there is no replay compatibility layer. Run lists, saved
+contract pin is **1.2.0**: saved 1.0.0 and 1.1.0 responses show the unsupported-version error.
+This is an accepted limitation; there is no replay compatibility layer. Run lists, saved
 metrics and comparisons remain available independently of item replay validation.
 
 ### Gold kinds
@@ -202,7 +220,7 @@ the proxy against a stub. The following live checks remain for the owner:
 - After downloading the real dataset and completing a paid pilot, open one real
   TofuEval item and compare its gold with the source CSV; inspect run detail and compare.
 - Open the largest saved item and check its load time in a real browser.
-- After A1, verify that older 1.1.0 items show the unsupported-version screen while
+- Verify that older (1.1.0 and earlier) items show the unsupported-version screen while
   run lists, metrics and comparisons still work.
 
 Full-stack launches, live provider calls and real dataset downloads are owner checks;

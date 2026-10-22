@@ -149,6 +149,6 @@ eval/api/eval-api.schema.json   # {$defs: {...}, "x-routes": {"GET /runs": "RunS
 4. Only one run active; second start returns 409 with the active id.
 5. Backend down → 502 `backend_unreachable`; version mismatch → 409 `schema_mismatch`; no run directory is created for either.
 6. Id traversal attempts never touch files outside roots.
-7. No transcript text or item ids in logs (sentinel test).
+7. No transcript text in logs; no item ids in B4's own HTTP request logs (route templates only). B2's engine logs may include filename-safe item ids per B2 R12.
 8. [Owner manual check] `scripts/dev.sh` brings up all three, prefixed output, Ctrl-C leaves no orphan processes; `--stub` works.
 9. Docs files listed above exist and are linked from their folder READMEs.

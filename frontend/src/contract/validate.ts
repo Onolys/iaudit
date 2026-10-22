@@ -43,7 +43,7 @@ export function validateResponse(
   request: AuditRequest,
 ): Result<AuditResponse, ResponseError> {
   if (!isObject(raw)) return { ok: false, error: { kind: "not_object" } };
-  if (raw.schema_version !== "1.1.0") return { ok: false, error: { kind: "wrong_version" } };
+  if (raw.schema_version !== "1.2.0") return { ok: false, error: { kind: "wrong_version" } };
   if (!checkResponse(raw)) {
     return { ok: false, error: { kind: "schema", issues: issues(checkResponse.errors) } };
   }

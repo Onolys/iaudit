@@ -9,9 +9,10 @@ def assert_sentence_offsets(text: str, sentences: Iterable[Mapping[str, Any]]) -
     """Fail loudly if a sentence's code-point span no longer identifies its text."""
     for sentence in sentences:
         start, end = sentence["start"], sentence["end"]
-        assert 0 <= start <= end <= len(text) and text[start:end] == sentence["text"], (
-            f"Sentence {sentence['sent_idx']} has invalid assessment offsets [{start}:{end}]"
-        )
+        if not (0 <= start <= end <= len(text) and text[start:end] == sentence["text"]):
+            raise ValueError(
+                f"Sentence {sentence['sent_idx']} has invalid assessment offsets [{start}:{end}]"
+            )
 
 
 def build_assessment(

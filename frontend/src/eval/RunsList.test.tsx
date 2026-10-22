@@ -4,6 +4,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { RunsList } from "./RunsList";
 import { createEvalApi } from "./evalApi";
 import fixtures from "./fixtures/runs.json";
+import failedDetail from "./fixtures/run-failed.json";
 import type { RunSummary } from "./evalTypes";
 afterEach(cleanup);
 const rows = fixtures as RunSummary[];
@@ -20,7 +21,7 @@ it("renders every column, nullable values and the cost-cap label", async () => {
   setup(); await screen.findByText("aborted: cost cap");
   for (const name of ["Select","Date","Dataset","Split","N","Schema","State","Cost","Failures"]) expect(screen.getByRole("columnheader",{name})).toBeTruthy();
   const row=screen.getByRole("checkbox",{name:"Select fictional-aborted"}).closest("tr")!;
-  expect(within(row).getByText("fixture-created")).toBeTruthy(); expect(within(row).getByText("1.1.0")).toBeTruthy();
+  expect(within(row).getByText("fixture-created")).toBeTruthy(); expect(within(row).getByText("1.2.0")).toBeTruthy();
   expect(within(row).getByText("—")).toBeTruthy(); expect(within(row).getByText("3")).toBeTruthy();
 });
 it("implements the complete resume matrix and attaches the returned run", async () => {
@@ -90,4 +91,24 @@ it("sends only one resume POST for quick repeated clicks",async()=>{
   render(<RunsList api={api} onResume={vi.fn()} onOpenRun={vi.fn()} onCompare={vi.fn()}/>);
   const buttons=await screen.findAllByRole("button",{name:"Resume"});
   fireEvent.click(buttons[0]);fireEvent.click(buttons[1]);expect(posts).toBe(1);
+});
+
+it("offers Resume without cap for a cost_missing failure and sends max_cost_usd null",async()=>{
+  const bodies:unknown[]=[];
+  const failed=rows.find(row=>row.run_id==="fictional-failed")!;
+  const api=createEvalApi({fetch:(async(url:RequestInfo|URL,opts?:RequestInit)=>{
+    const path=String(url);
+    if(path.endsWith("/resume")){bodies.push(opts?.body);return Response.json({...failed,state:"running"});}
+    if(path.endsWith("/runs/fictional-failed"))return Response.json(failedDetail);
+    return Response.json([failed,rows.find(row=>row.state==="aborted")!]);
+  }) as typeof fetch});
+  const onResume=vi.fn();
+  render(<RunsList api={api} onResume={onResume} onOpenRun={vi.fn()} onCompare={vi.fn()}/>);
+  const button=await screen.findByRole("button",{name:"Resume without cap"});
+  expect(screen.getByText(/backend doesn't report cost/)).toBeTruthy();
+  const aborted=screen.getByRole("checkbox",{name:"Select fictional-aborted"}).closest("tr")!;
+  expect(within(aborted).getByRole("button",{name:"Resume"})).toBeTruthy();
+  fireEvent.click(button);
+  await waitFor(()=>expect(onResume).toHaveBeenCalled());
+  expect(bodies).toEqual([JSON.stringify({max_cost_usd:null})]);
 });

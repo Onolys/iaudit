@@ -45,6 +45,7 @@ export const fixtureCases: FixtureCase[] = [
   { file: "run-finished.json", route: "GET /runs/{id}", status: 200 },
   { file: "run-interrupted.json", route: "GET /runs/{id}", status: 200 },
   { file: "run-rescore-response.json", route: "POST /runs/{id}/rescore", status: 202 },
+  { file: "run-resume-refused.json", route: "GET /runs/{id}", status: 200 },
   { file: "run-resume-response.json", route: "POST /runs/{id}/resume", status: 202 },
   { file: "run-running.json", route: "GET /runs/{id}", status: 200 },
   { file: "runs-empty.json", route: "GET /runs", status: 200 },

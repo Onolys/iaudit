@@ -10,7 +10,7 @@ export const VERDICTS = [
   "out_of_scope",
 ] as const;
 
-// Mission checks 1-12, in order.
+// Mission checks 1-13, in order.
 export const CONCERN_TYPES = [
   "unsupported_claim",
   "contradictory_evidence",
@@ -24,6 +24,7 @@ export const CONCERN_TYPES = [
   "correction_ignored",
   "conflicting_accounts_flattened",
   "unsupported_causal_link",
+  "quantity_mismatch",
 ] as const;
 
 export const EVIDENCE_ROLES = ["supporting", "contradicting", "qualifying"] as const;
@@ -58,7 +59,7 @@ export interface Section {
 }
 
 export interface AuditRequest {
-  schema_version: "1.1.0";
+  schema_version: "1.2.0";
   request_id?: string;
   transcript: Turn[];
   assessment: Section[];
@@ -117,7 +118,7 @@ export interface RunInfo {
 }
 
 export interface AuditResponse {
-  schema_version: "1.1.0";
+  schema_version: "1.2.0";
   request_id?: string;
   status: Status;
   warnings: Warning[];

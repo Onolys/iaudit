@@ -13,7 +13,7 @@ Hand-written mock samples live in [`../mock/`](../mock/) and are kept. They targ
 | File | What it is |
 |---|---|
 | `<interview-id>/request.json` | Transcript and clinician note. Valid against [audit-request.schema.json](../../contracts/audit-request.schema.json). |
-| `<interview-id>/expected.json` | Answer key: the evaluator-labelled claims that map to one of the 12 checks. |
+| `<interview-id>/expected.json` | Answer key: the evaluator-labelled claims that map to one of the 13 checks. |
 | `<interview-id>/SOURCE.md` | Exact upstream files and commit, license credit, citation and per-interview conversion notes. |
 | [DATASETS.md](DATASETS.md) | Every dataset reviewed, including the ones not used yet. |
 | [brainstorming.md](brainstorming.md) | The decisions behind this folder. |
@@ -35,7 +35,7 @@ Hand-written mock samples live in [`../mock/`](../mock/) and are kept. They targ
 
 In total there are 37 labelled claims, covering 92 of the 108 evaluator items.
 
-The keys cover checks 1–10. No label maps to check 11 (conflicting accounts flattened), because each consultation has only one respondent. None maps to check 12 (unsupported causal links) either.
+The keys cover checks 1–10. No label maps to check 11 (conflicting accounts flattened), because each consultation has only one respondent. None maps to check 12 (unsupported causal links) either, nor to check 13 (quantity mismatch). The keys were written when the mission had 12 checks.
 
 Some presenting complaints don't match the conversation, for example in `day2-consultation05` and `day3-consultation09`. They are upstream intake text, and the clinician's note says so in one case.
 
@@ -69,7 +69,7 @@ The evaluators reviewed each note only up to its impression or plan. The full no
 The labels come from the `Incorrect statements` column for the `doctor` rows. Evaluators produced it by post-editing the note and listing what they deleted. Items start with `!` (critical) or `-` (non-critical). A line without a marker continues the item above it.
 
 These labels are kept:
-- An item is mapped when, after reading the transcript around it, the claim it marks fails one of the 12 checks in [docs/mission.md](../../mission.md).
+- An item is mapped when, after reading the transcript around it, the claim it marks fails one of the 13 checks in [docs/mission.md](../../mission.md).
 - The evaluator's verbatim item is kept on every claim it maps to, so each mapping can be reviewed.
 
 These are dropped, and only their counts appear in `label_counts`:

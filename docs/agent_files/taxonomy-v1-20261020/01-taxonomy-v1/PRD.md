@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Add quantity_mismatch as mission check 13 (13th enum value, contract 1.2.0), widen wrong_attribution and context_stripping, add two labelling rules, amend the mission's score-arithmetic exclusion; everything justified from the mission, measured on TofuEval dev with mapping v1.0.0 untouched.
 date: 2026-10-20
 ---
@@ -106,8 +106,8 @@ verifier prompt  --flag quantity_mismatch(keys,conf)-->  verifier.apply_floors (
 | 13 | Fixture | New fictional mock `11-...` (medication/team size) plus boundary pairs as tests | Edit an existing mock | Existing mocks' offsets and ADHD gold stay untouched |
 
 ## Manual steps
-- User approves the final mission wording (table above) before implementation starts; the mission wins on conflict.
-- User records the TofuEval dev baseline (C/D tooling) before A1 prompt changes merge, and runs the after pass; test-split run once, only at the end.
+- User approves the final mission wording (table above) before implementation starts; the mission wins on conflict. [DONE: mission wording approved by owner 2026-10-21]
+- User records the TofuEval dev baseline (C/D tooling) before A1 prompt changes merge, and runs the after pass [baseline step waived by owner 2026-10-21]; test-split run once, only at the end.
 - User runs the final end-to-end test (incl. saved-item replay) after all changes. Owner runs everything live manually; implementing agents run no live LLM calls, live evals, or TofuEval before/after.
 - User confirms the 13-label ADR wording and ADR number if B1's changes.
 
@@ -124,6 +124,7 @@ verifier prompt  --flag quantity_mismatch(keys,conf)-->  verifier.apply_floors (
 - [DEFERRED: owner measures in manual runs] Widened `wrong_attribution` may raise false positives on current-vs-previous items; widened `context_stripping` may over-fire on legitimate summarization. Mitigation: clean few-shot cases, ADHD bucket 3 and 8 precision compared before/after by the owner in their own runs.
 - [DEFERRED: owner measures in manual runs; checks p95 latency] Prompt growth vs the audit deadline: 100 s (`config.py` `audit_deadline_s`) is canonical; ADR 0008 is corrected in eval-core B2 (owner decision 2026-10-20). Compare p95 latency on the ADHD set against 100 s; prompt token count only if available (backend does not compute tokens/cost).
 - [DEFERRED] Deterministic numeric comparison in code (Decision 4 alt b); rename `other_person`; broaden `unsupported_causal_link`; evidence-based escalation to contradicted.
+- [RESOLVED: mission wording approved and TofuEval dev baseline step waived, owner decision 2026-10-21]
 - Labelled evidence caveat: the 13-of-84 residue behind the brief is LLM-judged, not gold; a recall change is evidence about the implementation, not proof the taxonomy is right.
 
 ## Acceptance Criteria

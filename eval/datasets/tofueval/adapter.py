@@ -62,6 +62,15 @@ class TofuEvalAdapter:
     def gold(self, item: Item):
         return labels.gold(item)
 
+    def check_request(self, request: dict, item: Item) -> bool:
+        """True when the saved request's section-0 text equals the current local rebuild."""
+        section, _ = build_assessment(item.payload["sentences"])
+        try:
+            saved = next(s for s in request["assessment"] if s.get("id") == section["id"])
+        except (KeyError, TypeError, StopIteration):
+            return False
+        return saved.get("text") == section["text"]
+
     def project(self, response: dict, item: Item):
         return projection.project(response, item, self._frozen_mapping())
 

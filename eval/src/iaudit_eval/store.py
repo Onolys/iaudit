@@ -9,6 +9,7 @@ import json
 import os
 import re
 import secrets
+import time
 from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
@@ -86,6 +87,10 @@ def clean_stale_tmp(root: Path | None, run_id: str) -> int:
 
 # ---------- lock ----------
 
+_ACQUIRE_TRIES = 6
+_ACQUIRE_PAUSE_S = 0.02
+
+
 class RunLock:
     """Exclusive non-blocking flock on run.lock; released on exit or crash."""
 
@@ -98,7 +103,16 @@ class RunLock:
         fd = os.open(self.path, os.O_RDWR | os.O_CREAT, paths.FILE_MODE)
         try:
             os.fchmod(fd, paths.FILE_MODE)
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            # A concurrent is_locked probe holds a shared lock for an instant; retry
+            # briefly so a read never makes a real writer fail.
+            for attempt in range(_ACQUIRE_TRIES):
+                try:
+                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError:
+                    if attempt == _ACQUIRE_TRIES - 1:
+                        raise
+                    time.sleep(_ACQUIRE_PAUSE_S)
         except OSError as e:
             os.close(fd)
             raise RunLockedError("run is locked by another writer") from e
@@ -119,13 +133,18 @@ class RunLock:
 
 def is_locked(root: Path | None, run_id: str) -> bool:
     lock = run_dir(root, run_id) / "run.lock"
-    if not lock.exists():
+    try:
+        fd = os.open(lock, os.O_RDONLY)
+    except FileNotFoundError:
         return False
     try:
-        with RunLock(root, run_id):
-            return False
-    except RunLockedError:
+        # Shared probe: never excludes another prober, and a writer retries past it.
+        fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+    except BlockingIOError:
         return True
+    finally:
+        os.close(fd)
+    return False
 
 
 # ---------- run.json ----------

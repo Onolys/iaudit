@@ -57,7 +57,7 @@ def test_worked_row_exact_shape_counts_and_no_source_text(monkeypatch):
         "pred": "inconsistent (2 of 6; 1 unresolved)", "match": True, "outcome": "tp",
     }
     detail = row["detail"]
-    assert set(detail) == {"doc_id", "dataset", "topic_category", "model_name", "model_group", "gold", "pred", "sentences"}
+    assert set(detail) == {"doc_id", "dataset", "topic_category", "model_name", "model_group", "has_gaps", "gold", "pred", "sentences"}
     assert detail["gold"] == {"summary": "inconsistent", "n_sentences": 6, "n_inconsistent": 2, "types": ["Extrinsic Information", "Nuanced Meaning Shift", "Tense/Modality Error"]}
     assert detail["pred"] == {"summary": "inconsistent", "n_inconsistent": 2, "n_unresolved": 1, "n_meta": 1}
     assert [s["outcome"] for s in detail["sentences"]] == ["tp", "tn", "fp", "unresolved", "tn", "tn"]
@@ -136,3 +136,10 @@ def test_rows_join_by_id_and_snapshot_inputs_without_mutating_mapping(monkeypatc
     pred["sentences"][-1]["claim_ids"].append("later")
     assert row["detail"]["sentences"][0]["gold_types"] == ["Extrinsic Information", "Nuanced Meaning Shift"]
     assert row["detail"]["sentences"][0]["claim_ids"] == ["c0"]
+
+
+def test_has_gaps_reported_from_item_meta(monkeypatch):
+    item, gold, pred = fixture()
+    assert build(monkeypatch, item, gold, pred)["detail"]["has_gaps"] is False
+    item.meta["has_gaps"] = True
+    assert build(monkeypatch, item, gold, pred)["detail"]["has_gaps"] is True

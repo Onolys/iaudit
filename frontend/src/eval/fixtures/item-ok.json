@@ -2,7 +2,7 @@
   "item_id": "fictional-item-0",
   "status": "ok",
   "request": {
-    "schema_version": "1.1.0",
+    "schema_version": "1.2.0",
     "request_id": "example-001",
     "transcript": [
       {
@@ -53,7 +53,7 @@
     ]
   },
   "response": {
-    "schema_version": "1.1.0",
+    "schema_version": "1.2.0",
     "request_id": "example-001",
     "status": "complete",
     "warnings": [],

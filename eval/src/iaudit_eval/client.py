@@ -3,10 +3,12 @@
 Failure kinds (`Outcome.kind` when `status == "failed"`):
 
 - ``invalid_request``: the request failed contract validation locally; nothing was sent.
-- ``timeout``: total deadline (``timeout_s``) or any httpx timeout (read/write/pool/connect
-  timeout). Never retried: the backend may already have spent money.
+- ``timeout``: total deadline (``timeout_s``) or any httpx timeout (read/write/pool
+  timeout; a connect timeout is ``network``). Never retried: the backend may already have
+  spent money.
 - ``network``: transport failure with no HTTP response (refused, reset, DNS...). Only a
-  connect error (``httpx.ConnectError``) is retried once.
+  connect error or connect timeout (``httpx.ConnectError``/``ConnectTimeout``) is
+  retried once.
 - ``http_error``: non-2xx status whose body is a *valid* ErrorResponse; ``error_code`` and
   ``error_message`` are set. This is the backend telling us why (rate_limited, ...).
 - ``error_body``: non-2xx status whose body is non-JSON or not a valid ErrorResponse; only
@@ -121,7 +123,7 @@ class AuditClient:
         try:
             async with asyncio.timeout(self.timeout_s):
                 resp = await self._http.post("/v1/audit", json=request)
-        except httpx.ConnectError:
+        except (httpx.ConnectError, httpx.ConnectTimeout):
             return _failed("network", attempt), True
         except (httpx.TimeoutException, TimeoutError):
             return _failed("timeout", attempt), False

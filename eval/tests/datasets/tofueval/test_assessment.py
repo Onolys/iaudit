@@ -87,5 +87,5 @@ def test_corrupt_sentence_offset_or_text_raises(sentences, field, value):
     section, positioned = assessment.build_assessment(sentences)
     positioned[0][field] = value
 
-    with pytest.raises(AssertionError, match="Sentence 1.*offset"):
+    with pytest.raises(ValueError, match="Sentence 1.*offset"):
         assessment.assert_sentence_offsets(section["text"], positioned)

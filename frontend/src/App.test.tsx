@@ -122,6 +122,7 @@ describe("Audit and Eval switch", () => {
       render(<App deps={okDeps()} evalApi={createEvalApi({ fetch: fetch as typeof globalThis.fetch })} />);
       fireEvent.click(screen.getByRole("button", {name: "Eval"}));
       await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+      await act(async () => { await vi.advanceTimersByTimeAsync(400); });
       fireEvent.click(screen.getByRole("button", {name: "Run"}));
       await act(async () => { await vi.advanceTimersByTimeAsync(0); });
       expect(screen.getByRole("progressbar")).toBeTruthy();

@@ -12,6 +12,7 @@ from typing import Any
 from iaudit_eval.datasets.base import ID_RE, Item
 
 from .assessment import build_assessment
+from .mapping import load_mapping
 
 _DATASETS = ("mediasum", "meetingbank")
 _SPLITS = ("dev", "test")
@@ -82,6 +83,7 @@ def load_items(
     """
     repo_dir = Path(repo_dir)
     split_index = load_split_index(repo_dir / "document_ids_dev_test_split.json")
+    mapping = load_mapping()
     groups: dict[tuple[str, str, str, str], dict[int, dict[str, Any]]] = {}
     provenance: dict[tuple[tuple[str, str, str, str], int], tuple[str, int]] = {}
     duplicates: list[dict[str, Any]] = []
@@ -116,6 +118,9 @@ def load_items(
                         raise ValueError(f"Invalid sent_idx in {location}: {row['sent_idx']!r}")
                     if row["sent_label"] not in {"yes", "no"}:
                         raise ValueError(f"Invalid sent_label in {location}: {row['sent_label']!r}")
+                    for name in (part.strip() for part in row["type"].split(",")):
+                        if name and not mapping.is_known_type(name):
+                            raise ValueError(f"Unknown gold error type {name!r} in {location}")
                     doc_id, topic, model = row["doc_id"], row["topic"], row["model_name"]
                     assigned_split = split_index.get((dataset, doc_id))
                     if assigned_split is None:

@@ -55,7 +55,7 @@ def claim(start=0, end=5, verdict="supported", *, cid="c1", section=0, concerns=
 
 
 def response(*claims, status="complete"):
-    return {"schema_version": "1.1.0", "status": status,
+    return {"schema_version": "1.2.0", "status": status,
             "warnings": ([{"code": "section_not_processed", "message": "Fictional omission.",
                            "section_index": 0}] if status == "partial" else []),
             "claims": list(claims)}

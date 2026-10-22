@@ -1280,6 +1280,76 @@
       "title": "Progress",
       "type": "object"
     },
+    "ResumeRefusal": {
+      "additionalProperties": false,
+      "description": "Last refused resume of this run (in memory; lost on restart).",
+      "properties": {
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/ResumeRefusalChange"
+          },
+          "title": "Changes",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "fingerprint_changed",
+            "schema_version_changed"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "changes"
+      ],
+      "title": "ResumeRefusal",
+      "type": "object"
+    },
+    "ResumeRefusalChange": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "now": {
+          "default": null,
+          "title": "Now"
+        },
+        "was": {
+          "default": null,
+          "title": "Was"
+        }
+      },
+      "required": [
+        "field"
+      ],
+      "title": "ResumeRefusalChange",
+      "type": "object"
+    },
+    "ResumeRequest": {
+      "additionalProperties": false,
+      "description": "Optional resume body: absent key keeps the stored cap, null clears it, a number sets it.",
+      "properties": {
+        "max_cost_usd": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Cost Usd"
+        }
+      },
+      "title": "ResumeRequest",
+      "type": "object"
+    },
     "RunCreated": {
       "additionalProperties": false,
       "properties": {
@@ -1358,6 +1428,17 @@
         },
         "progress": {
           "$ref": "#/$defs/Progress"
+        },
+        "resume_refusal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResumeRefusal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "run_id": {
           "title": "Run Id",
@@ -1858,7 +1939,8 @@
   },
   "x-requests": {
     "POST /runs": "RunRequest",
-    "POST /runs/estimate": "EstimateRequest"
+    "POST /runs/estimate": "EstimateRequest",
+    "POST /runs/{id}/resume": "ResumeRequest"
   },
   "x-routes": {
     "GET /compare": "Comparison",

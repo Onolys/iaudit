@@ -35,7 +35,7 @@ beforeEach(() => {localStorage.clear(); vi.useFakeTimers();});
 afterEach(() => {cleanup(); vi.useRealTimers();});
 const start = () => fireEvent.click(screen.getByRole("button", {name:"Run"}));
 it("starts, updates progress and optional cost, aborts once and signals list refresh", async () => {
-  const s=setup(); await tick(); start(); await tick();
+  const s=setup(); await tick(); await tick(400); start(); await tick();
   expect(screen.getByRole("progressbar").getAttribute("value")).toBe("1");
   expect(screen.queryByText(/Cost:/)).toBeNull(); expect(s.changed).toHaveBeenCalledTimes(1);
   s.setDetail({...running, progress:{done:2,total:3,failures:1,cost_usd:0.12}} as RunDetail); await tick(1000);
@@ -56,11 +56,11 @@ it("offers missing data download, failure retry, then refreshes datasets and res
   expect(s.fetch.mock.calls.filter(([url]) => String(url).endsWith("/datasets"))).toHaveLength(2);
 });
 it("handles data_missing 409 even when dataset was present", async () => {
-  const s=setup(); await tick(); s.setStartError({code:"data_missing",message:"Download first"}); start(); await tick();
+  const s=setup(); await tick(); await tick(400); s.setStartError({code:"data_missing",message:"Download first"}); start(); await tick();
   expect(screen.getByRole("button",{name:"Download data"})).toBeTruthy();
 });
 it("attaches to run_active 409", async () => {
-  const s=setup(); await tick(); s.setStartError({code:"run_active",message:"busy",detail:{run_id:running.run_id}}); start(); await tick();
+  const s=setup(); await tick(); await tick(400); s.setStartError({code:"run_active",message:"busy",detail:{run_id:running.run_id}}); start(); await tick();
   expect(screen.getByText(`Run ${running.run_id} is already active`)).toBeTruthy(); fireEvent.click(screen.getByRole("button",{name:"Attach to active run"})); await tick();
   expect(screen.getByRole("progressbar")).toBeTruthy();
 });
@@ -75,6 +75,37 @@ it("shows failed state and the server's actual cost error", async () => {
   expect(screen.getByText("failed")).toBeTruthy(); expect(screen.getByText("No cost was returned")).toBeTruthy();
 });
 it.each(["schema_mismatch","backend_unreachable"])("preserves %s message and detail", async code => {
-  const s=setup(); await tick(); s.setStartError({code,message:"Exact server message",detail:{expected:"1.1.0",actual:"0.0.0"}}); start(); await tick();
+  const s=setup(); await tick(); await tick(400); s.setStartError({code,message:"Exact server message",detail:{expected:"1.2.0",actual:"0.0.0"}}); start(); await tick();
   expect(screen.getByText("Exact server message")).toBeTruthy(); expect(screen.getByText(/"actual": "0.0.0"/)).toBeTruthy();
+});
+it("retry after a failed download shows downloading, not the old failure", async () => {
+  const s=setup({missing:true}); await tick(); fireEvent.click(screen.getByRole("button",{name:"Download data"})); await tick();
+  s.setDownload("failed","Old failure"); await tick(1000); expect(screen.getByText("Old failure")).toBeTruthy();
+  s.setDownload("downloading"); fireEvent.click(screen.getByRole("button",{name:"Retry download"})); await tick();
+  expect(screen.queryByText("Old failure")).toBeNull(); expect(screen.getByText("downloading…")).toBeTruthy();
+});
+it("a retry does not take a previous attempt's ready as its own", async () => {
+  const s=setup({missing:true}); await tick(); fireEvent.click(screen.getByRole("button",{name:"Download data"})); await tick();
+  s.setDownload("failed","Old failure"); await tick(1000);
+  s.setDownload("downloading"); fireEvent.click(screen.getByRole("button",{name:"Retry download"})); await tick();
+  expect(screen.getByText("downloading…")).toBeTruthy(); expect(screen.queryByRole("button",{name:"Run"})).toBeNull();
+});
+it("a second dataset does not inherit the first one's download failure", async () => {
+  const s=setup({missing:true}); await tick(); fireEvent.click(screen.getByRole("button",{name:"Download data"})); await tick();
+  s.setDownload("failed","Alpha failure"); await tick(1000); expect(screen.getByText("Alpha failure")).toBeTruthy();
+  fireEvent.change(screen.getByLabelText("Dataset"),{target:{value:"fictional-beta"}}); await tick();
+  expect(screen.queryByText("Alpha failure")).toBeNull(); expect(screen.getByRole("button",{name:"Download data"})).toBeTruthy();
+});
+it("ignores an abort timeout once the poll shows the run is no longer running", async () => {
+  const s=setup(); await tick(); await tick(400); start(); await tick();
+  fireEvent.click(screen.getByRole("button",{name:"Abort"}));
+  s.setDetail({...running,state:"aborted"} as RunDetail); await tick(1000);
+  await tick(120_000);
+  expect(screen.queryByText(/timed out|timeout/i)).toBeNull(); expect(screen.getByText("aborted")).toBeTruthy();
+});
+it("gives abort a 120 s POST timeout", async () => {
+  setup(); await tick(); await tick(400); start(); await tick();
+  fireEvent.click(screen.getByRole("button",{name:"Abort"}));
+  await tick(60_000); expect(screen.queryByText(/timed out|timeout/i)).toBeNull();
+  expect((screen.getByRole("button",{name:"Aborting…"}) as HTMLButtonElement).disabled).toBe(true);
 });

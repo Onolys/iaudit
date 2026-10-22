@@ -72,7 +72,8 @@ def snapshot(roots):
 
 def assert_safe_logs(caplog):
     assert TEXT not in caplog.text
-    # B2 intentionally logs its filename-safe item_id; B4 must log only route templates.
+    # B2 R12 intentionally logs its filename-safe item_id; B4 AC7 (amended to match) only
+    # forbids item ids in its own http_request logs, which use route templates.
     http_messages = [record.getMessage() for record in caplog.records
                      if record.name == "iaudit_eval" and record.getMessage().startswith("http_request ")]
     assert http_messages
@@ -226,6 +227,7 @@ async def test_error_enum_is_exercised_over_http_without_sensitive_echo(
             await start(http, split="all", n=8)
         elif code == "bad_state":
             url = f"/runs/{a}/resume"
+            payload = None  # resume takes only an optional max_cost_usd body
         elif code == "data_missing":
             dataset = await app.state.manager.get_dataset("synthetic")
             dataset.meta = replace(dataset.meta, data_required=True)

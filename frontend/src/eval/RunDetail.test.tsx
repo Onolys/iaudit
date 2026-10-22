@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { RunDetail } from "./RunDetail";
 import { createEvalApi } from "./evalApi";
 import finished from "./fixtures/run-finished.json";
+import refused from "./fixtures/run-resume-refused.json";
 import metrics from "./fixtures/metrics.json";
 import items from "./fixtures/items.json";
 import type { MetricsReport, RunDetail as Detail } from "./evalTypes";
@@ -115,4 +116,21 @@ it("blocks duplicate rescore clicks and aborts its POST on unmount",async()=>{
   expect(s.fetch.mock.calls.filter(([url])=>String(url).endsWith("/rescore"))).toHaveLength(1);
   const signal=s.signals.at(-1)!;expect(signal.aborted).toBe(false);s.unmount();expect(signal.aborted).toBe(true);
   const count=s.fetch.mock.calls.length;await tick(60000);expect(s.fetch.mock.calls.length).toBe(count);
+});
+
+it("stops polling a terminal run whose pending score never resolves and enables Re-score",async()=>{
+  const s=setup({...finished,score_state:"pending"} as Detail,{report:null});await tick();
+  expect(screen.getByText("Scoring...")).toBeTruthy();expect(rescore().disabled).toBe(true);
+  await tick(3000);
+  expect(screen.queryByText("Scoring...")).toBeNull();expect(screen.getByText("Metrics missing. Re-score.")).toBeTruthy();expect(rescore().disabled).toBe(false);
+  const calls=s.fetch.mock.calls.length;await tick(10000);expect(s.fetch).toHaveBeenCalledTimes(calls);
+});
+it("shows run progress instead of Scoring... while the run is running",async()=>{
+  setup({...finished,state:"running",score_state:"pending",progress:{done:1,total:3,failures:0,cost_usd:null}} as Detail,{report:null});await tick();
+  expect(screen.getByText("Run in progress (1/3)")).toBeTruthy();expect(screen.queryByText("Scoring...")).toBeNull();
+});
+
+it("renders a resume refusal with its kind and changed fields",async()=>{
+  setup(refused as Detail);await tick();
+  expect(screen.getByText(/Resume refused: run settings changed/).textContent).toContain('model: "fictional-model-a" → "fictional-model-b"');
 });

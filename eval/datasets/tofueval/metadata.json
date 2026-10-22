@@ -585,6 +585,14 @@
       "params": {
         "key": "concern_not_in_mapping:unsupported_causal_link"
       }
+    },
+    {
+      "name": "concern_not_in_mapping_quantity_mismatch",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:quantity_mismatch"
+      }
     }
   ]
 }

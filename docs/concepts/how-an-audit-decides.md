@@ -6,7 +6,7 @@ How the backend turns an assessment and an interview into a verdict per claim.
 
 ## From text to claims
 
-The backend splits each assessment section into **claims**: short statements the interview can support or contradict. A claim that needs outside criteria or unseen observations (a diagnosis, a score rule, a recommendation) is marked **out of scope** and is not forced into a factual verdict. The twelve checks and the four verdicts are defined in the [mission](../mission.md).
+The backend splits each assessment section into **claims**: short statements the interview can support or contradict. A claim that needs outside criteria or unseen observations (a diagnosis, a score rule, a recommendation) is marked **out of scope** and is not forced into a factual verdict. The thirteen checks and the four verdicts are defined in the [mission](../mission.md).
 
 ## Evidence
 
@@ -26,6 +26,17 @@ Code then decides, from those observations, in a fixed order:
 6. Support with nothing wrong gives `supported`.
 
 Concerns are then de-duplicated so one problem is explained once, with the most specific concern kept. Explanations are written from fixed templates filled with counts and roles, not free text.
+
+## Quantity mismatch
+
+Check 13 (`quantity_mismatch`) covers amounts, counts, doses, ages, tallies and sums that the assessment states about the interview ("took 10 mg" when the interview says 20 mg; "three missed appointments" when the interview gives two). Dates and timing stay under `timeframe_mismatch`; how often, how bad or how long stays under `frequency_severity_inflation`. A faithful rounding ("about ten" for 9 or 11) is not a mismatch, while turning "about ten" into "exactly ten" is `certainty_inflation`.
+
+## Labelling rules for close calls
+
+- **Changed action.** When the assessment changes what someone did, the concern is `contradictory_evidence` if the interview states the actual action, otherwise `unsupported_claim`.
+- **Two true facts joined.** When two facts that are each true are merged into a relation the interview never states, the concern is `unsupported_claim`. It is `unsupported_causal_link` only when the assessment asserts cause and effect.
+- **Wrong attribution** covers the wrong person, source or entity: who experienced or reported something, and which person, source or entity a fact belongs to (for example a side effect attributed to the wrong medication).
+- **Context stripping** covers an omitted qualification and also a broadened scope ("some members" becomes "the panel").
 
 ## What a reviewer should read into a result
 

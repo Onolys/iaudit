@@ -9,7 +9,7 @@ from __future__ import annotations
 from iaudit_eval.datasets import Item, Unmapped
 from iaudit_eval.metrics.pair import Pair, default_pairs
 
-_SCHEMA_VERSION = "1.1.0"
+_SCHEMA_VERSION = "1.2.0"
 _FLAGGING = {"contradicted", "partially_supported", "insufficient_evidence"}
 _NEUTRAL = {"supported", "out_of_scope"}
 
@@ -38,9 +38,17 @@ _DOCS = {
         "topic": "clinical",
         "turns": [
             ("physio_ines", "interviewer", "How has the left knee felt since the last visit?"),
-            ("client_ola", "respondent", "Stairs are easier now, though the ache returns after long walks."),
+            (
+                "client_ola",
+                "respondent",
+                "Stairs are easier now, though the ache returns after long walks.",
+            ),
             ("physio_ines", "interviewer", "Are you still doing the band exercises each morning?"),
-            ("client_ola", "respondent", "Most mornings. I skipped them twice during the holiday week."),
+            (
+                "client_ola",
+                "respondent",
+                "Most mornings. I skipped them twice during the holiday week.",
+            ),
         ],
         "items": [
             ("physio-clean", "clean",
@@ -56,7 +64,11 @@ _DOCS = {
         "topic": "clinical",
         "turns": [
             ("nurse_pell", "interviewer", "Tell me about your nights over the past fortnight."),
-            ("client_tavi", "respondent", "I fall asleep quickly but wake around four most nights."),
+            (
+                "client_tavi",
+                "respondent",
+                "I fall asleep quickly but wake around four most nights.",
+            ),
             ("nurse_pell", "interviewer", "Do you take anything to help with that?"),
             ("client_tavi", "respondent", "Only chamomile tea. I stopped coffee after lunch."),
         ],

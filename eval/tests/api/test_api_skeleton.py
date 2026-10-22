@@ -257,3 +257,26 @@ async def test_lifespan_owns_default_backend_client(tmp_path):
     app2 = create_app(Settings(), backend_client=injected, runs_root=tmp_path, datasets_root=tmp_path)
     async with app2.router.lifespan_context(app2):
         assert app2.state.backend_client is injected
+
+
+@pytest.mark.parametrize("peer", ["127.0.0.1", "127.5.4.3", "::1"])
+async def test_loopback_peer_allowed(tmp_path, peer):
+    app = make_app(tmp_path)
+    transport = httpx.ASGITransport(app=app, client=(peer, 5000))
+    async with httpx.AsyncClient(transport=transport, base_url="http://localhost:8100") as c:
+        assert (await c.get("/ping")).status_code == 200
+
+
+@pytest.mark.parametrize("peer", ["203.0.113.5", "10.0.0.2", "testclient", "::ffff:8.8.8.8"])
+async def test_non_loopback_peer_403_even_with_valid_host(tmp_path, peer):
+    app = make_app(tmp_path)
+    transport = httpx.ASGITransport(app=app, client=(peer, 5000))
+    async with httpx.AsyncClient(transport=transport, base_url="http://localhost:8100") as c:
+        assert_error(await c.get("/ping"), 403, "forbidden")
+
+
+async def test_non_loopback_peer_allowed_with_allow_remote(tmp_path):
+    app = make_app(tmp_path, allow_remote=True)
+    transport = httpx.ASGITransport(app=app, client=("203.0.113.5", 5000))
+    async with httpx.AsyncClient(transport=transport, base_url="http://localhost:8100") as c:
+        assert (await c.get("/ping")).status_code == 200

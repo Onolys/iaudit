@@ -79,3 +79,19 @@ it("refreshes the current mismatch selection again after Re-score completes", as
   expect(screen.getByRole("button", { name: "Scored mismatch" })).toBeTruthy();
   expect(screen.queryByText("No items match this filter.")).toBeNull();
 });
+
+it("refreshes items while a run runs and when it ends", async () => {
+  let state = "running", done = 1;
+  const fetch = vi.fn(async (url: RequestInfo | URL): Promise<Response> => {
+    const path = String(url);
+    if (path.endsWith("/metrics")) return Response.json({ error: { code: "not_found", message: "n/a" } }, { status: 404 });
+    if (path.includes("/items?")) return Response.json({ total: 0, items: [] });
+    return Response.json({ ...finished, state, score_state: state === "running" ? "pending" : "done", progress: { done, total: 3, failures: 0, cost_usd: null } });
+  });
+  render(<RunDetail api={createEvalApi({ fetch: fetch as typeof globalThis.fetch })} runId={finished.run_id} onBack={() => {}} onOpenItem={() => {}} />);
+  const itemCalls = () => fetch.mock.calls.filter(([u]) => String(u).includes("/items?")).length;
+  await tick(); const first = itemCalls();
+  await tick(1000); expect(itemCalls()).toBe(first);
+  done = 2; await tick(1000); expect(itemCalls()).toBe(first + 1);
+  state = "finished"; done = 3; await tick(1000); expect(itemCalls()).toBeGreaterThan(first + 1);
+});

@@ -1,5 +1,6 @@
 """Settings, uniform error body, Host/Origin guard, id validators, path-under-root checks."""
 
+import ipaddress
 import os
 import re
 from collections.abc import Mapping
@@ -154,3 +155,13 @@ def resolve_under(root: Path, *parts: str) -> Path:
     if target != root_r and root_r not in target.parents:
         raise not_found()
     return target
+
+
+def is_loopback_client(client_host: str | None) -> bool:
+    """Peer address (socket, not a header) is 127.0.0.0/8 or ::1."""
+    if not client_host:
+        return False
+    try:
+        return ipaddress.ip_address(client_host).is_loopback
+    except ValueError:
+        return False

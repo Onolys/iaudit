@@ -63,14 +63,24 @@ Run state is one of `running`, `finished`, `aborted`, `aborted_cost`, `interrupt
 running run has no held writer lock; restarting the server does not automatically
 resume it or spend money. Resume retries failed or missing results and preserves
 successful results. Allowed states are aborted, aborted_cost, interrupted, failed, and
-finished with failures. Resume has no request body or mixed-fingerprint override.
+finished with failures. Resume has no mixed-fingerprint override. Its optional JSON body
+`ResumeRequest` is `{"max_cost_usd": number > 0 | null}`: no body or an absent key keeps
+the stored cost cap, `null` clears it, a number replaces it. A resume refused because the
+backend's models/prompts or schema version changed ends in the run's prior state; detail
+`resume_refusal` (`kind` `fingerprint_changed` or `schema_version_changed`, `changes` of
+`{field, was, now}`) reports the last refusal, kept in memory only and cleared by the next
+resume. Server shutdown stops dispatching and gives in-flight items a grace period to be
+saved before cancelling; the run stays `interrupted` and resumable.
 
 Only one audit run is active per server. Abort requires that run to be active and lets
 in-flight requests finish. Rescore is refused for a running run or a run already being
 scored. A run and its scoring work outlive the requesting browser connection.
 
-`score_state` is `pending`, `running`, `done`, or `failed`. A current metrics file makes
-it done; reports older than changed run/item files are not current. Failed scoring
+`score_state` is `pending`, `running`, `done`, or `failed`. `pending` means scoring is
+queued or about to start: reading a terminal (including interrupted) run whose metrics are
+missing or older than its run/item files schedules scoring once per run revision per
+process, so it resolves to done or failed (a failed score is not retried until the run
+changes or Rescore). A current metrics file makes it done. Failed scoring
 can be retried explicitly. Download state is `not_downloaded`, `downloading`, `ready`,
 or `failed`; there is at most one download task per dataset. Failed download responses
 use the fixed error message `Download failed.`; private persisted diagnostics are not
@@ -110,19 +120,22 @@ happen before creating a new run; a failed start probe creates no run directory.
 | `IAUDIT_EVAL_PORT` | `8100` | Port used by the Python server entrypoint |
 | `IAUDIT_BACKEND_URL` | `http://127.0.0.1:8000` | Audit backend URL |
 | `IAUDIT_EVAL_ALLOWED_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Comma-separated exact Origin allowlist |
-| `IAUDIT_EVAL_ALLOW_REMOTE` | unset | `1` allows a non-default `--host` through the Python entrypoint's bind check |
+| `IAUDIT_EVAL_ALLOW_REMOTE` | unset | `1` allows a non-default `--host` through the Python entrypoint's bind check and non-loopback peers |
 | `IAUDIT_EVAL_HOME` | Repository `eval/` | Root for datasets, downloaded data and run outputs |
 | `IAUDIT_CONTRACTS_DIR` | Repository `docs/contracts/` | Shared audit schemas; eval report/API schemas stay with the code |
 
 For a manual launch, use `cd eval && uv run python -m iaudit_eval.server.app`. It accepts
 `--host` and `--port`. It defaults to `127.0.0.1` and disables uvicorn access logs.
-Direct uvicorn invocation bypasses that entrypoint's bind validation; explicitly bind
+Direct uvicorn invocation bypasses that entrypoint's bind validation, but the app still
+rejects (403 `forbidden`) any request whose socket peer address is not loopback
+(127.0.0.0/8, `::1`) unless `IAUDIT_EVAL_ALLOW_REMOTE=1`. Explicitly bind
 `127.0.0.1` and pass `--no-access-log`, as the [development script](../../scripts/README.md)
 does. That script fixes ports at 8000/8100/5173 and supplies its own matching environment.
 
 Host must be `localhost` or `127.0.0.1`, optionally with a port. Requests without Origin
 are accepted; a supplied Origin must match the configured allowlist. There is no CORS
-middleware or authentication. Remote bind permission does not relax these HTTP guards.
+middleware or authentication. Remote bind permission relaxes only the peer-address check,
+not the Host/Origin guards.
 The server is intended for local use, without public hosting. Logs omit raw paths,
 queries, bodies and item ids; HTTP logging uses route templates.
 

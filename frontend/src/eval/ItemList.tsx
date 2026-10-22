@@ -7,7 +7,7 @@ import "./item-list.css";
 interface ItemListState { runId: string; page: ItemPage | null; loading: boolean; error: EvalError | null }
 
 /** One high-limit request per filter; keep the last rows visible while that filter reloads. */
-export function ItemList({ api, runId, onOpenItem, refreshKey = 0 }: { api: EvalApi; runId: string; onOpenItem: (itemId: string) => void; refreshKey?: number }) {
+export function ItemList({ api, runId, onOpenItem, refreshKey = 0 }: { api: EvalApi; runId: string; onOpenItem: (itemId: string) => void; refreshKey?: number | string }) {
   const filterName = useId();
   const [filter, setFilter] = useState<ItemFilter>("all");
   const [retry, setRetry] = useState(0);
@@ -43,6 +43,7 @@ export function ItemList({ api, runId, onOpenItem, refreshKey = 0 }: { api: Eval
         <td>{item.status === "failed" ? <span className="chip">failed</span> : "-"}</td>
       </tr>)}</tbody>
     </table>}
+    {page && page.items.length > 0 && page.items.length < page.total && <p>Showing {page.items.length} of {page.total} items</p>}
     {page?.items.length === 0 && !loading && !state.error && <p>No items match this filter.</p>}
   </section>;
 }

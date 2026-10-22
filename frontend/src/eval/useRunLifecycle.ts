@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { EvalApi } from "./evalApi";
 import type { EvalError, RunDetail, RunRequest } from "./evalTypes";
 import { usePolling } from "./usePolling";
-import { EvalErrorMessage, ServerBanner } from "./ServerBanner";
 
 interface Options {
   api: EvalApi;
@@ -25,6 +24,8 @@ export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownl
   const [downloadError, setDownloadError] = useState<string | EvalError | null>(null);
   const [downloadStarting, setDownloadStarting] = useState(false);
   const requests = useRef(new Set<AbortController>());
+  const downloadRequest = useRef<AbortController | null>(null);
+  const runStateRef = useRef<string | null>(null);
   const interaction = useRef(0);
   const callbacks = useRef({ onRunsChanged, onActiveRunChange, onDownloaded });
   callbacks.current = { onRunsChanged, onActiveRunChange, onDownloaded };
@@ -34,8 +35,13 @@ export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownl
   }, [api, runId, epoch]);
   const runPoll = usePolling(pollRun, { enabled: runId !== null, isTerminal: value => value.run.state !== "running" });
   const run = runPoll.data?.epoch === epoch && runPoll.data.run.run_id === runId ? runPoll.data.run : null;
-  const pollDownload = useCallback((signal: AbortSignal) => api.getDownload(download!.dataset, { signal }), [api, download]);
-  const downloadPoll = usePolling(pollDownload, { enabled: download !== null, isTerminal: value => value.status === "ready" || value.status === "failed" });
+  runStateRef.current = run?.state ?? null;
+  // Tag each poll result with its attempt so data from a previous attempt is never mistaken for this one.
+  const pollDownload = useCallback(async (signal: AbortSignal) => {
+    const result = await api.getDownload(download!.dataset, { signal });
+    return result.ok ? { ok: true as const, value: { status: result.value, attempt: download!.attempt } } : result;
+  }, [api, download]);
+  const downloadPoll = usePolling(pollDownload, { enabled: download !== null, isTerminal: value => value.status.status === "ready" || value.status.status === "failed" });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -63,12 +69,13 @@ export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownl
   }, [run]);
 
   useEffect(() => {
-    if (!download || !downloadPoll.data) return;
-    if (downloadPoll.data.status === "ready") {
+    if (!download || !downloadPoll.data || downloadPoll.data.attempt !== download.attempt) return;
+    const status = downloadPoll.data.status;
+    if (status.status === "ready") {
       setDownload(null); setMissingDataset(null); setDownloadError(null);
       callbacks.current.onDownloaded();
-    } else if (downloadPoll.data.status === "failed") {
-      setDownloadError(downloadPoll.data.error || "Download failed");
+    } else if (status.status === "failed") {
+      setDownloadError(status.error || "Download failed");
     }
   }, [downloadPoll.data, download]);
 
@@ -98,37 +105,34 @@ export function useRunLifecycle({ api, onRunsChanged, onActiveRunChange, onDownl
     requests.current.delete(controller);
     if (controller.signal.aborted) return;
     setAborting(false);
-    if (result.ok) callbacks.current.onRunsChanged?.(); else setError(result.error);
+    if (result.ok) callbacks.current.onRunsChanged?.();
+    // The server abort can outlast the POST timeout; a poll that already shows the run stopped wins.
+    else if (!(result.error.kind === "timeout" && runStateRef.current !== null && runStateRef.current !== "running")) setError(result.error);
   }
   async function startDownload(dataset: string) {
     if (downloadStarting) return;
-    const controller = new AbortController(); requests.current.add(controller);
+    const controller = new AbortController(); requests.current.add(controller); downloadRequest.current = controller;
     setDownloadStarting(true); setDownload(null); setDownloadError(null);
     const result = await api.startDownload(dataset, { signal: controller.signal });
     requests.current.delete(controller);
     if (controller.signal.aborted) return;
+    downloadRequest.current = null;
     setDownloadStarting(false);
     if (result.ok) setDownload({ dataset, attempt: ++interaction.current });
     else setDownloadError(result.error);
   }
+  /** A different dataset was selected: forget the previous dataset's download state. */
+  function resetDownload() {
+    downloadRequest.current?.abort(); downloadRequest.current = null;
+    setDownloadStarting(false); setDownload(null); setDownloadError(null);
+  }
   const downloading = downloadStarting || (!!download && !downloadError);
   const active = !!runId && (!run || run.state === "running");
   useEffect(() => { onRunActiveChange?.(active || busy); }, [active, busy, onRunActiveChange]);
-  const display = <>
-    {error && <EvalErrorMessage error={error} />}
-    {conflict && <div><p>Run {conflict} is already active</p><button type="button" onClick={() => { interaction.current++; setRunId(conflict); setEpoch(value => value + 1); setConflict(null); }}>Attach to active run</button></div>}
-    {(runPoll.stale && active || downloadPoll.stale && downloading) && <ServerBanner lostContact />}
-    {downloading && <p role="status">downloading…</p>}
-    {downloadError && <div role="alert">{typeof downloadError === "string" ? <p>{downloadError}</p> : <EvalErrorMessage error={downloadError} />}</div>}
-    {run && <div aria-label={`Run ${run.run_id}`}>
-      <span className="eval-state">{run.state === "aborted_cost" ? "aborted: cost cap" : run.state}</span>
-      <p>{run.progress.done}/{run.progress.total}</p>
-      <progress aria-label="Run progress" value={run.progress.done} max={run.progress.total || 1} />
-      <p>Failures: {run.progress.failures}</p>
-      {run.progress.cost_usd != null && <p>Cost: ${run.progress.cost_usd.toFixed(2)}</p>}
-      {run.error && <p className="eval-error">{run.error.message}</p>}
-      {run.state === "running" && <button type="button" disabled={aborting} onClick={() => void abort()}>{aborting ? "Aborting…" : "Abort"}</button>}
-    </div>}
-  </>;
-  return { start, startDownload, missingDataset, downloading, downloadError, busy, active, display };
+  function attachConflict() {
+    if (!conflict) return;
+    interaction.current++; setRunId(conflict); setEpoch(value => value + 1); setConflict(null);
+  }
+  const progress = { error, conflict, run, aborting, downloading, downloadError, lostContact: !!(runPoll.stale && active || downloadPoll.stale && downloading), abort: () => void abort(), attachConflict };
+  return { start, startDownload, missingDataset, downloading, downloadError, busy, active, resetDownload, progress };
 }

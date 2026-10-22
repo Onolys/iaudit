@@ -22,7 +22,7 @@ export function RunInfoBlock({ run }: { run: RunInfoInput }) {
       <dt>Mapping version</dt><dd>{info.mapping_version ?? "unknown"}</dd>
       <dt>Seed</dt><dd>{info.seed ?? run.seed ?? "unknown"}</dd>
       {info.tags && Object.keys(info.tags).length > 0 && <><dt>Tags</dt><dd><ul>{Object.entries(info.tags).map(([key, value]) => <li key={key}>{key}: {typeof value === "string" ? value : JSON.stringify(value)}</li>)}</ul></dd></>}
-      <dt>Total cost</dt><dd>{run.totals?.cost_usd == null ? "unknown" : `$${run.totals.cost_usd}`}</dd>
+      <dt>Total cost</dt><dd>{run.totals?.cost_usd == null ? "unknown" : `$${run.totals.cost_usd.toFixed(2)}`}</dd>
     </dl>
     {run.totals?.input_tokens !== undefined && <p>Input tokens: {run.totals.input_tokens}</p>}
     {run.totals?.output_tokens !== undefined && <p>Output tokens: {run.totals.output_tokens}</p>}

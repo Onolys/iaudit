@@ -1,0 +1,638 @@
+{
+  "schema_version": "1.2.0",
+  "run_info": {
+    "models": {
+      "cheap": "claude-haiku-5-5",
+      "mid": "claude-sonnet-5-5",
+      "strong": "claude-sonnet-5-5"
+    },
+    "prompt_hashes": {
+      "atomize": "0123456789abcdef",
+      "link": "fedcba9876543210",
+      "check": "00112233445566ff",
+      "prep": "a1b2c3d4e5f60718"
+    }
+  },
+  "request_id": "mock-11",
+  "status": "complete",
+  "warnings": [],
+  "claims": [
+    {
+      "id": "c-med-1",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 0
+        },
+        "end": {
+          "index": 0,
+          "char": 37
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent gives the same dose and the same time of day.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 3,
+              "char": 0
+            },
+            "end": {
+              "index": 3,
+              "char": 36
+            }
+          },
+          "note": "Current dose and timing."
+        }
+      ]
+    },
+    {
+      "id": "c-med-2",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 38
+        },
+        "end": {
+          "index": 0,
+          "char": 73
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The respondent did take citalopram, but at a different amount than the assessment records.",
+      "suggested_revision": "Was previously on citalopram 20 mg.",
+      "concerns": [
+        {
+          "type": "quantity_mismatch",
+          "explanation": "The recorded dose is double the dose the respondent gives.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 7,
+              "char": 0
+            },
+            "end": {
+              "index": 7,
+              "char": 48
+            }
+          },
+          "note": "Names the drug and the dose."
+        }
+      ]
+    },
+    {
+      "id": "c-med-3",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 74
+        },
+        "end": {
+          "index": 0,
+          "char": 115
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Missed doses are real but less frequent than the assessment says. This is a matter of how often, so it is not an amount error.",
+      "suggested_revision": "Misses the morning dose several times a week.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "Reported as near-daily; the respondent describes a few days each week.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 5,
+              "char": 5
+            },
+            "end": {
+              "index": 5,
+              "char": 59
+            }
+          },
+          "note": "Gives the weekly rate of missed doses."
+        }
+      ]
+    },
+    {
+      "id": "c-med-4",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 116
+        },
+        "end": {
+          "index": 0,
+          "char": 161
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The respondent lists a pair of tablets, then a single one later, so the daily total is three rather than four.",
+      "suggested_revision": "Takes three supplement tablets a day in total.",
+      "concerns": [
+        {
+          "type": "quantity_mismatch",
+          "explanation": "The stated total does not match the sum of the figures the respondent gives.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 11,
+              "char": 0
+            },
+            "end": {
+              "index": 11,
+              "char": 71
+            }
+          },
+          "note": "The two figures that make up the daily total."
+        }
+      ]
+    },
+    {
+      "id": "c-med-5",
+      "span": {
+        "start": {
+          "index": 0,
+          "char": 162
+        },
+        "end": {
+          "index": 0,
+          "char": 186
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The respondent had nausea early on, which has since passed. The assessment leaves out that qualifier.",
+      "suggested_revision": "Reports nausea in the first fortnight, now resolved.",
+      "concerns": [
+        {
+          "type": "context_stripping",
+          "explanation": "The early, temporary side effect is dropped.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 9,
+              "char": 0
+            },
+            "end": {
+              "index": 9,
+              "char": 52
+            }
+          },
+          "note": "The side effect and its resolution."
+        }
+      ]
+    },
+    {
+      "id": "c-work-1",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 0
+        },
+        "end": {
+          "index": 1,
+          "char": 32
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The respondent gives an approximate head count, which the assessment presents as exact.",
+      "suggested_revision": "Manages a team of about ten engineers.",
+      "concerns": [
+        {
+          "type": "certainty_inflation",
+          "explanation": "An approximate figure is presented as exact.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 13,
+              "char": 28
+            },
+            "end": {
+              "index": 13,
+              "char": 90
+            }
+          },
+          "note": "The count is approximate."
+        }
+      ]
+    },
+    {
+      "id": "c-work-2",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 33
+        },
+        "end": {
+          "index": 1,
+          "char": 87
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The starting figure matches, but the respondent gives a different current head count.",
+      "suggested_revision": "The team grew from six to eleven people during the year.",
+      "concerns": [
+        {
+          "type": "quantity_mismatch",
+          "explanation": "The end figure differs from the one the respondent gives.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 15,
+              "char": 0
+            },
+            "end": {
+              "index": 15,
+              "char": 52
+            }
+          },
+          "note": "Both the starting and current head counts."
+        }
+      ]
+    },
+    {
+      "id": "c-work-3",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 88
+        },
+        "end": {
+          "index": 1,
+          "char": 127
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "The respondent dates the start of the role to the previous year. This is a date, not an amount.",
+      "suggested_revision": "Has led the team since March of last year.",
+      "concerns": [
+        {
+          "type": "timeframe_mismatch",
+          "explanation": "The start date is placed a year too late.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 17,
+              "char": 0
+            },
+            "end": {
+              "index": 17,
+              "char": 33
+            }
+          },
+          "note": "The start of the role."
+        }
+      ]
+    },
+    {
+      "id": "c-work-4",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 128
+        },
+        "end": {
+          "index": 1,
+          "char": 156
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent gives a figure that rounds to the same number, so this is ordinary rounding.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 21,
+              "char": 0
+            },
+            "end": {
+              "index": 21,
+              "char": 29
+            }
+          },
+          "note": "Weekly hours."
+        }
+      ]
+    },
+    {
+      "id": "c-work-5",
+      "span": {
+        "start": {
+          "index": 1,
+          "char": 157
+        },
+        "end": {
+          "index": 1,
+          "char": 171
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent says nobody shares the management of the team.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 19,
+              "char": 0
+            },
+            "end": {
+              "index": 19,
+              "char": 27
+            }
+          },
+          "note": "No second manager."
+        }
+      ]
+    },
+    {
+      "id": "c-slp-1",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 0
+        },
+        "end": {
+          "index": 2,
+          "char": 31
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent's figure has a decimal that the assessment drops, which is ordinary rounding.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 23,
+              "char": 0
+            },
+            "end": {
+              "index": 23,
+              "char": 15
+            }
+          },
+          "note": "Typical sleep on a work night."
+        }
+      ]
+    },
+    {
+      "id": "c-slp-2",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 32
+        },
+        "end": {
+          "index": 2,
+          "char": 63
+        }
+      },
+      "verdict": "partially_supported",
+      "explanation": "Waking is frequent but not nightly. The count of wakings does not change this: it is a question of how often.",
+      "suggested_revision": "Wakes in the night on most nights.",
+      "concerns": [
+        {
+          "type": "frequency_severity_inflation",
+          "explanation": "Most nights is reported as every night.",
+          "evidence_ids": [
+            "e1"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 25,
+              "char": 0
+            },
+            "end": {
+              "index": 25,
+              "char": 31
+            }
+          },
+          "note": "How often the respondent wakes."
+        }
+      ]
+    },
+    {
+      "id": "c-slp-3",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 64
+        },
+        "end": {
+          "index": 2,
+          "char": 94
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent describes low mood on some days each week.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 27,
+              "char": 0
+            },
+            "end": {
+              "index": 27,
+              "char": 22
+            }
+          },
+          "note": "Frequency of low mood."
+        }
+      ]
+    },
+    {
+      "id": "c-slp-4",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 95
+        },
+        "end": {
+          "index": 2,
+          "char": 136
+        }
+      },
+      "verdict": "contradicted",
+      "explanation": "The respondent still has low mood on several days each week and only credits the tablets with a small effect.",
+      "suggested_revision": "The sertraline has helped a little; low mood continues on some days.",
+      "concerns": [
+        {
+          "type": "contradictory_evidence",
+          "explanation": "The respondent describes ongoing low mood.",
+          "evidence_ids": [
+            "e1",
+            "e2"
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "contradicting",
+          "span": {
+            "start": {
+              "index": 27,
+              "char": 0
+            },
+            "end": {
+              "index": 27,
+              "char": 22
+            }
+          },
+          "note": "Low mood continues."
+        },
+        {
+          "id": "e2",
+          "role": "qualifying",
+          "span": {
+            "start": {
+              "index": 31,
+              "char": 0
+            },
+            "end": {
+              "index": 31,
+              "char": 31
+            }
+          },
+          "note": "A modest, uncertain benefit."
+        }
+      ]
+    },
+    {
+      "id": "c-slp-5",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 137
+        },
+        "end": {
+          "index": 2,
+          "char": 166
+        }
+      },
+      "verdict": "supported",
+      "explanation": "The respondent says plainly that there are no such thoughts.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": [
+        {
+          "id": "e1",
+          "role": "supporting",
+          "span": {
+            "start": {
+              "index": 29,
+              "char": 0
+            },
+            "end": {
+              "index": 29,
+              "char": 22
+            }
+          },
+          "note": "Direct denial."
+        }
+      ]
+    },
+    {
+      "id": "c-slp-6",
+      "span": {
+        "start": {
+          "index": 2,
+          "char": 167
+        },
+        "end": {
+          "index": 2,
+          "char": 203
+        }
+      },
+      "verdict": "out_of_scope",
+      "explanation": "This is a diagnostic conclusion, not a factual statement about the interview.",
+      "out_of_scope_reason": "Whether diagnostic criteria are met depends on external criteria and clinical judgement, which this audit does not assess.",
+      "suggested_revision": null,
+      "concerns": [],
+      "evidence": []
+    }
+  ]
+}
