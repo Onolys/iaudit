@@ -39,7 +39,7 @@ from .metrics.report import (
 )
 
 PRIMARY_POLICY = "failures_count_wrong"
-_ITEM_REASONS = ("item_failed", "unmapped")
+_ITEM_REASONS = ("item_failed", "unmapped", "request_mismatch")
 _NEEDS_POSITIVE = ("precision", "recall", "f1")
 
 
@@ -169,13 +169,15 @@ def _entries(dataset: Dataset, cfg, all_pairs: list[Pair], datasets_root: Path |
     return out
 
 
-def _load_run(run_id, runs_root, datasets_root, data_root):
+def _load_run(run_id, runs_root, datasets_root, data_root, dataset=None):
     try:
         run = store.load_run(runs_root, run_id)
     except (OSError, ValueError) as e:
         raise ScoringError(f"cannot read run {run_id!r}: {type(e).__name__}") from e
     try:
-        dataset = dataset_registry.load(run["dataset"], root=datasets_root, data_root=data_root)
+        if dataset is None:
+            dataset = dataset_registry.load(
+                run["dataset"], root=datasets_root, data_root=data_root)
         by_id = {i.id: i for i in dataset.items(run["split"])}
     except (DatasetError, KeyError) as e:
         raise ScoringError(f"cannot load dataset for run {run_id!r}: {e}") from e
@@ -199,8 +201,11 @@ def _collect(run_id, dataset, by_id, saved, item_ids) -> _Collected:
     row_hook = getattr(adapter, "item_row", None)
     all_pairs: list[Pair] = []
     rows: list[dict] = []
-    reasons: Counter = Counter({r: 0 for r in (*_ITEM_REASONS, "unresolved")})
+    reasons: Counter = Counter(
+        {r: 0 for r in ("item_failed", "unmapped", "unresolved")}
+    )
     n_scored = n_failed = n_not_run = 0
+    primary_level = next(iter(dataset.meta.levels), None) if dataset.meta.levels else None
     for item_id in item_ids:
         if item_id not in saved:
             n_not_run += 1
@@ -220,10 +225,14 @@ def _collect(run_id, dataset, by_id, saved, item_ids) -> _Collected:
         if rec.get("status") == "failed":
             failure = "item_failed"
         else:
-            try:
-                pred = adapter.project(rec.get("response"), item)
-            except Unmapped:
-                failure = "unmapped"
+            check = getattr(adapter, "check_request", None)
+            if check and rec.get("request") is not None and not check(rec["request"], item):
+                failure = "request_mismatch"  # saved request no longer matches local data
+            else:
+                try:
+                    pred = adapter.project(rec.get("response"), item)
+                except Unmapped:
+                    failure = "unmapped"
         if failure in _ITEM_REASONS:
             reasons[failure] += 1
             n_failed += 1
@@ -231,10 +240,18 @@ def _collect(run_id, dataset, by_id, saved, item_ids) -> _Collected:
             n_scored += 1
         pairs = (pairs_hook or default_pairs)(item, gold, pred, failure)
         for p in pairs:
-            if p.failure is not None and p.failure not in _ITEM_REASONS:
+            # Item-level failures are already counted; count unit failures once, at the
+            # first declared (native) level, not again at every derived/alternate level.
+            if (
+                failure not in _ITEM_REASONS
+                and p.failure is not None
+                and p.failure not in _ITEM_REASONS
+                and (primary_level is None or p.level == primary_level)
+            ):
                 reasons[p.failure] += 1
         all_pairs.extend(pairs)
-        status = {"item_failed": "failed", "unmapped": "unmapped"}.get(failure, "ok")
+        status = {"item_failed": "failed", "unmapped": "unmapped",
+                  "request_mismatch": "failed"}.get(failure, "ok")  # fmt: skip
         if row_hook:
             row = row_hook(item, gold, pred, failure)
         else:
@@ -250,11 +267,15 @@ def score(
     runs_root: Path | None = None,
     datasets_root: Path | None = None,
     data_root: Path | None = None,
+    dataset: Dataset | None = None,
 ) -> dict:
-    """Score a saved run; write metrics.json and item_rows.json; return the metrics report."""
+    """Score a saved run; write metrics.json and item_rows.json; return the metrics report.
+
+    ``dataset`` (optional) is used instead of loading the run's dataset by name.
+    """
     from .engine import capture_git  # lazy: engine will import scoring for its on_finish hook
 
-    run, dataset, by_id = _load_run(run_id, runs_root, datasets_root, data_root)
+    run, dataset, by_id = _load_run(run_id, runs_root, datasets_root, data_root, dataset)
     cfg = metrics_config(dataset.meta)
     adapter = dataset.adapter
     saved = {it["item_id"]: it for it in store.iter_items(runs_root, run_id)}

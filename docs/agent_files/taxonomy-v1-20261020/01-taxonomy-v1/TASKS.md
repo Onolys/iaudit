@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 summary: Seven tasks adding quantity_mismatch (check 13), widening two definitions, contract 1.2.0, ADR 0015; mission edit gated on owner approval; no live runs by agents.
 date: 2026-10-20
 ---
@@ -9,13 +9,13 @@ Source of truth: [PRD.md](PRD.md). Add `quantity_mismatch` as the 13th enum valu
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Mission amendment (gated on owner approval) | owner approval of wording | todo |
-| 2 | Backend detection: enum, flag, guards, dedup | 1 | todo |
-| 3 | Prompt, few-shot, templates, labelling rules | 2 | todo |
-| 4 | Contract 1.2.0, ADR 0015, frontend enum and label | 2 | todo |
-| 5 | New mock fixture and boundary-pair tests | 3, 4 | todo |
-| 6 | Docs sweep for "12" references and concepts | 1, 4 | todo |
-| 7 | Offline verification and acceptance sweep | 1-6 | todo |
+| 1 | Mission amendment (gated on owner approval) | owner approval of wording | done |
+| 2 | Backend detection: enum, flag, guards, dedup | 1 | done |
+| 3 | Prompt, few-shot, templates, labelling rules | 2 | done |
+| 4 | Contract 1.2.0, ADR 0015, frontend enum and label | 2 | done |
+| 5 | New mock fixture and boundary-pair tests | 3, 4 | done |
+| 6 | Docs sweep for "12" references and concepts | 1, 4 | done |
+| 7 | Offline verification and acceptance sweep | 1-6 | done |
 
 ## Task 1 — Mission amendment (gated)
 What it is / what it means: The mission governs scope, so the arithmetic clarification and check 13 land first (Req 9, Decision 3). Blocked until the owner approves the PRD's draft wording table.

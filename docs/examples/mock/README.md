@@ -1,6 +1,6 @@
 # Mock audit samples
 
-Fictional request/response pairs for contract [1.1.0](../../contracts/README.md). Use them to see how the review UI lays out claims, verdicts, evidence, and warnings.
+Fictional request/response pairs for contract [1.2.0](../../contracts/README.md). Use them to see how the review UI lays out claims, verdicts, evidence, and warnings.
 
 Samples 01–05 are small plumbing fixtures. Their audit content is **not** meant to be correct; the verdicts and concerns are placeholders. Samples 06–10 are full-length interviews whose verdicts are meant to be clinically and logically defensible: each problem claim names its discrepancy, cites the excerpt that conflicts with or qualifies it, and offers a `suggested_revision`. In every sample the plumbing is exact: every span resolves to real text, in Unicode code points with an exclusive end, and every response follows the schema and rules 1–12.
 
@@ -18,10 +18,13 @@ Each folder holds `request.json` (transcript plus assessment) and `response.json
 | [08-child-parent-informant](08-child-parent-informant/) | A 9-year-old with a parent informant, plus a teacher's view relayed second-hand. 59 turns, 3 sections, 13 claims (6 supported). Concerns: wrong attribution, conflicting accounts flattened, frequency inflation, context stripping, contradictory evidence, certainty inflation. |
 | [09-cognitive-caregiver](09-cognitive-caregiver/) | Memory concerns in an older adult, with a daughter informant. 59 turns, 3 sections, 13 claims (5 supported). Concerns: negation reversal, correction ignored, conflicting accounts flattened, timeframe mismatch, wrong attribution, unsupported claim. |
 | [10-substance-use-sleep](10-substance-use-sleep/) | Alcohol, cannabis and insomnia after a move to night shifts, patient only. 59 turns, 3 sections, 13 claims (5 supported). Concerns: correction ignored, contradictory evidence, question as answer, timeframe mismatch, unsupported causal link, frequency inflation. |
+| [11-medication-team-size](11-medication-team-size/) | Sertraline dose, supplement tablets and a work team's size, patient only. Written to exercise `quantity_mismatch` and its boundaries. 32 turns, 3 sections, 16 claims (6 supported, 1 out of scope). Concerns: quantity mismatch (a dose, a summed total and a head count), frequency inflation (a rate, not an amount), certainty inflation ("about ten" written as exactly ten), timeframe mismatch (a start date, not a count), context stripping, contradictory evidence. Faithful rounding is left alone: dropped decimals (4.7 hours written as 4) and "forty-seven and a half" written as 47. |
 
-Across 01–05: all 5 verdicts, all 3 evidence roles, all 12 concern types, and 3 warning codes. `span_out_of_range` and `input_truncated` are left out on purpose, because a valid fixture cannot contain an out-of-range span.
+Across 01–05: all 5 verdicts, all 3 evidence roles, all 12 earlier concern types, and 3 warning codes. `span_out_of_range` and `input_truncated` are left out on purpose, because a valid fixture cannot contain an out-of-range span.
 
-Samples 06–10 are standard input with no edge cases. Every turn has a role and a timestamp, every audit is `complete` with no warnings, and all text is plain. Across those five samples there are 66 claims, 28 of them supported (about 40%). All 5 verdicts and all 3 evidence roles appear, every concern type appears at least twice, and each sample has at least one claim with two concerns.
+Samples 06–10 are standard input with no edge cases. Every turn has a role and a timestamp, every audit is `complete` with no warnings, and all text is plain. Across those five samples there are 66 claims, 28 of them supported (about 40%). All 5 verdicts and all 3 evidence roles appear, each of the 12 concern types before `quantity_mismatch` appears at least twice, and each sample has at least one claim with two concerns.
+
+Sample 11 is the only one with the thirteenth concern type, `quantity_mismatch`, and its boundary cases, so all 13 concern types appear across 01–11. Its audit is `complete` with no warnings, and every turn has a role and a timestamp.
 
 ## Validate
 

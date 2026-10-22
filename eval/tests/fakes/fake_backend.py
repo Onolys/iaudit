@@ -1,7 +1,7 @@
 """In-process fake of the audit backend for tests (httpx.MockTransport).
 
 Serves GET /healthz and POST /v1/audit. Default responses are schema-valid
-AuditResponses (contract 1.1.0 with run_info) derived deterministically from the
+AuditResponses (contract 1.2.0 with run_info) derived deterministically from the
 request: one `insufficient_evidence` claim per assessment section. Switch behaviour
 with `mode` (all requests) or `script` (per-request modes consumed in order, then
 `mode`). Offline only.

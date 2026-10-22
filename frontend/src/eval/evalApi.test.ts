@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { createEvalApi, type EvalApi } from "./evalApi";
 const health = { status: "ok", eval_api_version: "1", backend: { url: "http://localhost", reachable: true, schema_version: null } };
-const summary = { run_id: "r", dataset: "d", split: "test", n_requested: 1, n_items: 1, seed: null, created_at: "now", finished_at: null, schema_version: "1.1.0", state: "finished", score_state: "done", totals: { cost_usd: null, failures: 0 }, git_dirty: false };
+const summary = { run_id: "r", dataset: "d", split: "test", n_requested: 1, n_items: 1, seed: null, created_at: "now", finished_at: null, schema_version: "1.2.0", state: "finished", score_state: "done", totals: { cost_usd: null, failures: 0 }, git_dirty: false };
 const metrics = { schema_version: "1.0.0", run_id: "r", dataset: "d", dataset_version: "1", primary_policy: "p", scored: { at: "now", metrics_version: "1", git_commit: "abc", git_dirty: false }, bootstrap: { method: "bootstrap", resamples: 100, seed: 1, level: .95 }, run: { state: "finished", complete: true, mapping_version: null, tags: {} }, dataset_extra: {}, reference_caveats: [], items: { selected: 1, scored: 1, failed: 0, not_run: 0 }, failures: { by_reason: {} }, entries: [{ metric: "accuracy", level: "item", policy: "primary", slice: {}, value: 1, n: 1, n_clusters: 1, ci: [1, 1], ci_status: "few_clusters" }], references: [] };
 const comparison = { schema_version: "1.0.0", run_a: "a", run_b: "b", dataset: "d", warnings: [], n_shared: 1, n_a_only: 0, n_b_only: 0, n_clusters_shared: 1, deltas: [{ metric: "accuracy", level: "item", policy: "primary", slice: {}, a: { value: 1, n: 1, ci: null }, b: { value: 0, n: 1, ci: null }, delta: -1, delta_ci: null, ci_status: "few_clusters", n_clusters: 1 }], disagreements: [{ item_id: "i", cluster: "c", pairs: [{ level: "item", unit: "u", gold: "yes", a: "yes", b: "no" }] }] };
 const errorBody = (code = "not_found") => ({ error: { code, message: "probe failed", detail: { reason: "offline" } } });
@@ -137,4 +137,41 @@ it.each([
 ])("validates nested B3 %s definitions in their own schema scope", async (kind, body) => {
   const api = createEvalApi({ fetch: vi.fn<typeof fetch>().mockResolvedValue(json(body)) });
   expect(await (kind === "metrics" ? api.getMetrics("r") : api.compare("a", "b"))).toMatchObject({ ok: false, error: { kind: "bad_body" } });
+});
+
+it("gives GET /compare 120 s and leaves other GET routes at 10 s", async () => {
+  vi.useFakeTimers();
+  const hang = () => vi.fn<typeof fetch>(() => new Promise<Response>(() => {}));
+  const compareResult = createEvalApi({ fetch: hang() }).compare("a", "b");
+  const healthResult = createEvalApi({ fetch: hang() }).health();
+  await vi.advanceTimersByTimeAsync(10_001);
+  expect(await healthResult).toEqual({ ok: false, error: { kind: "timeout", seconds: 10 } });
+  await vi.advanceTimersByTimeAsync(100_000);
+  await vi.advanceTimersByTimeAsync(10_000);
+  expect(await compareResult).toEqual({ ok: false, error: { kind: "timeout", seconds: 120 } });
+});
+it("gives abort 120 s and other POST routes 30 s", async () => {
+  vi.useFakeTimers();
+  const hang = () => vi.fn<typeof fetch>(() => new Promise<Response>(() => {}));
+  const abortResult = createEvalApi({ fetch: hang() }).abortRun("r");
+  const rescoreResult = createEvalApi({ fetch: hang() }).rescore("r");
+  await vi.advanceTimersByTimeAsync(30_001);
+  expect(await rescoreResult).toEqual({ ok: false, error: { kind: "timeout", seconds: 30 } });
+  await vi.advanceTimersByTimeAsync(90_000);
+  expect(await abortResult).toEqual({ ok: false, error: { kind: "timeout", seconds: 120 } });
+});
+it.each(["", ".", ".."])("refuses id %j before any request, without throwing", async bad => {
+  const f = vi.fn<typeof fetch>();
+  const api = createEvalApi({ fetch: f });
+  const refused = { ok: false, error: { kind: "api", status: 400, code: "invalid_request", message: expect.stringContaining("id") } };
+  for (const call of [api.getRun(bad), api.abortRun(bad), api.resumeRun(bad), api.getMetrics(bad), api.listItems(bad), api.getItem("r", bad), api.getItem(bad, "i"), api.rescore(bad), api.getDataset(bad), api.getDownload(bad), api.startDownload(bad)])
+    expect(await call).toMatchObject(refused);
+  expect(f).not.toHaveBeenCalled();
+});
+it("sends an optional resume body: absent keeps cap, null clears it", async () => {
+  const f = vi.fn<typeof fetch>().mockImplementation(async () => json(summary));
+  const api = createEvalApi({ fetch: f });
+  await api.resumeRun("r"); await api.resumeRun("r", { max_cost_usd: null }, {});
+  expect(f.mock.calls[0][1]?.body).toBeUndefined();
+  expect(f.mock.calls[1][1]?.body).toBe(JSON.stringify({ max_cost_usd: null }));
 });

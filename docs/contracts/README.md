@@ -1,4 +1,4 @@
-# Audit contract 1.1.0
+# Audit contract 1.2.0
 
 Source of truth for the evidence-audit request and response. The frontend owns this contract. The backend implements it.
 
@@ -26,7 +26,9 @@ The verdict list and the concern-type list mirror [../mission.md](../mission.md)
 - Adding an optional field or an allowed value bumps **minor**.
 - Wording-only changes stay on the same version.
 
-A producer must send `"schema_version": "1.1.0"`. A consumer must reject any other value and must not render a partial audit from an invalid body.
+Version history: 1.0.0 initial; 1.1.0 optional `run_info` ([ADR 0014](../decisions/0014-run-info-optional-one-shared-version.md)); 1.2.0 adds the `quantity_mismatch` concern type ([ADR 0015](../decisions/0015-add-quantity-mismatch-widen-attribution-and-context-stripping.md)). 1.0.0 and 1.1.0 are rejected.
+
+A producer must send `"schema_version": "1.2.0"`. A consumer must reject any other value and must not render a partial audit from an invalid body.
 
 ## Conventions
 
@@ -66,7 +68,7 @@ A claim uses the same walk inside one section, so only step 3 applies, against `
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"1.1.0"`. |
+| `schema_version` | yes | Always `"1.2.0"`. |
 | `request_id` | no | Caller-chosen id. Echoed on the response. Not a content hash. |
 | `transcript` | yes | Non-empty array of turns, in order. |
 | `transcript[].id` | yes | Log id. Not an evidence anchor. |
@@ -86,7 +88,7 @@ Ids must be unique among turns, and unique among sections.
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"1.1.0"`. |
+| `schema_version` | yes | Always `"1.2.0"`. |
 | `request_id` | when sent | Exact echo of the request id. |
 | `status` | yes | `complete` or `partial`. |
 | `warnings` | yes | May be empty. |
@@ -137,13 +139,13 @@ These are the mission's results, plus outside-of-scope. The left pane distinguis
 
 ### Concern types
 
-A claim may have several. Explain the discrepancy once; do not repeat the same finding. Order matches mission checks 1–12.
+A claim may have several. Explain the discrepancy once; do not repeat the same finding. Order matches mission checks 1–13.
 
 | Value | Mission check |
 |---|---|
 | `unsupported_claim` | 1. Claim support |
 | `contradictory_evidence` | 2. Contradictory evidence |
-| `wrong_attribution` | 3. Wrong person or source attribution |
+| `wrong_attribution` | 3. Wrong person, source, or entity attribution |
 | `timeframe_mismatch` | 4. Timeframe mismatch |
 | `negation_reversal` | 5. Negation reversal |
 | `certainty_inflation` | 6. Certainty inflation |
@@ -153,6 +155,7 @@ A claim may have several. Explain the discrepancy once; do not repeat the same f
 | `correction_ignored` | 10. Correction ignored |
 | `conflicting_accounts_flattened` | 11. Conflicting accounts flattened |
 | `unsupported_causal_link` | 12. Unsupported causal links |
+| `quantity_mismatch` | 13. Quantity mismatch |
 
 Omitting a type means the audit did not find that concern. It is not a way to say the check was skipped. This version has no coverage field.
 
@@ -194,7 +197,7 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Consumer rules
 
-- If the body fails the schema or `schema_version` is not `1.1.0`, show an error. Do not render half an audit.
+- If the body fails the schema or `schema_version` is not `1.2.0`, show an error. Do not render half an audit.
 - If one span is out of range, still render that claim, with a warning badge. Do not shift the other highlights.
 - Colour and layout are not part of this contract. Verdict drives the left pane. Evidence `role` drives the right pane.
 - The right pane can expand past an excerpt. Expansion uses the same transcript array; it is not a new field.
@@ -202,11 +205,11 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Error response
 
-Any non-2xx reply carries this body instead of an audit. Example: [examples/error.json](examples/error.json). It shares the contract version: request, response and error bodies all carry `1.1.0`. HTTP path and CORS stay out of scope.
+Any non-2xx reply carries this body instead of an audit. Example: [examples/error.json](examples/error.json). It shares the contract version: request, response and error bodies all carry `1.2.0`. HTTP path and CORS stay out of scope.
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"1.1.0"`. |
+| `schema_version` | yes | Always `"1.2.0"`. |
 | `request_id` | no | Echo of the request id, when known. |
 | `error.code` | yes | One value from the table below. |
 | `error.message` | yes | Human-readable plain text, shown to the reviewer as-is. |

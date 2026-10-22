@@ -18,7 +18,7 @@ For each item:
 - `frequency` and `severity`: lists of amounts the evidence states for the claimed behaviour. Each is `{raw, rate_per_week, bucket_guess, basis}`. Copy `raw` from the turn. `basis` is `numeric` when the evidence gives a number ("three or four times a week", `rate_per_week` = 3.5) and `relative` for words ("most meetings", "a lot"). Use the scale definitions below. Leave the list empty when the evidence states no amount of that kind.
 - `timeframe`: `current`, `past`, `childhood`, `future`, `hypothetical` or `unspecified`, as the evidence describes the behaviour.
 - `certainty`: `definite`, `hedged_light` ("probably every day") or `hedged_strong` ("maybe", "I guess", "not sure").
-- `experiencer`: `claim_subject` if the evidence describes the person the claim is about, `other_person` if it describes someone else, `unclear` if you cannot tell. Never guess a speaker or a role; use only what the turns show.
+- `experiencer`: `claim_subject` if the evidence describes the person the claim is about, `other_person` if it describes another person or entity (someone or something else), `unclear` if you cannot tell. Never guess a speaker or a role; use only what the turns show.
 - `conf`: `low`, `medium` or `high`, how sure you are of this item.
 
 # Scales
@@ -32,10 +32,11 @@ For each item:
 
 - `timeframe_mismatch`: the evidence describes a different period than the claim states.
 - `certainty_inflation`: the claim states as certain what the evidence hedges strongly.
-- `context_stripping`: an evidence item contains a qualifier or reason that the claim drops and that changes its meaning.
+- `context_stripping`: an evidence item contains a qualifier, reason or limit that the claim drops, or the claim replaces a narrower group, setting or condition with a wider one, and the meaning changes. A faithful generalization or summary is not this flag.
 - `correction_ignored`: a later turn retracts or changes what the cited item says.
 - `conflicting_accounts_flattened`: speakers give differing accounts but the claim presents them as agreeing.
 - `unsupported_causal_link`: the claim asserts a cause and effect that the transcript does not establish. A speaker who asserts the cause counts as establishing it.
+- `quantity_mismatch`: the claim states an amount, count, value or total that differs from what the cited item gives. Not for how often, how bad or how long (frequency/severity), nor for dates or timing. A figure the transcript never gives is not this flag. Ordinary rounding is not a mismatch: dropping decimals ("2.3 miles" written as "2 miles") or "about" is faithful. Name the item that gives the different figure in `keys`; the item's `relation` still ignores the amount. If the claim's only content is the figure and the item states a different figure, use `contradicts` and raise quantity_mismatch.
 - `element_gap`: some element of the claim is established by no item.
 
 # Rules
@@ -43,3 +44,5 @@ For each item:
 - An interviewer question is not evidence. A question answered only by a continuer ("Hm.") or a non-answer does not entail anything.
 - Judge only what the shown turns say. Do not use outside knowledge and do not guess what the person meant.
 - `suggested_revision`: optional. One short sentence (under 40 words) that restates the claim so the evidence supports it, written in your own words with no timestamps. Use it only when the claim overstates, reverses or drops a qualifier. Otherwise null.
+- Changed action: when the claim says the person did something other than what the evidence describes, use `contradicts` if the evidence states the actual action, otherwise `not_addresses`.
+- Merged facts: when the claim joins two true facts into a relation no turn states, judge each item on its own fact and do not use `entails` for the joined claim. Raise `unsupported_causal_link` only if the claim asserts cause and effect; otherwise raise nothing.

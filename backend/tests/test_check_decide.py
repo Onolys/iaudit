@@ -1,5 +1,6 @@
 import random
 
+import pytest
 from check_helpers import claim, ev
 
 from iaudit_backend.check.models import Concern, FlagObs, ItemObs, JudgedEvidence, Signals
@@ -323,3 +324,93 @@ def test_property_decisions_always_satisfy_the_contract_guards():
         )  # fmt: skip
         d = decide(c, items, sig(*fl), CFG)
         guard(c, d)
+
+
+# --- quantity_mismatch (mission check 13) ------------------------------------------------------
+
+
+def test_quantity_flag_with_supported_behaviour_is_d8_partial():
+    d = run([j(cited=True)], ("quantity_mismatch", ["c0.1:e1"]))
+    assert (d.row, d.verdict, types(d)) == ("D8", V.partially_supported, [CT.quantity_mismatch])
+    assert d.roles == {"c0.1:e1": R.supporting}
+
+
+def test_quantity_flag_on_contradicting_item_is_d4_and_replaces_generic_contradiction():
+    d = run([j(rel="contradicts")], ("quantity_mismatch", ["c0.1:e1"]))
+    assert (d.row, d.verdict, types(d)) == ("D4", V.contradicted, [CT.quantity_mismatch])
+    guard(claim("Alex forgets."), d)
+
+
+def test_frequency_beats_quantity_on_the_same_key():
+    out = dedup(
+        [
+            Concern(CT.quantity_mismatch, ["c0.1:e1"]),
+            Concern(CT.frequency_severity_inflation, ["c0.1:e1"], "inflates", "frequency"),
+        ]
+    )
+    assert [c.type for c in out] == [CT.frequency_severity_inflation]
+
+
+def test_quantity_beats_contradictory_on_the_same_key_but_not_on_other_keys():
+    out = dedup(
+        [
+            Concern(CT.contradictory_evidence, ["c0.1:e1"]),
+            Concern(CT.quantity_mismatch, ["c0.1:e1"]),
+        ]
+    )
+    assert [c.type for c in out] == [CT.quantity_mismatch]
+    out = dedup(
+        [
+            Concern(CT.contradictory_evidence, ["c0.1:e2"]),
+            Concern(CT.quantity_mismatch, ["c0.1:e1"]),
+        ]
+    )
+    assert [c.type for c in out] == [CT.contradictory_evidence, CT.quantity_mismatch]
+
+
+def test_quantity_flag_with_not_addresses_item_keeps_the_concern():
+    d = run([j(rel="not_addresses", cited=True)], ("quantity_mismatch", ["c0.1:e1"]))
+    assert (d.verdict, types(d), d.roles) == (
+        V.partially_supported,
+        [CT.quantity_mismatch],
+        {"c0.1:e1": R.supporting},
+    )
+
+
+def test_quantity_concern_sorts_last_and_template_has_no_digits_or_banned_words():
+    from iaudit_backend.check.templates import BANNED, Slots, concern_text
+
+    d = run([j(cited=True)], ("quantity_mismatch", ["c0.1:e1"]), ("context_stripping", ["c0.1:e1"]))
+    assert types(d) == [CT.context_stripping, CT.quantity_mismatch]
+    text = concern_text(d.concerns[-1], Slots())
+    assert not any(ch.isdigit() for ch in text) and not BANNED.search(text)
+
+
+_STACK_PARTNERS = [
+    CT.certainty_inflation,
+    CT.correction_ignored,
+    CT.conflicting_accounts_flattened,
+    CT.timeframe_mismatch,
+]
+
+
+@pytest.mark.parametrize("other", _STACK_PARTNERS)
+def test_dedup_quantity_mismatch_yields_to_overlapping_partner(other):
+    got = dedup([Concern(CT.quantity_mismatch, ["a"]), Concern(other, ["a", "b"])])
+    assert [c.type for c in got] == [other]
+
+
+@pytest.mark.parametrize("other", _STACK_PARTNERS)
+def test_dedup_quantity_mismatch_yields_when_either_side_has_no_keys(other):
+    assert [c.type for c in dedup([Concern(CT.quantity_mismatch, []), Concern(other, ["b"])])] == [
+        other
+    ]
+    assert [c.type for c in dedup([Concern(CT.quantity_mismatch, ["a"]), Concern(other, [])])] == [
+        other
+    ]
+
+
+@pytest.mark.parametrize("other", _STACK_PARTNERS)
+def test_dedup_quantity_mismatch_kept_on_different_items(other):
+    got = dedup([Concern(CT.quantity_mismatch, ["a"]), Concern(other, ["b"])])
+    assert {c.type for c in got} == {CT.quantity_mismatch, other}

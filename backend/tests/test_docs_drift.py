@@ -95,3 +95,13 @@ def test_relative_markdown_links_resolve():
             if path and not (f.parent / path).exists():
                 broken.append(f"{f.relative_to(REPO)} -> {target}")
     assert broken == []
+
+
+def test_contract_readme_check_names_match_frontend_labels():
+    labels = (REPO / "frontend" / "src" / "claim-detail" / "concernLabels.ts").read_text(
+        encoding="utf-8"
+    )
+    readme = (DOCS / "contracts" / "README.md").read_text(encoding="utf-8")
+    for concern, name in re.findall(r'^\s+(\w+): "([^"]+)",$', labels, re.M):
+        row = re.search(rf"^\| `{concern}` \| \d+\. (.+) \|$", readme, re.M)
+        assert row is None or row.group(1) == name, (concern, name, row and row.group(1))

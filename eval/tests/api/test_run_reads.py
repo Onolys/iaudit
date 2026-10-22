@@ -266,7 +266,7 @@ async def test_detail_preserves_run_error_extra_fields(roots):
         path = roots[2] / run_id / "run.json"
         run = json.loads(path.read_text())
         run["error"] = {"kind": "fixture_failure", "message": "Exact fixture message",
-                        "versions": {"expected": "1.1.0", "actual": "0.0.0"}}
+                        "versions": {"expected": "1.2.0", "actual": "0.0.0"}}
         path.write_text(json.dumps(run))
         detail = checked(await http.get(f"/runs/{run_id}"), "RunDetail")
         assert detail["error"] == run["error"]

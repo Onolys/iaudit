@@ -30,12 +30,16 @@ ROUTES = {
     "POST /runs/{id}/rescore": "RunSummary",
     "GET /compare": "Comparison",
 }
-REQUESTS = {"POST /runs/estimate": "EstimateRequest", "POST /runs": "RunRequest"}
+REQUESTS = {
+    "POST /runs/estimate": "EstimateRequest", "POST /runs": "RunRequest",
+    "POST /runs/{id}/resume": "ResumeRequest",
+}
 ERRORS = {str(status): "ErrorResponse" for status in (403, 404, 409, 422, 500, 502)}
 _MODELS = (
     models.Health, models.DatasetSummary, models.DatasetMeta, models.DownloadStatus,
-    models.EstimateRequest, models.RunRequest, models.Estimate, models.RunCreated,
-    models.RunSummary, models.RunDetail, models.ItemPage, models.ItemDetail, models.ErrorResponse,
+    models.EstimateRequest, models.RunRequest, models.ResumeRequest, models.Estimate,
+    models.RunCreated, models.RunSummary, models.RunDetail, models.ItemPage, models.ItemDetail,
+    models.ErrorResponse,
 )
 
 

@@ -105,6 +105,12 @@ class RunRequest(EstimateRequest):
     tags: dict[str, Any] | None = None
 
 
+class ResumeRequest(Model):
+    """Optional resume body: absent key keeps the stored cap, null clears it, a number sets it."""
+
+    max_cost_usd: Annotated[float, Field(gt=0, allow_inf_nan=False)] | None = None
+
+
 class Estimate(Model):
     """B2 Estimate, without field renames, invented figures, or extra fields."""
 
@@ -170,10 +176,24 @@ class RunError(Model):
     message: str
 
 
+class ResumeRefusalChange(Model):
+    field: str
+    was: Any = None
+    now: Any = None
+
+
+class ResumeRefusal(Model):
+    """Last refused resume of this run (in memory; lost on restart)."""
+
+    kind: Literal["fingerprint_changed", "schema_version_changed"]
+    changes: list[ResumeRefusalChange]
+
+
 class RunDetail(RunSummary):
     progress: Progress
     run_info: RunInfo
     error: RunError | None = None
+    resume_refusal: ResumeRefusal | None = None
 
 
 @with_config(ConfigDict(extra="forbid"))

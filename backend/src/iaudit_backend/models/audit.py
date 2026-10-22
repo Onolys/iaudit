@@ -20,7 +20,7 @@ class Verdict(StrEnum):
 
 
 class ConcernType(StrEnum):
-    """Mission checks 1-12, in order."""
+    """Mission checks 1-13, in order."""
 
     unsupported_claim = "unsupported_claim"
     contradictory_evidence = "contradictory_evidence"
@@ -34,6 +34,7 @@ class ConcernType(StrEnum):
     correction_ignored = "correction_ignored"
     conflicting_accounts_flattened = "conflicting_accounts_flattened"
     unsupported_causal_link = "unsupported_causal_link"
+    quantity_mismatch = "quantity_mismatch"
 
 
 class EvidenceRole(StrEnum):
@@ -75,7 +76,7 @@ class Section(_Model):
 
 
 class AuditRequest(_Model):
-    schema_version: Literal["1.1.0"]
+    schema_version: Literal["1.2.0"]
     request_id: str | None = None
     transcript: list[Turn]
     assessment: list[Section]
@@ -133,7 +134,7 @@ class RunInfo(_Model):
 
 
 class AuditResponse(_Model):
-    schema_version: Literal["1.1.0"] = "1.1.0"
+    schema_version: Literal["1.2.0"] = "1.2.0"
     request_id: str | None = None
     status: Status
     warnings: list[Warning]

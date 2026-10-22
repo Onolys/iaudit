@@ -354,6 +354,371 @@
     ],
     "suggested_revision": null
    }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan manages a team of eight.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": [
+     "eight"
+    ]
+   },
+   "turns": [
+    {
+     "i": 50,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Tell me about work."
+    },
+    {
+     "i": 51,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I lead the design group. There are four of us in it."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      51
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I lead the design group. There are four of us in it."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "quantity_mismatch",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": "Jordan manages a team of four."
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan walks about two miles to the depot.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": [
+     "about two miles"
+    ]
+   },
+   "turns": [
+    {
+     "i": 60,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "How do you get to work?"
+    },
+    {
+     "i": 61,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I walk to the depot, 2.3 miles, give or take."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      61
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I walk to the depot, 2.3 miles, give or take."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan reviews the budget every day.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": [
+     "every day"
+    ]
+   },
+   "turns": [
+    {
+     "i": 70,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "How often do you review the budget?"
+    },
+    {
+     "i": 71,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Once a month, when the invoices come in."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      71
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Once a month, when the invoices come in."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [
+       {
+        "raw": "Once a month",
+        "rate_per_week": 0.23,
+        "bucket_guess": "sometimes",
+        "basis": "numeric"
+       }
+      ],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan reports side effects from Odamet.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 80,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Any side effects?"
+    },
+    {
+     "i": 81,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "The nausea was from Ravelin, the one I took before. Odamet has been fine."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      81
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "The nausea was from Ravelin, the one I took before. Odamet has been fine."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "contradicts",
+      "polarity": "negated",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "other_person",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan avoids all group events.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 90,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Do you go to group events?"
+    },
+    {
+     "i": 91,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I skip the big office parties, but I go to my book club every week."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      91
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I skip the big office parties, but I go to my book club every week."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "context_stripping",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": "Jordan skips large office parties but attends a book club weekly."
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan finds crowded places hard.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 100,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "How are crowds for you?"
+    },
+    {
+     "i": 101,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Malls, stations, concerts, I cannot stand any of them."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      101
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Malls, stations, concerts, I cannot stand any of them."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
   }
  ]
 }

@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "audit-response.schema.json",
   "title": "AuditResponse",
-  "description": "Body of one evidence-consistency audit response, schema 1.1.0. Positions only: do not copy transcript text or timestamps. One request yields one response. No streaming and no background job.",
+  "description": "Body of one evidence-consistency audit response, schema 1.2.0. Positions only: do not copy transcript text or timestamps. One request yields one response. No streaming and no background job.",
   "type": "object",
   "required": ["schema_version", "status", "warnings", "claims"],
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.1.0"
+      "const": "1.2.0"
     },
     "request_id": {
       "type": "string",
@@ -268,7 +268,7 @@
       "additionalProperties": false,
       "properties": {
         "type": {
-          "description": "Mirrors docs/mission.md checks 1–12, in that order. When the mission changes, update this list and bump schema_version.",
+          "description": "Mirrors docs/mission.md checks 1–13, in that order. When the mission changes, update this list and bump schema_version.",
           "enum": [
             "unsupported_claim",
             "contradictory_evidence",
@@ -281,7 +281,8 @@
             "question_as_answer",
             "correction_ignored",
             "conflicting_accounts_flattened",
-            "unsupported_causal_link"
+            "unsupported_causal_link",
+            "quantity_mismatch"
           ]
         },
         "explanation": {

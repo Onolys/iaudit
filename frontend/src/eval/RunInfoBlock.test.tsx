@@ -43,3 +43,8 @@ it("shows supplied zero token totals and the test-split informational line witho
   expect(screen.queryByRole("button")).toBeNull();
   expect(screen.queryByRole("dialog")).toBeNull();
 });
+
+it("formats cost to cents like the runs list", () => {
+  render(<RunInfoBlock run={{ ...run, totals: { failures: 0, cost_usd: 0.1234567 } }} />);
+  expect(screen.getByText("$0.12")).toBeTruthy();
+});

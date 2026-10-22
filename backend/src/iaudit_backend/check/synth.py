@@ -27,6 +27,16 @@ _CAUSAL_CUE = re.compile(
     r"|so|therefore)\b",
     re.IGNORECASE,
 )
+_NUMBER_WORDS = (
+    r"zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen"
+    r"|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy"
+    r"|eighty|ninety|hundred|thousand|million|billion|dozen|dozens|hundreds|thousands|millions"
+    r"|billions|tens|half|halves|couple|pair|single|double(?!-check)|triple|quarter"
+)
+_NUMBER_TOKEN = re.compile(rf"\d|\b(?:{_NUMBER_WORDS})\b", re.IGNORECASE)
+
+_YEAR = re.compile(r"\b(?:19|20)\d{2}\b")
+_PRONOUN_ONE = re.compile(r"\b(?:the|no|any|every|some|that|this|which|each)\s+one\b", re.I)
 
 # --- timeframe (bucket 4) -------------------------------------------------------------------
 
@@ -116,6 +126,26 @@ def _rate_ratio_conflict(
 
 def has_causal_cue(claim: AtomicClaim) -> bool:
     return bool(_CAUSAL_CUE.search(claim.proposition))
+
+
+def has_number_token(text: str, turn_side: bool = False) -> bool:
+    """A numeral, number word or amount token (currency and percent signs sit next to digits).
+
+    turn_side: also ignore 4-digit years and the pronoun "one" ("the one in Austin", "no one").
+    """
+    if turn_side:
+        text = _PRONOUN_ONE.sub(" ", _YEAR.sub(" ", text))
+    return bool(_NUMBER_TOKEN.search(text))
+
+
+def _quantity_flag_grounded(
+    claim: AtomicClaim, keys: list[str], items: list[JudgedEvidence], turns: list
+) -> bool:
+    """A quantity_mismatch flag needs a figure in the claim and in a cited item's turn text."""
+    if not has_number_token(claim.proposition):
+        return False
+    cited = [it for it in items if not keys or it.key in keys]
+    return any(has_number_token(turns[i].text, turn_side=True) for it in cited for i in it.turns)
 
 
 def counts_as_support_base(it: JudgedEvidence) -> bool:
@@ -219,14 +249,26 @@ def judge(
         if f.type == "unsupported_causal_link" and not has_causal_cue(claim):
             sig.counts["flags_suppressed"] = sig.counts.get("flags_suppressed", 0) + 1
             continue
-        sig.flags.append(f.model_copy(update={"keys": [k for k in f.keys if k in known]}))
+        kept_keys = [k for k in f.keys if k in known]
+        if f.type == "quantity_mismatch" and not _quantity_flag_grounded(
+            claim, kept_keys, items, turns
+        ):
+            sig.counts["flags_suppressed"] = sig.counts.get("flags_suppressed", 0) + 1
+            continue
+        sig.flags.append(f.model_copy(update={"keys": kept_keys}))
     apply_timeframe(claim, items, sig.flags)
     _rate_ratio_conflict(claim, items, sig, (cfg or Settings()).check_rate_ratio)
     sig.failed_inference = resolve_inferences(link, {it.key: it for it in items}, vout.inferences)
     cited = {
         k
         for f in sig.flags
-        if f.type in ("context_stripping", "correction_ignored", "unsupported_causal_link")
+        if f.type
+        in (
+            "context_stripping",
+            "correction_ignored",
+            "unsupported_causal_link",
+            "quantity_mismatch",
+        )
         for k in f.keys
     }
     for it in items:
@@ -240,6 +282,7 @@ _FLAG_CONCERN = {
     "conflicting_accounts_flattened": ConcernType.conflicting_accounts_flattened,
     "unsupported_causal_link": ConcernType.unsupported_causal_link,
     "element_gap": ConcernType.unsupported_claim,
+    "quantity_mismatch": ConcernType.quantity_mismatch,
 }
 
 
@@ -260,7 +303,14 @@ _CHAIN = (
     ConcernType.wrong_attribution,
     ConcernType.negation_reversal,
     ConcernType.frequency_severity_inflation,
+    ConcernType.quantity_mismatch,
     ConcernType.contradictory_evidence,
+)
+_QUANTITY_YIELDS_TO = (
+    ConcernType.certainty_inflation,
+    ConcernType.correction_ignored,
+    ConcernType.conflicting_accounts_flattened,
+    ConcernType.timeframe_mismatch,
 )
 _ORDER = {t: n for n, t in enumerate(ConcernType)}
 _Role = EvidenceRole
@@ -313,6 +363,14 @@ def dedup(concerns: list[Concern]) -> list[Concern]:
                 if not lc.keys or not hc.keys or set(lc.keys) & set(hc.keys):
                     del cs[low]
                     break
+    # One discrepancy, one concern: a more specific cause explains an amount gap on the same items.
+    qm = cs.get(ConcernType.quantity_mismatch)
+    if qm is not None:
+        for other in _QUANTITY_YIELDS_TO:
+            oc = cs.get(other)
+            if oc is not None and (not qm.keys or not oc.keys or set(qm.keys) & set(oc.keys)):
+                del cs[ConcernType.quantity_mismatch]
+                break
     # D5 precedence: conflicting accounts > correction ignored > generic contradiction
     if ConcernType.conflicting_accounts_flattened in cs:
         cs.pop(ConcernType.correction_ignored, None)

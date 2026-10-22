@@ -50,6 +50,10 @@ class RunManager:
         self._active_task: asyncio.Task | None = None
         self._score_tasks: dict[str, asyncio.Task] = {}
         self.score_states: dict[str, str] = {}
+        self.resume_refusals: dict[str, dict] = {}
+        self._scored_revisions: dict[str, int] = {}
+        self._lazy_scores: set[str] = set()
+        self._loop: asyncio.AbstractEventLoop | None = None
         self.backend_schema_version: str | None = None
         self._closing = False
         self.backend_client = None
@@ -149,6 +153,7 @@ class RunManager:
             transport = getattr(getattr(backend_client, "_http", None), "_transport", None)
             self._probe_transport = _BorrowedTransport(transport) if transport else None
         self._closing = False
+        self._loop = asyncio.get_running_loop()
         for run_id, state in self.score_states.items():
             if state == "running":
                 self.score_states[run_id] = "pending"
@@ -172,6 +177,13 @@ class RunManager:
             result.append(resolve_under(self.runs_root, run_id, "items", path.name))
         return result
 
+    def _revision(self, run_id: str, run: dict) -> int:
+        """Newest mtime of the run's scoring inputs (run.json and item files)."""
+        sources = [
+            resolve_under(self.runs_root, run_id, "run.json"), *self._item_paths(run_id, run),
+        ]
+        return max(path.stat().st_mtime_ns for path in sources)
+
     def _metrics_current(self, run_id: str, run: dict, state: str) -> bool:
         report = resolve_under(self.runs_root, run_id, "metrics.json")
         if state == "running" or self.score_states.get(run_id) in {"pending", "running", "failed"}:
@@ -180,10 +192,37 @@ class RunManager:
             return False
         # B3 atomically writes reports after run/item writes. A resumed or changed
         # run invalidates older reports, including after a server restart.
-        sources = [
-            resolve_under(self.runs_root, run_id, "run.json"), *self._item_paths(run_id, run),
-        ]
-        return report.stat().st_mtime_ns >= max(path.stat().st_mtime_ns for path in sources)
+        return report.stat().st_mtime_ns >= self._revision(run_id, run)
+
+    def _request_lazy_score(self, run_id: str) -> None:
+        """Called from read threads: hand a stale terminal run to the loop for scoring."""
+        loop = self._loop
+        if loop is None or self._closing:
+            return
+        try:
+            loop.call_soon_threadsafe(self._lazy_score, run_id)
+        except RuntimeError:  # loop already closed
+            pass
+
+    def _lazy_score(self, run_id: str) -> None:
+        """On the loop: score a terminal run whose metrics are stale, once per revision."""
+        # A control action in progress decides scoring itself; the next read retries.
+        if (self._closing or self._control_lock.locked() or self._scoring(run_id)
+                or (self._active_handle is not None and self._active_handle.run_id == run_id)):
+            return
+        try:
+            run = self._read_run(run_id)
+            state = store.effective_state(self.runs_root, run_id)
+            revision = self._revision(run_id, run)
+        except (ApiError, OSError, ValueError, KeyError):
+            return
+        if state == "running" or self._scored_revisions.get(run_id) == revision:
+            return
+        if self.score_states.get(run_id) != "failed" and self._metrics_current(
+                run_id, run, state):
+            return
+        self._lazy_scores.add(run_id)
+        self._schedule_score(run_id)
 
     def _read_summary(self, run_id: str) -> dict:
         run = self._read_run(run_id)
@@ -192,7 +231,13 @@ class RunManager:
         state = store.effective_state(self.runs_root, run_id)
         score_state = self.score_states.get(run_id)
         if score_state not in {"running", "failed"}:
-            score_state = "done" if self._metrics_current(run_id, run, state) else "pending"
+            if self._metrics_current(run_id, run, state):
+                score_state = "done"
+            else:
+                score_state = "pending"
+                if state != "running":
+                    # "pending" means scoring is queued/active: make that true.
+                    self._request_lazy_score(run_id)
         return {
             "run_id": run_id, "dataset": run["dataset"], "split": run["split"],
             "n_requested": run.get("n_requested"), "n_items": len(run["item_ids"]),
@@ -271,17 +316,34 @@ class RunManager:
                     base_url=self.backend_url, max_cost_usd=request.max_cost_usd,
                     tags=request.tags, client=self.backend_client, on_finish=None,
                     runs_root=self.runs_root, data_root=self.data_root,
+                    datasets_root=self.datasets_root,
                 )
             except DatasetError as exc:
                 raise ApiError("invalid_request", 422, "Invalid dataset selection.") from exc
+            except store.RunLockedError as exc:
+                raise ApiError("bad_state", 409, "Run could not be started.") from exc
             self._track(handle)
             return {"run_id": handle.run_id}
 
     async def _observe(self, handle: engine.RunHandle) -> None:
+        refused = False
         try:
             await handle.wait()
         except asyncio.CancelledError:
             return
+        except engine.FingerprintChanged as exc:
+            # A refused resume is not a scoring failure: nothing from the refused
+            # response was stored and run.json was restored. Surface the cause, and
+            # drop the optimistic "pending" so the state is derived from the files.
+            kind = ("schema_version_changed" if isinstance(exc, engine.SchemaVersionChanged)
+                    else "fingerprint_changed")
+            self.resume_refusals[handle.run_id] = {
+                "kind": kind,
+                "changes": [{"field": k, **v} for k, v in sorted(exc.changes.items())],
+            }
+            self.score_states.pop(handle.run_id, None)
+            log_event("resume_refused_observed", kind=kind)
+            refused = True
         except Exception as exc:
             self.score_states[handle.run_id] = "failed"
             log_event("run_task_failed", exc_class=type(exc).__name__)
@@ -289,10 +351,16 @@ class RunManager:
         finally:
             if self._active_handle is handle:
                 self._active_handle = None
-        if not self._closing:
+        if refused:
+            self._lazy_score(handle.run_id)  # only if the refused attempt made metrics stale
+        elif not self._closing:
             self._schedule_score(handle.run_id)
 
     def _schedule_score(self, run_id: str) -> None:
+        try:
+            self._scored_revisions[run_id] = self._revision(run_id, self._read_run(run_id))
+        except (ApiError, OSError, ValueError, KeyError):
+            self._scored_revisions.pop(run_id, None)
         self.score_states[run_id] = "running"
         self._score_tasks[run_id] = asyncio.create_task(self._score(run_id))
 
@@ -307,6 +375,8 @@ class RunManager:
             log_event("score_task_failed", exc_class=type(exc).__name__)
         else:
             self.score_states[run_id] = "done"
+        finally:
+            self._lazy_scores.discard(run_id)
 
     async def abort(self, run_id: str) -> dict:
         async with self._control_lock:
@@ -319,10 +389,13 @@ class RunManager:
         await asyncio.shield(task)
         return await self.summary(run_id)
 
-    async def resume(self, run_id: str) -> dict:
+    async def resume(self, run_id: str, *, max_cost_usd=engine.KEEP_CAP) -> dict:
         async with self._control_lock:
             run = await asyncio.to_thread(self._read_run, run_id)
             self._ensure_idle()
+            if self._scoring(run_id) and run_id in self._lazy_scores:
+                # Housekeeping scoring of a stale run is short; do not make resume fail on it.
+                await asyncio.gather(self._score_tasks[run_id], return_exceptions=True)
             if self._scoring(run_id):
                 raise ApiError("bad_state", 409, "Run is being scored.")
             summary = await self.summary(run_id)
@@ -339,11 +412,13 @@ class RunManager:
             try:
                 handle = await engine.resume_async(
                     run_id, dataset=dataset, base_url=self.backend_url,
-                    client=self.backend_client, on_finish=None,
+                    client=self.backend_client, on_finish=None, max_cost_usd=max_cost_usd,
                     runs_root=self.runs_root, data_root=self.data_root,
+                    datasets_root=self.datasets_root,
                 )
             except (engine.ResumeError, store.RunLockedError) as exc:
                 raise ApiError("bad_state", 409, "Run cannot be resumed.") from exc
+            self.resume_refusals.pop(run_id, None)
             self._track(handle)
             return await self.summary(run_id)
 
@@ -362,15 +437,17 @@ class RunManager:
             self._closing = True
             handle = self._active_handle
         if handle is not None:
-            # Cancellation deliberately leaves the stored state running; releasing
-            # the engine lock makes B2 report interrupted, rather than user-aborted.
-            handle._task.cancel()
+            # Drain: stop dispatching, let in-flight (paid) items finish and be written
+            # within the grace period. The run stays stored as running; releasing the
+            # engine lock makes B2 report interrupted, rather than user-aborted.
+            handle.drain()
             finished = asyncio.gather(handle._task, return_exceptions=True)
             try:
                 await asyncio.wait_for(asyncio.shield(finished), timeout=grace_s)
             except TimeoutError:
-                # The grace period is not permission to abandon transport cleanup.
-                # Reap the actual engine before its observer or owned HTTP client.
+                # Past the grace period, cancel; this also leaves the stored state running.
+                # Still reap the actual engine before its observer or owned HTTP client.
+                handle._task.cancel()
                 await asyncio.shield(finished)
             if self._active_task is not None:
                 await asyncio.gather(self._active_task, return_exceptions=True)

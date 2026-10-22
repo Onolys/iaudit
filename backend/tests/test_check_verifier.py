@@ -178,3 +178,42 @@ async def test_missing_inference_judgment_is_retried_then_stalls(make_ctx):
     assert r.stall is None and r.retries == 1 and "c0.1:e3" in seen[1].user
     r = await verify(claim("x"), lk, PREP, PREP.turns, make_ctx(llm=stub(plain)))
     assert (r.stall, r.unjudged) == ("bad_output", ["c0.1:e3"])
+
+
+def test_prompt_and_fewshot_cover_quantity_taxonomy():
+    from iaudit_backend.check.verifier import PROMPTS
+
+    sysmd = (PROMPTS / "check_system.md").read_text(encoding="utf-8")
+    assert "- `quantity_mismatch`:" in sysmd and "ordinary rounding" in sysmd.lower()
+    assert "another person or entity" in sysmd and "wider one" in sysmd
+    assert "IGNORE amount" in sysmd
+    shots = load_fewshot()
+    flagged = {f["type"] for s in shots for f in s["output"]["flags"]}
+    assert {"quantity_mismatch", "context_stripping"} <= flagged
+    assert any(s["output"]["items"][0]["experiencer"] == "other_person" for s in shots)
+    # a rate claim keeps frequency and raises no quantity flag
+    rate = [s for s in shots if s["output"]["items"][0]["frequency"] and s["claim"]["quantities"]]
+    assert any(
+        all(f["type"] != "quantity_mismatch" for f in s["output"]["flags"]) for s in rate
+    )
+    # unscored speaker ids only
+    assert {t["speaker"] for s in shots for t in s["turns"]} <= {"dr_vale", "jordan1"}
+
+
+def test_prompt_rounding_example_is_not_a_duration():
+    from iaudit_backend.check.verifier import PROMPTS
+
+    sysmd = (PROMPTS / "check_system.md").read_text(encoding="utf-8")
+    assert '"4.7 hours"' not in sysmd
+    assert '"2.3 miles" written as "2 miles"' in sysmd
+
+
+def test_prompt_has_figure_only_contradiction_rule():
+    from iaudit_backend.check.verifier import PROMPTS
+
+    sysmd = (PROMPTS / "check_system.md").read_text(encoding="utf-8")
+    rule = (
+        "If the claim's only content is the figure and the item states a different figure, "
+        "use `contradicts` and raise quantity_mismatch."
+    )
+    assert rule in sysmd

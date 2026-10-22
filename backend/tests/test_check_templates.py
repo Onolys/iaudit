@@ -114,3 +114,28 @@ def test_banned_words_in_suggested_revision_are_rejected():
         vet_revision("Alex deliberately skips meetings.", Verdict.partially_supported, INFL, CFG)
         is None
     )
+
+
+def test_new_and_widened_templates_have_no_digits_or_banned_words():
+    for t in (
+        ConcernType.quantity_mismatch,
+        ConcernType.wrong_attribution,
+        ConcernType.context_stripping,
+    ):
+        for s in SLOTS:
+            text = concern_text(Concern(t, [], None, None), s)
+            assert not re.search(r"\d", text) and not BANNED.search(text), text
+
+
+def test_widened_template_wording():
+    wa = concern_text(Concern(ConcernType.wrong_attribution, [], None, None), Slots())
+    assert "the source, person or entity described may differ" in wa
+    cs = concern_text(Concern(ConcernType.context_stripping, [], None, None), Slots())
+    assert "qualifier, reason or limit that the claim leaves out or broadens" in cs
+    qm = concern_text(Concern(ConcernType.quantity_mismatch, [], None, None), Slots())
+    assert "amount, count or value" in qm and "a reviewer may wish to confirm" in qm
+
+
+def test_quantity_mismatch_revision_is_allowed():
+    qm = [Concern(ConcernType.quantity_mismatch, ["k"])]
+    assert vet_revision("The team has six people.", Verdict.partially_supported, qm, CFG)
