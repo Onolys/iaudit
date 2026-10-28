@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # CORS
     cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:5173"]
     # Models (LiteLLM ids)
-    model_cheap: str = "anthropic/claude-haiku-4-5-20251001"
+    model_cheap: str = "anthropic/claude-haiku-5-5"
     model_mid: str = "anthropic/claude-sonnet-5-5"
     model_strong: str = "anthropic/claude-opus-5-5"
     # Timeouts / retries / concurrency

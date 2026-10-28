@@ -10,7 +10,7 @@ def test_defaults():
     assert s.max_turns == 2000
     assert s.max_sections == 50
     assert s.cors_origins == ["http://localhost:5173"]
-    assert s.model_cheap == "anthropic/claude-haiku-4-5-20251001"
+    assert s.model_cheap == "anthropic/claude-haiku-5-5"
     assert s.model_mid == "anthropic/claude-sonnet-5-5"
     assert s.model_strong == "anthropic/claude-opus-5-5"
     assert s.llm_timeout_s == 30

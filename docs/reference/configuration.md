@@ -21,7 +21,7 @@ Values here are the defaults. Tuning values (thresholds, caps, windows) are gues
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `IAUDIT_MODEL_CHEAP` | `anthropic/claude-haiku-4-5-20251001` | LiteLLM model id for the cheap tier (prep tagging). |
+| `IAUDIT_MODEL_CHEAP` | `anthropic/claude-haiku-5-5` | LiteLLM model id for the cheap tier (prep tagging). |
 | `IAUDIT_MODEL_MID` | `anthropic/claude-sonnet-5-5` | LiteLLM model id for the mid tier (atomize, link, check). |
 | `IAUDIT_MODEL_STRONG` | `anthropic/claude-opus-5-5` | LiteLLM model id for the strong tier. Offline use only. |
 | `IAUDIT_LLM_TIMEOUT_S` | `30` | Default call timeout for a stage with no `*_CALL_TIMEOUT_S` of its own, and the time a retry needs to fit. A stage cap replaces it, even when longer. |

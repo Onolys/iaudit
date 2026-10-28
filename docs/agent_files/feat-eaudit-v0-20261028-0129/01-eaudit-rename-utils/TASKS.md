@@ -24,7 +24,7 @@ Each task is one commit and must leave the eaudit/, eval/ and frontend suites gr
 | 10 | Swap retry into verifier | 5 | done |
 | 11 | Frontend retry: eval GETs and audit POST | 6 | in-progress |
 | 12 | Product registry and eaudit names in frontend | 6 | done |
-| 13 | Haiku 5.5 cheap tier | 1 | in-progress |
+| 13 | Haiku 5.5 cheap tier | 1 | done |
 | 14 | Acceptance sweep | 1-13 | todo |
 
 ## Task 1 — Mechanical rename backend/ to eaudit/
