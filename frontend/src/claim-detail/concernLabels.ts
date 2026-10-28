@@ -1,6 +1,6 @@
 import type { ConcernType } from "../contract";
 
-// Mission check names, in CONCERN_TYPES order.
+// Concern labels, in CONCERN_TYPES order.
 export const CONCERN_LABELS: Record<ConcernType, string> = {
   unsupported_claim: "Claim support",
   contradictory_evidence: "Contradictory evidence",
@@ -15,6 +15,10 @@ export const CONCERN_LABELS: Record<ConcernType, string> = {
   conflicting_accounts_flattened: "Conflicting accounts flattened",
   unsupported_causal_link: "Unsupported causal links",
   quantity_mismatch: "Quantity mismatch",
+  opinion_as_fact: "Opinion stated as fact",
+  calculation_error: "Calculation error",
+  meaning_shift: "Meaning shift",
+  unsupported_inference: "Unsupported inference",
 };
 
 export const concernLabel = (type: string): string =>

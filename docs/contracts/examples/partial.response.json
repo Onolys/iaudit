@@ -33,6 +33,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "Two early wakings are described as every night.",
           "evidence_ids": [
             "e-fine"

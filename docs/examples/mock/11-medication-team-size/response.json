@@ -69,6 +69,7 @@
       "concerns": [
         {
           "type": "quantity_mismatch",
+          "group": "changed_detail",
           "explanation": "The recorded dose is double the dose the respondent gives.",
           "evidence_ids": [
             "e1"
@@ -111,6 +112,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "Reported as near-daily; the respondent describes a few days each week.",
           "evidence_ids": [
             "e1"
@@ -153,6 +155,7 @@
       "concerns": [
         {
           "type": "quantity_mismatch",
+          "group": "changed_detail",
           "explanation": "The stated total does not match the sum of the figures the respondent gives.",
           "evidence_ids": [
             "e1"
@@ -195,6 +198,7 @@
       "concerns": [
         {
           "type": "context_stripping",
+          "group": "missing_context",
           "explanation": "The early, temporary side effect is dropped.",
           "evidence_ids": [
             "e1"
@@ -237,6 +241,7 @@
       "concerns": [
         {
           "type": "certainty_inflation",
+          "group": "changed_detail",
           "explanation": "An approximate figure is presented as exact.",
           "evidence_ids": [
             "e1"
@@ -279,6 +284,7 @@
       "concerns": [
         {
           "type": "quantity_mismatch",
+          "group": "changed_detail",
           "explanation": "The end figure differs from the one the respondent gives.",
           "evidence_ids": [
             "e1"
@@ -321,6 +327,7 @@
       "concerns": [
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "The start date is placed a year too late.",
           "evidence_ids": [
             "e1"
@@ -465,6 +472,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "Most nights is reported as every night.",
           "evidence_ids": [
             "e1"
@@ -541,6 +549,7 @@
       "concerns": [
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "The respondent describes ongoing low mood.",
           "evidence_ids": [
             "e1",

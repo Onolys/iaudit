@@ -20,17 +20,34 @@ BANNED = re.compile(
     r"fabricat|\blie\b|\blies\b|\blying\b|false claim|dishonest|misconduct|deliberate|misrepresent",
     re.IGNORECASE,
 )
+# SP02 exposes the expanded contract; SP03 adds detection/templates for checks 14-17.
+# Keep exercising every currently implemented template explicitly until that task lands.
+IMPLEMENTED_CONCERN_TYPES = (
+    ConcernType.unsupported_claim,
+    ConcernType.contradictory_evidence,
+    ConcernType.wrong_attribution,
+    ConcernType.timeframe_mismatch,
+    ConcernType.negation_reversal,
+    ConcernType.certainty_inflation,
+    ConcernType.frequency_severity_inflation,
+    ConcernType.context_stripping,
+    ConcernType.question_as_answer,
+    ConcernType.correction_ignored,
+    ConcernType.conflicting_accounts_flattened,
+    ConcernType.unsupported_causal_link,
+    ConcernType.quantity_mismatch,
+)
 SLOTS = [Slots(), Slots("the respondent", 1), Slots("the informant", 3)]
 
 
 def all_texts() -> list[str]:
     out = list(VERDICT_TEXT.values())
     for t, s, d, sc in itertools.product(
-        ConcernType, SLOTS, (None, "inflates", "understates"), (None, "frequency", "severity")
+        IMPLEMENTED_CONCERN_TYPES, SLOTS, (None, "inflates", "understates"), (None, "frequency", "severity")
     ):
         out.append(concern_text(Concern(t, [], d, sc), s))
     for v in Verdict:
-        out.append(claim_text(v, [Concern(t, [], "understates") for t in ConcernType]))
+        out.append(claim_text(v, [Concern(t, [], "understates") for t in IMPLEMENTED_CONCERN_TYPES]))
     return out
 
 

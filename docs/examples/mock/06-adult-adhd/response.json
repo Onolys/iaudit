@@ -118,6 +118,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "A one-off client-facing error is written up as a regular occurrence.",
           "evidence_ids": [
             "e2"
@@ -209,6 +210,7 @@
       "concerns": [
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "Onset is moved from middle childhood to early adolescence, and the teacher concerns are moved to the wrong school stage.",
           "evidence_ids": [
             "e2",
@@ -331,6 +333,7 @@
       "concerns": [
         {
           "type": "wrong_attribution",
+          "group": "changed_detail",
           "explanation": "An informant's observation is recorded as the respondent's own report.",
           "evidence_ids": [
             "e1",
@@ -389,6 +392,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "A single purchase is generalised into a recurrent pattern.",
           "evidence_ids": [
             "e1",
@@ -447,6 +451,7 @@
       "concerns": [
         {
           "type": "correction_ignored",
+          "group": "missing_context",
           "explanation": "The first figure is kept and the respondent's correction straight afterwards is dropped.",
           "evidence_ids": [
             "e1",
@@ -505,6 +510,7 @@
       "concerns": [
         {
           "type": "unsupported_causal_link",
+          "group": "not_in_interview",
           "explanation": "A possible aggravating factor is presented as the cause.",
           "evidence_ids": [
             "e1",
@@ -513,6 +519,7 @@
         },
         {
           "type": "certainty_inflation",
+          "group": "changed_detail",
           "explanation": "A tentative probably becomes a definite causal statement.",
           "evidence_ids": [
             "e2"

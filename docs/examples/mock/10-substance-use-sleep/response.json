@@ -84,6 +84,7 @@
       "concerns": [
         {
           "type": "correction_ignored",
+          "group": "missing_context",
           "explanation": "The figure the respondent retracted is kept instead of the corrected one.",
           "evidence_ids": [
             "e1",
@@ -142,6 +143,7 @@
       "concerns": [
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "A direct answer in the interview conflicts with the claim.",
           "evidence_ids": [
             "e1"
@@ -233,6 +235,7 @@
       "concerns": [
         {
           "type": "question_as_answer",
+          "group": "not_in_interview",
           "explanation": "The clinician's question is recorded as a denial the respondent never gave.",
           "evidence_ids": [
             "e2"
@@ -290,6 +293,7 @@
       "concerns": [
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "A past pattern of daily use is presented as current.",
           "evidence_ids": [
             "e1",
@@ -298,6 +302,7 @@
         },
         {
           "type": "unsupported_causal_link",
+          "group": "not_in_interview",
           "explanation": "A sleep motive is added that the respondent did not give.",
           "evidence_ids": [
             "e1"
@@ -457,6 +462,7 @@
       "concerns": [
         {
           "type": "unsupported_causal_link",
+          "group": "not_in_interview",
           "explanation": "Two things that happened around the same time are joined by a cause the interview does not support.",
           "evidence_ids": [
             "e1",
@@ -515,6 +521,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "A single episode becomes a repeated pattern.",
           "evidence_ids": [
             "e1"
@@ -572,6 +579,7 @@
       "concerns": [
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "The original reason for drinking is presented as the current one.",
           "evidence_ids": [
             "e1"

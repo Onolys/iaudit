@@ -59,6 +59,7 @@
         "concerns": [
           {
             "type": "unsupported_claim",
+            "group": "not_in_interview",
             "explanation": "Fictional concern for acceptance.",
             "evidence_ids": []
           }
@@ -114,6 +115,7 @@
         "concerns": [
           {
             "type": "unsupported_claim",
+            "group": "not_in_interview",
             "explanation": "Fictional concern for acceptance.",
             "evidence_ids": []
           }

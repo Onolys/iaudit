@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 
 from eaudit.models import ConcernType, EvidenceRole, Verdict
+from eaudit.models.concern_groups import GROUP_OF
 
 from .claims import LocatedClaim
 from .evidence import EvidenceResult
@@ -56,7 +57,14 @@ def _merge_concern(concerns: list[dict], type_: str, explanation: str, ids: list
         if c["type"] == type_:
             c["evidence_ids"] = c["evidence_ids"] + [i for i in ids if i not in c["evidence_ids"]]
             return
-    concerns.append({"type": type_, "explanation": explanation, "evidence_ids": list(ids)})
+    concerns.append(
+        {
+            "type": type_,
+            "group": GROUP_OF[ConcernType(type_)].value,
+            "explanation": explanation,
+            "evidence_ids": list(ids),
+        }
+    )
 
 
 def repair_claim(lc: LocatedClaim, ev: EvidenceResult, report: AssembleReport) -> RepairedClaim:

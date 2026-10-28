@@ -45,6 +45,7 @@
       "concerns": [
         {
           "type": "correction_ignored",
+          "group": "missing_context",
           "explanation": "The later correction is not reflected.",
           "evidence_ids": [
             "e1",
@@ -53,6 +54,7 @@
         },
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "The corrected account conflicts with the claim.",
           "evidence_ids": [
             "e2"
@@ -110,6 +112,7 @@
       "concerns": [
         {
           "type": "wrong_attribution",
+          "group": "changed_detail",
           "explanation": "The report is credited to a named person the transcript does not identify.",
           "evidence_ids": [
             "e1"

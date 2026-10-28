@@ -35,6 +35,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "The side of the leg weakness is not established by the interview.",
           "evidence_ids": [
             "e1"
@@ -90,6 +91,7 @@
       "concerns": [
         {
           "type": "context_stripping",
+          "group": "missing_context",
           "explanation": "A denial limited to the present is recorded as unrestricted, dropping the swallowing complaint during episodes.",
           "evidence_ids": [
             "e1",
@@ -181,6 +183,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "A preventive operation is recorded as a stroke that happened.",
           "evidence_ids": [
             "e1"
@@ -236,6 +239,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "The timing of the checks is not stated in the interview.",
           "evidence_ids": [
             "e1"

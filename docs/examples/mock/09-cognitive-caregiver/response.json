@@ -69,6 +69,7 @@
       "concerns": [
         {
           "type": "negation_reversal",
+          "group": "opposite_of_interview",
           "explanation": "A denial is recorded as an acknowledgement.",
           "evidence_ids": [
             "e1"
@@ -111,6 +112,7 @@
       "concerns": [
         {
           "type": "correction_ignored",
+          "group": "missing_context",
           "explanation": "The first answer is kept as accurate despite a correction he accepted.",
           "evidence_ids": [
             "e2",
@@ -282,6 +284,7 @@
       "concerns": [
         {
           "type": "conflicting_accounts_flattened",
+          "group": "missing_context",
           "explanation": "The respondent's account is kept and the informant's conflicting account is dropped.",
           "evidence_ids": [
             "e1",
@@ -290,6 +293,7 @@
         },
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "Independence that the informant places before last summer is written in the present tense.",
           "evidence_ids": [
             "e2"
@@ -362,6 +366,7 @@
       "concerns": [
         {
           "type": "conflicting_accounts_flattened",
+          "group": "missing_context",
           "explanation": "One side of a disputed account is stated as fact, without his explanation or her uncertainty.",
           "evidence_ids": [
             "e1",
@@ -470,6 +475,7 @@
       "concerns": [
         {
           "type": "correction_ignored",
+          "group": "missing_context",
           "explanation": "The tentative first answer is kept and the immediate self-correction is dropped.",
           "evidence_ids": [
             "e1"
@@ -561,6 +567,7 @@
       "concerns": [
         {
           "type": "wrong_attribution",
+          "group": "changed_detail",
           "explanation": "An observation made by the informant is recorded as his own report.",
           "evidence_ids": [
             "e1",
@@ -619,6 +626,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "No passage in the supplied interview describes night-time wandering.",
           "evidence_ids": [
             "e1"

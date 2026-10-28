@@ -21,7 +21,7 @@ class Verdict(StrEnum):
 
 
 class ConcernType(StrEnum):
-    """Mission checks 1-13, in order."""
+    """Concern types in contract order."""
 
     unsupported_claim = "unsupported_claim"
     contradictory_evidence = "contradictory_evidence"
@@ -36,6 +36,17 @@ class ConcernType(StrEnum):
     conflicting_accounts_flattened = "conflicting_accounts_flattened"
     unsupported_causal_link = "unsupported_causal_link"
     quantity_mismatch = "quantity_mismatch"
+    opinion_as_fact = "opinion_as_fact"
+    calculation_error = "calculation_error"
+    meaning_shift = "meaning_shift"
+    unsupported_inference = "unsupported_inference"
+
+
+class ConcernGroup(StrEnum):
+    not_in_interview = "not_in_interview"
+    opposite_of_interview = "opposite_of_interview"
+    changed_detail = "changed_detail"
+    missing_context = "missing_context"
 
 
 class EvidenceRole(StrEnum):
@@ -102,6 +113,7 @@ class Evidence(_Model):
 
 class Concern(_Model):
     type: ConcernType
+    group: ConcernGroup
     explanation: str
     evidence_ids: list[str]
 

@@ -35,6 +35,7 @@
       "concerns": [
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "The duration as written does not match the couple of weeks the patient described.",
           "evidence_ids": [
             "e1"
@@ -101,6 +102,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "No question or answer establishes the absence of breathlessness at rest.",
           "evidence_ids": [
             "e1"
@@ -151,6 +153,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "No turn describes swelling above the ankles.",
           "evidence_ids": [
             "e1"
@@ -206,6 +209,7 @@
       "concerns": [
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "The patient explicitly said the event was more than angina.",
           "evidence_ids": [
             "e1"

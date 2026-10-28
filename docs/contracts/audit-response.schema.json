@@ -264,11 +264,16 @@
     },
     "Concern": {
       "type": "object",
-      "required": ["type", "explanation", "evidence_ids"],
+      "required": [
+        "type",
+        "group",
+        "explanation",
+        "evidence_ids"
+      ],
       "additionalProperties": false,
       "properties": {
         "type": {
-          "description": "Mirrors docs/mission.md checks 1–13, in that order. When the mission changes, update this list and bump schema_version.",
+          "description": "Concern taxonomy in contract order; see the approved taxonomy design.",
           "enum": [
             "unsupported_claim",
             "contradictory_evidence",
@@ -282,7 +287,11 @@
             "correction_ignored",
             "conflicting_accounts_flattened",
             "unsupported_causal_link",
-            "quantity_mismatch"
+            "quantity_mismatch",
+            "opinion_as_fact",
+            "calculation_error",
+            "meaning_shift",
+            "unsupported_inference"
           ]
         },
         "explanation": {
@@ -292,9 +301,119 @@
         "evidence_ids": {
           "type": "array",
           "description": "Ids of evidence items on this same claim. May be empty.",
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "group": {
+          "enum": [
+            "not_in_interview",
+            "opposite_of_interview",
+            "changed_detail",
+            "missing_context"
+          ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "unsupported_claim",
+                  "unsupported_causal_link",
+                  "question_as_answer",
+                  "unsupported_inference"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "group": {
+                "const": "not_in_interview"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "contradictory_evidence",
+                  "negation_reversal"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "group": {
+                "const": "opposite_of_interview"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "wrong_attribution",
+                  "timeframe_mismatch",
+                  "quantity_mismatch",
+                  "frequency_severity_inflation",
+                  "certainty_inflation",
+                  "opinion_as_fact",
+                  "calculation_error",
+                  "meaning_shift"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "group": {
+                "const": "changed_detail"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "context_stripping",
+                  "correction_ignored",
+                  "conflicting_accounts_flattened"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "group": {
+                "const": "missing_context"
+              }
+            }
+          }
+        }
+      ]
     },
     "Evidence": {
       "type": "object",

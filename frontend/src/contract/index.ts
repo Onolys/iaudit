@@ -8,3 +8,4 @@ export type { Piece, Segment } from "./spans";
 export { buildChunks } from "./excerpts";
 export type { Chunk, ChunkInput, ChunkRow, ExcerptInput, Expansion } from "./excerpts";
 export { sliceCodePoints, codePointLength } from "../utils/codepoints";
+export { CONCERN_GROUP, CONCERN_GROUP_LABELS } from "./concernGroups";

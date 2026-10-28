@@ -75,6 +75,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "Nothing in the supplied interview addresses a walking aid.",
           "evidence_ids": []
         }

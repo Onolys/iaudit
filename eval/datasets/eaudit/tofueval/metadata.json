@@ -594,6 +594,38 @@
       "params": {
         "key": "concern_not_in_mapping:quantity_mismatch"
       }
+    },
+    {
+      "name": "concern_not_in_mapping_opinion_as_fact",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:opinion_as_fact"
+      }
+    },
+    {
+      "name": "concern_not_in_mapping_calculation_error",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:calculation_error"
+      }
+    },
+    {
+      "name": "concern_not_in_mapping_meaning_shift",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:meaning_shift"
+      }
+    },
+    {
+      "name": "concern_not_in_mapping_unsupported_inference",
+      "fn": "concern_not_in_mapping",
+      "level": "summary",
+      "params": {
+        "key": "concern_not_in_mapping:unsupported_inference"
+      }
     }
   ]
 }

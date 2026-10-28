@@ -111,7 +111,7 @@ describe("excerpts", () => {
     const e1 = { id: "e1", role: "supporting" as const, span: span(0, 0, 0, 5) };
     const e2 = { id: "e2", role: "contradicting" as const, span: span(3, 0, 3, 9) };
     const claim = claimOf([e1, e2], {
-      concerns: [{ type: "negation_reversal", explanation: "why", evidence_ids: ["e2"] }],
+      concerns: [{ type: "negation_reversal", group: "opposite_of_interview" as const, explanation: "why", evidence_ids: ["e2"] }],
     });
     const { container } = render(<ClaimDetail {...inlineProps(req, claim)} />);
     const btn = screen.getByRole("button", { name: /Negation reversal/ });
