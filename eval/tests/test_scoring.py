@@ -157,7 +157,7 @@ _META = {
 
 def _tiny(tmp_path, *, meta=None, extra="", missing=False, files=None):
     root = tmp_path / "datasets"
-    d = root / "tiny"
+    d = root / "eaudit/tiny"
     d.mkdir(parents=True)
     (d / "metadata.json").write_text(json.dumps({**_META, **(meta or {})}))
     src = _ADAPTER.replace("EXTRA", textwrap.indent(textwrap.dedent(extra), "    "))

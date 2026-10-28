@@ -16,7 +16,7 @@ from iaudit_eval import paths, scoring, store
 @pytest.fixture
 def roots(tmp_path):
     datasets = tmp_path / "datasets"
-    shutil.copytree(paths.datasets_dir() / "synthetic", datasets / "synthetic")
+    shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", datasets / "eaudit/synthetic")
     return datasets, tmp_path / "data", tmp_path / "runs"
 
 
@@ -155,8 +155,8 @@ async def test_compare_uses_current_items_and_validates_nested_bundle(roots):
 
 async def test_compare_refuses_different_datasets(roots):
     datasets, _, _ = roots
-    shutil.copytree(datasets / "synthetic", datasets / "other")
-    path = datasets / "other" / "metadata.json"
+    shutil.copytree(datasets / "eaudit/synthetic", datasets / "eaudit/other")
+    path = datasets / "eaudit/other" / "metadata.json"
     metadata = json.loads(path.read_text())
     metadata["name"] = "other"
     path.write_text(json.dumps(metadata))

@@ -17,7 +17,7 @@ from iaudit_eval import download as framework
 from iaudit_eval.datasets.base import Dataset, DatasetMeta
 
 FIXTURES = Path(__file__).with_name("fixtures")
-MODULE = Path(__file__).resolve().parents[3] / "datasets/tofueval/download.py"
+MODULE = Path(__file__).resolve().parents[3] / "datasets/eaudit/tofueval/download.py"
 
 
 def hook():

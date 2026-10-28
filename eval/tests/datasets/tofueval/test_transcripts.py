@@ -9,8 +9,8 @@ import pytest
 from jsonschema import Draft202012Validator
 
 FIXTURES = Path(__file__).with_name("fixtures")
-MODULE = Path(__file__).resolve().parents[3] / "datasets/tofueval/transcripts.py"
-SCHEMA = MODULE.parents[3] / "docs/contracts/audit-request.schema.json"
+MODULE = Path(__file__).resolve().parents[3] / "datasets/eaudit/tofueval/transcripts.py"
+SCHEMA = MODULE.parents[4] / "docs/contracts/audit-request.schema.json"
 
 
 def load_transcripts():

@@ -125,10 +125,10 @@ async def test_lock_failure_on_start_leaves_no_run_dir(synth, tmp_path, monkeypa
 
 async def test_auto_score_uses_the_runs_datasets_root(tmp_path):
     root = tmp_path / "datasets"
-    shutil.copytree(paths.datasets_dir() / "synthetic", root / "synth2")
-    meta = json.loads((root / "synth2" / "metadata.json").read_text())
+    shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", root / "eaudit/synth2")
+    meta = json.loads((root / "eaudit/synth2" / "metadata.json").read_text())
     meta["name"] = "synth2"
-    (root / "synth2" / "metadata.json").write_text(json.dumps(meta))
+    (root / "eaudit/synth2" / "metadata.json").write_text(json.dumps(meta))
     runs = tmp_path / "runs"
     h = start_run("synth2", Selection(split="all"), base_url=URL, runs_root=runs,
                   datasets_root=root, client=_client(FakeBackend("ok")))  # fmt: skip

@@ -16,13 +16,13 @@ DATASETS = EVAL / "datasets"
 
 
 def dataset():
-    raw = json.loads((DATASETS / "tofueval/metadata.json").read_text())
+    raw = json.loads((DATASETS / "eaudit/tofueval/metadata.json").read_text())
     return Dataset(DatasetMeta.from_dict(raw), None)
 
 
 def worked_pairs(monkeypatch, group="original_five", dataset="mediasum"):
     monkeypatch.syspath_prepend(str(EVAL))
-    emit = importlib.import_module("datasets.tofueval.pairs").pairs
+    emit = importlib.import_module("datasets.eaudit.tofueval.pairs").pairs
     item = Item(f"fictional-{group}", f"doc-{group}", "dev", {}, {
         "model_group": group, "dataset": dataset, "topic_category": "main",
         "model_name": "fictional-model",
@@ -101,7 +101,7 @@ def test_partition_is_explicit_everywhere_and_types_use_only_group_dataset(monke
     typed = [e for e in entries if e["metric"].startswith(("rec_type_", "concern_match_"))]
     assert typed and all(set(e["slice"]) == {"model_group", "group_dataset"} for e in typed)
     # Paper references and live entries must have exactly the same slice shape.
-    refs = json.loads((DATASETS / "tofueval/references.json").read_text())["rows"]
+    refs = json.loads((DATASETS / "eaudit/tofueval/references.json").read_text())["rows"]
     cell = next(r for r in refs if r["metric"] == "bacc_sentence" and r["slice"] == {
         "model_group": "original_five", "group_topic": "original_five|mediasum|main"})
     assert entry(entries, cell["metric"], slice=cell["slice"])["value"] == 0.625

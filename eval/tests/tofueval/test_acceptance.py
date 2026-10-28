@@ -169,7 +169,7 @@ def test_pure_module_imports_without_network_or_client_modules(module, tmp_path)
         assert "fictional_tofueval.adapter" not in sys.modules
     ''')
     result = subprocess.run(
-        [sys.executable, "-c", script, str(EVAL / "datasets/tofueval"), module, str(EVAL / "src")],
+        [sys.executable, "-c", script, str(EVAL / "datasets/eaudit/tofueval"), module, str(EVAL / "src")],
         cwd=tmp_path, capture_output=True, text=True, timeout=20,
     )
     assert result.returncode == 0, result.stdout + result.stderr

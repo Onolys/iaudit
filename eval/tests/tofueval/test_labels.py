@@ -15,7 +15,7 @@ FIXTURES = EVAL / "tests/datasets/tofueval/fixtures/repo"
 
 
 def module(name):
-    path = DATASETS / f"tofueval/{name}.py"
+    path = DATASETS / f"eaudit/tofueval/{name}.py"
     assert path.is_file(), f"TofuEval {name} is not implemented"
     spec = importlib.util.spec_from_file_location(
         f"fictional_gold_{name}", path, submodule_search_locations=[str(path.parent)]

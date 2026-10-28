@@ -14,9 +14,9 @@ EVAL = Path(__file__).resolve().parents[2]
 
 
 def build(monkeypatch, item, gold, prediction, failure=None, mapping=None):
-    assert (EVAL / "datasets/tofueval/item_rows.py").is_file(), "Item row builder missing"
+    assert (EVAL / "datasets/eaudit/tofueval/item_rows.py").is_file(), "Item row builder missing"
     monkeypatch.syspath_prepend(str(EVAL))
-    return importlib.import_module("datasets.tofueval.item_rows").build(
+    return importlib.import_module("datasets.eaudit.tofueval.item_rows").build(
         item, gold, prediction, failure, mapping,
     )
 
@@ -124,7 +124,7 @@ def test_concern_matches_use_aliases_and_overrides_preserving_native_types(monke
 
 def test_rows_join_by_id_and_snapshot_inputs_without_mutating_mapping(monkeypatch):
     monkeypatch.syspath_prepend(str(EVAL))
-    mapping = importlib.import_module("datasets.tofueval.mapping").load_mapping()
+    mapping = importlib.import_module("datasets.eaudit.tofueval.mapping").load_mapping()
     item, gold, pred = fixture()
     pred["sentences"].reverse()
     before = deepcopy((item, gold, pred))

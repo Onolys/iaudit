@@ -14,10 +14,10 @@ EVAL = Path(__file__).resolve().parents[2]
 
 
 def emit(monkeypatch, item, gold, prediction, failure=None):
-    path = EVAL / "datasets/tofueval/pairs.py"
+    path = EVAL / "datasets/eaudit/tofueval/pairs.py"
     assert path.is_file(), "TofuEval pairs emission is not implemented"
     monkeypatch.syspath_prepend(str(EVAL))
-    return importlib.import_module("datasets.tofueval.pairs").pairs(
+    return importlib.import_module("datasets.eaudit.tofueval.pairs").pairs(
         item, gold, prediction, failure,
     )
 

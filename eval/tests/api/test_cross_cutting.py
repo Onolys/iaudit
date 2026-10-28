@@ -50,8 +50,8 @@ def block_network(monkeypatch):
 @pytest.fixture
 def roots(tmp_path):
     datasets = tmp_path / "datasets"
-    shutil.copytree(paths.datasets_dir() / "synthetic", datasets / "synthetic")
-    adapter = datasets / "synthetic/adapter.py"
+    shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", datasets / "eaudit/synthetic")
+    adapter = datasets / "eaudit/synthetic/adapter.py"
     source = adapter.read_text().replace("garden-clean", ITEM)
     source = source.replace("Let us settle the plot rota", TEXT + " Let us settle the plot rota")
     source = source.replace("Mira offered to water", TEXT + " Mira offered to water")

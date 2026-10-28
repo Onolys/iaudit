@@ -14,7 +14,7 @@ import pytest
 from iaudit_eval import contracts
 
 ROOT = Path(__file__).resolve().parents[4]
-MODULE = ROOT / "eval/datasets/tofueval/mapping.py"
+MODULE = ROOT / "eval/datasets/eaudit/tofueval/mapping.py"
 MAPPING = MODULE.with_suffix(".json")
 V1_SHA256 = "0b5ecb4b33e56d6b3252ef349eaca0158fbc964924d5e0871e1a8266ebad77af"
 

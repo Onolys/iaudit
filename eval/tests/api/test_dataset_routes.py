@@ -20,7 +20,7 @@ from iaudit_eval.server.guards import Settings
 @pytest.fixture
 def roots(tmp_path):
     datasets = tmp_path / "datasets"
-    shutil.copytree(paths.datasets_dir() / "synthetic", datasets / "synthetic")
+    shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", datasets / "eaudit/synthetic")
     return datasets, tmp_path / "data", tmp_path / "runs"
 
 
@@ -107,7 +107,7 @@ async def test_unknown_dataset_is_schema_valid_404(roots, method, path):
 
 def downloadable(roots):
     datasets, data, _ = roots
-    folder = datasets / "local"
+    folder = datasets / "eaudit/local"
     folder.mkdir()
     (folder / "metadata.json").write_text(json.dumps({
         "name": "local", "title": "Offline download", "data_required": True,
@@ -231,7 +231,7 @@ async def test_download_outlives_request_client(roots):
 @pytest.mark.parametrize("filename", ["metadata.json", "adapter.py"])
 async def test_dataset_file_symlink_cannot_escape_root(roots, tmp_path, filename):
     datasets, _, _ = roots
-    source = datasets / "synthetic" / filename
+    source = datasets / "eaudit/synthetic" / filename
     outside = tmp_path / ("outside-" + filename)
     source.replace(outside)
     source.symlink_to(outside)
