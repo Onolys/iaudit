@@ -110,8 +110,8 @@ def test_saved_worked_example_scores_real_adapter_without_persisting_gold(tmp_pa
         assert result["impl"] == "dataset:tofueval"
     assert entry("concern_match_given_detected_TAM")["ci"] is None
     assert all(e["slice"].get("model_group") == "original_five" for e in report["entries"])
-    assert report["dataset_extra"]["mapping_version"] == "1.0.0"
-    assert report["dataset_extra"]["mapping_sha256"] == "0b5ecb4b33e56d6b3252ef349eaca0158fbc964924d5e0871e1a8266ebad77af"
+    assert report["dataset_extra"]["mapping_version"] == "0.0.1"
+    assert report["dataset_extra"]["mapping_sha256"] == "2c47702f2fb2a07e0b9ec3787ee700f5fafbd1c8f58d18638b61976e6daec303"
     assert len(rows["rows"]) == 1
     row = rows["rows"][0]
     assert row["item_id"] == item.id

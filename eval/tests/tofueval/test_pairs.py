@@ -156,3 +156,24 @@ def test_unknown_gold_type_raises_like_item_rows(monkeypatch):
     gold["sentences"][0]["types"] = ["Fictional Bogus Type"]
     with pytest.raises(ValueError, match="Unknown TofuEval error type"):
         emit(monkeypatch, item, gold, None, "item_failed")
+
+
+@pytest.mark.parametrize("dataset", ["mediasum", "meetingbank"])
+@pytest.mark.parametrize("error_type, code, concerns", [
+    ("Nuanced Meaning Shift", "NMS", ["meaning_shift"]),
+    ("Reasoning Error", "RE", ["calculation_error"]),
+    ("Reasoning Error", "RE", ["unsupported_inference"]),
+    ("Reasoning Error", "RE", ["unsupported_causal_link"]),
+    ("Stating Opinion as Fact", "OF", ["opinion_as_fact"]),
+    ("Extrinsic Information", "EI", ["question_as_answer"]),
+])
+def test_refined_types_emit_concern_agreement_and_detected_populations(monkeypatch, dataset, error_type, code, concerns):
+    item, gold, pred = fixture(dataset)
+    gold["sentences"] = gold["sentences"][:2]
+    pred["sentences"] = pred["sentences"][:2]
+    gold["sentences"][0]["types"] = [error_type]
+    pred["sentences"][0]["concerns"] = concerns
+    pred["sentences"][1]["concerns"] = []
+    result = emit(monkeypatch, item, gold, pred)
+    assert [(p.unit, p.pred) for p in at(result, f"concern:{code}")] == [("2", True), ("5", False)]
+    assert [(p.unit, p.pred) for p in at(result, f"concern_detected:{code}")] == [("2", True)]

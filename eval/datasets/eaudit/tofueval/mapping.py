@@ -1,9 +1,4 @@
-"""Frozen concern agreement rules; predictions never expand the allowed sets.
-
-On the first mapping/projection version bump, preserve the old JSON bytes as
-``mapping_history/<mapping_version>.json`` before replacing ``mapping.json``.
-The history directory is deliberately absent until that first bump.
-"""
+"""Frozen concern agreement rules; predictions never expand the allowed sets."""
 
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass

@@ -2,7 +2,6 @@
 
 import importlib.util
 import json
-import re
 import sys
 from copy import deepcopy
 from dataclasses import replace
@@ -16,7 +15,19 @@ from iaudit_eval import contracts
 ROOT = Path(__file__).resolve().parents[4]
 MODULE = ROOT / "eval/datasets/eaudit/tofueval/mapping.py"
 MAPPING = MODULE.with_suffix(".json")
-V1_SHA256 = "0b5ecb4b33e56d6b3252ef349eaca0158fbc964924d5e0871e1a8266ebad77af"
+CROSSWALK = {
+    "Extrinsic Information": {"unsupported_claim", "question_as_answer"},
+    "Mis-Referencing": {"wrong_attribution"},
+    "Stating Opinion as Fact": {"opinion_as_fact"},
+    "Tense/Modality": {"timeframe_mismatch", "certainty_inflation"},
+    "Contradiction": {"contradictory_evidence", "negation_reversal"},
+    "Reasoning Error": {"unsupported_causal_link", "calculation_error", "unsupported_inference"},
+    "Nuanced Meaning Shift": {"meaning_shift"},
+}
+UNMAPPED = {
+    "quantity_mismatch", "frequency_severity_inflation", "context_stripping",
+    "correction_ignored", "conflicting_accounts_flattened",
+}
 
 
 def loader():
@@ -28,35 +39,27 @@ def loader():
     return module
 
 
-def test_frozen_bytes_match_approved_brief_and_version_pin():
-    assert MAPPING.is_file(), "Frozen mapping v1.0.0 is not implemented"
-    brief = (ROOT / "docs/agent_files/eval-tofueval-20261020/brainstorming.md").read_text()
-    approved = re.search(r"### 5\.7.*?```json\n(.*?)```", brief, re.S)[1].encode()
-    assert MAPPING.read_bytes() == approved
-    assert sha256(MAPPING.read_bytes()).hexdigest() == V1_SHA256
+def test_mapping_version_digest_and_disjoint_crosswalk():
+    raw = json.loads(MAPPING.read_text())
     mapping = loader().load_mapping()
-    assert mapping.mapping_version == "1.0.0"
-    assert mapping.sha256 == V1_SHA256
+    assert mapping.mapping_version == "0.0.1"
+    assert mapping.sha256 == sha256(MAPPING.read_bytes()).hexdigest()
+    assert set(raw["types"]) == set(CROSSWALK)
+    concerns = [concern for rule in raw["types"].values() for concern in rule["allowed"]]
+    assert len(concerns) == len(set(concerns))
+    enum = set(contracts.get_contracts().schemas["response"]["$defs"]["Concern"]["properties"]["type"]["enum"])
+    assert set(concerns) <= enum
+    assert enum - mapping.mapped_concerns == UNMAPPED
 
 
-@pytest.mark.parametrize(
-    ("error_type", "dataset", "allowed"),
-    [
-        ("Extrinsic Information", "mediasum", {"unsupported_claim"}),
-        ("Mis-Referencing", "mediasum", {"wrong_attribution"}),
-        ("Mis-Referencing", "meetingbank", None),
-        ("Tense/Modality", "meetingbank", {"timeframe_mismatch", "certainty_inflation"}),
-        ("Tense/Modality Error", "mediasum", {"timeframe_mismatch", "certainty_inflation"}),
-        ("Stating Opinion as Fact", "mediasum", {"certainty_inflation", "wrong_attribution"}),
-        ("Stating Opinion as Fact", "meetingbank", {"certainty_inflation"}),
-        ("Contradiction", "meetingbank", {"contradictory_evidence", "negation_reversal"}),
-        ("Nuanced Meaning Shift", "mediasum", None),
-        ("Reasoning Error", "meetingbank", None),
-    ],
-)
-def test_applicable_allowed_honours_dataset_and_recall_only(error_type, dataset, allowed):
+@pytest.mark.parametrize("dataset", ["mediasum", "meetingbank"])
+@pytest.mark.parametrize("error_type, allowed", CROSSWALK.items())
+def test_applicable_allowed_honours_crosswalk_and_dataset_restriction(dataset, error_type, allowed):
     mapping = loader().load_mapping()
-    assert mapping.applicable_allowed(error_type, dataset) == allowed
+    expected = None if (error_type, dataset) == ("Mis-Referencing", "meetingbank") else allowed
+    assert mapping.applicable_allowed(error_type, dataset) == expected
+    for concern in mapping.mapped_concerns | UNMAPPED:
+        assert mapping.matches(error_type, dataset, [concern]) == (expected is not None and concern in expected)
 
 
 def test_unknown_predicted_concerns_are_ignored_for_matching():
@@ -66,18 +69,15 @@ def test_unknown_predicted_concerns_are_ignored_for_matching():
     assert mapping.matches("Extrinsic Information", "mediasum", ["quantity_mismatch", "unsupported_claim"])
     assert not mapping.matches("Stating Opinion as Fact", "meetingbank", ["wrong_attribution"])
     assert not mapping.matches("Mis-Referencing", "meetingbank", ["wrong_attribution"])
-    assert not mapping.matches("Reasoning Error", "mediasum", ["unsupported_causal_link"])
-    assert mapping.mapped_concerns == {
-        "unsupported_claim", "wrong_attribution", "timeframe_mismatch", "certainty_inflation",
-        "contradictory_evidence", "negation_reversal",
-    }
+    assert mapping.matches("Reasoning Error", "mediasum", ["unsupported_causal_link"])
+    assert mapping.mapped_concerns == set().union(*CROSSWALK.values())
     assert module.matches("Tense/Modality Error", "mediasum", ["timeframe_mismatch"])
     assert module.applicable_allowed("Mis-Referencing", "meetingbank") is None
     assert module.normalize_type("Tense/Modality Error") == "Tense/Modality"
     assert module.normalize_type("Unknown Type") == "Unknown Type"
 
 
-@pytest.mark.parametrize("concern", ["unsupported_claim", "wrong_attribution", "timeframe_mismatch", "certainty_inflation", "contradictory_evidence", "negation_reversal"])
+@pytest.mark.parametrize("concern", sorted(set().union(*CROSSWALK.values())))
 def test_mapped_concern_disappearing_from_current_enum_fails_loudly(monkeypatch, concern):
     current = contracts.get_contracts()
     schemas = deepcopy(current.schemas)

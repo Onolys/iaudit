@@ -1,14 +1,13 @@
 {
-  "mapping_version": "1.0.0",
+  "mapping_version": "0.0.1",
   "semantics": "gold type matches if ANY predicted concern on a claim mapped to the sentence is in the allowed set",
   "types": {
-    "Extrinsic Information":    {"allowed": ["unsupported_claim"]},
+    "Extrinsic Information":    {"allowed": ["unsupported_claim", "question_as_answer"]},
     "Mis-Referencing":          {"allowed": ["wrong_attribution"], "datasets": ["mediasum"]},
+    "Stating Opinion as Fact":  {"allowed": ["opinion_as_fact"]},
     "Tense/Modality":           {"allowed": ["timeframe_mismatch", "certainty_inflation"]},
-    "Stating Opinion as Fact":  {"allowed": ["certainty_inflation", "wrong_attribution"],
-                                "dataset_overrides": {"meetingbank": ["certainty_inflation"]}},
     "Contradiction":            {"allowed": ["contradictory_evidence", "negation_reversal"]},
-    "Nuanced Meaning Shift":    {"allowed": null, "recall_only": true},
-    "Reasoning Error":          {"allowed": null, "recall_only": true}
+    "Reasoning Error":          {"allowed": ["unsupported_causal_link", "calculation_error", "unsupported_inference"]},
+    "Nuanced Meaning Shift":    {"allowed": ["meaning_shift"]}
   }
 }

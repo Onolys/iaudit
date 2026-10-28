@@ -165,6 +165,34 @@
         true
       ],
       "positive": true
+    },
+    "concern:NMS": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern_detected:NMS": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern:RE": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern_detected:RE": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
     }
   },
   "metrics": [
@@ -509,6 +537,70 @@
       ]
     },
     {
+      "name": "concern_match_rate_NMS",
+      "fn": "recall_by_type",
+      "level": "concern:NMS",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_inconsistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_base_rate_NMS",
+      "fn": "recall_by_type",
+      "level": "concern:NMS",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_consistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_given_detected_NMS",
+      "fn": "recall",
+      "level": "concern_detected:NMS",
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_rate_RE",
+      "fn": "recall_by_type",
+      "level": "concern:RE",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_inconsistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_base_rate_RE",
+      "fn": "recall_by_type",
+      "level": "concern:RE",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_consistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_given_detected_RE",
+      "fn": "recall",
+      "level": "concern_detected:RE",
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
       "name": "claims_per_sentence",
       "fn": "claims_per_sentence",
       "level": "sentence"
@@ -556,14 +648,6 @@
       }
     },
     {
-      "name": "concern_not_in_mapping_question_as_answer",
-      "fn": "concern_not_in_mapping",
-      "level": "summary",
-      "params": {
-        "key": "concern_not_in_mapping:question_as_answer"
-      }
-    },
-    {
       "name": "concern_not_in_mapping_correction_ignored",
       "fn": "concern_not_in_mapping",
       "level": "summary",
@@ -580,51 +664,11 @@
       }
     },
     {
-      "name": "concern_not_in_mapping_unsupported_causal_link",
-      "fn": "concern_not_in_mapping",
-      "level": "summary",
-      "params": {
-        "key": "concern_not_in_mapping:unsupported_causal_link"
-      }
-    },
-    {
       "name": "concern_not_in_mapping_quantity_mismatch",
       "fn": "concern_not_in_mapping",
       "level": "summary",
       "params": {
         "key": "concern_not_in_mapping:quantity_mismatch"
-      }
-    },
-    {
-      "name": "concern_not_in_mapping_opinion_as_fact",
-      "fn": "concern_not_in_mapping",
-      "level": "summary",
-      "params": {
-        "key": "concern_not_in_mapping:opinion_as_fact"
-      }
-    },
-    {
-      "name": "concern_not_in_mapping_calculation_error",
-      "fn": "concern_not_in_mapping",
-      "level": "summary",
-      "params": {
-        "key": "concern_not_in_mapping:calculation_error"
-      }
-    },
-    {
-      "name": "concern_not_in_mapping_meaning_shift",
-      "fn": "concern_not_in_mapping",
-      "level": "summary",
-      "params": {
-        "key": "concern_not_in_mapping:meaning_shift"
-      }
-    },
-    {
-      "name": "concern_not_in_mapping_unsupported_inference",
-      "fn": "concern_not_in_mapping",
-      "level": "summary",
-      "params": {
-        "key": "concern_not_in_mapping:unsupported_inference"
       }
     }
   ]

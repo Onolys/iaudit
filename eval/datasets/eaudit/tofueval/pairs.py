@@ -1,7 +1,7 @@
 """Pure B3 comparisons over native gold and frozen sentence projections.
 
-Concern levels use EI, MR, TAM, OF and CO; recall flags additionally use NMS
-and RE. Concern pairs always have gold=True (desired agreement), with
+Concern levels and recall flags use EI, MR, TAM, OF, CO, NMS and RE.
+Concern pairs always have gold=True (desired agreement), with
 ``concern_population`` separating gold-inconsistent recall from gold-consistent
 base rates. Only native sentence/summary levels carry diagnostic counts, so
 alternate-policy and concern comparisons cannot multiply those counts.

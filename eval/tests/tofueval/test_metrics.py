@@ -20,7 +20,8 @@ def dataset():
     return Dataset(DatasetMeta.from_dict(raw), None)
 
 
-def worked_pairs(monkeypatch, group="original_five", dataset="mediasum"):
+def worked_pairs(monkeypatch, group="original_five", dataset="mediasum",
+                 error_type="Extrinsic Information", concern="unsupported_claim"):
     monkeypatch.syspath_prepend(str(EVAL))
     emit = importlib.import_module("datasets.eaudit.tofueval.pairs").pairs
     item = Item(f"fictional-{group}", f"doc-{group}", "dev", {}, {
@@ -31,7 +32,7 @@ def worked_pairs(monkeypatch, group="original_five", dataset="mediasum"):
     gold = {"summary": "inconsistent", "sentences": [
         {"sent_idx": i, "label": label, "types": types}
         for i, (label, types) in enumerate([
-            ("inconsistent", ["Extrinsic Information"]), ("consistent", []),
+            ("inconsistent", [error_type]), ("consistent", []),
             ("consistent", []), ("inconsistent", ["Tense/Modality"]),
             ("consistent", []), ("consistent", []),
         ])
@@ -40,7 +41,7 @@ def worked_pairs(monkeypatch, group="original_five", dataset="mediasum"):
         {"sent_idx": i, "label": label, "meta": i == 4,
          "claim_ids": ids, "concerns": concerns, "boundary": i in (0, 1)}
         for i, (label, ids, concerns) in enumerate([
-            ("inconsistent", ["a", "b"], ["unsupported_claim"]),
+            ("inconsistent", ["a", "b"], [concern]),
             ("consistent", ["b"], []), ("inconsistent", ["c"], []),
             ("unresolved", [], []), ("consistent", ["d"], []),
             ("consistent", ["e"], []),
@@ -199,3 +200,20 @@ def test_bacc_both_gold_classes_keep_mean_recall(alias, policy):
     ])
     result = entry(entries, alias, policy=policy)
     assert (result["value"], result["n"]) == (0.75, 4)
+
+
+@pytest.mark.parametrize("code, error_type, concern", [
+    ("NMS", "Nuanced Meaning Shift", "meaning_shift"),
+    ("RE", "Reasoning Error", "calculation_error"),
+])
+@pytest.mark.parametrize("dataset", ["mediasum", "meetingbank"])
+def test_refined_types_have_scored_concern_metrics(monkeypatch, code, error_type, concern, dataset):
+    entries = score_pairs(worked_pairs(
+        monkeypatch, dataset=dataset, error_type=error_type, concern=concern,
+    ))
+    slice = {"model_group": "original_five", "group_dataset": f"original_five|{dataset}"}
+    for name in (f"concern_match_rate_{code}", f"concern_match_given_detected_{code}"):
+        result = entry(entries, name, slice=slice)
+        assert (result["value"], result["n"]) == (1, 1)
+    result = entry(entries, f"concern_match_base_rate_{code}", slice=slice)
+    assert (result["value"], result["n"]) == (0, 4)
