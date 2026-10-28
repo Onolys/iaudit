@@ -1,6 +1,7 @@
 import Ajv2020 from "ajv/dist/2020";
 import type { ValidateFunction } from "ajv";
 import schema from "@eval-api/eval-api.schema.json";
+import { retry } from "../utils/retry";
 import type { Result } from "../contract";
 import type { CallOpts, Comparison, DatasetMeta, DatasetSummary, DownloadStatus, ErrorResponse, Estimate, EstimateRequest, EvalError, Health, ItemDetail, ItemPage, ItemQuery, MetricsReport, ResumeRequest, RunCreated, RunDetail, RunRequest, RunSummary } from "./evalTypes";
 export type { ApiCode, CallOpts, EvalError } from "./evalTypes";
@@ -77,10 +78,13 @@ export function createEvalApi({ fetch: doFetch, baseUrl = "/eval-api" }: EvalApi
     const timer = setTimeout(() => abort({ kind: "timeout", seconds: timeout / 1000 }), timeout);
     const perform = async (): Reply<T> => {
       try {
-        const response = await doFetch(`${baseUrl.replace(/\/+$/, "")}${typeof path === "function" ? path() : path}`, {
+        const response = await retry(() => doFetch(`${baseUrl.replace(/\/+$/, "")}${typeof path === "function" ? path() : path}`, {
           method, credentials: "omit", signal: controller.signal,
           headers: { Accept: "application/json", ...(body === undefined ? {} : { "Content-Type": "application/json" }) },
           ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+        }), {
+          attempts: method === "GET" ? 2 : 1, delayMs: 300, signal: controller.signal,
+          shouldRetry: outcome => !outcome.ok || (outcome.value.status >= 500 && outcome.value.status < 600),
         });
         let data: unknown;
         try { data = await response.json(); }

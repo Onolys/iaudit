@@ -145,3 +145,65 @@ describe("isRetryable", () => {
   ];
   it.each(cases)("%j -> %s", (e, want) => expect(isRetryable(e)).toBe(want));
 });
+
+describe("automatic POST retries", () => {
+  it.each([429, 503])("retries HTTP %s once after 300 ms regardless of detail code", async status => {
+    const f = vi.fn<typeof fetch>().mockResolvedValueOnce(new Response('{"error":{"code":"invalid_request"}}', { status })).mockResolvedValueOnce(new Response("done"));
+    const pending = postAudit(URL_, request, { fetch: f, signal: new AbortController().signal });
+    await vi.advanceTimersByTimeAsync(299);
+    expect(f).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(await pending).toEqual({ ok: true, value: "done" });
+    expect(f).toHaveBeenCalledTimes(2);
+  });
+  it.each([302, 400, 408, 500, 502, 504])("never retries HTTP %s even with busy detail code", async status => {
+    const f = reply(status, '{"error":{"code":"busy"}}');
+    expect(await postAudit(URL_, request, { fetch: f, signal: new AbortController().signal })).toMatchObject({ ok: false, error: { status } });
+    expect(f).toHaveBeenCalledTimes(1);
+  });
+  it.each([new TypeError("offline"), new DOMException("timeout", "TimeoutError")])("never retries transport failure %s", async error => {
+    const f = vi.fn<typeof fetch>().mockRejectedValue(error);
+    expect(await postAudit(URL_, request, { fetch: f, signal: new AbortController().signal })).toMatchObject({ ok: false, error: { kind: "network" } });
+    expect(f).toHaveBeenCalledTimes(1);
+  });
+  it("returns the second 503 without a third attempt", async () => {
+    const f = reply(503, "");
+    const pending = postAudit(URL_, request, { fetch: f, signal: new AbortController().signal });
+    await vi.advanceTimersByTimeAsync(300);
+    expect(await pending).toMatchObject({ ok: false, error: { status: 503 } });
+    expect(f).toHaveBeenCalledTimes(2);
+  });
+  it("cancels during retry delay", async () => {
+    const f = reply(429, "");
+    const ctl = new AbortController();
+    const pending = postAudit(URL_, request, { fetch: f, signal: ctl.signal });
+    await vi.advanceTimersByTimeAsync(100);
+    ctl.abort();
+    expect(await pending).toMatchObject({ ok: false, error: { kind: "cancelled" } });
+    expect(f).toHaveBeenCalledTimes(1);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+  it("keeps one 120s deadline across attempts", async () => {
+    const f = vi.fn<typeof fetch>().mockImplementationOnce(async () => {
+      await new Promise(resolve => setTimeout(resolve, 119_000));
+      return new Response("", { status: 503 });
+    }).mockImplementation(hangingFetch());
+    const pending = postAudit(URL_, request, { fetch: f, signal: new AbortController().signal });
+    await vi.advanceTimersByTimeAsync(119_300);
+    expect(f).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(700);
+    expect(await pending).toMatchObject({ ok: false, error: { kind: "timeout", seconds: 120 } });
+    expect(f).toHaveBeenCalledTimes(2);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+  it("never starts a second attempt after deadline expiry during delay", async () => {
+    const f = vi.fn<typeof fetch>().mockImplementation(async () => {
+      await new Promise(resolve => setTimeout(resolve, 119_900));
+      return new Response("", { status: 503 });
+    });
+    const pending = postAudit(URL_, request, { fetch: f, signal: new AbortController().signal });
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(await pending).toMatchObject({ ok: false, error: { kind: "timeout" } });
+    expect(f).toHaveBeenCalledTimes(1);
+  });
+});

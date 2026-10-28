@@ -1,4 +1,5 @@
 import type { AuditRequest, Result } from "../contract";
+import { retry } from "../utils/retry";
 import { readErrorMessage } from "./errorBody";
 import type { LoadError } from "./errors";
 
@@ -28,12 +29,15 @@ export async function postAudit(
   const timer = setTimeout(() => abort("timeout"), TIMEOUT_MS);
 
   try {
-    const res = await doFetch(url, {
+    const res = await retry(() => doFetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       credentials: "omit",
       body: JSON.stringify(request),
       signal: controller.signal,
+    }), {
+      attempts: 2, delayMs: 300, signal: controller.signal,
+      shouldRetry: outcome => outcome.ok && (outcome.value.status === 429 || outcome.value.status === 503),
     });
     const text = await res.text();
     if (res.ok) return { ok: true, value: text };

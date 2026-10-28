@@ -45,7 +45,7 @@ it("uses custom base and omits absent query values", async () => {
   expect(f.mock.calls[0][0]).toBe("/custom/runs/r/items");
 });
 it.each(["invalid_request", "not_found", "run_active", "bad_state", "data_missing", "backend_unreachable", "schema_mismatch", "forbidden", "internal_error"])("preserves structured API error %s including 502", async code => {
-  expect(await createEvalApi({ fetch: vi.fn<typeof fetch>().mockResolvedValue(json(errorBody(code), 502)) }).health()).toEqual({ ok: false, error: { kind: "api", status: 502, ...errorBody(code).error } });
+  expect(await createEvalApi({ fetch: vi.fn<typeof fetch>().mockImplementation(async () => json(errorBody(code), 502)) }).health()).toEqual({ ok: false, error: { kind: "api", status: 502, ...errorBody(code).error } });
 });
 it("only metrics 404 not_found succeeds with null", async () => {
   const api = createEvalApi({ fetch: vi.fn<typeof fetch>().mockImplementation(async () => json(errorBody(), 404)) });
@@ -54,7 +54,7 @@ it("only metrics 404 not_found succeeds with null", async () => {
   expect(await createEvalApi({ fetch: vi.fn<typeof fetch>().mockResolvedValue(json(errorBody("bad_state"), 404)) }).getMetrics("r")).toMatchObject({ ok: false, error: { kind: "api", code: "bad_state" } });
 });
 it.each([new Response("Bad gateway", { status: 502 }), json(errorBody("unknown"), 502)])("maps unstructured proxy 502 to unreachable", async response => {
-  expect(await createEvalApi({ fetch: vi.fn<typeof fetch>().mockResolvedValue(response) }).health()).toEqual({ ok: false, error: { kind: "unreachable" } });
+  expect(await createEvalApi({ fetch: vi.fn<typeof fetch>().mockImplementation(async () => response.clone()) }).health()).toEqual({ ok: false, error: { kind: "unreachable" } });
 });
 it.each([new Response("not json"), json(null), json(errorBody("unknown"), 400), new Response("bad", { status: 400 })])("rejects non-JSON or invalid error/success", async response => {
   expect(await createEvalApi({ fetch: vi.fn<typeof fetch>().mockResolvedValue(response) }).health()).toMatchObject({ ok: false, error: { kind: "bad_body" } });
@@ -174,4 +174,64 @@ it("sends an optional resume body: absent keeps cap, null clears it", async () =
   await api.resumeRun("r"); await api.resumeRun("r", { max_cost_usd: null }, {});
   expect(f.mock.calls[0][1]?.body).toBeUndefined();
   expect(f.mock.calls[1][1]?.body).toBe(JSON.stringify({ max_cost_usd: null }));
+});
+
+it.each([500, 502, 503, 504, 599])("GET retries HTTP %s after 300ms even with invalid body", async status => {
+  vi.useFakeTimers();
+  const f = vi.fn<typeof fetch>().mockResolvedValueOnce(new Response("not JSON", { status })).mockResolvedValueOnce(json(health));
+  const pending = createEvalApi({ fetch: f }).health();
+  await vi.advanceTimersByTimeAsync(299);
+  expect(f).toHaveBeenCalledTimes(1);
+  await vi.advanceTimersByTimeAsync(1);
+  expect(await pending).toEqual({ ok: true, value: health });
+  expect(f).toHaveBeenCalledTimes(2);
+});
+it.each([400, 404, 408, 429])("GET never retries HTTP %s", async status => {
+  const f = vi.fn<typeof fetch>().mockImplementation(async () => json(errorBody("invalid_request"), status));
+  expect(await createEvalApi({ fetch: f }).health()).toMatchObject({ ok: false, error: { status } });
+  expect(f).toHaveBeenCalledTimes(1);
+});
+it.each([new TypeError("offline"), new DOMException("timed out", "TimeoutError")])("GET retries transport failure %s", async error => {
+  vi.useFakeTimers();
+  const f = vi.fn<typeof fetch>().mockRejectedValueOnce(error).mockResolvedValueOnce(json(health));
+  const pending = createEvalApi({ fetch: f }).health();
+  await vi.advanceTimersByTimeAsync(300);
+  expect(await pending).toEqual({ ok: true, value: health });
+  expect(f).toHaveBeenCalledTimes(2);
+});
+it("GET stops after two network failures", async () => {
+  vi.useFakeTimers();
+  const f = vi.fn<typeof fetch>().mockRejectedValue(new TypeError("offline"));
+  const pending = createEvalApi({ fetch: f }).health();
+  await vi.advanceTimersByTimeAsync(300);
+  expect(await pending).toEqual({ ok: false, error: { kind: "unreachable" } });
+  expect(f).toHaveBeenCalledTimes(2);
+});
+it("GET cancellation interrupts retry delay", async () => {
+  vi.useFakeTimers();
+  const f = vi.fn<typeof fetch>().mockRejectedValue(new TypeError("offline"));
+  const controller = new AbortController();
+  const pending = createEvalApi({ fetch: f }).health({ signal: controller.signal });
+  await vi.advanceTimersByTimeAsync(100);
+  controller.abort();
+  expect(await pending).toEqual({ ok: false, error: { kind: "cancelled" } });
+  expect(f).toHaveBeenCalledTimes(1);
+  expect(vi.getTimerCount()).toBe(0);
+});
+it("GET shares its existing overall deadline across retries", async () => {
+  vi.useFakeTimers();
+  const f = vi.fn<typeof fetch>().mockImplementationOnce(async () => {
+    await new Promise(resolve => setTimeout(resolve, 9_500));
+    throw new TypeError("offline");
+  }).mockImplementation(() => new Promise(() => {}));
+  const pending = createEvalApi({ fetch: f }).health();
+  await vi.advanceTimersByTimeAsync(10_000);
+  expect(await pending).toEqual({ ok: false, error: { kind: "timeout", seconds: 10 } });
+  expect(f).toHaveBeenCalledTimes(2);
+  expect(vi.getTimerCount()).toBe(0);
+});
+it.each([429, 503])("eval POST never retries HTTP %s", async status => {
+  const f = vi.fn<typeof fetch>().mockImplementation(async () => json(errorBody("internal_error"), status));
+  expect(await createEvalApi({ fetch: f }).startRun(request)).toMatchObject({ ok: false, error: { status } });
+  expect(f).toHaveBeenCalledTimes(1);
 });

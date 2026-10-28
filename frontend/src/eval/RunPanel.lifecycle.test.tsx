@@ -66,7 +66,7 @@ it("attaches to run_active 409", async () => {
 });
 it("reattaches on reload, shows lost contact after three misses, then recovers", async () => {
   const s=setup({reload:true}); await tick(); expect(screen.getByRole("progressbar")).toBeTruthy();
-  s.failPolls(true); await tick(3000); expect(screen.getByText("Lost contact with eval server — retrying")).toBeTruthy();
+  s.failPolls(true); await tick(4000); expect(screen.getByText("Lost contact with eval server — retrying")).toBeTruthy();
   s.failPolls(false); await tick(1000); expect(screen.queryByText("Lost contact with eval server — retrying")).toBeNull();
   s.unmount(); const count=s.fetch.mock.calls.length; await tick(10000); expect(s.fetch).toHaveBeenCalledTimes(count);
 });

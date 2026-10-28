@@ -58,7 +58,7 @@ it.each([
 });
 
 it("retries a fetch error through the server banner", async () => {
-  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockResolvedValueOnce(json(ok));
+  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockRejectedValueOnce(Error("offline")).mockResolvedValueOnce(json(ok));
   render(<ItemDetail api={createEvalApi({ fetch })} runId="r" itemId="i" onBack={() => {}} backLabel="Back" />);
   await screen.findByText("Eval server not reachable");
   fireEvent.click(screen.getByRole("button", { name: "Retry" }));

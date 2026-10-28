@@ -90,13 +90,13 @@ it("ignores a stale filter result even if the injected API ignores cancellation"
 
 it("offers Retry on an inline failure and aborts the active request on unmount", async () => {
   const pending = deferred<Response>();
-  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockImplementationOnce(() => pending.promise);
+  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockRejectedValueOnce(Error("offline")).mockImplementationOnce(() => pending.promise);
   const { unmount } = render(<ItemList api={createEvalApi({ fetch })} runId="run" onOpenItem={() => {}} />);
   expect(await screen.findByRole("alert")).toBeTruthy();
   expect(screen.getByText("Eval server not reachable")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Retry" }));
-  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
-  const signal = fetch.mock.calls[1][1]?.signal;
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
+  const signal = fetch.mock.calls[2][1]?.signal;
   expect(signal?.aborted).toBe(false);
   unmount();
   expect(signal?.aborted).toBe(true);
@@ -104,14 +104,14 @@ it("offers Retry on an inline failure and aborts the active request on unmount",
 });
 
 it("retries the selected filter and replaces an inline error with rows", async () => {
-  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockResolvedValueOnce(json(fixture));
+  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockRejectedValueOnce(Error("offline")).mockResolvedValueOnce(json(fixture));
   render(<ItemList api={createEvalApi({ fetch })} runId="run" onOpenItem={() => {}} />);
   await screen.findByRole("alert");
   fireEvent.click(screen.getByRole("button", { name: "Retry" }));
   await screen.findByRole("button", { name: "Public contract example" });
   expect(screen.queryByRole("alert")).toBeNull();
-  expect(fetch).toHaveBeenCalledTimes(2);
-  expect(String(fetch.mock.calls[1][0])).toContain("filter=all");
+  expect(fetch).toHaveBeenCalledTimes(3);
+  expect(String(fetch.mock.calls[2][0])).toContain("filter=all");
 });
 
 it("says when the server holds more items than were returned", async () => {
