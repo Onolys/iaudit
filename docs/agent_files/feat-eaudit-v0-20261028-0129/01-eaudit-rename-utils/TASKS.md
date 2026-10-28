@@ -20,7 +20,7 @@ Each task is one commit and must leave the eaudit/, eval/ and frontend suites gr
 | 6 | Frontend utils/: codepoints move and retry() | 1 | done |
 | 7 | Swap retry into litellm_client | 5 | done |
 | 8 | Swap retry into atomize stage | 5 | done |
-| 9 | Swap retry into linker | 5 | in-progress |
+| 9 | Swap retry into linker | 5 | done |
 | 10 | Swap retry into verifier | 5 | in-progress |
 | 11 | Frontend retry: eval GETs and audit POST | 6 | todo |
 | 12 | Product registry and eaudit names in frontend | 6 | todo |

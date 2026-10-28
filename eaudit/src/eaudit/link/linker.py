@@ -10,11 +10,12 @@ from eaudit.models import Turn
 from eaudit.pipeline.layout import shared_layout
 from eaudit.prep import PrepResult
 from eaudit.safe_log import log_event
+from eaudit.utils.retry import retry
 
 from .context import LinkContext, build_link_context
 from .models import LinkerOutput, LinkResult
 from .prompt import FALLBACK_SYSTEM, build_prompt, stage_system_and_block
-from .validate import validate_output
+from .validate import Validated, validate_output
 
 _UNSAFE = re.compile(r"[^A-Za-z0-9_-]")
 _ID_UNSAFE = re.compile(r"[^A-Za-z0-9_.-]|\.\.")  # claim ids are code-made: c0.1
@@ -85,30 +86,36 @@ async def _link(claim: AtomicClaim, lctx: LinkContext, ctx) -> LinkResult:
             return (await ctx.llm.complete_json(r, ctx.metrics)).parsed
 
     cfg = ctx.settings
+    previous_counts: dict[str, int] = {}
+
+    async def attempt(n: int) -> tuple[Validated, bool]:
+        nonlocal previous_counts
+        request = req
+        if n == 2:
+            res.counts["retries"] = 1
+            request = LLMRequest(
+                **{
+                    **req.__dict__,
+                    "user": _retry_user(user, previous_counts),
+                    "fixture_key": f"{req.fixture_key}.retry" if req.fixture_key else None,
+                    "timeout_s": ctx.call_timeout("link") or timeout,
+                }
+            )
+        out = await call(request)
+        validated = validate_output(claim.id, out, lctx.turns, lctx.prep, sl.indices, cfg)
+        previous_counts = validated.counts
+        return validated, bool(out.items) and validated.counts["items_kept"] == 0
+
     try:
-        out = await call(req)
+        v, all_dropped = await retry(
+            attempt,
+            should_retry=lambda outcome: not isinstance(outcome, BaseException) and outcome[1],
+            attempts=2 if cfg.link_retry else 1,
+            can_continue=lambda: ctx.remaining() >= cfg.llm_timeout_s,
+        )
     except LLMError as exc:
         res.status, res.reason = "stalled", _stall_reason(exc)
         return res
-    v = validate_output(claim.id, out, lctx.turns, lctx.prep, sl.indices, cfg)
-    all_dropped = bool(out.items) and v.counts["items_kept"] == 0
-    if all_dropped and cfg.link_retry and ctx.remaining() >= cfg.llm_timeout_s:
-        res.counts["retries"] = 1
-        retry = LLMRequest(
-            **{
-                **req.__dict__,
-                "user": _retry_user(user, v.counts),
-                "fixture_key": f"{req.fixture_key}.retry" if req.fixture_key else None,
-                "timeout_s": ctx.call_timeout("link") or timeout,
-            }
-        )
-        try:
-            out = await call(retry)
-        except LLMError as exc:
-            res.status, res.reason = "stalled", _stall_reason(exc)
-            return res
-        v = validate_output(claim.id, out, lctx.turns, lctx.prep, sl.indices, cfg)
-        all_dropped = bool(out.items) and v.counts["items_kept"] == 0
     for k, n in v.counts.items():
         res.counts[k] = res.counts.get(k, 0) + n
     if all_dropped:
