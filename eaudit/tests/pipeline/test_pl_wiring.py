@@ -42,4 +42,4 @@ def test_unavailable_provider_is_503_through_the_real_pipeline(example_request):
     app = create_app(Settings(llm_mode="stub"), llm=FailingClient(LLMUnavailable("down")))
     with TestClient(app) as c:
         r = c.post("/v1/audit", json=example_request)
-    assert r.status_code == 503 and r.json()["error"]["code"] == "unavailable"
+    assert r.status_code == 503 and r.json()["details"][0]["code"] == "upstream_unavailable"

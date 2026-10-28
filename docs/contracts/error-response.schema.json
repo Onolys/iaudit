@@ -2,35 +2,71 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "error-response.schema.json",
   "title": "ErrorResponse",
-  "description": "Body the backend returns with any non-2xx status, schema 0.0.1. The message is shown to the reviewer as-is. An error body is never an audit.",
+  "description": "Body returned with every non-2xx status. Messages are plain text for human review.",
   "type": "object",
-  "required": ["schema_version", "error"],
+  "required": [
+    "schema_version",
+    "status",
+    "message",
+    "details"
+  ],
   "additionalProperties": false,
   "properties": {
-    "schema_version": { "const": "0.0.1" },
+    "schema_version": {
+      "const": "0.0.1"
+    },
     "request_id": {
       "type": "string",
-      "description": "Echo of the request id, when the backend could read it."
+      "description": "Echo of the request id, when readable."
     },
-    "error": {
-      "type": "object",
-      "required": ["code", "message"],
-      "additionalProperties": false,
-      "properties": {
-        "code": {
-          "enum": [
-            "invalid_request",
-                "payload_too_large",
-            "rate_limited",
-            "internal_error",
-            "unavailable",
-            "other"
-          ]
-        },
-        "message": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Human-readable. Plain text; shown as-is."
+    "status": {
+      "type": "integer",
+      "minimum": 400,
+      "maximum": 599,
+      "description": "Equals the HTTP response status."
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1
+    },
+    "details": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "invalid_json",
+              "unsupported_media_type",
+              "schema_violation",
+              "empty_transcript",
+              "empty_assessment",
+              "duplicate_ids",
+              "invalid_parameters",
+              "body_too_large",
+              "too_many_turns",
+              "too_many_sections",
+              "rate_limited",
+              "not_found",
+              "method_not_allowed",
+              "cors_rejected",
+              "request_rejected",
+              "upstream_unavailable",
+              "deadline_exceeded",
+              "internal_error"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Schema paths and fixed text only; never instance values."
+          }
         }
       }
     }

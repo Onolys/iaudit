@@ -45,7 +45,11 @@ class ContractCORSMiddleware(CORSMiddleware):
         if resp.status_code >= 400:
             return JSONResponse(
                 status_code=resp.status_code,
-                content=error_body("other", "CORS preflight rejected."),
+                content=error_body(
+                    resp.status_code,
+                    "Cross-origin request blocked.",
+                    [{"code": "cors_rejected", "message": "CORS preflight rejected."}],
+                ),
             )
         return resp
 
@@ -114,7 +118,7 @@ def create_app(
         try:
             return await _audit(request, info)
         except ApiError as exc:
-            status, outcome = exc.status, exc.code
+            status, outcome = exc.status, exc.details[0]["code"]
             raise
         finally:
             metrics = info.pop("metrics", None)
@@ -140,18 +144,35 @@ def create_app(
             # 0. content type (a missing header is tolerated; an explicit non-JSON one is not)
             media_type = request.headers.get("content-type", "").split(";")[0].strip().lower()
             if media_type and media_type != "application/json":
-                raise ApiError("invalid_request", "Content-Type must be application/json.", 415)
+                raise ApiError(
+                    415,
+                    "Request rejected: wrong content type.",
+                    [
+                        {
+                            "code": "unsupported_media_type",
+                            "message": "Content-Type must be application/json.",
+                        }
+                    ],
+                )
             # 1. body size
             declared = request.headers.get("content-length")
             if declared and declared.isdigit() and int(declared) > settings.max_body_bytes:
-                raise ApiError("payload_too_large", "Request body is too large.", 413)
+                raise ApiError(
+                    413,
+                    "Request too large.",
+                    [{"code": "body_too_large", "message": "Request body is too large."}],
+                )
             chunks: list[bytes] = []
             size = 0
             async for chunk in request.stream():  # stop reading as soon as the cap is passed
                 size += len(chunk)
                 if size > settings.max_body_bytes:
                     info["body_bytes"] = size
-                    raise ApiError("payload_too_large", "Request body is too large.", 413)
+                    raise ApiError(
+                        413,
+                        "Request too large.",
+                        [{"code": "body_too_large", "message": "Request body is too large."}],
+                    )
                 chunks.append(chunk)
             body = b"".join(chunks)
             info["body_bytes"] = len(body)
@@ -160,9 +181,17 @@ def create_app(
             try:
                 raw = json.loads(body)
             except (ValueError, UnicodeDecodeError, RecursionError):
-                raise ApiError("invalid_request", "Body is not valid JSON.", 400) from None
+                raise ApiError(
+                    400,
+                    "Request rejected: the file is not valid JSON.",
+                    [{"code": "invalid_json", "message": "Body is not valid JSON."}],
+                ) from None
             if not isinstance(raw, dict):
-                raise ApiError("invalid_request", "Body must be a JSON object.", 400)
+                raise ApiError(
+                    400,
+                    "Request rejected: the file is not valid JSON.",
+                    [{"code": "invalid_json", "message": "Body must be a JSON object."}],
+                )
             rid = raw.get("request_id")
             request_id = rid if isinstance(rid, str) and rid else None
             info["request_id"] = request_id
@@ -175,37 +204,65 @@ def create_app(
             transcript, assessment = raw.get("transcript"), raw.get("assessment")
             if isinstance(transcript, list) and len(transcript) > settings.max_turns:
                 raise ApiError(
-                    "payload_too_large",
-                    f"Transcript has more than {settings.max_turns} turns.",
                     413,
+                    "Transcript has too many turns.",
+                    [
+                        {
+                            "code": "too_many_turns",
+                            "message": (
+                                f"transcript: must contain at most {settings.max_turns} turns"
+                            ),
+                        }
+                    ],
                     request_id,
                 )
             if isinstance(assessment, list) and len(assessment) > settings.max_sections:
                 raise ApiError(
-                    "payload_too_large",
-                    f"Assessment has more than {settings.max_sections} sections.",
                     413,
+                    "Assessment has too many sections.",
+                    [
+                        {
+                            "code": "too_many_sections",
+                            "message": (
+                                f"assessment: must contain at most {settings.max_sections} sections"
+                            ),
+                        }
+                    ],
                     request_id,
                 )
 
             # 5. schema validation (worker thread: 2 MB bodies would block the loop)
             issues = await run_in_threadpool(contract.validate_request, raw)
             if issues:
-                detail = "; ".join(str(i) for i in issues)
-                raise ApiError(
-                    "invalid_request",
-                    f"Request does not match the contract: {detail}",
-                    400,
-                    request_id,
-                )
+                details = []
+                for issue in issues:
+                    code = "schema_violation"
+                    if issue.path == "transcript" and transcript == []:
+                        code = "empty_transcript"
+                    elif issue.path == "assessment" and assessment == []:
+                        code = "empty_assessment"
+                    details.append({"code": code, "message": str(issue)})
+                message = {
+                    "empty_transcript": "Request rejected: the transcript has no turns.",
+                    "empty_assessment": "Request rejected: the assessment has no sections.",
+                }.get(details[0]["code"], "The request does not match the audit contract.")
+                raise ApiError(400, message, details, request_id)
 
             # 6. unique ids (count only, never the ids)
             dup_turns, dup_sections = _count_dupes(transcript), _count_dupes(assessment)
             if dup_turns or dup_sections:
                 raise ApiError(
-                    "invalid_request",
-                    f"Duplicate ids: {dup_turns} in transcript, {dup_sections} in assessment.",
                     400,
+                    "Request rejected: duplicate ids.",
+                    [
+                        {
+                            "code": "duplicate_ids",
+                            "message": (
+                                f"Duplicate ids: {dup_turns} in transcript, "
+                                f"{dup_sections} in assessment."
+                            ),
+                        }
+                    ],
                     request_id,
                 )
 
@@ -227,7 +284,12 @@ def create_app(
             if settings.pipeline == "full":
                 out["run_info"] = run_info.build(settings)
             if out.get("request_id") != request_id or contract.validate_response(out):
-                raise ApiError("internal_error", "Internal server error.", 500, request_id)
+                raise ApiError(
+                    500,
+                    "Internal server error.",
+                    [{"code": "internal_error", "message": "Internal server error."}],
+                    request_id,
+                )
             headers = {}
             if settings.server_timing:
                 headers["Server-Timing"] = _server_timing(
@@ -239,15 +301,31 @@ def create_app(
             raise
         except LLMUnavailable:
             raise ApiError(
-                "unavailable", "The audit service is temporarily unavailable.", 503, request_id
+                503,
+                "Audit service temporarily unavailable.",
+                [
+                    {
+                        "code": "upstream_unavailable",
+                        "message": "Audit service temporarily unavailable.",
+                    }
+                ],
+                request_id,
             ) from None
-        except DeadlineExceeded:
+        except (DeadlineExceeded, TimeoutError):
             raise ApiError(
-                "unavailable", "The audit could not produce a usable result.", 504, request_id
+                504,
+                "The audit ran out of time.",
+                [{"code": "deadline_exceeded", "message": "The audit ran out of time."}],
+                request_id,
             ) from None
         except Exception as exc:
             log_exception(exc)
-            raise ApiError("internal_error", "Internal server error.", 500, request_id) from None
+            raise ApiError(
+                500,
+                "Internal server error.",
+                [{"code": "internal_error", "message": "Internal server error."}],
+                request_id,
+            ) from None
 
     return app
 

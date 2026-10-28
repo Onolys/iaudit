@@ -192,3 +192,17 @@ async def test_probe_unrecognized_body_does_not_accept_version(body):
 
     result = await probe(URL, transport=httpx.MockTransport(handler))
     assert result.reachable and not result.accepts_version
+
+
+@pytest.mark.parametrize("body", [
+    {"schema_version": "0.0.1", "error": {"code": "other", "message": "old"}},
+    {"schema_version": "0.0.1", "status": 422, "message": "wrong status",
+     "details": [{"code": "invalid_parameters", "message": "fixed"}]},
+])
+async def test_probe_rejects_invalid_error_contract(body):
+    def handler(request):
+        if request.method == "GET":
+            return httpx.Response(200, json={"status": "ok"})
+        return httpx.Response(400, json=body)
+    result = await probe(URL, transport=httpx.MockTransport(handler))
+    assert result.reachable and not result.accepts_version

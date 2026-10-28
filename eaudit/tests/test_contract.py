@@ -16,7 +16,12 @@ def test_example_response_valid(example_response):
 
 
 def test_error_example_valid():
-    body = {"schema_version": "0.0.1", "error": {"code": "other", "message": "x"}}
+    body = {
+        "schema_version": "0.0.1",
+        "status": 400,
+        "message": "x",
+        "details": [{"code": "schema_violation", "message": "x"}],
+    }
     assert contract.validate_error(body) == []
 
 
@@ -59,3 +64,71 @@ def test_env_override_fails_import_clearly(tmp_path):
     )
     assert r.returncode != 0
     assert "contracts" in r.stderr.lower()
+
+
+ERROR_CODES = {
+    "invalid_json",
+    "unsupported_media_type",
+    "schema_violation",
+    "empty_transcript",
+    "empty_assessment",
+    "duplicate_ids",
+    "invalid_parameters",
+    "body_too_large",
+    "too_many_turns",
+    "too_many_sections",
+    "rate_limited",
+    "not_found",
+    "method_not_allowed",
+    "cors_rejected",
+    "request_rejected",
+    "upstream_unavailable",
+    "deadline_exceeded",
+    "internal_error",
+}
+
+
+@pytest.mark.parametrize("code", sorted(ERROR_CODES))
+def test_all_error_detail_codes_are_valid(code):
+    assert (
+        contract.validate_error(
+            {
+                "schema_version": "0.0.1",
+                "status": 400,
+                "message": "Request rejected.",
+                "details": [{"code": code, "message": "Fixed text."}],
+            }
+        )
+        == []
+    )
+
+
+def test_error_code_enum_is_exact():
+    schema = contract.get_contracts().error.schema
+    assert (
+        set(schema["properties"]["details"]["items"]["properties"]["code"]["enum"]) == ERROR_CODES
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("schema_version", "9.8.7"),
+        ("status", 399),
+        ("status", 600),
+        ("status", 400.5),
+        ("message", ""),
+        ("details", []),
+        ("details", [{"code": "other", "message": "x"}]),
+        ("details", [{"code": "internal_error", "message": ""}]),
+    ],
+)
+def test_invalid_error_fields_rejected(field, value):
+    body = {
+        "schema_version": "0.0.1",
+        "status": 400,
+        "message": "x",
+        "details": [{"code": "schema_violation", "message": "x"}],
+    }
+    body[field] = value
+    assert contract.validate_error(body)

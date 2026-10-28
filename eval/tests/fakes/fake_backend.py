@@ -29,8 +29,8 @@ MODES = {
 _ERRORS = {
     "429": (429, "rate_limited", "Too many requests."),
     "500": (500, "internal_error", "Internal error."),
-    "503": (503, "unavailable", "Service unavailable."),
-    "504": (504, "unavailable", "Gateway timeout."),
+    "503": (503, "upstream_unavailable", "Service unavailable."),
+    "504": (504, "deadline_exceeded", "Gateway timeout."),
 }
 
 BASE_MODELS = {"cheap": "fake-cheap-1", "mid": "fake-mid-1", "strong": "fake-strong-1"}
@@ -81,13 +81,13 @@ class FakeBackend:
             return httpx.Response(200, json={"status": "ok"})
         if request.method == "POST" and request.url.path == "/v1/audit":
             return await self._audit(request)
-        return httpx.Response(404, json=self._error("other", "Not found."))
+        return httpx.Response(404, json=self._error(404, "not_found", "Not found."))
 
-    def _error(self, code: str, message: str, request_id: str | None = None) -> dict[str, Any]:
+    def _error(self, status: int, code: str, message: str, request_id: str | None = None) -> dict[str, Any]:
         body: dict[str, Any] = {"schema_version": self.supported_version}
         if request_id:
             body["request_id"] = request_id
-        body["error"] = {"code": code, "message": message}
+        body.update(status=status, message=message, details=[{"code": code, "message": message}])
         return body
 
     async def _audit(self, request: httpx.Request) -> httpx.Response:
@@ -111,24 +111,24 @@ class FakeBackend:
         except ValueError:
             raw = None
         if not isinstance(raw, dict):
-            return httpx.Response(400, json=self._error("invalid_request", "Body is not JSON."))
+            return httpx.Response(400, json=self._error(400, "invalid_json", "Body is not JSON."))
         rid = raw.get("request_id")
         rid = rid if isinstance(rid, str) and rid else None
 
         if mode == "invalid_request":
             return httpx.Response(
-                400, json=self._error("invalid_request", "Request does not match the contract.", rid)
+                400, json=self._error(400, "schema_violation", "Request does not match the contract.", rid)
             )
         if mode in _ERRORS:
             status, code, msg = _ERRORS[mode]
             headers = {"Retry-After": self.retry_after} if self.retry_after else None
-            return httpx.Response(status, json=self._error(code, msg, rid), headers=headers)
+            return httpx.Response(status, json=self._error(status, code, msg, rid), headers=headers)
         if mode == "invalid_error_body":
             return httpx.Response(500, json={"oops": "not an error body"})
         if contracts.validate_request(raw):
             return httpx.Response(
                 400,
-                json=self._error("invalid_request", "Request does not match the contract.", rid),
+                json=self._error(400, "schema_violation", "Request does not match the contract.", rid),
             )
         if mode == "bad_body":
             return httpx.Response(200, content=b"<html>not json</html>")

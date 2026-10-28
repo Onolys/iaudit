@@ -883,5 +883,9 @@ async def probe(
     version = body.get("schema_version") if isinstance(body, dict) else None
     version = version if isinstance(version, str) else None
     status = resp.status_code
-    accepts = version == contracts.schema_version() and 200 <= status < 500
+    valid_body = (
+        not contracts.validate_response(body) if 200 <= status < 300
+        else not contracts.validate_error(body) and body["status"] == status
+    )
+    accepts = version == contracts.schema_version() and 200 <= status < 500 and valid_body
     return ProbeResult(True, version, accepts)

@@ -1,6 +1,7 @@
 """Every non-2xx body is a contract error body. Messages never carry instance values."""
 
 import logging
+from typing import TypedDict
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -13,12 +14,19 @@ from eaudit.llm.errors import LLMUnavailable
 log = logging.getLogger("iaudit")
 
 
+class ErrorDetail(TypedDict):
+    code: str
+    message: str
+
+
 class ApiError(Exception):
-    def __init__(self, code: str, message: str, status: int, request_id: str | None = None):
+    def __init__(
+        self, status: int, message: str, details: list[ErrorDetail], request_id: str | None = None
+    ):
         super().__init__(message)
-        self.code = code
-        self.message = message
         self.status = status
+        self.message = message
+        self.details = details
         self.request_id = request_id
 
 
@@ -26,16 +34,24 @@ class DeadlineExceeded(Exception):
     """The overall audit deadline elapsed (backstop timeout or the orchestrator's own)."""
 
 
-def error_body(code: str, message: str, request_id: str | None = None) -> dict:
-    body: dict = {"schema_version": SCHEMA_VERSION}
+def error_body(
+    status: int, message: str, details: list[ErrorDetail], request_id: str | None = None
+) -> dict:
+    body: dict = {
+        "schema_version": SCHEMA_VERSION,
+        "status": status,
+        "message": message,
+        "details": details,
+    }
     if request_id:
         body["request_id"] = request_id
-    body["error"] = {"code": code, "message": message}
     return body
 
 
-def _response(status: int, code: str, message: str, request_id: str | None = None):
-    return JSONResponse(status_code=status, content=error_body(code, message, request_id))
+def _response(status: int, message: str, details: list[ErrorDetail], request_id: str | None = None):
+    return JSONResponse(
+        status_code=status, content=error_body(status, message, details, request_id)
+    )
 
 
 def log_exception(exc: BaseException) -> None:
@@ -51,32 +67,52 @@ def log_exception(exc: BaseException) -> None:
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(ApiError)
     async def _api_error(_: Request, exc: ApiError):
-        return _response(exc.status, exc.code, exc.message, exc.request_id)
+        return _response(exc.status, exc.message, exc.details, exc.request_id)
 
     @app.exception_handler(LLMUnavailable)
     async def _unavailable(_: Request, exc: LLMUnavailable):
-        return _response(503, "unavailable", "The audit service is temporarily unavailable.")
+        message = "Audit service temporarily unavailable."
+        return _response(503, message, [{"code": "upstream_unavailable", "message": message}])
 
     @app.exception_handler(DeadlineExceeded)
     @app.exception_handler(TimeoutError)
     async def _deadline(_: Request, exc: Exception):
-        return _response(504, "unavailable", "The audit could not produce a usable result.")
+        message = "The audit ran out of time."
+        return _response(504, message, [{"code": "deadline_exceeded", "message": message}])
 
     @app.exception_handler(StarletteHTTPException)
     async def _http(_: Request, exc: StarletteHTTPException):
         if exc.status_code == 404:
-            return _response(404, "other", "Not found.")
+            message = "Service endpoint not found."
+            return _response(404, message, [{"code": "not_found", "message": message}])
         if exc.status_code == 405:
-            return _response(405, "other", "Method not allowed.")
-        return _response(exc.status_code, "other", "Request could not be served.")
+            message = "Method not allowed."
+            return _response(405, message, [{"code": "method_not_allowed", "message": message}])
+        if exc.status_code >= 500:
+            code, message = {
+                503: ("upstream_unavailable", "Audit service temporarily unavailable."),
+                504: ("deadline_exceeded", "The audit ran out of time."),
+            }.get(exc.status_code, ("internal_error", "Internal server error."))
+            return _response(exc.status_code, message, [{"code": code, "message": message}])
+        message = "Request could not be served."
+        return _response(
+            exc.status_code, message, [{"code": "request_rejected", "message": message}]
+        )
 
     @app.exception_handler(RequestValidationError)
     async def _validation(_: Request, exc: RequestValidationError):
         # paths only: pydantic messages can embed input values
-        locs = ", ".join("/".join(str(p) for p in e["loc"]) for e in exc.errors()[:5])
-        return _response(422, "invalid_request", f"Invalid request parameters: {locs}.")
+        details: list[ErrorDetail] = [
+            {
+                "code": "invalid_parameters",
+                "message": f"{'/'.join(str(p) for p in e['loc'])}: invalid parameter",
+            }
+            for e in exc.errors()[:5]
+        ]
+        return _response(422, "Request rejected: invalid parameters.", details)
 
     @app.exception_handler(Exception)
     async def _any(_: Request, exc: Exception):
         log_exception(exc)
-        return _response(500, "internal_error", "Internal server error.")
+        message = "Internal server error."
+        return _response(500, message, [{"code": "internal_error", "message": message}])

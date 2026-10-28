@@ -1,5 +1,5 @@
 import pytest
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.testclient import TestClient
 
 from eaudit import contract
@@ -13,7 +13,7 @@ def make_app() -> FastAPI:
 
     @app.get("/api-error")
     def api_error():
-        raise ApiError("invalid_request", "bad thing", 400, request_id="r-1")
+        raise ApiError(400, "bad thing", [{"code": "schema_violation", "message": "bad thing"}], request_id="r-1")
 
     @app.get("/unavailable")
     def unavailable():
@@ -22,6 +22,14 @@ def make_app() -> FastAPI:
     @app.get("/timeout")
     def timeout():
         raise TimeoutError("SENTINEL")
+
+    @app.get("/http/{status}")
+    def http(status: int):
+        raise HTTPException(status, detail="SENTINEL")
+
+    @app.get("/forbidden")
+    def forbidden():
+        raise HTTPException(403, detail="SENTINEL")
 
     @app.get("/boom")
     def boom():
@@ -44,13 +52,18 @@ def client():
 
 
 CASES = [
-    ("/api-error", 400, "invalid_request"),
-    ("/unavailable", 503, "unavailable"),
-    ("/timeout", 504, "unavailable"),
+    ("/api-error", 400, "schema_violation"),
+    ("/unavailable", 503, "upstream_unavailable"),
+    ("/timeout", 504, "deadline_exceeded"),
     ("/boom", 500, "internal_error"),
-    ("/nope", 404, "other"),
-    ("/q", 422, "invalid_request"),
-    ("/q?n=SENTINEL", 422, "invalid_request"),
+    ("/forbidden", 403, "request_rejected"),
+    ("/http/500", 500, "internal_error"),
+    ("/http/502", 502, "internal_error"),
+    ("/http/503", 503, "upstream_unavailable"),
+    ("/http/504", 504, "deadline_exceeded"),
+    ("/nope", 404, "not_found"),
+    ("/q", 422, "invalid_parameters"),
+    ("/q?n=SENTINEL", 422, "invalid_parameters"),
 ]
 
 
@@ -59,7 +72,8 @@ def test_error_rows(client, path, status, code):
     r = client.get(path)
     assert r.status_code == status
     body = r.json()
-    assert body["error"]["code"] == code
+    assert body["status"] == status
+    assert body["details"][0]["code"] == code
     assert contract.validate_error(body) == []
     assert "SENTINEL" not in r.text
 
@@ -67,7 +81,7 @@ def test_error_rows(client, path, status, code):
 def test_405(client):
     r = client.get("/only-post")
     assert r.status_code == 405
-    assert r.json()["error"]["code"] == "other"
+    assert r.json()["details"][0]["code"] == "method_not_allowed"
     assert contract.validate_error(r.json()) == []
 
 
@@ -77,4 +91,4 @@ def test_request_id_echoed(client):
 
 
 def test_500_message_generic(client):
-    assert client.get("/boom").json()["error"]["message"] == "Internal server error."
+    assert client.get("/boom").json()["message"] == "Internal server error."

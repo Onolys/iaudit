@@ -52,7 +52,7 @@ def test_every_http_status_the_code_sends_is_in_backend_api_md():
         (SRC / "app.py").read_text(encoding="utf-8"),
         (SRC / "api" / "errors.py").read_text(encoding="utf-8"),
     )
-    sent = set(re.findall(r"ApiError\(\s*[^()]*?,\s*(\d{3})\b", app, re.S))
+    sent = set(re.findall(r"ApiError\(\s*(\d{3})\b", app, re.S))
     sent |= set(re.findall(r"_response\(\s*(\d{3})\b", errors))
     sent |= set(re.findall(r"status_code == (\d{3})", errors))
     sent |= {"422"}  # the framework fallback in errors.py
