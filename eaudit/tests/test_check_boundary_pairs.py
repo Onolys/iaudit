@@ -85,10 +85,10 @@ PAIRS = {
         ["I take 20 mg in the morning.", "Then 10 mg at bedtime."],
         {
             "items": [o(E1), o(E2)],
-            "flags": [flag("quantity_mismatch", E1, E2)],
+            "flags": [flag("calculation_error", E1, E2)],
         },
         "partially_supported",
-        ["quantity_mismatch"],
+        ["calculation_error"],
     ),
     "figure-never-given": (
         "Tomas leads a team of nine.",
@@ -116,9 +116,9 @@ PAIRS = {
         "Sam avoids all social events.",
         {},
         ["I skip the big parties, but I enjoy dinners with friends."],
-        {"items": [o()], "flags": [flag("context_stripping", E1)]},
+        {"items": [o()], "flags": [flag("unsupported_inference", E1)]},
         "partially_supported",
-        ["context_stripping"],
+        ["unsupported_inference"],
     ),
     "faithful-generalization": (
         "Sam finds crowds hard.",

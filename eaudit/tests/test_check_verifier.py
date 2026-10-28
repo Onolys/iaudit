@@ -185,7 +185,7 @@ def test_prompt_and_fewshot_cover_quantity_taxonomy():
 
     sysmd = (PROMPTS / "check_system.md").read_text(encoding="utf-8")
     assert "- `quantity_mismatch`:" in sysmd and "ordinary rounding" in sysmd.lower()
-    assert "another person or entity" in sysmd and "wider one" in sysmd
+    assert "another person or entity" in sysmd and "Scope broadening belongs to `unsupported_inference`" in sysmd
     assert "IGNORE amount" in sysmd
     shots = load_fewshot()
     flagged = {f["type"] for s in shots for f in s["output"]["flags"]}

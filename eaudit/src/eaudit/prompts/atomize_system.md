@@ -43,6 +43,7 @@ One claim is one checkable fact: one subject, one predicate, one polarity, one t
 
 - `subject_text`: the subject as written. `subject_speaker`: a roster speaker id only if the subject is exactly that speaker, otherwise null.
 - `reported_by`: who the section says the fact comes from. `source` is `self` (the interviewee), `informant`, `interviewer`, `assessor` (the writer's own statement), or `unspecified`. `speaker` must be a roster speaker id or null. A word like "partner" is not a speaker id.
+- For an attributed belief such as "mother believes the lamp causes restlessness", keep the belief attributed in `proposition` and put the believer in `reported_by` (`source: "informant"` for the mother). Use her roster id only when supplied; otherwise `speaker` is null. The object of the belief is not an assessor assertion.
 - `polarity`: `negated` for denial, absence or exception, otherwise `affirmed`.
 - `quantities`: 0 to 2 items. `kind` is `frequency` or `severity`; `raw` is the wording copied from the text; `bucket` is your best guess; `rate_per_week` only when the text gives a number.
   - Frequency buckets: never, rarely (below about monthly), sometimes (monthly up to weekly), often (1 to under 4 a week), most (4 to under 7 a week, "most days", "usually"), always (daily or more, "every time", "constantly").

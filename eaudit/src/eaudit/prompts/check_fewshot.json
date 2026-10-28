@@ -653,7 +653,7 @@
     ],
     "flags": [
      {
-      "type": "context_stripping",
+      "type": "unsupported_inference",
       "keys": [
        "c0.1:e1"
       ],
@@ -699,6 +699,438 @@
      "linker_role": "supporting",
      "answer_status": "endorsed",
      "text": "Malls, stations, concerts, I cannot stand any of them."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "The amber lamp makes Jordan restless.",
+    "reported_by": [
+     "unspecified"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I believe the amber lamp makes me restless."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I believe the amber lamp makes me restless."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "opinion_as_fact",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan believes the amber lamp causes restlessness.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I believe the amber lamp makes me restless."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I believe the amber lamp makes me restless."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan packed nine ceramic tiles in total.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I packed three ceramic tiles before lunch and four after lunch."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I packed three ceramic tiles before lunch and four after lunch."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "calculation_error",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan packed seven ceramic tiles in total.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I packed three ceramic tiles before lunch and four after lunch."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I packed three ceramic tiles before lunch and four after lunch."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan authorized the mural sketch.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I suggested using the mural sketch."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I suggested using the mural sketch."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "meaning_shift",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan proposed using the mural sketch.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I suggested using the mural sketch."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I suggested using the mural sketch."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "The whole pottery circle opposed the new kiln.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Some members of our pottery circle opposed the new kiln."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Some members of our pottery circle opposed the new kiln."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "unsupported_inference",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Some pottery circle members opposed the new kiln.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Some members of our pottery circle opposed the new kiln."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Some members of our pottery circle opposed the new kiln."
     }
    ],
    "output": {

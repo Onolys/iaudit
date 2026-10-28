@@ -20,23 +20,7 @@ BANNED = re.compile(
     r"fabricat|\blie\b|\blies\b|\blying\b|false claim|dishonest|misconduct|deliberate|misrepresent",
     re.IGNORECASE,
 )
-# SP02 exposes the expanded contract; SP03 adds detection/templates for checks 14-17.
-# Keep exercising every currently implemented template explicitly until that task lands.
-IMPLEMENTED_CONCERN_TYPES = (
-    ConcernType.unsupported_claim,
-    ConcernType.contradictory_evidence,
-    ConcernType.wrong_attribution,
-    ConcernType.timeframe_mismatch,
-    ConcernType.negation_reversal,
-    ConcernType.certainty_inflation,
-    ConcernType.frequency_severity_inflation,
-    ConcernType.context_stripping,
-    ConcernType.question_as_answer,
-    ConcernType.correction_ignored,
-    ConcernType.conflicting_accounts_flattened,
-    ConcernType.unsupported_causal_link,
-    ConcernType.quantity_mismatch,
-)
+IMPLEMENTED_CONCERN_TYPES = tuple(ConcernType)
 SLOTS = [Slots(), Slots("the respondent", 1), Slots("the informant", 3)]
 
 
@@ -133,8 +117,12 @@ def test_banned_words_in_suggested_revision_are_rejected():
     )
 
 
-def test_new_and_widened_templates_have_no_digits_or_banned_words():
+def test_changed_detail_and_context_templates_have_no_digits_or_banned_words():
     for t in (
+        ConcernType.opinion_as_fact,
+        ConcernType.calculation_error,
+        ConcernType.meaning_shift,
+        ConcernType.unsupported_inference,
         ConcernType.quantity_mismatch,
         ConcernType.wrong_attribution,
         ConcernType.context_stripping,
@@ -144,11 +132,14 @@ def test_new_and_widened_templates_have_no_digits_or_banned_words():
             assert not re.search(r"\d", text) and not BANNED.search(text), text
 
 
-def test_widened_template_wording():
+def test_template_wording_preserves_narrowed_boundaries():
     wa = concern_text(Concern(ConcernType.wrong_attribution, [], None, None), Slots())
     assert "the source, person or entity described may differ" in wa
     cs = concern_text(Concern(ConcernType.context_stripping, [], None, None), Slots())
-    assert "qualifier, reason or limit that the claim leaves out or broadens" in cs
+    assert "qualifier, reason or limit that the claim leaves out" in cs
+    assert "broadens" not in cs
+    ci = concern_text(Concern(ConcernType.certainty_inflation), Slots())
+    assert "hedge" in ci and "belief" not in ci
     qm = concern_text(Concern(ConcernType.quantity_mismatch, [], None, None), Slots())
     assert "amount, count or value" in qm and "a reviewer may wish to confirm" in qm
 

@@ -88,15 +88,14 @@ def concern_text(c: Concern, s: Slots) -> str:
             f"The related passage from {s.source} says the opposite of the claim."
         ),
         t.certainty_inflation: (
-            "The claim is stated more firmly than the related passage, which is tentative."
+            "The claim drops a hedge or expression of uncertainty from the related passage."
         ),
         t.frequency_severity_inflation: (
             f"The claim {c.direction or 'inflates'} the {scale} described by {s.source}; the "
             "stated amount may differ from what the interview supports."
         ),
         t.context_stripping: (
-            "The related passage includes a qualifier, reason or limit that the claim leaves out "
-            "or broadens."
+            "The related passage includes a qualifier, reason or limit that the claim leaves out."
         ),
         t.question_as_answer: (
             "The related passage is an interviewer question without an answer, so it is not "
