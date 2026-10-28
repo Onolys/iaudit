@@ -14,6 +14,7 @@ from pathlib import Path
 import httpx
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import restrict_engine_fixture
 from test_dataset_routes import checked, session
 from test_run_control import start, terminal
 
@@ -51,6 +52,7 @@ def block_network(monkeypatch):
 def roots(tmp_path):
     datasets = tmp_path / "datasets"
     shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", datasets / "eaudit/synthetic")
+    restrict_engine_fixture(datasets)
     adapter = datasets / "eaudit/synthetic/adapter.py"
     source = adapter.read_text().replace("garden-clean", ITEM)
     source = source.replace("Let us settle the plot rota", TEXT + " Let us settle the plot rota")

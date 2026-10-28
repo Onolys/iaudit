@@ -5,10 +5,10 @@ import json
 import httpx
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import contracts, store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import RunProgress, Selection, start_run
 
 URL = "http://fake"
@@ -16,7 +16,7 @@ URL = "http://fake"
 
 @pytest.fixture(scope="module")
 def synth():
-    return load("synthetic")
+    return engine_dataset()
 
 
 async def _nosleep(_s):

@@ -9,10 +9,10 @@ import threading
 
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import paths, store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import Selection, resume, start_run
 
 URL = "http://fake"
@@ -28,7 +28,7 @@ def _client(fb):
 
 @pytest.fixture(scope="module")
 def synth():
-    return load("synthetic")
+    return engine_dataset()
 
 
 async def test_drain_lets_inflight_finish_and_stores_no_terminal_state(synth, tmp_path):

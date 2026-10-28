@@ -6,10 +6,10 @@ import threading
 from dataclasses import replace
 
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import download, engine, store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import Selection, resume_async, start_run_async
 
 UPSTREAM = "downloaded file 'source.txt' changed upstream since first recorded"
@@ -17,7 +17,7 @@ TAMPERED = "downloaded file 'source.txt' changed since it was recorded"
 
 
 def _dataset_and_data(tmp_path):
-    dataset = load("synthetic")
+    dataset = engine_dataset()
     dataset = replace(dataset, meta=replace(dataset.meta, data_required=True))
     data = tmp_path / "injected-data"
     directory = data / dataset.meta.name

@@ -1,4 +1,4 @@
-"""Synthetic fictional dataset: 3 conversations, 8 items, one label per item.
+"""Synthetic fictional dataset: seven conversations, twenty items, one label per item.
 
 Everything here is invented. Gold is the item label ("clean" or "flagged");
 project() maps an AuditResponse onto the same labels.
@@ -77,6 +77,85 @@ _DOCS = {
              "Tavi falls asleep quickly and often wakes near four. Chamomile tea is the only aid."),
             ("sleep-meds", "flagged",
              "Tavi relies on prescription sleeping tablets to get through the night."),
+        ],
+    },
+    "doc-opinion_as_fact": {
+        "split": "dev",
+        "topic": "meeting",
+        "turns": [
+            ("host_bren", "interviewer", "What are your impressions of the workshop?"),
+            ("member_vessa", "respondent",
+             "In my view, the copper sculpture is the most graceful exhibit."),
+            ("member_vessa", "respondent",
+             "I also believe the evening workshop is better than the daytime session."),
+        ],
+        "items": [
+            ("opinion_as_fact-flagged-a", "flagged",
+             "The copper sculpture is the most graceful exhibit."),
+            ("opinion_as_fact-flagged-b", "flagged",
+             "The evening workshop is better than the daytime session."),
+            ("opinion_as_fact-clean", "clean",
+             "Vessa considers the copper sculpture the most graceful exhibit and prefers "
+             "the evening workshop to the daytime session."),
+        ],
+    },
+    "doc-calculation_error": {
+        "split": "dev",
+        "topic": "meeting",
+        "turns": [
+            ("host_darin", "interviewer", "How many lanterns did the festival receive?"),
+            ("steward_nemi", "respondent", "The red crate held seven lanterns."),
+            ("steward_nemi", "respondent", "The blue crate held four lanterns."),
+            ("steward_nemi", "respondent", "The green crate held three lanterns."),
+        ],
+        "items": [
+            ("calculation_error-flagged-a", "flagged",
+             "The red and blue crates held thirteen lanterns altogether."),
+            ("calculation_error-flagged-b", "flagged",
+             "The blue crate held two more lanterns than the green crate."),
+            ("calculation_error-clean", "clean",
+             "The red and blue crates held eleven lanterns altogether; "
+             "the blue crate held one more than the green crate."),
+        ],
+    },
+    "doc-meaning_shift": {
+        "split": "dev",
+        "topic": "clinical",
+        "turns": [
+            ("therapist_elsi", "interviewer", "What did the mobility adviser suggest?"),
+            ("client_orven", "respondent",
+             "The adviser recommended a walking stick for the hillside path."),
+            ("client_orven", "respondent",
+             "She offered a home visit to discuss the doorway."),
+        ],
+        "items": [
+            ("meaning_shift-flagged-a", "flagged",
+             "The mobility adviser prescribed a walking stick for the hillside path."),
+            ("meaning_shift-flagged-b", "flagged",
+             "The adviser scheduled a home visit to discuss the doorway."),
+            ("meaning_shift-clean", "clean",
+             "The adviser suggested using a walking stick on the hillside path "
+             "and offered to visit Orven at home to discuss the doorway."),
+        ],
+    },
+    "doc-unsupported_inference": {
+        "split": "test",
+        "topic": "meeting",
+        "turns": [
+            ("host_tevra", "interviewer", "What feedback came from the mural committee?"),
+            ("secretary_ispen", "respondent",
+             "Some committee members raised concerns about the mural design."),
+            ("secretary_ispen", "respondent", "Luris displayed a sketch at the gathering."),
+            ("secretary_ispen", "respondent", "Kelda received the studio fellowship."),
+        ],
+        "items": [
+            ("unsupported_inference-flagged-a", "flagged",
+             "The committee as a whole raised concerns about the mural design."),
+            ("unsupported_inference-flagged-b", "flagged",
+             "Kelda received the studio fellowship for the sketch Luris displayed."),
+            ("unsupported_inference-clean", "clean",
+             "Some members questioned the mural design. Luris showed a sketch; "
+             "Kelda received the studio fellowship."),
         ],
     },
 }

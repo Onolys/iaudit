@@ -1,9 +1,12 @@
-"""Ten fictional boundary pairs for the quantity check (taxonomy v1, Req 10).
+"""Fictional quantity and taxonomy v2 boundaries with scripted verifier output.
 
 Each pair scripts the verifier output (no LLM, no network) and asserts the exact concern set the
 pipeline settles on. The scripted outputs are what a careful verifier returns; the first and
 sixth, and the date, "about ten" and previous-medication pairs also carry a stray
 `quantity_mismatch` flag to pin the precedence and grounding rules.
+
+The taxonomy v2 pairs contrast a discrepancy with a faithful near-miss on the same
+interview. They exercise the checker, gates, deduplication, verdict and evidence roles.
 """
 
 import pytest
@@ -195,3 +198,102 @@ async def test_previous_medication_fewshot_matches_the_boundary_pair(make_ctx):
         PAIRS["previous-medication"][4],
         PAIRS["previous-medication"][5],
     )
+
+
+# (source replies, claim, atomizer fields, observations, flags, verdict, concern, role)
+# Each pair changes the assessment while keeping the supplied interview fixed.
+TAXONOMY_PAIRS = {
+    "certainty": (
+        ["I think the parcel arrived on Tuesday, but I cannot be sure."],
+        (
+            ("The parcel arrived on Tuesday.", {}, [o(certainty="hedged_strong")], [],
+             "partially_supported", ["certainty_inflation"], "supporting"),
+            ("The parcel may have arrived on Tuesday.", {"hedged": True},
+             [o(certainty="hedged_strong")], [], "supported", [], "supporting"),
+        ),
+    ),
+    "opinion": (
+        ["In my opinion, the ridge route is the safest choice."],
+        (
+            ("The ridge route is the safest choice.", {}, [o(certainty="hedged_strong")],
+             [flag("opinion_as_fact", E1), flag("certainty_inflation", E1)],
+             "partially_supported", ["opinion_as_fact"], "supporting"),
+            ("The participant considers the ridge route the safest choice.",
+             {"reported_by": [{"source": "self", "speaker": "pt"}]}, [o()],
+             [flag("opinion_as_fact", E1)], "supported", [], "supporting"),
+        ),
+    ),
+    "calculation": (
+        ["The red crate held seven lanterns.", "The blue crate held four lanterns."],
+        (
+            ("The crates held thirteen lanterns in total.", {}, [o(E1), o(E2)],
+             [flag("calculation_error", E1, E2), flag("quantity_mismatch", E1, E2)],
+             "partially_supported", ["calculation_error"], "supporting"),
+            ("The crates held eleven lanterns in total.", {}, [o(E1), o(E2)], [],
+             "supported", [], "supporting"),
+        ),
+    ),
+    "quantity": (
+        ["The red crate held seven lanterns."],
+        (
+            ("The red crate held nine lanterns.", {}, [o(rel="contradicts")],
+             [flag("calculation_error", E1), flag("quantity_mismatch", E1)],
+             "contradicted", ["quantity_mismatch"], "contradicting"),
+            ("The red crate held seven lanterns.", {}, [o()], [],
+             "supported", [], "supporting"),
+        ),
+    ),
+    "meaning": (
+        ["I recommended a walking stick for the hillside path."],
+        (
+            ("The participant prescribed a walking stick for the hillside path.", {},
+             [o(rel="contradicts")], [flag("meaning_shift", E1)],
+             "contradicted", ["meaning_shift"], "contradicting"),
+            ("The participant suggested a walking stick for the hillside path.", {},
+             [o()], [], "supported", [], "supporting"),
+        ),
+    ),
+    "negation": (
+        ["I did not recommend a walking stick for the hillside path."],
+        (
+            ("The participant recommended a walking stick for the hillside path.", {},
+             [o(rel="contradicts", polarity="negated")], [flag("meaning_shift", E1)],
+             "contradicted", ["negation_reversal"], "contradicting"),
+            ("The participant did not recommend a walking stick for the hillside path.",
+             {"polarity": "negated"}, [o(polarity="negated")], [],
+             "supported", [], "supporting"),
+        ),
+    ),
+    "attribution": (
+        ["My aunt recommended a walking stick for the hillside path."],
+        (
+            ("The participant recommended a walking stick for the hillside path.", {},
+             [o(rel="contradicts", experiencer="other_person")], [flag("meaning_shift", E1)],
+             "contradicted", ["wrong_attribution"], "contradicting"),
+            ("The participant's aunt recommended a walking stick for the hillside path.",
+             {"subject": "the participant's aunt"}, [o()], [],
+             "supported", [], "supporting"),
+        ),
+    ),
+}
+
+
+@pytest.mark.parametrize("boundary", TAXONOMY_PAIRS)
+@pytest.mark.parametrize("variant", [0, 1], ids=["flagged", "faithful"])
+async def test_taxonomy_v2_boundary_pair(make_ctx, boundary, variant):
+    replies, variants = TAXONOMY_PAIRS[boundary]
+    text, kw, observations, flags, verdict, concerns, role = variants[variant]
+    prep = prep_for(*replies)
+    c = claim(text, **kw)
+    lk = link(*(ev(n=n, turn=2 * n - 1, text=reply) for n, reply in enumerate(replies, 1)))
+    stub = StubClient()
+    stub.register("check", lambda req: VerifierOutput(items=observations, flags=flags))
+
+    (draft,) = await check_claims([c], [lk], prep, prep.turns, make_ctx(llm=stub))
+
+    assert draft.outcome == "ok"
+    assert draft.verdict.value == verdict
+    assert [concern.type.value for concern in draft.concerns] == concerns
+    assert [(item.key, item.role.value) for item in draft.evidence] == [
+        (f"c0.1:e{n}", role) for n in range(1, len(replies) + 1)
+    ]

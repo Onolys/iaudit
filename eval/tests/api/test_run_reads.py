@@ -7,6 +7,7 @@ import threading
 
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import restrict_engine_fixture
 from test_dataset_routes import checked, session
 from test_run_control import start, terminal
 
@@ -17,6 +18,7 @@ from iaudit_eval import paths, scoring, store
 def roots(tmp_path):
     datasets = tmp_path / "datasets"
     shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", datasets / "eaudit/synthetic")
+    restrict_engine_fixture(datasets)
     return datasets, tmp_path / "data", tmp_path / "runs"
 
 

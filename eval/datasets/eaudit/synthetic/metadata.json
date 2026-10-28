@@ -6,8 +6,8 @@
   "dataset_version": "1",
   "kind": "adapter",
   "splits": [
-    {"name": "dev", "description": "Two documents: a garden-club meeting and a physiotherapy follow-up."},
-    {"name": "test", "description": "One document: a sleep check-in."}
+    {"name": "dev", "description": "Five fictional conversations: garden club, physiotherapy, workshop opinions, festival arithmetic and mobility advice."},
+    {"name": "test", "description": "Two fictional conversations: a sleep check-in and mural committee accounts."}
   ],
   "default_split": "dev",
   "cluster_key": "source conversation",
