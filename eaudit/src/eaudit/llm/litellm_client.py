@@ -13,6 +13,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from eaudit.config import Settings
+from eaudit.utils.retry import retry
 
 from .errors import LLMBadOutput, LLMTimeout, LLMUnavailable
 from .types import LLMRequest, LLMResult, MetricsCollector, Usage
@@ -138,31 +139,32 @@ class LiteLLMClient:
         started = time.monotonic()
         attempts = 0
         usage = Usage()
+
+        async def call(attempt: int):
+            nonlocal attempts, usage
+            attempts = attempt
+            parsed, usage = await self._once(req, timeout_s)
+            return parsed
+
         try:
-            while True:
-                attempts += 1
-                try:
-                    parsed, usage = await self._once(req, timeout_s)
-                    result = LLMResult(
-                        parsed=parsed,
-                        usage=usage,
-                        latency_ms=(time.monotonic() - started) * 1000,
-                        model=model,
-                        attempts=attempts,
-                    )
-                    self._record(
-                        metrics, req, model, result.usage, result.latency_ms, attempts, True
-                    )
-                    return result
-                except (LLMTimeout, LLMBadOutput, LLMUnavailable) as exc:
-                    retryable = not getattr(exc, "no_retry", False)
-                    if (
-                        not retryable
-                        or not req.retry
-                        or attempts > self._s.llm_max_retries
-                        or not self._can_retry(req, timeout_s)
-                    ):
-                        raise
+            parsed = await retry(
+                call,
+                attempts=1 + self._s.llm_max_retries if req.retry else 1,
+                should_retry=lambda outcome: isinstance(
+                    outcome, (LLMTimeout, LLMBadOutput, LLMUnavailable)
+                )
+                and not getattr(outcome, "no_retry", False),
+                can_continue=lambda: self._can_retry(req, timeout_s),
+            )
+            result = LLMResult(
+                parsed=parsed,
+                usage=usage,
+                latency_ms=(time.monotonic() - started) * 1000,
+                model=model,
+                attempts=attempts,
+            )
+            self._record(metrics, req, model, result.usage, result.latency_ms, attempts, True)
+            return result
         except Exception:
             self._record(
                 metrics, req, model, usage, (time.monotonic() - started) * 1000, attempts, False,
