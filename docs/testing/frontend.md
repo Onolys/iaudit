@@ -1,6 +1,6 @@
 # Frontend testing
 
-How to test the Audit and Eval UI and what to check before a release.
+How to test the eaudit and Eval UI and what to check before a release.
 
 **Audience:** contributors.
 
@@ -50,9 +50,9 @@ Transport tests inject `fetch`, config and the mock registry; no test touches a 
   metrics/list/compare remain available. Stale-version behavior is covered offline.
 - [ ] The [known limits](../concepts/review-ui.md#known-limits) are still accurate.
 
-The current `.env.example` points Audit at `http://localhost:8000/v1/audit`.
-`VITE_MOCK` affects Audit only; Eval tests use injected fake fetch, fictional fixtures
-and fake timers. Do not interpret Audit mock mode as an Eval application mock mode.
+The current `.env.example` points eaudit at `http://localhost:8000/v1/audit`.
+`VITE_MOCK` affects eaudit only; Eval tests use injected fake fetch, fictional fixtures
+and fake timers. Do not interpret eaudit mock mode as an Eval application mock mode.
 
 
 ## Eval coverage

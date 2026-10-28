@@ -4,7 +4,7 @@ How is this implemented? Private implementation details.
 
 **Audience:** maintainers and coding agents.
 
-- [frontend.md](frontend.md): Audit/Eval architecture, transport, saved replay and review UI internals.
+- [frontend.md](frontend.md): eaudit/Eval architecture, transport, saved replay and review UI internals.
 - [pipeline.md](pipeline.md): flows, deadline, degradation, metrics.
 - [llm-client.md](llm-client.md): the one interface to every model call.
 - [prep-atomize.md](prep-atomize.md): dialogue acts and claim extraction.

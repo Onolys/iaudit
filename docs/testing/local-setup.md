@@ -34,7 +34,7 @@ scripts/dev.sh --stub    # same, IAUDIT_PIPELINE=stub (no key, empty valid audit
 |---|---|
 | Backend | `http://127.0.0.1:8000` (`/healthz`) |
 | Eval server | `http://127.0.0.1:8100` (`/health`) |
-| Web (Audit and Eval tabs) | `http://localhost:5173` |
+| Web (eaudit and Eval tabs) | `http://localhost:5173` |
 
 Ports are fixed by the script. Ctrl-C stops all three. Details: [scripts/README.md](../../scripts/README.md).
 
@@ -47,7 +47,7 @@ Components alone:
 (cd frontend && VITE_MOCK=true npm run dev)             # Audit mock mode
 ```
 
-In mock mode upload `docs/contracts/examples/request.json`. Mock mode covers Audit only; Eval has no mock mode ([eval UI](../reference/eval-ui.md)).
+In mock mode upload `docs/contracts/examples/request.json`. Mock mode covers eaudit only; Eval has no mock mode ([eval UI](../reference/eval-ui.md)).
 
 ## Offline checks
 

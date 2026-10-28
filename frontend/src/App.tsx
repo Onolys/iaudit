@@ -7,24 +7,28 @@ import { ErrorScreen, LoadingView, useAuditLoader } from "./transport";
 import type { LoadResult } from "./transport";
 import type { AuditDeps } from "./transport/runAudit";
 import EvalApp from "./eval/EvalApp";
+import { PRODUCTS } from "./products";
+import type { ProductId } from "./products";
 import type { EvalApi } from "./eval/evalApi";
 
 export default function App({ deps, evalApi }: { deps?: AuditDeps; evalApi?: EvalApi }) {
-  const [mode, setMode] = useState<"audit" | "eval">("audit");
+  const [mode, setMode] = useState<ProductId | "eval">(PRODUCTS[0].id);
   return (
     <div className="app-shell">
       <nav className="app-mode-switch" aria-label="Workspace">
-        <button type="button" aria-pressed={mode === "audit"} onClick={() => setMode("audit")}>Audit</button>
+        {PRODUCTS.map(product => (
+          <button key={product.id} type="button" aria-pressed={mode === product.id} onClick={() => setMode(product.id)}>{product.label}</button>
+        ))}
         <button type="button" aria-pressed={mode === "eval"} onClick={() => setMode("eval")}>Eval</button>
       </nav>
       <div className="app-content">
-        {mode === "audit" ? <AuditApp deps={deps} /> : <EvalApp api={evalApi} />}
+        {mode === "eval" ? <EvalApp api={evalApi} /> : <EauditApp deps={deps} />}
       </div>
     </div>
   );
 }
 
-function AuditApp({ deps }: { deps?: AuditDeps }) {
+function EauditApp({ deps }: { deps?: AuditDeps }) {
   const { state, loadFile, retry, cancel } = useAuditLoader(deps);
   const inputRef = useRef<HTMLInputElement>(null);
   // Each loaded result gets its own id, so a new upload (even of the same file) remounts the review.

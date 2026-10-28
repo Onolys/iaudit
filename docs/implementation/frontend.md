@@ -42,7 +42,7 @@ Each excerpt starts at its turn range. Expansion grows it by 3 turns per click (
 
 The shell scrolls the left pane only after navigation or stepping, not after a direct click.
 `Header` accepts optional `inputRef` and `onFile`; the file input and upload button
-render only when `onFile` is supplied. Audit supplies both; saved replay omits them.
+render only when `onFile` is supplied. eaudit supplies both; saved replay omits them.
 
 `LeftPane` renders section cards, per-section "Unplaced claims" and a final "Claims outside the supplied assessment" card.
 
