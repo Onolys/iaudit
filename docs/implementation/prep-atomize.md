@@ -1,6 +1,6 @@
 # Prep and atomize
 
-Stages 0 and 1. Code: `backend/src/iaudit_backend/prep/` and `atomize/`.
+Stages 0 and 1. Code: `eaudit/src/eaudit/prep/` and `atomize/`.
 
 **Audience:** maintainers and coding agents.
 

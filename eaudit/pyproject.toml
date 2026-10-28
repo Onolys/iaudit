@@ -1,0 +1,43 @@
+[project]
+name = "eaudit"
+version = "0.1.0"
+description = "Interview Evidence Auditor backend (contract 1.2.0)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.3",
+  "jsonschema>=4.22",
+  "referencing>=0.35",
+  "litellm>=1.50",
+  "httpx>=0.27",
+  "rapidfuzz>=3.14.6",
+  "rank-bm25>=0.2.2",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/eaudit"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "eval/tests"]
+asyncio_mode = "auto"
+pythonpath = ["src", "."]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E501"]
+"eval/tests/**" = ["E501"]

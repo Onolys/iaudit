@@ -6,7 +6,7 @@ Target 30 to 45 seconds for a typical audit, hard cap 100 (`IAUDIT_AUDIT_DEADLIN
 
 ## Offline scenarios
 
-`backend/tests/latency/` runs the pipeline against a scripted model whose latencies are lognormal per call tag and scaled by one factor (default 1/50), so ratios hold and a minute takes about a second. It covers the baseline run, failure injection (a link timeout, a check outage, a failed atomize), deadline overrun without leaked tasks, and a check that a sentinel word never reaches logs, metrics or headers.
+`eaudit/tests/latency/` runs the pipeline against a scripted model whose latencies are lognormal per call tag and scaled by one factor (default 1/50), so ratios hold and a minute takes about a second. It covers the baseline run, failure injection (a link timeout, a check outage, a failed atomize), deadline overrun without leaked tasks, and a check that a sentinel word never reaches logs, metrics or headers.
 
 ## Live
 

@@ -1,6 +1,6 @@
 # Configuration
 
-Every `IAUDIT_*` setting, read from `Settings` in `backend/src/iaudit_backend/config.py`. Set one as an environment variable named `IAUDIT_<NAME>` in upper case (for example `IAUDIT_AUDIT_DEADLINE_S=45`). `Settings` also reads a `.env` file in the directory the server starts in, which is normally `backend/`.
+Every `IAUDIT_*` setting, read from `Settings` in `eaudit/src/eaudit/config.py`. Set one as an environment variable named `IAUDIT_<NAME>` in upper case (for example `IAUDIT_AUDIT_DEADLINE_S=45`). `Settings` also reads a `.env` file in the directory the server starts in, which is normally `eaudit/`.
 
 **Audience:** users.
 

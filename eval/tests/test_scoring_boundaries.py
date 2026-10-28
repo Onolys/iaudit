@@ -46,7 +46,7 @@ def test_score_and_compare_work_with_sockets_blocked(saved_runs, monkeypatch):
 def _protected_files(repo):
     return {
         str(path.relative_to(repo)): hashlib.sha256(path.read_bytes()).hexdigest()
-        for directory in (repo / "backend/eval", repo / "docs/contracts")
+        for directory in (repo / "eaudit/eval", repo / "docs/contracts")
         for path in directory.rglob("*")
         if path.is_file()
     }
@@ -55,7 +55,7 @@ def _protected_files(repo):
 def test_score_and_compare_leave_protected_areas_unchanged(saved_runs):
     repo = Path(__file__).resolve().parents[2]
     before = _protected_files(repo)
-    assert any(path.startswith("backend/eval/") for path in before)
+    assert any(path.startswith("eaudit/eval/") for path in before)
     assert any(path.startswith("docs/contracts/") for path in before)
     root, a, b = saved_runs
     score(a, runs_root=root)

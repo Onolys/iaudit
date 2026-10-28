@@ -127,7 +127,7 @@ trap 'exit 143' TERM
 
 if [ "$STUB" -eq 1 ]; then export IAUDIT_PIPELINE=stub; fi
 
-launch backend backend uv run uvicorn iaudit_backend.app:app --port "$BACKEND_PORT"
+launch backend eaudit uv run uvicorn eaudit.app:app --port "$BACKEND_PORT"
 launch eval eval env "IAUDIT_BACKEND_URL=http://127.0.0.1:$BACKEND_PORT" \
   uv run uvicorn iaudit_eval.server.app:app --no-access-log --host 127.0.0.1 --port "$EVAL_PORT"
 launch web frontend env "VITE_AUDIT_URL=http://localhost:$BACKEND_PORT/v1/audit" \

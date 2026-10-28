@@ -93,9 +93,9 @@ def _backend_imports(path):
     found = []
     for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
         if isinstance(node, ast.Import):
-            found += [a.name for a in node.names if a.name.split(".")[0] == "iaudit_backend"]
+            found += [a.name for a in node.names if a.name.split(".")[0] == "eaudit"]
         elif isinstance(node, ast.ImportFrom):
-            if node.level == 0 and (node.module or "").split(".")[0] == "iaudit_backend":
+            if node.level == 0 and (node.module or "").split(".")[0] == "eaudit":
                 found.append(node.module)
     return found
 
@@ -109,8 +109,8 @@ def test_no_backend_import_in_eval():
 
 def test_backend_import_detector_catches_violation(tmp_path):
     f = tmp_path / "x.py"
-    f.write_text("import iaudit_backend.config\nfrom iaudit_backend import app\n")
-    assert _backend_imports(f) == ["iaudit_backend.config", "iaudit_backend"]
+    f.write_text("import eaudit.config\nfrom eaudit import app\n")
+    assert _backend_imports(f) == ["eaudit.config", "eaudit"]
 
 
 def _audit_contract_copies(eval_dir):

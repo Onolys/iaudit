@@ -1,6 +1,6 @@
 # Backend API
 
-What the backend accepts, returns, and reads from the environment. Facts are taken from `backend/src/iaudit_backend/`.
+What the backend accepts, returns, and reads from the environment. Facts are taken from `eaudit/src/eaudit/`.
 
 **Audience:** users.
 

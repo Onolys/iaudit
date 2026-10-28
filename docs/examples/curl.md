@@ -2,10 +2,10 @@
 
 **Audience:** users.
 
-Start the service from `backend/` (see [backend/README.md](../../backend/README.md)). To try it without a provider key, start the stub pipeline, which returns an empty valid audit:
+Start the service from `eaudit/` (see [eaudit/README.md](../../eaudit/README.md)). To try it without a provider key, start the stub pipeline, which returns an empty valid audit:
 
 ```bash
-IAUDIT_PIPELINE=stub uv run uvicorn iaudit_backend.app:app --port 8000
+IAUDIT_PIPELINE=stub uv run uvicorn eaudit.app:app --port 8000
 ```
 
 Send the contract's worked example (from the repo root):

@@ -148,7 +148,7 @@ def test_pure_module_imports_without_network_or_client_modules(module, tmp_path)
 
         sys.path.insert(0, sys.argv[3])
         forbidden = ("httpx", "httpcore", "requests", "urllib3", "aiohttp",
-                     "openai", "anthropic", "litellm", "iaudit_backend")
+                     "openai", "anthropic", "litellm", "eaudit")
         def no_network(*args, **kwargs):
             raise AssertionError("Pure module import attempted network")
         socket.socket.connect = no_network
