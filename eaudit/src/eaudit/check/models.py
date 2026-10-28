@@ -22,6 +22,10 @@ FlagType = Literal[
     "unsupported_causal_link",
     "element_gap",
     "quantity_mismatch",
+    "opinion_as_fact",
+    "calculation_error",
+    "meaning_shift",
+    "unsupported_inference",
 ]
 StallReason = Literal["timeout", "unavailable", "bad_output"]
 
@@ -81,7 +85,7 @@ class JudgedEvidence:
     endorsed: bool = True
     attribution: Literal["ok", "mismatch", "skip"] = "ok"
     demote: str | None = None  # "timeframe" | "inference"
-    cited: bool = False  # cited by an accepted 8/10/12 flag: counts as partial support
+    cited: bool = False  # cited by an accepted discrepancy flag: counts as partial support
     escalated: bool = False  # amount gap made it a contradiction
     speakers: list[str] = field(default_factory=list)  # who said the cited turns
 

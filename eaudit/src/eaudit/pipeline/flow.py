@@ -57,5 +57,13 @@ async def claim_flow(st: RunState, req: AuditRequest, claim: AtomicClaim, ctx) -
     with st.span("link"):
         link = await link_one(claim, st.link_ctx, ctx)
     with st.span("check"):
-        draft: ClaimDraft = await check_one(claim, link, st.prep, st.prep.turns, ctx)
+        atoms = st.atoms.get(claim.section_index)
+        draft: ClaimDraft = await check_one(
+            claim,
+            link,
+            st.prep,
+            st.prep.turns,
+            ctx,
+            causal_links=atoms.links if atoms is not None else (),
+        )
     st.write_draft(claim.id, draft)

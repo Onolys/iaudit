@@ -111,6 +111,22 @@ def concern_text(c: Concern, s: Slots) -> str:
             "The claim states an amount, count or value that may differ from the supplied "
             "interview; a reviewer may wish to confirm the figure."
         ),
+        t.opinion_as_fact: (
+            "The related passage gives this as someone's view or belief, but the claim states "
+            "it as fact"
+        ),
+        t.calculation_error: (
+            "The total or result the claim states may differ from the figures the supplied "
+            "interview gives; a reviewer may wish to confirm the calculation"
+        ),
+        t.meaning_shift: (
+            "The claim uses a word or action whose meaning may differ from what the related "
+            "passage describes; a reviewer may wish to confirm"
+        ),
+        t.unsupported_inference: (
+            "The claim links facts, or generalizes beyond them, in a way the supplied interview "
+            "does not establish"
+        ),
     }
     return texts[c.type]
 

@@ -2,7 +2,7 @@
 
 import re
 
-from eaudit.atomize.models import AtomicClaim
+from eaudit.atomize.models import AtomicClaim, CausalLink
 from eaudit.config import Settings
 from eaudit.link.models import LinkResult
 from eaudit.models import ConcernType, EvidenceRole, Verdict
@@ -33,7 +33,7 @@ _NUMBER_WORDS = (
     r"|eighty|ninety|hundred|thousand|million|billion|dozen|dozens|hundreds|thousands|millions"
     r"|billions|tens|half|halves|couple|pair|single|double(?!-check)|triple|quarter"
 )
-_NUMBER_TOKEN = re.compile(rf"\d|\b(?:{_NUMBER_WORDS})\b", re.IGNORECASE)
+_NUMBER_TOKEN = re.compile(rf"\d+(?:[.,]\d+)*|\b(?:{_NUMBER_WORDS})\b", re.IGNORECASE)
 
 _YEAR = re.compile(r"\b(?:19|20)\d{2}\b")
 _PRONOUN_ONE = re.compile(r"\b(?:the|no|any|every|some|that|this|which|each)\s+one\b", re.I)
@@ -139,13 +139,22 @@ def has_number_token(text: str, turn_side: bool = False) -> bool:
 
 
 def _quantity_flag_grounded(
-    claim: AtomicClaim, keys: list[str], items: list[JudgedEvidence], turns: list
+    claim: AtomicClaim,
+    keys: list[str],
+    items: list[JudgedEvidence],
+    turns: list,
+    min_turn_tokens: int = 1,
 ) -> bool:
-    """A quantity_mismatch flag needs a figure in the claim and in a cited item's turn text."""
+    """Require a claim figure and enough number tokens across distinct cited turns."""
     if not has_number_token(claim.proposition):
         return False
     cited = [it for it in items if not keys or it.key in keys]
-    return any(has_number_token(turns[i].text, turn_side=True) for it in cited for i in it.turns)
+    indices = {i for it in cited for i in it.turns}
+    tokens = sum(
+        len(_NUMBER_TOKEN.findall(_PRONOUN_ONE.sub(" ", _YEAR.sub(" ", turns[i].text))))
+        for i in indices
+    )
+    return tokens >= min_turn_tokens
 
 
 def counts_as_support_base(it: JudgedEvidence) -> bool:
@@ -227,6 +236,8 @@ def judge(
     vout: VerifierOutput,
     counts: dict[str, int] | None = None,
     cfg: Settings | None = None,
+    *,
+    causal_links: list[CausalLink] | tuple[CausalLink, ...] = (),
 ) -> tuple[list[JudgedEvidence], Signals]:
     """Join the link items, group A results and floored observations; run the per-item checks."""
     sig = Signals(counts=dict(counts or {}))
@@ -250,8 +261,26 @@ def judge(
             sig.counts["flags_suppressed"] = sig.counts.get("flags_suppressed", 0) + 1
             continue
         kept_keys = [k for k in f.keys if k in known]
-        if f.type == "quantity_mismatch" and not _quantity_flag_grounded(
-            claim, kept_keys, items, turns
+        if f.type == "opinion_as_fact" and (
+            claim.hedged
+            or any(r.source not in ("assessor", "unspecified") for r in claim.reported_by)
+            or any(
+                cl.source != "assessor"
+                for cl in causal_links
+                if claim.id in cl.cause_ids or claim.id == cl.effect_id
+            )
+        ):
+            sig.counts["flags_suppressed"] = sig.counts.get("flags_suppressed", 0) + 1
+            continue
+        if f.type == "meaning_shift" and not kept_keys:
+            sig.counts["flags_suppressed"] = sig.counts.get("flags_suppressed", 0) + 1
+            continue
+        if f.type in ("quantity_mismatch", "calculation_error") and not _quantity_flag_grounded(
+            claim,
+            kept_keys,
+            items,
+            turns,
+            min_turn_tokens=2 if f.type == "calculation_error" else 1,
         ):
             sig.counts["flags_suppressed"] = sig.counts.get("flags_suppressed", 0) + 1
             continue
@@ -268,6 +297,10 @@ def judge(
             "correction_ignored",
             "unsupported_causal_link",
             "quantity_mismatch",
+            "opinion_as_fact",
+            "calculation_error",
+            "meaning_shift",
+            "unsupported_inference",
         )
         for k in f.keys
     }
@@ -283,6 +316,10 @@ _FLAG_CONCERN = {
     "unsupported_causal_link": ConcernType.unsupported_causal_link,
     "element_gap": ConcernType.unsupported_claim,
     "quantity_mismatch": ConcernType.quantity_mismatch,
+    "opinion_as_fact": ConcernType.opinion_as_fact,
+    "calculation_error": ConcernType.calculation_error,
+    "meaning_shift": ConcernType.meaning_shift,
+    "unsupported_inference": ConcernType.unsupported_inference,
 }
 
 
@@ -453,7 +490,18 @@ def decide(
         cands.append(Concern(ConcernType.contradictory_evidence, con))
     if con and not sup:
         row, verdict = "D4", Verdict.contradicted
-        kept = [c for c in cands if c.type in _CHAIN]
+        kept = [
+            c
+            for c in cands
+            if c.type in _CHAIN
+            or c.type
+            in (
+                ConcernType.opinion_as_fact,
+                ConcernType.calculation_error,
+                ConcernType.meaning_shift,
+                ConcernType.unsupported_inference,
+            )
+        ]
     elif con:
         row, verdict = "D5", Verdict.partially_supported
         kept = cands
@@ -464,7 +512,7 @@ def decide(
         if tf_keys:
             kept.append(Concern(ConcernType.timeframe_mismatch, tf_keys))
         if inf_keys:
-            kept.append(Concern(ConcernType.unsupported_claim, inf_keys))
+            kept.append(Concern(ConcernType.unsupported_inference, inf_keys))
         if not kept:
             kept = [Concern(ConcernType.unsupported_claim)]
     else:
