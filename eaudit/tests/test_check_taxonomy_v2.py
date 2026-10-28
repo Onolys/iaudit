@@ -9,7 +9,7 @@ from eaudit.atomize.models import CausalLink
 from eaudit.check import check_one
 from eaudit.check.group_a import run_group_a
 from eaudit.check.models import VerifierOutput
-from eaudit.check.synth import judge
+from eaudit.check.synth import decide, judge
 from eaudit.check.verifier import apply_floors
 from eaudit.config import Settings
 from eaudit.llm import StubClient
@@ -194,6 +194,91 @@ async def test_failed_inference_with_entailing_premises_is_insufficient_inferenc
         ("unsupported_inference", [E1, E2])
     ]
     assert [(e.key, e.role) for e in draft.evidence] == [(E1, "qualifying"), (E2, "qualifying")]
+
+
+@pytest.mark.parametrize("step", [None, True, False, "below_floor_true", "below_floor_false"])
+@pytest.mark.parametrize("premise", ["entails", "not_addresses", "missing", "below_floor"])
+def test_inference_needs_rejected_step_and_entailing_premises_for_reasoning_concern(step, premise):
+    # Missing judgments or premises must not become a reasoning-error finding.
+    lk = link(
+        ev(n=1), ev(n=2, turn=5),
+        ev(n=3, lt="inference", premises=[E1, E2], step="These facts are related."),
+    )
+    data = {"items": [{"key": E1, "relation": "entails"}], "inferences": []}
+    if premise != "missing":
+        data["items"].append({
+            "key": E2, "relation": "not_addresses" if premise == "not_addresses" else "entails",
+            "conf": "low" if premise == "below_floor" else "high",
+        })
+    if step is not None:
+        data["inferences"].append({
+            "key": "c0.1:e3", "step_acceptable": step is True or step == "below_floor_true",
+            "conf": "low" if isinstance(step, str) else "high",
+        })
+    c = claim("The project demonstrates poor planning.")
+    items, sig = gated(c, data, lk)
+    d = decide(c, items, sig, Settings())
+    if step is True and premise == "entails":
+        assert (d.verdict, d.concerns) == ("supported", [])
+        assert d.roles == {E1: "supporting", E2: "supporting"}
+    else:
+        want = "unsupported_inference" if step is False and premise == "entails" else "unsupported_claim"
+        assert d.verdict == "insufficient_evidence"
+        assert [(cn.type, cn.keys) for cn in d.concerns] == [(want, [E1, E2])]
+        assert d.roles == {E1: "qualifying", E2: "qualifying"}
+        assert [it.demote for it in items] == ["inference", "inference"]
+
+
+@pytest.mark.parametrize("first_step", [None, False, True])
+@pytest.mark.parametrize("second_relation", ["entails", "not_addresses", "missing"])
+@pytest.mark.parametrize("reverse_groups", [False, True])
+def test_shared_groups_preserve_qualification_and_successful_premise_support(
+    first_step, second_relation, reverse_groups
+):
+    e3 = "c0.1:e3"
+    groups = [
+        ev(n=4, lt="inference", premises=[E1, E2], step="First relation."),
+        ev(n=5, lt="inference", premises=[E2, e3], step="Second relation."),
+    ]
+    if reverse_groups:
+        groups.reverse()
+    lk = link(ev(n=1), ev(n=2, turn=5), ev(n=3, turn=7), *groups)
+    c = claim("The project demonstrates poor planning.")
+    data = {
+        "items": [
+            {"key": E1, "relation": "entails"}, {"key": E2, "relation": "entails"},
+        ],
+        "inferences": [{"key": "c0.1:e5", "step_acceptable": False, "conf": "high"}],
+    }
+    if second_relation != "missing":
+        data["items"].append({"key": e3, "relation": second_relation})
+    if first_step is not None:
+        data["inferences"].append({
+            "key": "c0.1:e4", "step_acceptable": first_step, "conf": "high",
+        })
+    items, sig = gated(c, data, lk)
+    d = decide(c, items, sig, Settings())
+    assert sig.failed_inference
+    if first_step is True:
+        assert [it.demote for it in items] == [None, None, "inference"]
+        assert (d.verdict, d.concerns) == ("supported", [])
+        want_roles = {E1: "supporting", E2: "supporting"}
+        if second_relation != "missing":
+            want_roles[e3] = "qualifying"
+        assert d.roles == want_roles
+    else:
+        inference_keys = []
+        if first_step is False:
+            inference_keys = [E1, E2]
+        if second_relation == "entails":
+            inference_keys = [E1, E2, e3] if first_step is False else [E2, e3]
+        want = [("unsupported_inference", inference_keys)] if inference_keys else [
+            ("unsupported_claim", [E1, E2, e3])
+        ]
+        assert [(cn.type, cn.keys) for cn in d.concerns] == want
+        assert d.verdict == "insufficient_evidence"
+        assert d.roles == {E1: "qualifying", E2: "qualifying", e3: "qualifying"}
+        assert all(it.demote == "inference" for it in items)
 
 
 @pytest.mark.parametrize(

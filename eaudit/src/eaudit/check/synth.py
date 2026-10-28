@@ -197,35 +197,37 @@ def resolve_inferences(
     link: LinkResult,
     by_key: dict[str, JudgedEvidence],
     judgments: list[InferenceObs],
-) -> bool:
+) -> tuple[bool, set[str]]:
     """An inference is supported iff every premise entails and the step is acceptable.
 
-    Premises of failed groups are demoted (they supply no support). Returns True if any failed.
+    Premises of failed groups are demoted (they supply no support). Return whether any failed
+    and the premise keys of explicitly rejected steps whose premises all entail.
     """
     verdict = {g.key: g.step_acceptable for g in judgments}
     supported_premises: set[str] = set()
+    rejected_premises: set[str] = set()
     failed: list[list[str]] = []
     for e in link.evidence:
         if e.link_type != "inference":
             continue
         prem = [by_key.get(k) for k in e.premise_keys]
-        ok = (
-            bool(prem)
-            and verdict.get(e.draft.key, False)
-            and all(
-                p is not None and p.obs is not None and p.obs.relation == "entails" for p in prem
-            )
+        premises_entail = bool(prem) and all(
+            p is not None and p.obs is not None and p.obs.relation == "entails" for p in prem
         )
+        step = verdict.get(e.draft.key)
+        ok = premises_entail and step is True
         keys = [k for k in e.premise_keys if k in by_key]
         if ok:
             supported_premises.update(keys)
         else:
             failed.append(keys)
+            if premises_entail and step is False:
+                rejected_premises.update(keys)
     for keys in failed:
         for k in keys:
             if k not in supported_premises:
                 by_key[k].demote = by_key[k].demote or "inference"
-    return bool(failed)
+    return bool(failed), rejected_premises
 
 
 def judge(
@@ -287,7 +289,9 @@ def judge(
         sig.flags.append(f.model_copy(update={"keys": kept_keys}))
     apply_timeframe(claim, items, sig.flags)
     _rate_ratio_conflict(claim, items, sig, (cfg or Settings()).check_rate_ratio)
-    sig.failed_inference = resolve_inferences(link, {it.key: it for it in items}, vout.inferences)
+    sig.failed_inference, sig.rejected_inference_keys = resolve_inferences(
+        link, {it.key: it for it in items}, vout.inferences
+    )
     cited = {
         k
         for f in sig.flags
@@ -526,7 +530,15 @@ def decide(
         if tf_keys:
             kept.append(Concern(ConcernType.timeframe_mismatch, tf_keys))
         if inf_keys:
-            kept.append(Concern(ConcernType.unsupported_inference, inf_keys))
+            # Keep failed premises inspectable even when dedup removes their generic concern.
+            for k in inf_keys:
+                roles[k] = roles[k] or _Role.qualifying
+            rejected_keys = [k for k in inf_keys if k in signals.rejected_inference_keys]
+            missing_keys = [k for k in inf_keys if k not in signals.rejected_inference_keys]
+            if rejected_keys:
+                kept.append(Concern(ConcernType.unsupported_inference, rejected_keys))
+            if missing_keys:
+                kept.append(Concern(ConcernType.unsupported_claim, missing_keys))
         if not kept:
             kept = [Concern(ConcernType.unsupported_claim)]
     else:

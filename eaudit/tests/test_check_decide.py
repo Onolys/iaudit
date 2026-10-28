@@ -121,9 +121,9 @@ def test_d6_timeframe_demotion_leaves_no_support():  # V5
     assert d.roles == {"c0.1:e1": R.qualifying}
 
 
-def test_d6_failed_inference_is_unsupported_inference():
+def test_d6_inference_demotion_without_rejected_step_is_missing_support():
     d = run([j(1, demote="inference"), j(2, demote="inference")], failed=True)
-    assert (d.row, d.verdict, types(d)) == ("D6", V.insufficient_evidence, [CT.unsupported_inference])
+    assert (d.row, d.verdict, types(d)) == ("D6", V.insufficient_evidence, [CT.unsupported_claim])
     assert set(d.roles.values()) == {R.qualifying}
 
 

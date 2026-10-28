@@ -95,6 +95,8 @@ class Signals:
     flags: list[FlagObs] = field(default_factory=list)  # accepted (above floor), keys known
     failed_inference: bool = False
     counts: dict[str, int] = field(default_factory=dict)
+    # Premises of explicitly rejected steps, only when every premise entails.
+    rejected_inference_keys: set[str] = field(default_factory=set)
 
 
 @dataclass
