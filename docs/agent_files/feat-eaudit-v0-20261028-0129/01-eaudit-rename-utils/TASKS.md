@@ -16,8 +16,8 @@ Each task is one commit and must leave the eaudit/, eval/ and frontend suites gr
 | 2 | Delete .party/ | 1 | done |
 | 3 | Regroup eval datasets under eaudit/ | 1 | done |
 | 4 | `product` field on dataset metadata | 3 | in-progress |
-| 5 | Python utils/ and retry() | 1 | in-progress |
-| 6 | Frontend utils/: codepoints move and retry() | 1 | todo |
+| 5 | Python utils/ and retry() | 1 | done |
+| 6 | Frontend utils/: codepoints move and retry() | 1 | in-progress |
 | 7 | Swap retry into litellm_client | 5 | todo |
 | 8 | Swap retry into atomize stage | 5 | todo |
 | 9 | Swap retry into linker | 5 | todo |
