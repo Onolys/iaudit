@@ -44,3 +44,7 @@ date: 2026-10-28
 - Re-record LLM fixtures (needs API keys) after SP03 prompt changes.
 - Review concerns-and-groups examples and research.md paper claims before SP04 merge.
 - Run TofuEval later, outside this initiative (optional).
+
+## SP03 completion
+
+Taxonomy v2 is complete and independently reviewed: bugs, architecture and security all PASS after review fix `98ad587`. See [completed tasks](03-taxonomy-v2/TASKS.md), [implementation run summary](03-taxonomy-v2/code-2026-10-28-0545.md), [final review](03-taxonomy-v2/review-2026-10-28-0545.md), [acceptance evidence](03-taxonomy-v2/acceptance-2026-10-28.md) and [gold check](03-taxonomy-v2/gold-check-2026-10-28.md). SP03 owner/deferred work is recorded in the run summary.

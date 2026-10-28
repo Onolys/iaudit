@@ -1,6 +1,6 @@
 ---
 status: done
-summary: PASS — all non-deferred SP03 acceptance criteria verified offline; backend 1357, eval 847 and frontend 663 tests pass.
+summary: PASS — initial full offline sweep retained below; post-review fix 98ad587 passes 1395 backend tests and lint; all reviewers PASS.
 date: 2026-10-28
 ---
 # SP03 Task8 — Offline acceptance
@@ -80,3 +80,13 @@ Output: `PASS: 17 checks/definitions/examples; numbering, enum/schema/groups agr
 - `eaudit/eval/recorded/` contains only its README. Actual pipeline replay has missing fixtures; the passing replay/freshness unit tests use test fixtures. Owner re-recording remains required after prompt changes.
 - Mission wording was approved before implementation. Owner live TofuEval comparison and latency/p95 measurement remain deferred, with no offline acceptance gate.
 - Independent review and push are orchestrator follow-ups. `TASKS.md` was neither read, edited nor staged by this task agent.
+
+## Post-review addendum — 2026-10-28
+
+The full sweep above records the initial implementation through `0923e05`, committed as Task 8 evidence in `6a8fdb9`. Its 1357 backend, 847 eval and 663 frontend counts are historical results for that implementation.
+
+Independent bugs and architecture reviewers identified one issue: blanket failed-inference relabelling also classified missing premises or an absent inference-step judgment as `unsupported_inference`. Commit `98ad587` restricts that concern to an explicitly rejected step with entailing premises; missing/not-addressed/below-floor premises and absent step judgments retain `unsupported_claim`. Successful shared groups and evidence roles remain preserved.
+
+The regression set produced 24 failures before the fix; afterward 169 targeted tests passed. Final verification at `98ad587`: **1395 backend tests passed** and backend Ruff passed. The earlier eval/frontend results remain recorded above; those suites were not unnecessarily repeated because the review fix changed only backend inference synthesis, associated models and backend tests, with no eval/frontend dependency changes. No live calls were made.
+
+Final independent review: **bugs PASS, architecture PASS, security PASS**, including incremental security review of the fix. See [final review](review-2026-10-28-0545.md). Missing owner recordings, live TofuEval runs and latency/p95 measurements remain deferred as documented above. SP04 concept-document updates remain outside SP03 scope.

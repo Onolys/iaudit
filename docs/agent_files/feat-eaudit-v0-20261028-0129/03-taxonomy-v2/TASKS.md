@@ -1,6 +1,6 @@
 ---
-status: draft
-summary: Eight tasks adding four detected concern types, narrowing three, rewriting the TofuEval mapping and the mission (17 checks, 4 groups); mission gated on owner approval; no live runs by agents.
+status: done
+summary: All eight SP03 tasks completed; approved mission implemented; review fix verified and all three reviewers PASS.
 date: 2026-10-28
 ---
 # Tasks: SP03 Taxonomy v2
@@ -10,14 +10,14 @@ Contract versioning rule: all schemas are `schema_version` "0.0.1"; the project 
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Mission rewrite (gated on owner approval) | owner approval of wording | todo |
-| 2 | Detection: flags, gates, verdicts, failed-inference relabel | 1 | todo |
-| 3 | Dedup chain, yields and REVISABLE | 2 | todo |
-| 4 | Prompt, few-shot, atomizer check, templates, labelling rules | 2, 3 | todo |
-| 5 | Gold check for failed-inference relabelling | 2 | todo |
-| 6 | TofuEval mapping rewrite | 2 | todo |
-| 7 | Synthetic cases and boundary pairs | 4, 5 | todo |
-| 8 | Offline verification and acceptance sweep | 1-7 | todo |
+| 1 | Mission rewrite (gated on owner approval) | owner approval of wording | done |
+| 2 | Detection: flags, gates, verdicts, failed-inference relabel | 1 | done |
+| 3 | Dedup chain, yields and REVISABLE | 2 | done |
+| 4 | Prompt, few-shot, atomizer check, templates, labelling rules | 2, 3 | done |
+| 5 | Gold check for failed-inference relabelling | 2 | done |
+| 6 | TofuEval mapping rewrite | 2 | done |
+| 7 | Synthetic cases and boundary pairs | 4, 5 | done |
+| 8 | Offline verification and acceptance sweep | 1-7 | done |
 
 ## Task 1 — Mission rewrite (gated)
 What it is / what it means: The mission governs scope, so it lands first and only once the owner approves the 17-check, 4-group wording (Req 5, Decision 9, Manual steps).
@@ -63,3 +63,7 @@ Done when: all suites pass and every non-deferred acceptance item is satisfied.
 - Approve mission wording (17 checks, 4 groups) before Task 1 lands.
 - Re-record LLM fixtures (needs API keys) after the prompt changes; agents make no live calls.
 - TofuEval baseline, before/after and test runs are deferred and not a merge gate; when run, mapping is frozen, tuning is on dev only, and the report notes concern-match is not comparable across mappings.
+
+## Post-review follow-up — 2026-10-28
+
+Independent review found one failed-inference classification issue. Commit `98ad587` distinguishes an explicitly rejected inference step with entailing premises (`unsupported_inference`) from missing premises or an absent step judgment (`unsupported_claim`). Revalidation passed: 169 targeted tests, 1395 full backend tests and backend lint. Bugs, architecture and security reviewers all returned PASS. See [review](review-2026-10-28-0545.md) and [acceptance addendum](acceptance-2026-10-28.md#post-review-addendum--2026-10-28).
