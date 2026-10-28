@@ -37,7 +37,7 @@ export async function postAudit(
       signal: controller.signal,
     }), {
       attempts: 2, delayMs: 300, signal: controller.signal,
-      shouldRetry: outcome => outcome.ok && (outcome.value.status === 429 || outcome.value.status === 503),
+      shouldRetry: outcome => outcome.ok && outcome.value.status === 429,
     });
     const text = await res.text();
     if (res.ok) return { ok: true, value: text };

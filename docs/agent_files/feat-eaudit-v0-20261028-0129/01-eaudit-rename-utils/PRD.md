@@ -8,7 +8,7 @@ date: 2026-10-28
 Repo/branch: iaudit / `feat/eaudit-v0` · Depends on: none (Phase 1) · Owns: `backend/` → `eaudit/` (all of it incl. `eaudit/eval/` ADHD harness and `eaudit/uv.lock`), `eval/datasets/**` regroup, `eval/src/iaudit_eval/datasets/registry.py`, `scripts/{dev.sh,README.md}`, `.github/workflows/{ci,nightly}.yml`, `.party/` (deleted), `README.md`, `AGENTS.md`, path/command fixes in `docs/**` (not content), `frontend/{index.html,package.json,README.md}`, `frontend/src/{App.tsx,utils/**,eval/{RunPanel.tsx,evalTypes.ts,evalApi.ts}}`, `eval/src/iaudit_eval/{api,schemas}` dataset metadata (`product` field), `eval/schemas/*` dataset-meta part, `eaudit/src/eaudit/{utils/**,llm/litellm_client.py,atomize/stage.py,link/linker.py,check/verifier.py,config.py}`
 
 ## TL;DR
-Pure refactor plus one default change. (1) `git mv backend eaudit`, package `iaudit_backend` → `eaudit`, every import/path/command follows; `.party/` deleted. (2) Eval datasets move under `eval/datasets/eaudit/`; dataset ids stay `tofueval` / `synthetic`; dataset metadata gains `product` ("eaudit") and the Eval UI groups by it. (3) Frontend gets a small product registry (tab label "eaudit"), `frontend/src/utils/`, and `eaudit/src/eaudit/utils/` hold generic helpers. (4) One `retry()` helper per language replaces the hand-rolled loops (frontend also retries the audit POST on HTTP 429/503 only); request prompts, fixture keys and attempt counts are unchanged. (5) `model_cheap` → `anthropic/claude-haiku-5-5`. No behaviour change otherwise; the existing suites are the proof.
+Pure refactor plus one default change. (1) `git mv backend eaudit`, package `iaudit_backend` → `eaudit`, every import/path/command follows; `.party/` deleted. (2) Eval datasets move under `eval/datasets/eaudit/`; dataset ids stay `tofueval` / `synthetic`; dataset metadata gains `product` ("eaudit") and the Eval UI groups by it. (3) Frontend gets a small product registry (tab label "eaudit"), `frontend/src/utils/`, and `eaudit/src/eaudit/utils/` hold generic helpers. (4) One `retry()` helper per language replaces the hand-rolled loops (frontend also retries the audit POST on HTTP 429 only); request prompts, fixture keys and attempt counts are unchanged. (5) `model_cheap` → `anthropic/claude-haiku-5-5`. No behaviour change otherwise; the existing suites are the proof.
 
 ## Contract-versioning rule (whole initiative)
 All schemas reset to `0.0.1` (SP02). The project is not deployed, so **no legacy/back-compat code, version history or migration**. A file that does not match the current schema shows a validation error; the user deletes it. SP01 touches no schema version (the new `product` dataset field ships in the eval schemas that SP02 resets to `0.0.1`); it must not add any compat shim (e.g. for old dataset paths or old run records, see D3).
@@ -21,7 +21,11 @@ All schemas reset to `0.0.1` (SP02). The project is not deployed, so **no legacy
 
 ## Goals / Non-Goals
 **Goals:** rename with zero broken links/commands; one retry helper per language with identical observable behaviour; Haiku 5.5 default; paudit can later slot in (tab registry, `eval/datasets/<product>/`).
-**Non-goals:** schema/contract changes (SP02); taxonomy/prompts (SP03); docs rewrites (SP04); renaming the GitHub repo or `iaudit_eval` / `IAUDIT_*` env vars / `iaudit-eval-server` (umbrella, keep); any frontend retry beyond the 429/503 audit POST and idempotent eval GETs (R5); any change to the semantic retry prompts.
+**Non-goals:** schema/contract changes (SP02); taxonomy/prompts (SP03); docs rewrites (SP04); renaming the GitHub repo or `iaudit_eval` / `IAUDIT_*` env vars / `iaudit-eval-server` (umbrella, keep); any frontend retry beyond the 429 audit POST and idempotent eval GETs (R5); any change to the semantic retry prompts.
+
+## Review correction (2026-10-28)
+
+The original R5/D6 premise that HTTP 503 means the audit never ran was disproven by source review: `eaudit/src/eaudit/app.py` maps `LLMUnavailable` to 503, and `eaudit/tests/pipeline/test_pl_degrade.py` covers link-only unavailability after earlier stages. Those earlier stages may already have incurred LLM cost. The orchestrator decision narrows automatic audit POST retries to HTTP 429 only; 503 returns immediately with the existing manual Retry action. Backend status/error taxonomy and idempotent eval GET retries remain unchanged. This correction supersedes the original 429/503 policy.
 
 ## Requirements
 ### R1 Backend rename
@@ -74,7 +78,7 @@ Replacement map (behaviour must be identical):
 | `link/linker.py` | `2` if `cfg.link_retry` | all items dropped | same | `counts["retries"]=1` set before attempt 2 |
 | `check/verifier.py` | `2` if `cfg.check_retry` | items unjudged (`missing`) | same | `res.retries=1` before attempt 2 |
 `fn(1)` uses the original request/fixture key; only `fn(2)` appends `.retry`, so recorded-replay keys (ADR 0013) stay byte-identical.
-- Frontend: no automatic retries exist today; every "Retry" is a user button and `usePolling` is a cadence loop with a 3-miss stale rule [verified: grep -rli retry frontend/src → App.tsx + eval/* are button/state names]. Ship `retry.ts` + tests and apply it in two places: (a) idempotent eval GETs in `evalApi.ts` (attempts 2, delay 300 ms, retry on network/timeout/5xx, not 4xx); (b) the audit POST in `transport/client`, **only when the HTTP status is 429 or 503** (the backend never ran the audit, so no LLM cost is re-spent; attempts 2, small delay). Never retry the audit POST on 500, any other status, a network error/timeout, or the 120 s client deadline (the backend may have run and spent LLM cost). Retry decisions use HTTP status only, never detail codes (SP02). The existing user Retry button stays.
+- Frontend: no automatic retries exist today; every "Retry" is a user button and `usePolling` is a cadence loop with a 3-miss stale rule [verified: grep -rli retry frontend/src → App.tsx + eval/* are button/state names]. Ship `retry.ts` + tests and apply it in two places: (a) idempotent eval GETs in `evalApi.ts` (attempts 2, delay 300 ms, retry on network/timeout/5xx, not 4xx); (b) the audit POST in `transport/client`, **only when the HTTP status is 429** (the backend never ran the audit, so no LLM cost is re-spent; attempts 2, small delay). Never retry the audit POST on 503, 500, any other status, a network error/timeout, or the 120 s client deadline (the backend may have run and spent LLM cost). Retry decisions use HTTP status only, never detail codes (SP02). The existing user Retry button stays.
 
 ### R6 Haiku 5.5
 `model_cheap: str = "anthropic/claude-haiku-5-5"` (same style as mid/strong, undated aliases `config.py:22-23`); update `tests/test_config.py:13` and `docs/reference/configuration.md:24` row. Cheap tier is used only by prep tagging (`prep_llm` default false), so blast radius is small. Cost table keys on fragment "haiku" → unaffected [verified: eaudit/eval/prices.json].
@@ -101,7 +105,7 @@ Sequencing inside SP01: (a) rename commit alone (mechanical, tests green); (b) d
 | D3 | Existing run records / `eval/data` | no migration; stale run references simply error | read old paths | Initiative rule: not deployed |
 | D4 | Retry owns | the loop only; callers keep request building and fallback | wrapper builds retry requests | Preserves prompts + fixture keys exactly |
 | D5 | Deadline awareness | injected `can_continue` callback | pass `deadline` into wrapper | Three different deadline sources (req.deadline vs ctx.remaining) |
-| D6 | Frontend retry scope | util + idempotent eval GETs + audit POST on HTTP 429/503 only | retry POST on any failure; wrap polling | 429/503 mean the backend never ran the audit (no re-spend); 500/timeouts may have run it; polling already has stale semantics |
+| D6 | Frontend retry scope | util + idempotent eval GETs + audit POST on HTTP 429 only | retry POST on any failure; wrap polling | 429 is rejected before the audit; 503/500/timeouts may have incurred LLM cost; polling already has stale semantics |
 | D10 | `product` on dataset metadata | add `product` to `DatasetMeta`/`GET /datasets`, eval schema, frontend types; UI groups by it | derive in UI from path only | Eval UI needs it for paudit later; SP01 owns the dataset regroup |
 | D11 | `.party/` | delete whole folder | fix contents; rename `backend.md` | Owner decision; nothing references it |
 | D7 | `iaudit_eval`, `IAUDIT_*`, `eval/` | keep | rename to `eval-core` etc. | Umbrella tooling serves all products |
@@ -131,7 +135,7 @@ Sequencing inside SP01: (a) rename commit alone (mechanical, tests green); (b) d
 - `scripts/dev.sh --check` passes; `uv run uvicorn eaudit.app:app` serves `/healthz`.
 - `eval/datasets/eaudit/{tofueval,synthetic}` exist; `GET /datasets` still lists `synthetic` and `tofueval`, each with `product: "eaudit"`; Eval UI groups them under "eaudit"; old `eval/datasets/tofueval` gone.
 - `.party/` no longer exists (`git ls-files .party` empty); no dangling references.
-- Frontend retry tests: audit POST retried on 429 and 503 only (once, attempts 2); not retried on 500, 400, network error, timeout or the 120 s deadline; eval GET retry as above.
+- Frontend retry tests: audit POST retried on 429 only (once, attempts 2); not retried on 503, 500, 400, network error, timeout or the 120 s deadline; eval GET retry as above.
 - Recorded-replay tests pass with no fixture/recording file edited (`git diff --stat -- '*recorded*'` shows renames only).
 - Retry unit tests cover (py + ts): success first try, retry then success, exhaustion returns/raises last, `can_continue` false stops, exponential delays via injected sleep, cancel/abort not retried.
 - Tab reads "eaudit" (sourced from `products.ts`); `frontend/index.html` title updated.

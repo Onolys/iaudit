@@ -79,8 +79,8 @@ Done when: `test_check_verifier.py` passes unedited beyond imports, recorded-rep
 
 ## Task 11 — Frontend retry: eval GETs and audit POST
 What it is / what it means: The only two places the frontend retries automatically (R5, D6). Decisions use HTTP status only.
-What changes at a high level: Idempotent eval GETs go through the wrapper (2 attempts, 300 ms delay, retry on network, timeout or 5xx; never 4xx). The audit POST in the transport client retries once with a small delay, only on HTTP 429 or 503, since the backend never ran the audit; never on 500, other statuses, network error, timeout or the 120 s client deadline. The user Retry button and polling stay as they are.
-Done when: tests prove POST retried on 429 and 503 only and not on 500, 400, network error, timeout or deadline, and GET retry rules hold.
+What changes at a high level: Idempotent eval GETs go through the wrapper (2 attempts, 300 ms delay, retry on network, timeout or 5xx; never 4xx). The audit POST in the transport client retries once with a small delay, only on HTTP 429, because 429 is rejected before the audit; 503 may follow paid stages and returns immediately for manual Retry; never on 503, 500, other statuses, network error, timeout or the 120 s client deadline. The user Retry button and polling stay as they are.
+Done when: tests prove POST retried on 429 only and not on 503, 500, 400, network error, timeout or deadline, and GET retry rules hold.
 
 ## Task 12 — Product registry and eaudit names in frontend
 What it is / what it means: A drop-in tab list so paudit is one entry plus one component (R2, D8).

@@ -63,7 +63,7 @@ Done when: verified against code and `config.py`; links resolve; Audience lines 
 
 ## Task 9 — Frontend implementation page
 What it is / what it means: plain explanation of the frontend helpers (D8).
-What changes at a high level: tiny examples for `utils/codepoints.ts` (emoji = 1 code point, 2 UTF-16 units), `contract/analysis.ts`, `contract/excerpts.ts`, `utils/retry.ts` (429/503 only for audit POST); frontend flowchart; tab registry.
+What changes at a high level: tiny examples for `utils/codepoints.ts` (emoji = 1 code point, 2 UTF-16 units), `contract/analysis.ts`, `contract/excerpts.ts`, `utils/retry.ts` (429 only for audit POST); frontend flowchart; tab registry.
 Done when: behaviour verified in the frontend source; Mermaid valid; links resolve; Audience line kept.
 
 ## Task 10 — Remaining docs sweep

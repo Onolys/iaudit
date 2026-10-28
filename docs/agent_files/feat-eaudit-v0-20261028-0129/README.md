@@ -22,7 +22,7 @@ date: 2026-10-28
 - 17 concern types in 4 groups (not_in_interview, opposite_of_interview, changed_detail, missing_context); order 14-17 = opinion_as_fact, calculation_error, meaning_shift, unsupported_inference; SP03 Requirements 2 and 5 are the single source.
 - `speaker` optional; missing = unknown, never invented; single `ambiguous_speaker` warning; unknown-speaker turns skipped in Q/A pairing; prompts render "unknown".
 - Error body: `{schema_version, request_id?, status, message, details[{code,message}]}`, `details` minItems 1; `rate_limited` reserved.
-- Retry wrapper: one `retry()` per language; callers keep request building and fallbacks; fixture keys unchanged. Frontend: audit POST retried only on HTTP 429/503 (never 500, other statuses, network timeout or the 120 s deadline); eval idempotent GETs use it; decisions on HTTP status only.
+- Retry wrapper: one `retry()` per language; callers keep request building and fallbacks; fixture keys unchanged. Frontend: audit POST retried only on HTTP 429 (never 503, 500, other statuses, network timeout or the 120 s deadline); eval idempotent GETs use it; decisions on HTTP status only.
 - Cheap tier = `anthropic/claude-haiku-5-5` (owner confirms on first live run, not blocking).
 - `.party/` folder deleted.
 - Eval dataset metadata and `GET /datasets` gain `product` (only "eaudit"); UI groups by it.

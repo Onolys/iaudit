@@ -99,7 +99,7 @@ Top-level `message` per code is fixed backend text (one string per status class)
 
 **R6. Backend errors.** `ApiError(status, message, details, request_id)`; `error_body(status, message, details, request_id)`; delete `SUPPORTED_VERSION` check at step 3 of `app.py` (schema `const` covers it). Step 5 chooses `empty_transcript`/`empty_assessment` when those arrays are `[]`, else `schema_violation` per issue (cap 5, existing `_MAX_ISSUES`). Outcome log field uses first detail code instead of `exc.code`. `ContractCORSMiddleware` preflight reject uses `cors_rejected`.
 
-**R7. Frontend errors.** `readErrorMessage` → `readErrorBody(text): {status, message, details} | undefined`, only when the body validates; `LoadError.http_4xx/http_5xx` carry `message` + `details`; `ErrorScreen` shows title from status (existing), `message`, then details list; invalid/non-JSON body → generic text for the HTTP status (consumer rule kept). `isRetryable` unchanged (status-based only; detail codes are display/diagnostics, never drive retry). Automatic audit-POST retry is limited to 429/503 (SP01). Delete `wrong_version` LoadError reason and its screen text; wrong version surfaces as `schema`.
+**R7. Frontend errors.** `readErrorMessage` → `readErrorBody(text): {status, message, details} | undefined`, only when the body validates; `LoadError.http_4xx/http_5xx` carry `message` + `details`; `ErrorScreen` shows title from status (existing), `message`, then details list; invalid/non-JSON body → generic text for the HTTP status (consumer rule kept). `isRetryable` unchanged (status-based only; detail codes are display/diagnostics, never drive retry). Automatic audit-POST retry is limited to 429 (SP01). Delete `wrong_version` LoadError reason and its screen text; wrong version surfaces as `schema`.
 
 **R8. Frontend UI.** `ConcernType` 17, `ConcernGroup` type, `CONCERN_GROUP: Record<ConcernType, ConcernGroup>` and `CONCERN_GROUP_LABELS` in new `frontend/src/contract/concernGroups.ts`; `CONCERN_LABELS` gains: "Opinion stated as fact", "Calculation error", "Meaning shift", "Unsupported inference". `ConcernList` groups a claim's concerns under group headings (fixed order: Not in interview, Opposite of interview, Changed detail, Missing context; empty groups omitted); inside a group, concern order kept. Validator: after Ajv, no extra group check needed (schema enforces); `concerns` tests updated. Tokens: concern types have no color tokens today (`tokens/index.ts` is verdict/evidence-role only), so no token change; a group is a heading only. [verified: grep]
 
@@ -151,7 +151,7 @@ Error flow: raise `ApiError(status, message, details)` anywhere → one handler 
 - [RESOLVED: eval schemas also reset] per initiative rule.
 - [RESOLVED: `details` minItems 1; every error body always carries at least one detail (bare framework 404 gets `not_found`)] details.
 - [RESOLVED: keep `rate_limited` as a reserved code] rate_limited.
-- [RESOLVED: frontend retry decisions on HTTP status only (429/503 for audit POST, per SP01); detail codes are display/diagnostics] retry basis.
+- [RESOLVED: frontend retry decisions on HTTP status only (429 for audit POST, per SP01); detail codes are display/diagnostics] retry basis.
 - [RESOLVED: single `ambiguous_speaker` warning covers missing role and missing speaker] warnings.
 - [RESOLVED: unknown-speaker turns are skipped in Q/A pairing] pairing.
 - [RESOLVED: missing speaker rendered as "unknown" in prompts (prompt text only)] prompt rendering.
