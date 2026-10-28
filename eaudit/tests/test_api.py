@@ -71,7 +71,7 @@ def test_content_type_must_be_json(client, example_request):
     )
 
 
-def test_wrong_version_is_schema_violation(client, example_request):
+def test_schema_version_mismatch_is_schema_violation(client, example_request):
     example_request["schema_version"] = "2.0.0"
     example_request["bogus"] = 1  # would also fail schema validation
     assert_error(post(client, example_request), 400, "schema_violation", "example-001")

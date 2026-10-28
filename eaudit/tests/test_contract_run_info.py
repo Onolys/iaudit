@@ -35,7 +35,7 @@ def test_every_example_validates(path):
 
 
 @pytest.mark.parametrize("name", ["audit-request", "audit-response", "error-response"])
-def test_schema_version_is_1_1_0(name):
+def test_schema_version_is_0_0_1(name):
     assert _schema(name)["properties"]["schema_version"]["const"] == "0.0.1"
 
 

@@ -20,7 +20,7 @@ Every task regenerates the examples and fixtures it touches, so each commit leav
 | 6 | Backend error body and detail codes | 1 | done |
 | 7 | Frontend error handling | 6 | done |
 | 8 | Contract README tables and ADR 0016 | 3, 5, 6 | done |
-| 9 | Acceptance sweep | 1-8 | in-progress |
+| 9 | Acceptance sweep | 1-8 | done |
 
 ## Task 1 — Version reset and back-compat deletion
 What it is / what it means: The versioning rule applied to the three contract schemas and every component that carries a version (R1, Decisions 1, 9).

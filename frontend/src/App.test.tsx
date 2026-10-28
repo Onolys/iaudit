@@ -20,7 +20,7 @@ const okDeps = (response = responseRaw, mock = false): AuditDeps => ({
   registry: [],
 });
 
-const healthyEval = { eval_api_version: "1.0.0", backend: { url: "http://backend.invalid", reachable: true } };
+const healthyEval = { eval_api_version: "0.1.0", backend: { url: "http://backend.invalid", reachable: true } };
 const evalApi = (healthFetch?: typeof fetch) => createEvalApi({ fetch: async (url, options) => {
   if (String(url).endsWith("/health")) return healthFetch ? healthFetch(url, options) : Response.json(healthyEval);
   if (String(url).endsWith("/datasets") || String(url).endsWith("/runs")) return Response.json([]);

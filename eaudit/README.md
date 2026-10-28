@@ -1,6 +1,6 @@
 # Backend
 
-HTTP service for the Interview Evidence Auditor. `POST /v1/audit` takes an assessment and an interview and returns a claim-by-claim evidence audit (with `full`, plus `run_info`: model ids and prompt hashes). It implements the [contract](../docs/contracts/README.md) (version 1.2.0).
+HTTP service for the Interview Evidence Auditor. `POST /v1/audit` takes an assessment and an interview and returns a claim-by-claim evidence audit (with `full`, plus `run_info`: model ids and prompt hashes). It implements the [contract](../docs/contracts/README.md) (version 0.0.1).
 
 Endpoint, errors, settings and warnings: [docs/reference/backend-api.md](../docs/reference/backend-api.md).
 
