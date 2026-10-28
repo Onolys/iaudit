@@ -27,6 +27,9 @@ REVISABLE = frozenset(
         ConcernType.certainty_inflation,
         ConcernType.context_stripping,
         ConcernType.quantity_mismatch,
+        ConcernType.opinion_as_fact,
+        ConcernType.meaning_shift,
+        ConcernType.unsupported_inference,
     }
 )
 

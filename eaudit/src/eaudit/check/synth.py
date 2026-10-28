@@ -341,7 +341,15 @@ _CHAIN = (
     ConcernType.negation_reversal,
     ConcernType.frequency_severity_inflation,
     ConcernType.quantity_mismatch,
+    ConcernType.meaning_shift,
     ConcernType.contradictory_evidence,
+)
+_SPECIFIC_YIELDS = (
+    (ConcernType.opinion_as_fact, ConcernType.certainty_inflation),
+    (ConcernType.opinion_as_fact, ConcernType.unsupported_causal_link),
+    (ConcernType.opinion_as_fact, ConcernType.unsupported_inference),
+    (ConcernType.unsupported_causal_link, ConcernType.unsupported_inference),
+    (ConcernType.calculation_error, ConcernType.quantity_mismatch),
 )
 _QUANTITY_YIELDS_TO = (
     ConcernType.certainty_inflation,
@@ -393,6 +401,12 @@ def _merge(concerns: list[Concern]) -> list[Concern]:
 def dedup(concerns: list[Concern]) -> list[Concern]:
     """Explain once: a specific concern suppresses a more generic one on the same items."""
     cs = {c.type: c for c in _merge(concerns)}
+    # Remove yielded concerns before they can suppress another concern in the chain.
+    for high, low in _SPECIFIC_YIELDS:
+        if high in cs and low in cs:
+            hc, lc = cs[high], cs[low]
+            if not hc.keys or not lc.keys or set(hc.keys) & set(lc.keys):
+                del cs[low]
     for n, low in enumerate(_CHAIN):
         for high in _CHAIN[:n]:
             if low in cs and high in cs:
