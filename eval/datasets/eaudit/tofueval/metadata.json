@@ -1,4 +1,5 @@
 {
+  "product": "eaudit",
   "name": "tofueval",
   "title": "TofuEval",
   "description": "Factual consistency of topic-focused dialogue summaries from MediaSum and MeetingBank. Each item is one summary, with source documents defining the dev/test split and clustering. Licensed source text is downloaded locally.",

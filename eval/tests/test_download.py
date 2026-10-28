@@ -21,7 +21,7 @@ class Adapter:
 
 def make_ds(sources, data_required=True, adapter=None, name="fake"):
     return Dataset(
-        DatasetMeta(name=name, data_required=data_required, sources=tuple(sources)),
+        DatasetMeta(product="eaudit", name=name, data_required=data_required, sources=tuple(sources)),
         adapter or Adapter(),
     )
 

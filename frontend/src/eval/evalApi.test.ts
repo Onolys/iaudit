@@ -12,8 +12,8 @@ const encoded = "a%2Fb%20%3F%26";
 type RouteCase = [string, (api: EvalApi) => unknown, string, string, unknown, unknown?];
 const routes: RouteCase[] = [
   ["health", a => a.health(), "/health", "GET", health],
-  ["listDatasets", a => a.listDatasets(), "/datasets", "GET", [{ name: "d", title: "D", data_present: true, splits: [{ name: "test", size: null }] }]],
-  ["getDataset", a => a.getDataset(id), `/datasets/${encoded}`, "GET", { name: "d", splits: [{ name: "test", size: 1, description: "test" }], description: "D", custom: true }],
+  ["listDatasets", a => a.listDatasets(), "/datasets", "GET", [{ name: "d", product: "eaudit", title: "D", data_present: true, splits: [{ name: "test", size: null }] }]],
+  ["getDataset", a => a.getDataset(id), `/datasets/${encoded}`, "GET", { name: "d", product: "eaudit", splits: [{ name: "test", size: 1, description: "test" }], description: "D", custom: true }],
   ["startDownload", a => a.startDownload(id), `/datasets/${encoded}/download`, "POST", { status: "downloading", files: [], warnings: [], error: null, updated_at: null }],
   ["getDownload", a => a.getDownload(id), `/datasets/${encoded}/download`, "GET", { status: "ready", files: [{ id: "f", filename: "f.json", sha256: "abc", size_bytes: 2, fetched_at: "now" }], warnings: [] }],
   ["estimate", a => a.estimate(request), "/runs/estimate", "POST", { basis: "none", n_items: 3, est_input_tokens: null, est_output_tokens: null, est_cost_usd: null, rough: true, note: "pilot" }, request],

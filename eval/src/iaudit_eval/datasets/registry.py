@@ -23,6 +23,9 @@ def _read_meta(folder: Path) -> DatasetMeta:
     meta = DatasetMeta.from_dict(raw)
     if meta.name != folder.name:
         raise DatasetError(f"metadata name {meta.name!r} != folder name {folder.name!r}")
+    product = folder.parent.name
+    if meta.product != product:
+        raise DatasetError(f"metadata product {meta.product!r} != parent folder {product!r}")
     return meta
 
 

@@ -149,7 +149,7 @@ EXTRA
 '''
 
 _META = {
-    "name": "tiny", "dataset_version": "7", "kind": "adapter",
+    "name": "tiny", "product": "eaudit", "dataset_version": "7", "kind": "adapter",
     "splits": [{"name": "all"}], "default_split": "all", "cluster_key": "doc",
     "slices": ["grp"], "levels": {"item": {"labels": [False, True], "positive": True}},
 }  # fmt: skip

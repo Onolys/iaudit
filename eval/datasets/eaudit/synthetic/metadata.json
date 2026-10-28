@@ -1,4 +1,5 @@
 {
+  "product": "eaudit",
   "name": "synthetic",
   "title": "Synthetic (fictional)",
   "description": "Small fictional dataset for zero-spend tests. All people, speaker ids, statements and timestamps are invented; none is a real quotation or a real person. Gold is one label per item: 'flagged' when the summary holds a claim the conversation does not support, else 'clean'.",

@@ -142,6 +142,7 @@ def test_framework_nested_records_noop_tamper_and_failed_refresh(tmp_path, netwo
         download=lambda d, p: module.download(d, p, metadata=metadata, transport=network[3])
     )
     meta = DatasetMeta(
+        product="eaudit",
         name="tofueval", sources=tuple(metadata["sources"]), extra={"expected_sha256": {}}
     )
     ds = Dataset(meta, adapter)
@@ -234,7 +235,7 @@ def test_framework_rejects_unsafe_custom_record_paths(tmp_path, name):
             framework.FileRecord("unsafe", name, sha256(b"fictional").hexdigest(), 9, "fixture")
         ]
 
-    ds = Dataset(DatasetMeta(name="unsafe", sources=()), SimpleNamespace(download=unsafe))
+    ds = Dataset(DatasetMeta(product="eaudit", name="unsafe", sources=()), SimpleNamespace(download=unsafe))
     result = framework.download(ds, data_root=tmp_path)
     assert result["status"] == "failed"
     assert "invalid download record" in result["error"]
@@ -245,7 +246,7 @@ def test_framework_post_hook_failure_preserves_previous_dataset(tmp_path, networ
     adapter = SimpleNamespace(
         download=lambda d, p: module.download(d, p, metadata=network[0], transport=network[3])
     )
-    ds = Dataset(DatasetMeta(name="tofueval", sources=tuple(network[0]["sources"])), adapter)
+    ds = Dataset(DatasetMeta(product="eaudit", name="tofueval", sources=tuple(network[0]["sources"])), adapter)
     assert framework.download(ds, data_root=tmp_path)["status"] == "ready"
     root = tmp_path / "tofueval"
     (root / "derived/transcripts.json").write_text("fictional stale cache")
@@ -302,7 +303,7 @@ def test_repacked_archive_and_new_manifest_timestamp_give_no_upstream_warning(tm
     adapter = SimpleNamespace(
         download=lambda d, p: module.download(d, p, metadata=network[0], transport=network[3])
     )
-    ds = Dataset(DatasetMeta(name="tofueval", sources=tuple(network[0]["sources"])), adapter)
+    ds = Dataset(DatasetMeta(product="eaudit", name="tofueval", sources=tuple(network[0]["sources"])), adapter)
     assert framework.download(ds, data_root=tmp_path)["status"] == "ready"
     archive = io.BytesIO()
     with (

@@ -372,6 +372,10 @@
           "title": "Pool All",
           "type": "boolean"
         },
+        "product": {
+          "title": "Product",
+          "type": "string"
+        },
         "references": {
           "anyOf": [
             {
@@ -426,6 +430,7 @@
       },
       "required": [
         "name",
+        "product",
         "splits"
       ],
       "title": "DatasetMeta",
@@ -442,6 +447,10 @@
           "title": "Name",
           "type": "string"
         },
+        "product": {
+          "title": "Product",
+          "type": "string"
+        },
         "splits": {
           "items": {
             "$ref": "#/$defs/SplitSummary"
@@ -456,6 +465,7 @@
       },
       "required": [
         "name",
+        "product",
         "title",
         "data_present",
         "splits"

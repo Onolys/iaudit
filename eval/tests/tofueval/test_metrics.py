@@ -123,6 +123,7 @@ def test_diagnostics_count_native_units_once_and_keep_unknown_names(monkeypatch)
 
 def test_optional_partition_and_per_metric_slices_do_not_change_defaults():
     ds = Dataset(DatasetMeta.from_dict({
+        "product": "eaudit",
         "name": "none", "slices": ["topic", "model"],
         "metrics": [{"name": "all_topics", "fn": "recall"},
                     {"name": "models_only", "fn": "recall", "slices": ["model"]}],
@@ -135,7 +136,7 @@ def test_optional_partition_and_per_metric_slices_do_not_change_defaults():
 
 @pytest.mark.parametrize("raw", ["model", [1]])
 def test_invalid_per_metric_slice_declaration_rejected(raw):
-    meta = DatasetMeta.from_dict({"name": "none", "metrics": [{"name": "recall", "slices": raw}]})
+    meta = DatasetMeta.from_dict({"product": "eaudit", "name": "none", "metrics": [{"name": "recall", "slices": raw}]})
     with pytest.raises(ValueError, match="slices"):
         metrics_config(meta)
 

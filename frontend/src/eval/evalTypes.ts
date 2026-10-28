@@ -12,10 +12,10 @@ export interface BackendHealth { url: string; reachable: boolean; schema_version
 export interface Health { status?: "ok"; eval_api_version: string; backend: BackendHealth }
 export interface SplitSummary { name: string; size: number | null }
 export interface SplitMeta extends SplitSummary { description?: string }
-export interface DatasetSummary { name: string; title: string; data_present: boolean; splits: SplitSummary[] }
+export interface DatasetSummary { name: string; product: string; title: string; data_present: boolean; splits: SplitSummary[] }
 export interface DatasetMeta {
   [key: string]: unknown;
-  name: string; splits: SplitMeta[]; title?: string; kind?: string; description?: string;
+  name: string; product: string; splits: SplitMeta[]; title?: string; kind?: string; description?: string;
   dataset_version?: string; default_split?: string; test_split_note?: string | null;
   data_required?: boolean; cluster_key?: string; pool_all?: boolean; gold_kind?: string | null;
   mapping?: string | null; references?: string | null; levels?: Record<string, unknown>;

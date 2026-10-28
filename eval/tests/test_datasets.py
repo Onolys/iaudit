@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from iaudit_eval.datasets import Dataset, Item, Unmapped, list_datasets, load
-from iaudit_eval.datasets.base import DatasetError, validate_items
+from iaudit_eval.datasets.base import DatasetError, DatasetMeta, validate_items
 from iaudit_eval.selection import select
 
 ADAPTER = """
@@ -33,6 +33,7 @@ def make(root: Path, name="toy", adapter=ADAPTER, *, product="eaudit", **extra):
     d.mkdir(parents=True)
     meta = {
         "name": name,
+        "product": product,
         "title": "Toy",
         "description": "x",
         "dataset_version": "1",
@@ -186,3 +187,29 @@ def test_flat_dataset_folder_is_not_discovered(tmp_path):
     assert list_datasets(tmp_path) == []
     with pytest.raises(DatasetError, match="unknown"):
         load("toy", root=tmp_path)
+
+
+def test_product_derived_from_parent_and_serialized(tmp_path):
+    make(tmp_path, product="paudit")
+    meta = list_datasets(tmp_path)[0]
+    assert meta.product == "paudit"
+    assert meta.get("product") == "paudit"
+    assert meta.to_dict()["product"] == "paudit"
+    assert "product" not in meta.extra
+    assert load("toy", root=tmp_path).meta.product == "paudit"
+
+
+@pytest.mark.parametrize("operation", [list_datasets, lambda root: load("toy", root=root)])
+def test_product_must_match_parent(tmp_path, operation):
+    folder = make(tmp_path)
+    raw = json.loads((folder / "metadata.json").read_text())
+    raw["product"] = "paudit"
+    (folder / "metadata.json").write_text(json.dumps(raw))
+    with pytest.raises(DatasetError, match="product.*paudit.*eaudit"):
+        operation(tmp_path)
+
+
+@pytest.mark.parametrize("raw", [{"name": "toy"}, {"name": "toy", "product": None}, {"name": "toy", "product": 3}])
+def test_product_is_required_string(raw):
+    with pytest.raises(DatasetError, match="product"):
+        DatasetMeta.from_dict(raw)

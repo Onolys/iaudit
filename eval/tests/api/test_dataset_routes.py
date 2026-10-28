@@ -86,9 +86,11 @@ async def test_dataset_list_and_metadata_use_injected_roots(roots, monkeypatch, 
         datasets = checked(await http.get("/datasets"), "DatasetSummary[]")
         assert len(datasets) == 1
         assert datasets[0]["name"] == "synthetic"
+        assert datasets[0]["product"] == "eaudit"
         assert datasets[0]["data_present"] is True
         assert datasets[0]["splits"] == [{"name": "dev", "size": 6}, {"name": "test", "size": 2}]
         meta = checked(await http.get("/datasets/synthetic"), "DatasetMeta")
+        assert meta["product"] == "eaudit"
         assert meta["default_split"] == "dev"
         assert meta["license"]["name"] == "CC0-1.0"
         assert meta["splits"][0]["size"] == 6
@@ -110,7 +112,7 @@ def downloadable(roots):
     folder = datasets / "eaudit/local"
     folder.mkdir()
     (folder / "metadata.json").write_text(json.dumps({
-        "name": "local", "title": "Offline download", "data_required": True,
+        "name": "local", "product": "eaudit", "title": "Offline download", "data_required": True,
         "splits": [{"name": "test", "description": "Local fixture"}], "default_split": "test",
     }))
     (folder / "adapter.py").write_text('''
