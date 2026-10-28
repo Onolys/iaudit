@@ -24,7 +24,7 @@ function setup(active=false, resumable=false) {
   const network=vi.fn(()=>{throw Error("Live audit calls are forbidden");});vi.stubGlobal("fetch",network);
   const fetch=vi.fn(async(url:RequestInfo|URL,opts?:RequestInit):Promise<Response>=>{
     const path=String(url);
-    if(path.endsWith("/health"))return Response.json({eval_api_version:"1.0.0",backend:{url:"http://backend.invalid",reachable:true}});
+    if(path.endsWith("/health"))return Response.json({eval_api_version:"0.1.0",backend:{url:"http://backend.invalid",reachable:true}});
     if(path.endsWith("/datasets"))return Response.json(datasets);
     if(path.includes("/datasets/"))return Response.json(metadata);
     if(path.endsWith("/estimate"))return Response.json(estimate);

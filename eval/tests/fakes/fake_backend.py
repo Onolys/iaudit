@@ -7,7 +7,7 @@ with `mode` (all requests) or `script` (per-request modes consumed in order, the
 `mode`). Offline only.
 
 Modes: ok, 429, 500, 503, 504, timeout, bad_body, invalid_error_body, mismatched_id,
-missing_cost, changed_models, changed_prompts, unsupported_version.
+missing_cost, changed_models, changed_prompts, invalid_request.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from iaudit_eval import contracts
 MODES = {
     "ok", "429", "500", "503", "504", "timeout", "bad_body", "invalid_error_body",
     "mismatched_id", "missing_cost", "changed_models", "changed_prompts",
-    "unsupported_version",
+    "invalid_request",
 }  # fmt: skip
 
 _ERRORS = {
@@ -115,14 +115,9 @@ class FakeBackend:
         rid = raw.get("request_id")
         rid = rid if isinstance(rid, str) and rid else None
 
-        # Real backend order: version check precedes schema validation.
-        if "schema_version" in raw and raw["schema_version"] != self.supported_version:
+        if mode == "invalid_request":
             return httpx.Response(
-                400, json=self._error("unsupported_version", "Unsupported schema_version.", rid)
-            )
-        if mode == "unsupported_version":
-            return httpx.Response(
-                400, json=self._error("unsupported_version", "Unsupported schema_version.", rid)
+                400, json=self._error("invalid_request", "Request does not match the contract.", rid)
             )
         if mode in _ERRORS:
             status, code, msg = _ERRORS[mode]

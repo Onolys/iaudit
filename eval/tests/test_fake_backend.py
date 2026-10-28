@@ -122,26 +122,26 @@ async def test_changed_models_and_prompts():
     assert contracts.validate_response(m) == [] and contracts.validate_response(p) == []
 
 
-async def test_unsupported_version_mode():
-    r = await _post(FakeBackend(mode="unsupported_version"))
+async def test_invalid_request_mode():
+    r = await _post(FakeBackend(mode="invalid_request"))
     assert r.status_code == 400
     assert contracts.validate_error(r.json()) == []
-    assert r.json()["error"]["code"] == "unsupported_version"
+    assert r.json()["error"]["code"] == "invalid_request"
 
 
 async def test_version_mismatch_detected_from_request():
-    fb = FakeBackend(supported_version="9.9.9")
-    r = await _post(fb)
-    assert r.json()["error"]["code"] == "unsupported_version"
+    fb = FakeBackend()
+    r = await _post(fb, _req(schema_version="9.8.7"))
+    assert r.json()["error"]["code"] == "invalid_request"
 
 
 async def test_probe_empty_body_semantics():
     fb = FakeBackend()
     async with _client(fb) as c:
         ok = await c.post("/v1/audit", json={"schema_version": contracts.schema_version()})
-        bad = await c.post("/v1/audit", json={"schema_version": "0.0.1"})
+        bad = await c.post("/v1/audit", json={"schema_version": "9.8.7"})
     assert ok.status_code == 400 and ok.json()["error"]["code"] == "invalid_request"
-    assert bad.json()["error"]["code"] == "unsupported_version"
+    assert bad.json()["error"]["code"] == "invalid_request"
 
 
 async def test_script_sequence_then_default():

@@ -255,7 +255,7 @@
           "type": "string"
         },
         "schema_version": {
-          "const": "1.0.0"
+          "const": "0.0.1"
         },
         "warnings": {
           "items": {
@@ -1205,7 +1205,7 @@
           "type": "string"
         },
         "schema_version": {
-          "const": "1.0.0"
+          "const": "0.0.1"
         },
         "scored": {
           "additionalProperties": false,

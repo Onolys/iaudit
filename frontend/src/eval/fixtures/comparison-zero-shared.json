@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "0.0.1",
   "run_a": "fictional-finished",
   "run_b": "fictional-finished-with-failures",
   "dataset": "fictional-alpha",

@@ -169,10 +169,10 @@ async def test_error_body_non_json_400():
 
 
 async def test_backend_400_valid_error_is_http_error():
-    fb = FakeBackend("unsupported_version")
+    fb = FakeBackend("invalid_request")
     out, _ = await _audit(fb)
     assert out.kind == "http_error" and out.http_status == 400
-    assert out.error_code == "unsupported_version"
+    assert out.error_code == "invalid_request"
 
 
 async def test_invalid_request_zero_posts():

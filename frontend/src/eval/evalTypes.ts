@@ -65,7 +65,7 @@ export interface MetricEntry {
 }
 export interface MetricReference { source: string; label: string; metric: string; level: string; slice: Slice; value: number; note?: string }
 export interface MetricsReport {
-  schema_version: "1.0.0"; run_id: string; dataset: string; dataset_version: string; primary_policy: string;
+  schema_version: "0.0.1"; run_id: string; dataset: string; dataset_version: string; primary_policy: string;
   scored: { at: string; metrics_version: string; git_commit: string; git_dirty: boolean };
   bootstrap: { method: string; resamples: number; seed: number; level: number };
   run: { state: RunState; complete: boolean; mapping_version: string | null; tags: Record<string, unknown> };
@@ -80,7 +80,7 @@ export interface ComparisonDelta {
 }
 export interface Disagreement { item_id: string; cluster: string; pairs: { level: string; unit: string; gold: string; a: string | null; b: string | null }[] }
 export interface Comparison {
-  schema_version: "1.0.0"; run_a: string; run_b: string; dataset: string; warnings: string[];
+  schema_version: "0.0.1"; run_a: string; run_b: string; dataset: string; warnings: string[];
   n_shared: number; n_a_only: number; n_b_only: number; n_clusters_shared: number;
   deltas: ComparisonDelta[]; disagreements: Disagreement[];
 }

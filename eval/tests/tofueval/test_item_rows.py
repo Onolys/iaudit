@@ -49,7 +49,7 @@ def fixture(dataset="mediasum"):
 def test_worked_row_exact_shape_counts_and_no_source_text(monkeypatch):
     row = build(monkeypatch, *fixture())
     schema = json.loads((EVAL / "schemas/item_rows.schema.json").read_text())
-    Draft202012Validator(schema).validate({"schema_version": "1.0.0", "run_id": "fictional", "rows": [row]})
+    Draft202012Validator(schema).validate({"schema_version": "0.0.1", "run_id": "fictional", "rows": [row]})
     assert set(row) == {"item_id", "label", "status", "gold", "pred", "match", "outcome", "detail"}
     assert {k: row[k] for k in ("item_id", "label", "status", "gold", "pred", "match", "outcome")} == {
         "item_id": "fictional-item", "label": "fictional-doc / Fictional topic / fictional-model",

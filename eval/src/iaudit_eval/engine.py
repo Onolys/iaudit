@@ -8,8 +8,8 @@ Flow: ``start_run`` (sync, needs a running loop) selects items, writes run.json
    each gets ``request_id=<run_id>:<item_id>`` when the adapter gave none, and each
    validates. Any failure ends the run ``failed`` with zero POSTs.
 2. Canary: the first item alone. Run-level fatal canary outcomes end the run ``failed``
-   with no fan-out: ``network`` (connection refused...), an ``unsupported_version``
-   error, an ``invalid_response`` (schema mismatch), HTTP 401/403 (auth). Any other
+   with no fan-out: ``network`` (connection refused...), an ``invalid_response``
+   (schema mismatch), HTTP 401/403 (auth). Any other
    canary failure (timeout, rate limit, 5xx, request_id mismatch) is an ordinary item
    failure: it is stored and the run continues. The canary's item file is always written.
 3. The rest under ``asyncio.Semaphore(concurrency)``; each completion writes its item
@@ -165,7 +165,6 @@ def _canary_fatal(out: Outcome) -> bool:
         return False
     return (
         out.kind in ("network", "invalid_response")
-        or out.error_code == "unsupported_version"
         or out.http_status in _FATAL_HTTP
     )
 
@@ -857,9 +856,9 @@ async def probe(
     """Zero-spend reachability and version check.
 
     ``GET /healthz`` then one ``POST /v1/audit`` whose body is only
-    ``{"schema_version": <loaded>}``. The backend checks the version before the schema,
-    so ``unsupported_version`` = mismatch; any other 4xx = accepted (the body is rejected
-    as invalid, no audit work). 2xx also counts as accepted; 5xx or an unreadable answer
+    ``{"schema_version": <loaded>}``. The deliberately incomplete body is rejected
+    by ordinary request validation without audit work. A 2xx or 4xx answer with the
+    current schema version counts as accepted; 5xx or an unreadable answer
     is reachable but not a version verdict (``accepts_version`` False). A failed GET or
     POST means ``reachable`` False. Lives here (not in client.py) because it composes
     the client with the loaded contract version for the engine's callers.
@@ -883,9 +882,6 @@ async def probe(
         body = None
     version = body.get("schema_version") if isinstance(body, dict) else None
     version = version if isinstance(version, str) else None
-    code = None
-    if isinstance(body, dict) and isinstance(body.get("error"), dict):
-        code = body["error"].get("code")
     status = resp.status_code
-    accepts = (200 <= status < 300) or (400 <= status < 500 and code != "unsupported_version")
+    accepts = version == contracts.schema_version() and 200 <= status < 500
     return ProbeResult(True, version, accepts)

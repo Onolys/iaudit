@@ -181,3 +181,14 @@ async def test_probe_healthz_ok_post_unreachable():
 
     res = await probe(URL, transport=httpx.MockTransport(h))
     assert res.reachable is False
+
+
+@pytest.mark.parametrize("body", [{}, {"schema_version": 7}, {"schema_version": "9.8.7"}])
+async def test_probe_unrecognized_body_does_not_accept_version(body):
+    def handler(request):
+        if request.url.path == "/healthz":
+            return httpx.Response(200, json={"status": "ok"})
+        return httpx.Response(400, json=body)
+
+    result = await probe(URL, transport=httpx.MockTransport(handler))
+    assert result.reachable and not result.accepts_version

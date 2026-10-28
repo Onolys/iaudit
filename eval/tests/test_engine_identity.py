@@ -50,7 +50,7 @@ async def test_resume_checks_schema_even_without_a_stored_fingerprint(tmp_path, 
                            runs_root=tmp_path, client=client, on_finish=None)
         await handle.wait()
     assert store.load_run(tmp_path, handle.run_id)["fingerprint"] is None
-    store.update_run(tmp_path, handle.run_id, schema_version="0.0.1")
+    store.update_run(tmp_path, handle.run_id, schema_version="9.8.7")
     before = (tmp_path / handle.run_id / "run.json").read_bytes()
     backend = FakeBackend()
     async with AuditClient("http://fake", transport=backend.transport()) as client:
