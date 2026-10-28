@@ -109,18 +109,25 @@ describe("non-2xx", () => {
     expect(await run(400, example("error"))).toEqual({
       kind: "http_4xx",
       status: 400,
-      message: "transcript must contain at least one turn.",
+      message: JSON.parse(example("error")).message,
+      details: JSON.parse(example("error")).details,
     });
   });
 
   it("500 with an HTML body shows no body text", async () => {
-    expect(await run(500, "<html>boom</html>")).toEqual({ kind: "http_5xx", status: 500, message: undefined });
+    expect(await run(500, "<html>boom</html>")).toEqual({ kind: "http_5xx", status: 500, message: undefined, details: undefined });
   });
 
   it.each(["", "{}", "[]", "null", '{"error":{"message":"x"}}'])("ignores invalid error body %j", async (body) => {
     const e = await run(422, body);
     expect(e).toMatchObject({ kind: "http_4xx", status: 422 });
     expect((e as { message?: string }).message).toBeUndefined();
+  });
+
+  it("ignores a schema-valid body with a status different from HTTP", async () => {
+    const error = await run(503, example("error"));
+    expect(error).toMatchObject({ kind: "http_5xx", status: 503 });
+    expect((error as { message?: string }).message).toBeUndefined();
   });
 
   it("treats a 302 like 5xx", async () => {
@@ -149,19 +156,20 @@ describe("isRetryable", () => {
 describe("automatic POST retries", () => {
   it("returns HTTP 503 after one attempt because an audit may already have incurred cost", async () => {
     const f = vi.fn<typeof fetch>()
-      .mockResolvedValueOnce(new Response(example("error"), { status: 503 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ...JSON.parse(example("error")), status: 503 }), { status: 503 }))
       .mockResolvedValueOnce(new Response("duplicate audit"));
     const pending = postAudit(URL_, request, { fetch: f, signal: new AbortController().signal });
     await vi.advanceTimersByTimeAsync(0);
     expect(vi.getTimerCount()).toBe(0);
     expect(await pending).toEqual({ ok: false, error: {
-      kind: "http_5xx", status: 503, message: "transcript must contain at least one turn.",
+      kind: "http_5xx", status: 503, message: JSON.parse(example("error")).message,
+      details: JSON.parse(example("error")).details,
     } });
     await vi.advanceTimersByTimeAsync(300);
     expect(f).toHaveBeenCalledTimes(1);
   });
   it.each([429])("retries HTTP %s once after 300 ms regardless of detail code", async status => {
-    const f = vi.fn<typeof fetch>().mockResolvedValueOnce(new Response('{"error":{"code":"invalid_request"}}', { status })).mockResolvedValueOnce(new Response("done"));
+    const f = vi.fn<typeof fetch>().mockResolvedValueOnce(new Response(JSON.stringify({ ...JSON.parse(example("error")), status }), { status })).mockResolvedValueOnce(new Response("done"));
     const pending = postAudit(URL_, request, { fetch: f, signal: new AbortController().signal });
     await vi.advanceTimersByTimeAsync(299);
     expect(f).toHaveBeenCalledTimes(1);
@@ -170,7 +178,7 @@ describe("automatic POST retries", () => {
     expect(f).toHaveBeenCalledTimes(2);
   });
   it.each([302, 400, 408, 500, 502, 504])("never retries HTTP %s even with busy detail code", async status => {
-    const f = reply(status, '{"error":{"code":"busy"}}');
+    const f = reply(status, JSON.stringify({ ...JSON.parse(example("error")), status, details: [{ code: "rate_limited", message: "Busy." }] }));
     expect(await postAudit(URL_, request, { fetch: f, signal: new AbortController().signal })).toMatchObject({ ok: false, error: { status } });
     expect(f).toHaveBeenCalledTimes(1);
   });

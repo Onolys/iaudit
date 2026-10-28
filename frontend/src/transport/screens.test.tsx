@@ -94,10 +94,23 @@ describe("ErrorScreen", () => {
 
   it("renders server text literally, never as HTML", () => {
     const evil = "<b>bold</b><img src=x onerror=alert(1)>";
-    const { container } = render(<ErrorScreen error={{ kind: "http_4xx", status: 400, message: evil }} onChooseFile={() => {}} />);
+    const { container } = render(<ErrorScreen error={{ kind: "http_4xx", status: 400, message: evil, details: [{ code: "schema_violation", message: evil }] }} onChooseFile={() => {}} />);
     expect(container.querySelector("b")).toBeNull();
     expect(container.querySelector("img")).toBeNull();
     expect(container.textContent).toContain(evil);
+  });
+
+  it.each(["http_4xx", "http_5xx"] as const)("shows message and each detail in order for %s", kind => {
+    render(<ErrorScreen error={{ kind, status: kind === "http_4xx" ? 400 : 500,
+      message: "Request rejected.", details: [
+        { code: "schema_violation", message: "transcript/0/text: must be of type string" },
+        { code: "schema_violation", message: "assessment/0: required property missing" },
+      ],
+    }} />);
+    expect(screen.getByText("Request rejected.").tagName).toBe("P");
+    expect(screen.getAllByRole("listitem").map(item => item.textContent)).toEqual([
+      "transcript/0/text: must be of type string", "assessment/0: required property missing",
+    ]);
   });
 
   it("shows no body text when the 5xx body was not a valid error", () => {

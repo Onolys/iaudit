@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { ValidationIssue } from "../contract";
 import { isRetryable } from "./errors";
 import type { LoadError } from "./errors";
+import type { ErrorBody } from "./errorBody";
 
 const MAX_ISSUES = 50;
 
@@ -16,6 +17,17 @@ function Issues({ issues }: { issues: ValidationIssue[] }) {
       ))}
       {more > 0 ? <li>and {more} more</li> : null}
     </ul>
+  );
+}
+
+function HttpDetails({ message, details }: Partial<ErrorBody>) {
+  return (
+    <>
+      {message ? <p>{message}</p> : null}
+      {details?.length ? (
+        <ul>{details.map((detail, i) => <li key={i}>{detail.message}</li>)}</ul>
+      ) : null}
+    </>
   );
 }
 
@@ -61,9 +73,9 @@ function describe(error: LoadError): { title: string; detail: ReactNode } {
     case "cancelled":
       return { title: "Cancelled.", detail: null };
     case "http_4xx":
-      return { title: `Request rejected (${error.status})`, detail: error.message ? <p>{error.message}</p> : null };
+      return { title: `Request rejected (${error.status})`, detail: <HttpDetails message={error.message} details={error.details} /> };
     case "http_5xx":
-      return { title: `Audit service error (${error.status}).`, detail: error.message ? <p>{error.message}</p> : null };
+      return { title: `Audit service error (${error.status}).`, detail: <HttpDetails message={error.message} details={error.details} /> };
     case "invalid_response":
       return {
         title: "Invalid audit response",
