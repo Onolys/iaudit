@@ -6,16 +6,16 @@ import json
 import httpx
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import Selection, resume, start_run
 from iaudit_eval.scoring import score
 
 
 async def test_worker_fault_drains_inflight_before_finish_and_resume(tmp_path, monkeypatch):
-    dataset = load("synthetic")
+    dataset = engine_dataset()
     ids = sorted(it.id for it in dataset.items("all"))
     sibling_started, release, fault = asyncio.Event(), asyncio.Event(), asyncio.Event()
     backend = FakeBackend()
@@ -73,7 +73,7 @@ async def test_worker_fault_drains_inflight_before_finish_and_resume(tmp_path, m
 
 
 async def test_cancellation_drains_worker_cleanup_before_unlock(tmp_path):
-    dataset = load("synthetic")
+    dataset = engine_dataset()
     ids = sorted(it.id for it in dataset.items("all"))
     started = {item_id: asyncio.Event() for item_id in ids[1:3]}
     cancelled, release = asyncio.Event(), asyncio.Event()
@@ -122,7 +122,7 @@ async def test_owned_client_close_error_still_releases_lock(tmp_path):
             raise RuntimeError("close failed")
 
     backend = FakeBackend()
-    run = start_run(load("synthetic"), Selection(split="all"), base_url="http://fake",
+    run = start_run(engine_dataset(), Selection(split="all"), base_url="http://fake",
                     runs_root=tmp_path, transport=BrokenClose(backend.handle), on_finish=None)
     with pytest.raises(RuntimeError, match="close failed"):
         await run.wait()
@@ -142,7 +142,7 @@ async def test_cancellation_during_owned_client_close_still_releases_lock(tmp_pa
             close_started.set()
             await release.wait()
 
-    run = start_run(load("synthetic"), Selection(split="all"), base_url="http://fake",
+    run = start_run(engine_dataset(), Selection(split="all"), base_url="http://fake",
                     runs_root=tmp_path, transport=BlockedClose(blocked_request), on_finish=None)
     try:
         await asyncio.wait_for(request_started.wait(), 2)

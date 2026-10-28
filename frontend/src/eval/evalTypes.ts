@@ -12,10 +12,10 @@ export interface BackendHealth { url: string; reachable: boolean; schema_version
 export interface Health { status?: "ok"; eval_api_version: string; backend: BackendHealth }
 export interface SplitSummary { name: string; size: number | null }
 export interface SplitMeta extends SplitSummary { description?: string }
-export interface DatasetSummary { name: string; title: string; data_present: boolean; splits: SplitSummary[] }
+export interface DatasetSummary { name: string; product: string; title: string; data_present: boolean; splits: SplitSummary[] }
 export interface DatasetMeta {
   [key: string]: unknown;
-  name: string; splits: SplitMeta[]; title?: string; kind?: string; description?: string;
+  name: string; product: string; splits: SplitMeta[]; title?: string; kind?: string; description?: string;
   dataset_version?: string; default_split?: string; test_split_note?: string | null;
   data_required?: boolean; cluster_key?: string; pool_all?: boolean; gold_kind?: string | null;
   mapping?: string | null; references?: string | null; levels?: Record<string, unknown>;
@@ -65,7 +65,7 @@ export interface MetricEntry {
 }
 export interface MetricReference { source: string; label: string; metric: string; level: string; slice: Slice; value: number; note?: string }
 export interface MetricsReport {
-  schema_version: "1.0.0"; run_id: string; dataset: string; dataset_version: string; primary_policy: string;
+  schema_version: "0.0.1"; run_id: string; dataset: string; dataset_version: string; primary_policy: string;
   scored: { at: string; metrics_version: string; git_commit: string; git_dirty: boolean };
   bootstrap: { method: string; resamples: number; seed: number; level: number };
   run: { state: RunState; complete: boolean; mapping_version: string | null; tags: Record<string, unknown> };
@@ -80,7 +80,7 @@ export interface ComparisonDelta {
 }
 export interface Disagreement { item_id: string; cluster: string; pairs: { level: string; unit: string; gold: string; a: string | null; b: string | null }[] }
 export interface Comparison {
-  schema_version: "1.0.0"; run_a: string; run_b: string; dataset: string; warnings: string[];
+  schema_version: "0.0.1"; run_a: string; run_b: string; dataset: string; warnings: string[];
   n_shared: number; n_a_only: number; n_b_only: number; n_clusters_shared: number;
   deltas: ComparisonDelta[]; disagreements: Disagreement[];
 }

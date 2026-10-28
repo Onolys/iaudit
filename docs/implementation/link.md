@@ -1,6 +1,6 @@
 # Link
 
-Stage 2: find evidence for each in-scope claim. Code: `backend/src/iaudit_backend/link/`.
+Stage 2: find evidence for each in-scope claim. Code: `eaudit/src/eaudit/link/`.
 
 **Audience:** maintainers and coding agents.
 

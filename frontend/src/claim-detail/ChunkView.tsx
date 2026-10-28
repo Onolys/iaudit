@@ -38,7 +38,7 @@ export function ChunkView({ chunk, request, views, activeIds }: Props) {
             >
               <div className="cd-row-head">
                 <span>
-                  {turn.speaker}
+                  {turn.speaker ?? "Unknown speaker"}
                   {turn.role ? ` · ${turn.role}` : ""}
                 </span>
                 <span>{turn.timestamp ?? `#${row.turn}`}</span>

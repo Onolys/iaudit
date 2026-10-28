@@ -4,7 +4,7 @@
 
 Quality is measured per bucket (mission checks 1 to 13), never as one score. Data is the worked ADHD example: a faithful assessment plus eight variants with one injected fault each (plus an extra variant with roles removed). Results are labelled split `poc-all`: a smoke check on data the authors have seen, not an estimate for real interviews. No precision claim is made from it.
 
-## Commands (from `backend/`)
+## Commands (from `eaudit/`)
 
 ```bash
 uv run python -m eval.smoke                       # the POC gate through POST /v1/audit

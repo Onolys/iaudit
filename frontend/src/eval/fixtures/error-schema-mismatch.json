@@ -3,7 +3,7 @@
     "code": "schema_mismatch",
     "message": "Fictional schema mismatch error.",
     "detail": {
-      "expected": "1.2.0",
+      "expected": "0.0.1",
       "actual": "fictional-version"
     }
   }

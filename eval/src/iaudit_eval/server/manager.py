@@ -12,6 +12,7 @@ from iaudit_eval import contracts, download, engine, scoring, store
 from iaudit_eval import estimate as estimates
 from iaudit_eval.datasets import Dataset, load
 from iaudit_eval.datasets.base import DatasetError
+from iaudit_eval.datasets.registry import dataset_folder, dataset_folders
 from iaudit_eval.log import log_event
 from iaudit_eval.server.guards import (
     ApiError,
@@ -61,12 +62,13 @@ class RunManager:
         self._probe_transport = None
 
     def _load_dataset(self, name: str) -> Dataset:
-        resolve_under(self.datasets_root, name)
         resolve_under(self.data_root, name)
-        metadata = resolve_under(self.datasets_root, name, "metadata.json")
-        resolve_under(self.datasets_root, name, "adapter.py")
-        if not metadata.is_file():
-            raise not_found("Dataset not found.")
+        try:
+            folder = dataset_folder(name, self.datasets_root)
+        except DatasetError as exc:
+            raise not_found("Dataset not found.") from exc
+        for filename in ("metadata.json", "adapter.py"):
+            resolve_under(self.datasets_root, folder.parent.name, name, filename)
         return load(name, root=self.datasets_root, data_root=self.data_root)
 
     async def get_dataset(self, name: str) -> Dataset:
@@ -77,19 +79,15 @@ class RunManager:
             return self._datasets[name]
 
     def _dataset_names(self) -> list[str]:
-        if not self.datasets_root.is_dir():
-            return []
         names = []
-        for path in sorted(self.datasets_root.iterdir()):
+        for name, path in dataset_folders(self.datasets_root).items():
             try:
-                validate_dataset_id(path.name)
-                folder = resolve_under(self.datasets_root, path.name)
-                resolve_under(self.datasets_root, path.name, "metadata.json")
-                resolve_under(self.datasets_root, path.name, "adapter.py")
+                validate_dataset_id(name)
+                for filename in ("metadata.json", "adapter.py"):
+                    resolve_under(self.datasets_root, path.parent.name, name, filename)
             except ApiError:
                 continue
-            if folder.is_dir() and (folder / "metadata.json").is_file():
-                names.append(path.name)
+            names.append(name)
         return names
 
     async def list_datasets(self) -> list[Dataset]:

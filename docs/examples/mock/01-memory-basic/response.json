@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "0.0.1",
   "run_info": {
     "models": {
       "cheap": "claude-haiku-5-5",
@@ -68,6 +68,7 @@
       "concerns": [
         {
           "type": "negation_reversal",
+          "group": "opposite_of_interview",
           "explanation": "A denial is presented as an established behaviour.",
           "evidence_ids": [
             "e1"
@@ -75,6 +76,7 @@
         },
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "One reported event is written as frequent.",
           "evidence_ids": [
             "e2",
@@ -148,6 +150,7 @@
       "concerns": [
         {
           "type": "certainty_inflation",
+          "group": "changed_detail",
           "explanation": "A sharp decline is stated as fact without a reported change.",
           "evidence_ids": [
             "e1"
@@ -155,6 +158,7 @@
         },
         {
           "type": "context_stripping",
+          "group": "missing_context",
           "explanation": "The respondent's framing of name-forgetting as lifelong is dropped.",
           "evidence_ids": []
         }

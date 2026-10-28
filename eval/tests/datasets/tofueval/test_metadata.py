@@ -51,13 +51,13 @@ def test_per_type_concern_not_in_mapping_metrics_cover_enum_minus_mapped():
         (DATASETS.parents[1] / "docs/contracts/audit-response.schema.json").read_text()
     )
     enum = set(contract["$defs"]["Concern"]["properties"]["type"]["enum"])
-    mapping = json.loads((DATASETS / "tofueval/mapping.json").read_text())
+    mapping = json.loads((DATASETS / "eaudit/tofueval/mapping.json").read_text())
     mapped = set()
     for rule in mapping["types"].values():
         mapped.update(rule["allowed"] or ())
         for values in rule.get("dataset_overrides", {}).values():
             mapped.update(values)
-    meta = json.loads((DATASETS / "tofueval/metadata.json").read_text())
+    meta = json.loads((DATASETS / "eaudit/tofueval/metadata.json").read_text())
     prefix = "concern_not_in_mapping:"
     reported = {
         m["params"]["key"].removeprefix(prefix)

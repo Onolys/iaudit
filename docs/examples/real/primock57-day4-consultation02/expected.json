@@ -35,6 +35,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "No turn establishes preserved strength, sensation or function.",
           "evidence_ids": []
         }
@@ -72,6 +73,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "No turn reports fevers, with headaches or otherwise.",
           "evidence_ids": [
             "e1"
@@ -132,6 +134,7 @@
       "concerns": [
         {
           "type": "negation_reversal",
+          "group": "opposite_of_interview",
           "explanation": "A denial of breathlessness on exercise becomes breathlessness on exertion.",
           "evidence_ids": [
             "e2"
@@ -139,6 +142,7 @@
         },
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "The patient's answer about exercise conflicts with the claim.",
           "evidence_ids": [
             "e2"
@@ -234,6 +238,7 @@
       "concerns": [
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "The patient said the symptoms come one at a time, not sometimes together.",
           "evidence_ids": [
             "e2"

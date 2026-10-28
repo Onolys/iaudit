@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from iaudit_eval.datasets import Dataset, Item, Unmapped, list_datasets, load
-from iaudit_eval.datasets.base import DatasetError, validate_items
+from iaudit_eval.datasets.base import DatasetError, DatasetMeta, validate_items
 from iaudit_eval.selection import select
 
 ADAPTER = """
@@ -28,11 +28,12 @@ def create(data_dir):
 """
 
 
-def make(root: Path, name="toy", adapter=ADAPTER, **extra):
-    d = root / name
+def make(root: Path, name="toy", adapter=ADAPTER, *, product="eaudit", **extra):
+    d = root / product / name
     d.mkdir(parents=True)
     meta = {
         "name": name,
+        "product": product,
         "title": "Toy",
         "description": "x",
         "dataset_version": "1",
@@ -57,7 +58,7 @@ def items(n, doc="d"):
 
 def test_discovery_and_load(tmp_path):
     make(tmp_path)
-    make(tmp_path, name="other")
+    make(tmp_path, name="other", product="paudit")
     (tmp_path / "junk").mkdir()  # no metadata.json: ignored
     assert [m.name for m in list_datasets(tmp_path)] == ["other", "toy"]
     ds = load("toy", root=tmp_path, data_root=tmp_path / "data")
@@ -171,3 +172,44 @@ def create(data_dir):
     assert first.adapter.value == again.adapter.value == "first evidence"
     assert second.adapter.value == "second evidence"
     assert load("multifile", root=tmp_path / "first").adapter.value == "first evidence"
+
+
+@pytest.mark.parametrize("operation", [list_datasets, lambda root: load("toy", root=root)])
+def test_duplicate_dataset_names_across_products_rejected(tmp_path, operation):
+    make(tmp_path, product="eaudit")
+    make(tmp_path, product="paudit")
+    with pytest.raises(DatasetError, match="duplicate.*toy"):
+        operation(tmp_path)
+
+
+def test_flat_dataset_folder_is_not_discovered(tmp_path):
+    make(tmp_path, product="legacy").rename(tmp_path / "toy")
+    assert list_datasets(tmp_path) == []
+    with pytest.raises(DatasetError, match="unknown"):
+        load("toy", root=tmp_path)
+
+
+def test_product_derived_from_parent_and_serialized(tmp_path):
+    make(tmp_path, product="paudit")
+    meta = list_datasets(tmp_path)[0]
+    assert meta.product == "paudit"
+    assert meta.get("product") == "paudit"
+    assert meta.to_dict()["product"] == "paudit"
+    assert "product" not in meta.extra
+    assert load("toy", root=tmp_path).meta.product == "paudit"
+
+
+@pytest.mark.parametrize("operation", [list_datasets, lambda root: load("toy", root=root)])
+def test_product_must_match_parent(tmp_path, operation):
+    folder = make(tmp_path)
+    raw = json.loads((folder / "metadata.json").read_text())
+    raw["product"] = "paudit"
+    (folder / "metadata.json").write_text(json.dumps(raw))
+    with pytest.raises(DatasetError, match="product.*paudit.*eaudit"):
+        operation(tmp_path)
+
+
+@pytest.mark.parametrize("raw", [{"name": "toy"}, {"name": "toy", "product": None}, {"name": "toy", "product": 3}])
+def test_product_is_required_string(raw):
+    with pytest.raises(DatasetError, match="product"):
+        DatasetMeta.from_dict(raw)

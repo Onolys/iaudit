@@ -1,6 +1,6 @@
 # Assembler
 
-Stage 4: resolve text to positions and enforce the contract. Code: `backend/src/iaudit_backend/assembler/`.
+Stage 4: resolve text to positions and enforce the contract. Code: `eaudit/src/eaudit/assembler/`.
 
 **Audience:** maintainers and coding agents.
 

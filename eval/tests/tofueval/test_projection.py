@@ -13,10 +13,10 @@ EVAL = Path(__file__).resolve().parents[2]
 
 
 def project(response, item, monkeypatch, mapping=None):
-    path = EVAL / "datasets/tofueval/projection.py"
+    path = EVAL / "datasets/eaudit/tofueval/projection.py"
     assert path.is_file(), "TofuEval claim projection is not implemented"
     monkeypatch.syspath_prepend(str(EVAL))
-    module = importlib.import_module("datasets.tofueval.projection")
+    module = importlib.import_module("datasets.eaudit.tofueval.projection")
     return module.project(response, item, mapping)
 
 
@@ -55,7 +55,7 @@ def claim(start=0, end=5, verdict="supported", *, cid="c1", section=0, concerns=
 
 
 def response(*claims, status="complete"):
-    return {"schema_version": "1.2.0", "status": status,
+    return {"schema_version": "0.0.1", "status": status,
             "warnings": ([{"code": "section_not_processed", "message": "Fictional omission.",
                            "section_index": 0}] if status == "partial" else []),
             "claims": list(claims)}
@@ -169,7 +169,7 @@ def test_union_order_is_first_seen_and_unknown_diagnostics_count_claims(monkeypa
 
 def test_supplied_mapping_controls_unknown_counts_without_changing_labels(monkeypatch):
     monkeypatch.syspath_prepend(str(EVAL))
-    mapping = importlib.import_module("datasets.tofueval.mapping").load_mapping()
+    mapping = importlib.import_module("datasets.eaudit.tofueval.mapping").load_mapping()
     mapping = replace(mapping, mapped_concerns=mapping.mapped_concerns | {"quantity_mismatch"})
     result = project(response(claim(concerns=("quantity_mismatch",))), item(), monkeypatch, mapping)
     assert result["concern_not_in_mapping"] == {}

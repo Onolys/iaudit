@@ -60,7 +60,7 @@ def test_nested_report_references_resolve_without_fetching():
     metrics["entries"][0]["n"] = -1
     assert not validator("MetricsReport").is_valid(metrics)
     comparison = {
-        "schema_version": "1.0.0", "run_a": "a", "run_b": "b", "dataset": "synthetic",
+        "schema_version": "0.0.1", "run_a": "a", "run_b": "b", "dataset": "synthetic",
         "warnings": [], "n_shared": 1, "n_a_only": 0, "n_b_only": 0, "n_clusters_shared": 1,
         "deltas": [{"metric": "accuracy", "level": "item", "policy": "primary", "slice": {},
                     "a": {"value": 1, "n": 1, "ci": None}, "b": {"value": 0, "n": 1, "ci": None},
@@ -145,7 +145,7 @@ def test_schema_closes_prd_enums(name, field, values):
 
 def test_item_detail_preserves_opaque_gold_and_failure():
     models, _ = api_modules()
-    detail = {"item_id": "a", "status": "failed", "request": {"schema_version": "1.0.0"},
+    detail = {"item_id": "a", "status": "failed", "request": {"schema_version": "0.0.1"},
               "response": None, "failure": {"reason": "timeout", "custom": {"retry": False}},
               "run_info": None, "gold": {"sentences": [{"label": "supported"}]},
               "gold_kind": "tofueval_summary_sentences"}

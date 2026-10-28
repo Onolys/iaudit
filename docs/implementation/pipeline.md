@@ -1,6 +1,6 @@
 # Pipeline
 
-How one audit runs. Code: `backend/src/iaudit_backend/pipeline/`.
+How one audit runs. Code: `eaudit/src/eaudit/pipeline/`.
 
 **Audience:** maintainers and coding agents.
 

@@ -15,6 +15,7 @@ async def list_datasets(request: Request):
         present, sizes = await manager.dataset_sizes(dataset)
         result.append({
             "name": dataset.meta.name,
+            "product": dataset.meta.product,
             "title": dataset.meta.title,
             "data_present": present,
             "splits": [{"name": name, "size": sizes[name]} for name in dataset.meta.split_names()],

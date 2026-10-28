@@ -63,8 +63,8 @@ async def test_healthz():
     "mode,status,code",
     [
         ("429", 429, "rate_limited"),
-        ("503", 503, "unavailable"),
-        ("504", 504, "unavailable"),
+        ("503", 503, "upstream_unavailable"),
+        ("504", 504, "deadline_exceeded"),
         ("500", 500, "internal_error"),
     ],
 )
@@ -73,7 +73,7 @@ async def test_error_modes(mode, status, code):
     r = await _post(fb)
     assert r.status_code == status
     assert contracts.validate_error(r.json()) == []
-    assert r.json()["error"]["code"] == code
+    assert r.json()["details"][0]["code"] == code
 
 
 async def test_429_has_retry_after_option():
@@ -122,26 +122,26 @@ async def test_changed_models_and_prompts():
     assert contracts.validate_response(m) == [] and contracts.validate_response(p) == []
 
 
-async def test_unsupported_version_mode():
-    r = await _post(FakeBackend(mode="unsupported_version"))
+async def test_invalid_request_mode():
+    r = await _post(FakeBackend(mode="invalid_request"))
     assert r.status_code == 400
     assert contracts.validate_error(r.json()) == []
-    assert r.json()["error"]["code"] == "unsupported_version"
+    assert r.json()["details"][0]["code"] == "schema_violation"
 
 
 async def test_version_mismatch_detected_from_request():
-    fb = FakeBackend(supported_version="9.9.9")
-    r = await _post(fb)
-    assert r.json()["error"]["code"] == "unsupported_version"
+    fb = FakeBackend()
+    r = await _post(fb, _req(schema_version="9.8.7"))
+    assert r.json()["details"][0]["code"] == "schema_violation"
 
 
 async def test_probe_empty_body_semantics():
     fb = FakeBackend()
     async with _client(fb) as c:
         ok = await c.post("/v1/audit", json={"schema_version": contracts.schema_version()})
-        bad = await c.post("/v1/audit", json={"schema_version": "0.0.1"})
-    assert ok.status_code == 400 and ok.json()["error"]["code"] == "invalid_request"
-    assert bad.json()["error"]["code"] == "unsupported_version"
+        bad = await c.post("/v1/audit", json={"schema_version": "9.8.7"})
+    assert ok.status_code == 400 and ok.json()["details"][0]["code"] == "schema_violation"
+    assert bad.json()["details"][0]["code"] == "schema_violation"
 
 
 async def test_script_sequence_then_default():

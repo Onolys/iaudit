@@ -1,4 +1,4 @@
-import { codePointLength, sliceCodePoints } from "./codepoints";
+import { codePointLength, sliceCodePoints } from "../utils/codepoints";
 import type { AuditRequest, Claim, ClaimCheck, Span } from "./types";
 
 export type SpanSource = "assessment" | "transcript";

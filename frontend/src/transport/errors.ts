@@ -1,4 +1,5 @@
 import type { AuditRequest, AuditResponse, ResponseAnalysis, ValidationIssue } from "../contract";
+import type { ErrorDetail } from "./errorBody";
 
 export type LoadError =
   | { kind: "invalid_request_file"; reason: "empty" | "not_json" | "schema"; message?: string; issues?: ValidationIssue[] }
@@ -7,11 +8,11 @@ export type LoadError =
   | { kind: "network"; url: string }
   | { kind: "timeout"; seconds: number }
   | { kind: "cancelled" }
-  | { kind: "http_4xx"; status: number; message?: string }
-  | { kind: "http_5xx"; status: number; message?: string }
+  | { kind: "http_4xx"; status: number; message?: string; details?: ErrorDetail[] }
+  | { kind: "http_5xx"; status: number; message?: string; details?: ErrorDetail[] }
   | {
       kind: "invalid_response";
-      reason: "empty" | "not_json" | "not_object" | "wrong_version" | "schema" | "duplicate_claim_id" | "duplicate_evidence_id";
+      reason: "empty" | "not_json" | "not_object" | "schema" | "duplicate_claim_id" | "duplicate_evidence_id";
       message?: string;
       issues?: ValidationIssue[];
       claimId?: string;

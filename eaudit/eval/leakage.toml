@@ -1,0 +1,6 @@
+# Prompt material that must never share an 8-word window with scored data (07 R11).
+# Globs are relative to eaudit/src/eaudit/. Scored data is eval/data/ and eval/private/.
+window = 8
+prompt_globs = ["prompts/*_fewshot.json"]
+scored_dirs = ["eval/data", "eval/private", "tests/data", "../eval/data"]
+scored_speaker_ids = ["alex1", "sam1", "clinician1"]

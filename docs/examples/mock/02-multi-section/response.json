@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "0.0.1",
   "run_info": {
     "models": {
       "cheap": "claude-haiku-5-5",
@@ -69,6 +69,7 @@
       "concerns": [
         {
           "type": "question_as_answer",
+          "group": "not_in_interview",
           "explanation": "The interviewer's question is treated as the respondent's answer.",
           "evidence_ids": [
             "e1"
@@ -111,6 +112,7 @@
       "concerns": [
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "A past difficulty is written in the present tense.",
           "evidence_ids": [
             "e1",
@@ -188,6 +190,7 @@
       "concerns": [
         {
           "type": "certainty_inflation",
+          "group": "changed_detail",
           "explanation": "A hedged habit is written as a rule.",
           "evidence_ids": [
             "e1"
@@ -229,6 +232,7 @@
       "concerns": [
         {
           "type": "unsupported_causal_link",
+          "group": "not_in_interview",
           "explanation": "Busyness is restated as stress and given as the cause.",
           "evidence_ids": [
             "e1"

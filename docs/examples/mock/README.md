@@ -1,6 +1,6 @@
 # Mock audit samples
 
-Fictional request/response pairs for contract [1.2.0](../../contracts/README.md). Use them to see how the review UI lays out claims, verdicts, evidence, and warnings.
+Fictional request/response pairs for contract [0.0.1](../../contracts/README.md). Use them to see how the review UI lays out claims, verdicts, evidence, and warnings.
 
 Samples 01–05 are small plumbing fixtures. Their audit content is **not** meant to be correct; the verdicts and concerns are placeholders. Samples 06–10 are full-length interviews whose verdicts are meant to be clinically and logically defensible: each problem claim names its discrepancy, cites the excerpt that conflicts with or qualifies it, and offers a `suggested_revision`. In every sample the plumbing is exact: every span resolves to real text, in Unicode code points with an exclusive end, and every response follows the schema and rules 1–12.
 

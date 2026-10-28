@@ -5,10 +5,10 @@ import json
 import httpx
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import contracts, store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import RunProgress, Selection, start_run
 
 URL = "http://fake"
@@ -16,7 +16,7 @@ URL = "http://fake"
 
 @pytest.fixture(scope="module")
 def synth():
-    return load("synthetic")
+    return engine_dataset()
 
 
 async def _nosleep(_s):
@@ -161,14 +161,14 @@ async def test_item_failures_have_right_kind(synth, tmp_path):
     assert t["ok"] == 5 and t["failed"] == 3
 
 
-async def test_canary_fatal_unsupported_version(synth, tmp_path):
-    fb = FakeBackend("unsupported_version")
+async def test_canary_invalid_request_is_item_failure(synth, tmp_path):
+    fb = FakeBackend("invalid_request")
     h = await _run(synth, fb, tmp_path)
-    assert h.state == "failed" and fb.count == 1
+    assert h.state == "finished" and fb.count == 8
     run = store.load_run(tmp_path, h.run_id)
-    assert run["error"]["kind"] == "canary_failed"
-    assert run["error"]["code"] == "unsupported_version"
-    assert run["totals"]["missing"] == 7
+    assert run.get("error") is None
+    assert run["totals"]["failed"] == 8
+    assert run["totals"]["missing"] == 0
 
 
 async def test_canary_fatal_connection_refused(synth, tmp_path):

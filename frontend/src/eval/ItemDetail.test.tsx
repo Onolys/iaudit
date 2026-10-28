@@ -46,7 +46,7 @@ it("shows failure fields and gold without mounting review", async () => {
 });
 
 it.each([
-  ["stale", { ...ok, response: { ...ok.response, schema_version: "1.0.0" } }, "The service response uses an unsupported schema version."],
+  ["stale", { ...ok, response: { ...ok.response, schema_version: "9.8.7" } }, "The service response does not match the audit response schema."],
   ["invalid", { ...ok, response: { ...ok.response, claims: "bad" } }, "The service response does not match the audit response schema."],
 ])("uses existing ErrorScreen for %s data without choose-file action", async (_label, body, message) => {
   const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(json(body));
@@ -58,7 +58,7 @@ it.each([
 });
 
 it("retries a fetch error through the server banner", async () => {
-  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockResolvedValueOnce(json(ok));
+  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockRejectedValueOnce(Error("offline")).mockResolvedValueOnce(json(ok));
   render(<ItemDetail api={createEvalApi({ fetch })} runId="r" itemId="i" onBack={() => {}} backLabel="Back" />);
   await screen.findByText("Eval server not reachable");
   fireEvent.click(screen.getByRole("button", { name: "Retry" }));

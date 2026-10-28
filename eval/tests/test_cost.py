@@ -3,10 +3,10 @@
 import httpx
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import contracts, store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import Selection, probe, resume, start_run
 from iaudit_eval.estimate import Estimate, estimate, request_chars
 
@@ -15,7 +15,7 @@ URL = "http://fake"
 
 @pytest.fixture(scope="module")
 def synth():
-    return load("synthetic")
+    return engine_dataset()
 
 
 async def _nosleep(_s):
@@ -181,3 +181,28 @@ async def test_probe_healthz_ok_post_unreachable():
 
     res = await probe(URL, transport=httpx.MockTransport(h))
     assert res.reachable is False
+
+
+@pytest.mark.parametrize("body", [{}, {"schema_version": 7}, {"schema_version": "9.8.7"}])
+async def test_probe_unrecognized_body_does_not_accept_version(body):
+    def handler(request):
+        if request.url.path == "/healthz":
+            return httpx.Response(200, json={"status": "ok"})
+        return httpx.Response(400, json=body)
+
+    result = await probe(URL, transport=httpx.MockTransport(handler))
+    assert result.reachable and not result.accepts_version
+
+
+@pytest.mark.parametrize("body", [
+    {"schema_version": "0.0.1", "error": {"code": "other", "message": "old"}},
+    {"schema_version": "0.0.1", "status": 422, "message": "wrong status",
+     "details": [{"code": "invalid_parameters", "message": "fixed"}]},
+])
+async def test_probe_rejects_invalid_error_contract(body):
+    def handler(request):
+        if request.method == "GET":
+            return httpx.Response(200, json={"status": "ok"})
+        return httpx.Response(400, json=body)
+    result = await probe(URL, transport=httpx.MockTransport(handler))
+    assert result.reachable and not result.accepts_version

@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.0.1",
+  "request_id": "no-speaker-001",
+  "status": "complete",
+  "warnings": [
+    {"code": "ambiguous_speaker", "message": "Speaker or role was missing for turn(s) 0; none was assumed.", "claim_id": "c1"}
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "span": {"start": {"index": 0, "char": 0}, "end": {"index": 0, "char": 36}},
+      "verdict": "supported",
+      "explanation": "The supplied interview supports this claim.",
+      "concerns": [],
+      "evidence": [
+        {"id": "e1", "role": "supporting", "span": {"start": {"index": 0, "char": 0}, "end": {"index": 0, "char": 22}}}
+      ]
+    }
+  ]
+}

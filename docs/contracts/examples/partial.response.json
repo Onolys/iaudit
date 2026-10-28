@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "0.0.1",
   "request_id": "partial-001",
   "status": "partial",
   "warnings": [
@@ -33,6 +33,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "Two early wakings are described as every night.",
           "evidence_ids": [
             "e-fine"

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "0.0.1",
   "run_id": "fictional-finished-with-failures",
   "dataset": "fictional-alpha",
   "dataset_version": "fixture-1",

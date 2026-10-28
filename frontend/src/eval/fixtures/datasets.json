@@ -1,5 +1,6 @@
 [
   {
+    "product": "eaudit",
     "name": "fictional-alpha",
     "title": "Fictional Alpha",
     "data_present": true,
@@ -15,6 +16,7 @@
     ]
   },
   {
+    "product": "eaudit",
     "name": "fictional-beta",
     "title": "Fictional Beta",
     "data_present": false,

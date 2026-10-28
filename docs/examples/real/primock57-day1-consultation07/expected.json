@@ -35,6 +35,7 @@
       "concerns": [
         {
           "type": "negation_reversal",
+          "group": "opposite_of_interview",
           "explanation": "An affirmative answer about feeling feverish is recorded as an absence of fevers.",
           "evidence_ids": [
             "e1"
@@ -42,6 +43,7 @@
         },
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "The patient's answer conflicts with the stated absence.",
           "evidence_ids": [
             "e1"
@@ -113,6 +115,7 @@
       "concerns": [
         {
           "type": "question_as_answer",
+          "group": "not_in_interview",
           "explanation": "A symptom suggested in the clinician's question is recorded without a clear affirmative answer.",
           "evidence_ids": [
             "e2"
@@ -198,6 +201,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "Stiffness is recorded as muscle and joint pain.",
           "evidence_ids": [
             "e1"
@@ -248,6 +252,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "No question or answer covers unwell contacts.",
           "evidence_ids": []
         }
@@ -285,6 +290,7 @@
       "concerns": [
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "A bowel symptom reported within this illness conflicts with its stated absence.",
           "evidence_ids": [
             "e1"
@@ -360,6 +366,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "The social pattern is not stated in the interview.",
           "evidence_ids": [
             "e1"

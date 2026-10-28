@@ -14,9 +14,9 @@ EVAL = Path(__file__).resolve().parents[2]
 
 
 def build(monkeypatch, item, gold, prediction, failure=None, mapping=None):
-    assert (EVAL / "datasets/tofueval/item_rows.py").is_file(), "Item row builder missing"
+    assert (EVAL / "datasets/eaudit/tofueval/item_rows.py").is_file(), "Item row builder missing"
     monkeypatch.syspath_prepend(str(EVAL))
-    return importlib.import_module("datasets.tofueval.item_rows").build(
+    return importlib.import_module("datasets.eaudit.tofueval.item_rows").build(
         item, gold, prediction, failure, mapping,
     )
 
@@ -49,7 +49,7 @@ def fixture(dataset="mediasum"):
 def test_worked_row_exact_shape_counts_and_no_source_text(monkeypatch):
     row = build(monkeypatch, *fixture())
     schema = json.loads((EVAL / "schemas/item_rows.schema.json").read_text())
-    Draft202012Validator(schema).validate({"schema_version": "1.0.0", "run_id": "fictional", "rows": [row]})
+    Draft202012Validator(schema).validate({"schema_version": "0.0.1", "run_id": "fictional", "rows": [row]})
     assert set(row) == {"item_id", "label", "status", "gold", "pred", "match", "outcome", "detail"}
     assert {k: row[k] for k in ("item_id", "label", "status", "gold", "pred", "match", "outcome")} == {
         "item_id": "fictional-item", "label": "fictional-doc / Fictional topic / fictional-model",
@@ -66,7 +66,7 @@ def test_worked_row_exact_shape_counts_and_no_source_text(monkeypatch):
         "gold_types": ["Extrinsic Information", "Nuanced Meaning Shift"],
         "pred_label": "inconsistent", "meta": False, "claim_ids": ["c0"],
         "verdicts": ["supported"], "concerns": ["unsupported_claim", "new_concern"],
-        "outcome": "tp", "concern_match": {"Extrinsic Information": True},
+        "outcome": "tp", "concern_match": {"Extrinsic Information": True, "Nuanced Meaning Shift": False},
     }
     assert all(set(s) == set(detail["sentences"][0]) for s in detail["sentences"])
     serialized = json.dumps(row)
@@ -106,14 +106,14 @@ def test_failure_keeps_gold_and_all_unresolved_without_made_up_claims(monkeypatc
         assert sentence["pred_label"] == sentence["outcome"] == "unresolved"
         assert sentence["meta"] is False
         assert sentence["claim_ids"] == sentence["verdicts"] == sentence["concerns"] == []
-    assert row["detail"]["sentences"][0]["concern_match"] == {"Extrinsic Information": False}
+    assert row["detail"]["sentences"][0]["concern_match"] == {"Extrinsic Information": False, "Nuanced Meaning Shift": False}
 
 
 @pytest.mark.parametrize(("dataset", "expected"), [
-    ("mediasum", {"Mis-Referencing": True, "Stating Opinion as Fact": True, "Tense/Modality Error": True}),
-    ("meetingbank", {"Stating Opinion as Fact": False, "Tense/Modality Error": True}),
+    ("mediasum", {"Mis-Referencing": True, "Stating Opinion as Fact": False, "Tense/Modality Error": True, "Reasoning Error": False}),
+    ("meetingbank", {"Stating Opinion as Fact": False, "Tense/Modality Error": True, "Reasoning Error": False}),
 ])
-def test_concern_matches_use_aliases_and_overrides_preserving_native_types(monkeypatch, dataset, expected):
+def test_concern_matches_use_aliases_and_crosswalk_preserving_native_types(monkeypatch, dataset, expected):
     item, gold, pred = fixture(dataset)
     gold["sentences"][0]["types"] = ["Mis-Referencing", "Stating Opinion as Fact", "Tense/Modality Error", "Reasoning Error"]
     pred["sentences"][0]["concerns"] = ["wrong_attribution", "timeframe_mismatch"]
@@ -124,7 +124,7 @@ def test_concern_matches_use_aliases_and_overrides_preserving_native_types(monke
 
 def test_rows_join_by_id_and_snapshot_inputs_without_mutating_mapping(monkeypatch):
     monkeypatch.syspath_prepend(str(EVAL))
-    mapping = importlib.import_module("datasets.tofueval.mapping").load_mapping()
+    mapping = importlib.import_module("datasets.eaudit.tofueval.mapping").load_mapping()
     item, gold, pred = fixture()
     pred["sentences"].reverse()
     before = deepcopy((item, gold, pred))

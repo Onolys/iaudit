@@ -4,8 +4,8 @@ Lookup facts for the review UI in [../../frontend/](../../frontend/). Request an
 
 **Audience:** users.
 
-The top-level **Audit | Eval** switch opens either this upload/review flow or the
-[Eval UI](eval-ui.md). Audit is selected initially. Switching away discards the loaded
+The top-level **eaudit | Eval** switch opens either this upload/review flow or the
+[Eval UI](eval-ui.md). eaudit is selected initially. Switching away discards the loaded
 audit and selection and cancels any in-flight audit request; returning starts fresh.
 Eval runs continue on the server when leaving its tab and reattach on return.
 
@@ -44,10 +44,9 @@ In this order. The first failure stops the audit.
 
 1. Body is not empty and is valid JSON.
 2. It is a JSON object.
-3. `schema_version` is `1.2.0`.
-4. It matches the response schema.
-5. `request_id` equals the request's, if the request had one.
-6. Claim ids are unique.
+3. It matches the response schema, including `schema_version: "0.0.1"`.
+4. `request_id` equals the request's, if the request had one.
+5. Claim ids are unique.
 
 The optional `run_info` block is accepted when it matches the schema and is not displayed. A reply renders the same with or without it.
 
@@ -67,10 +66,10 @@ Then each span is checked against the uploaded text. A bad span flags only its c
 | HTTP 5xx | Audit service error (status). | Retry |
 | HTTP 408, 429 | Request rejected (status) | Retry, Choose another file |
 | Other HTTP 4xx | Request rejected (status) | Choose another file |
-| Steps 1–4 and 6 above fail | Invalid audit response | Choose another file |
-| Step 5 fails | Response doesn't match this request. | Choose another file |
+| Steps 1–3 and 5 above fail | Invalid audit response | Choose another file |
+| Step 4 fails | Response doesn't match this request. | Choose another file |
 
-For HTTP errors the service's `error.message` is shown only if the body matches the [error schema](../contracts/error-response.schema.json). Schema problems list at most 50 paths.
+For HTTP errors the service's `message` and each `details[].message` are shown only if the body matches the [error schema](../contracts/error-response.schema.json) and its `status` equals the HTTP status; otherwise generic status text is shown. Schema problems list at most 50 paths.
 
 ## Fixed values
 
@@ -79,6 +78,6 @@ For HTTP errors the service's `error.message` is shown only if the body matches 
 | Request timeout | 120 s |
 | Mock delay | 250 ms |
 | Context step | 3 turns per click |
-| Schema version | `1.2.0` |
+| Schema version | `0.0.1` |
 
-Verdict and evidence styles are in `frontend/src/tokens/index.ts`; concern names in `frontend/src/claim-detail/concernLabels.ts` (mission checks 1–13).
+Verdict and evidence styles are in `frontend/src/tokens/index.ts`; concern names in `frontend/src/claim-detail/concernLabels.ts` (17 concern types).

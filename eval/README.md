@@ -11,8 +11,8 @@ over HTTP, never imported.
 - `src/iaudit_eval/` - engine package: `paths`, `log`, `contracts`, `datasets/` (plug-in API),
   `selection`, `store`, `client`, `engine` (start/resume/probe, cost cap), `estimate`,
   `download`, `metrics/`, `scoring`, `compare`, `server/` (HTTP API).
-- `datasets/<name>/` - one folder per dataset: `metadata.json` and `adapter.py`.
-  `datasets/synthetic/` is a small fictional set for zero-spend tests.
+- `datasets/<product>/<name>/` - one folder per dataset: `metadata.json` and `adapter.py`.
+  `datasets/eaudit/synthetic/` is a small fictional set for zero-spend tests.
 - `schemas/` - eval's own report schemas (`metrics`, `item_rows`, `compare`). No audit-contract copies.
 - `tests/` - offline tests; no API key or network needed.
 - `runs/`, `data/` - run output and downloaded data (under `IAUDIT_EVAL_HOME`, default `eval/`).
@@ -41,9 +41,9 @@ unnecessary. Contract boundary tests check for backend imports and copied audit 
 
 ## Writing a dataset adapter
 
-Create `eval/datasets/<name>/metadata.json` and `adapter.py` (or use the configured eval home).
-Use a folder name matching `[A-Za-z0-9_-]+`; the metadata `name` must match it. Import `Item`
-and `Unmapped` from `iaudit_eval.datasets.base`, and use `iaudit_eval.datasets.registry.load(name)`
+Create `eval/datasets/<product>/<name>/metadata.json` and `adapter.py` (or use the configured eval home).
+Use a folder name matching `[A-Za-z0-9_-]+`; the metadata `name` must match it. Dataset names
+must be unique across products. Import `Item` and `Unmapped` from `iaudit_eval.datasets.base`, and use `iaudit_eval.datasets.registry.load(name)`
 to load and exercise the adapter. Do not import backend modules.
 
 `metadata.json` keys: `name` (required, string), `title`, `description`, `dataset_version`,
@@ -76,7 +76,7 @@ interview's actual source locations and uncertainty when constructing requests; 
 quotations, speaker identities, or timestamps. Bump `dataset_version` when items or gold change.
 
 Optional hooks, found with `getattr`: `post_download`, `download`, `pairs`, `item_row`,
-`mapping_version`, `report_extra`. See `datasets/synthetic/adapter.py` for a worked example.
+`mapping_version`, `report_extra`. See `datasets/eaudit/synthetic/adapter.py` for a worked example.
 
 ## Manual (owner) steps
 

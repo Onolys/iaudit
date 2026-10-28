@@ -14,7 +14,7 @@ Starts, each in its own process group with prefixed output:
 
 | Prefix | Process | Port |
 |---|---|---|
-| `[backend]` | `uv run uvicorn iaudit_backend.app:app` (in `backend/`) | 8000 |
+| `[backend]` | `uv run uvicorn eaudit.app:app` (in `eaudit/`) | 8000 |
 | `[eval]` | `uv run uvicorn iaudit_eval.server.app:app --no-access-log --host 127.0.0.1` (in `eval/`) | 8100 |
 | `[web]` | `npm run dev` (in `frontend/`) | 5173 |
 

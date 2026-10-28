@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 FIXTURES = Path(__file__).with_name("fixtures")
-MODULE = Path(__file__).resolve().parents[3] / "datasets/tofueval/assessment.py"
+MODULE = Path(__file__).resolve().parents[3] / "datasets/eaudit/tofueval/assessment.py"
 
 
 def load_assessment():

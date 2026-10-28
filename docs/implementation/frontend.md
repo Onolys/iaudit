@@ -42,7 +42,7 @@ Each excerpt starts at its turn range. Expansion grows it by 3 turns per click (
 
 The shell scrolls the left pane only after navigation or stepping, not after a direct click.
 `Header` accepts optional `inputRef` and `onFile`; the file input and upload button
-render only when `onFile` is supplied. Audit supplies both; saved replay omits them.
+render only when `onFile` is supplied. eaudit supplies both; saved replay omits them.
 
 `LeftPane` renders section cards, per-section "Unplaced claims" and a final "Claims outside the supplied assessment" card.
 
@@ -102,8 +102,8 @@ actual cross-dataset HTTP 422 remain inline API errors.
 ItemList, ItemDetail and CompareView abort old requests and ignore stale callbacks
 on identity changes/unmount. Styling is isolated in their component stylesheets and
 metrics/gold stylesheets. The review shell, panes, reducer and ClaimDetail remain
-unchanged. The current response pin is 1.2.0; saved 1.0.0 and 1.1.0 responses fail replay
-without compatibility conversion.
+unchanged. The current response schema pins `0.0.1`; non-conforming saved bodies
+show a validation error, and the owner deletes those files.
 
 See [Eval UI reference](../reference/eval-ui.md) and
 [frontend tests](../testing/frontend.md) for behavior and verification.

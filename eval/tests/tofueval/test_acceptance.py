@@ -110,8 +110,8 @@ def test_saved_worked_example_scores_real_adapter_without_persisting_gold(tmp_pa
         assert result["impl"] == "dataset:tofueval"
     assert entry("concern_match_given_detected_TAM")["ci"] is None
     assert all(e["slice"].get("model_group") == "original_five" for e in report["entries"])
-    assert report["dataset_extra"]["mapping_version"] == "1.0.0"
-    assert report["dataset_extra"]["mapping_sha256"] == "0b5ecb4b33e56d6b3252ef349eaca0158fbc964924d5e0871e1a8266ebad77af"
+    assert report["dataset_extra"]["mapping_version"] == "0.0.1"
+    assert report["dataset_extra"]["mapping_sha256"] == "2c47702f2fb2a07e0b9ec3787ee700f5fafbd1c8f58d18638b61976e6daec303"
     assert len(rows["rows"]) == 1
     row = rows["rows"][0]
     assert row["item_id"] == item.id
@@ -148,7 +148,7 @@ def test_pure_module_imports_without_network_or_client_modules(module, tmp_path)
 
         sys.path.insert(0, sys.argv[3])
         forbidden = ("httpx", "httpcore", "requests", "urllib3", "aiohttp",
-                     "openai", "anthropic", "litellm", "iaudit_backend")
+                     "openai", "anthropic", "litellm", "eaudit")
         def no_network(*args, **kwargs):
             raise AssertionError("Pure module import attempted network")
         socket.socket.connect = no_network
@@ -169,7 +169,7 @@ def test_pure_module_imports_without_network_or_client_modules(module, tmp_path)
         assert "fictional_tofueval.adapter" not in sys.modules
     ''')
     result = subprocess.run(
-        [sys.executable, "-c", script, str(EVAL / "datasets/tofueval"), module, str(EVAL / "src")],
+        [sys.executable, "-c", script, str(EVAL / "datasets/eaudit/tofueval"), module, str(EVAL / "src")],
         cwd=tmp_path, capture_output=True, text=True, timeout=20,
     )
     assert result.returncode == 0, result.stdout + result.stderr
