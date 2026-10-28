@@ -230,7 +230,7 @@ def test_saved_fixture_scoring_uses_adapter_hooks_and_compare_warns(dataset, tmp
     item = items[0]
     sentence = item.payload["sentences"][0]
     response = {
-        "schema_version": "1.2.0", "status": "complete", "warnings": [],
+        "schema_version": "0.0.1", "status": "complete", "warnings": [],
         "claims": [{"id": "fictional", "verdict": "supported", "concerns": [],
                     "explanation": "Fictional support.",
                     "evidence": [{"id": "e1", "role": "supporting",

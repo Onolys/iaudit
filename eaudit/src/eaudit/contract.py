@@ -5,7 +5,7 @@ import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, get_args
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
@@ -18,6 +18,9 @@ _NAMES = {
     "error": "error-response.schema.json",
 }
 _MAX_ISSUES = 5
+
+SchemaVersion = Literal["0.0.1"]
+SCHEMA_VERSION = get_args(SchemaVersion)[0]
 
 
 class ContractError(RuntimeError):

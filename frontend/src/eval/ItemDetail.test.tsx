@@ -46,7 +46,7 @@ it("shows failure fields and gold without mounting review", async () => {
 });
 
 it.each([
-  ["stale", { ...ok, response: { ...ok.response, schema_version: "1.0.0" } }, "The service response uses an unsupported schema version."],
+  ["stale", { ...ok, response: { ...ok.response, schema_version: "1.0.0" } }, "The service response does not match the audit response schema."],
   ["invalid", { ...ok, response: { ...ok.response, claims: "bad" } }, "The service response does not match the audit response schema."],
 ])("uses existing ErrorScreen for %s data without choose-file action", async (_label, body, message) => {
   const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(json(body));

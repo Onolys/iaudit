@@ -2,6 +2,8 @@ import type { EvidenceRole, Verdict } from "../tokens";
 
 export type { EvidenceRole, Verdict };
 
+export const SCHEMA_VERSION = "0.0.1" as const;
+
 export const VERDICTS = [
   "supported",
   "partially_supported",
@@ -59,7 +61,7 @@ export interface Section {
 }
 
 export interface AuditRequest {
-  schema_version: "1.2.0";
+  schema_version: typeof SCHEMA_VERSION;
   request_id?: string;
   transcript: Turn[];
   assessment: Section[];
@@ -118,7 +120,7 @@ export interface RunInfo {
 }
 
 export interface AuditResponse {
-  schema_version: "1.2.0";
+  schema_version: typeof SCHEMA_VERSION;
   request_id?: string;
   status: Status;
   warnings: Warning[];

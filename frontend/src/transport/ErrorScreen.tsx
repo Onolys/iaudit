@@ -23,7 +23,6 @@ const RESPONSE_REASON = {
   empty: "The service returned an empty response.",
   not_json: "The service response is not valid JSON.",
   not_object: "The service response is not a JSON object.",
-  wrong_version: "The service response uses an unsupported schema version.",
   schema: "The service response does not match the audit response schema.",
   duplicate_claim_id: "The service response contains a duplicate claim id.",
   duplicate_evidence_id: "The service response contains a duplicate evidence id within a claim.",

@@ -70,10 +70,10 @@ def test_content_type_must_be_json(client, example_request):
     )
 
 
-def test_unsupported_version_before_schema(client, example_request):
+def test_wrong_version_is_schema_violation(client, example_request):
     example_request["schema_version"] = "2.0.0"
     example_request["bogus"] = 1  # would also fail schema validation
-    assert_error(post(client, example_request), 400, "unsupported_version", "example-001")
+    assert_error(post(client, example_request), 400, "invalid_request", "example-001")
 
 
 def test_missing_version_is_invalid_request(client, example_request):
@@ -247,11 +247,11 @@ def test_deeply_nested_json_is_400(client):
     assert_error(post(client, b"[" * 200_000), 400, "invalid_request")
 
 
-def test_previous_version_1_1_0_is_unsupported(client, example_request):
-    example_request["schema_version"] = "1.1.0"
-    assert_error(post(client, example_request), 400, "unsupported_version", "example-001")
+def test_nonmatching_version_is_invalid_request(client, example_request):
+    example_request["schema_version"] = "9.8.7"
+    assert_error(post(client, example_request), 400, "invalid_request", "example-001")
 
 
-def test_previous_version_1_0_0_is_unsupported(client, example_request):
-    example_request["schema_version"] = "1.0.0"
-    assert_error(post(client, example_request), 400, "unsupported_version", "example-001")
+def test_another_nonmatching_version_is_invalid_request(client, example_request):
+    example_request["schema_version"] = "8.7.6"
+    assert_error(post(client, example_request), 400, "invalid_request", "example-001")

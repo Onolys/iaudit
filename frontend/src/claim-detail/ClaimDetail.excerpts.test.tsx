@@ -26,7 +26,7 @@ const claimOf = (evidence: Claim["evidence"], over: Partial<Claim> = {}): Claim 
 });
 const LONG = "0123456789".repeat(6); // 60 code points
 const req: AuditRequest = {
-  schema_version: "1.2.0",
+  schema_version: "0.0.1",
   transcript: [
     { id: "a", speaker: "A", role: "interviewer", text: "first", timestamp: "00:00:01" },
     { id: "b", speaker: "B", text: LONG },

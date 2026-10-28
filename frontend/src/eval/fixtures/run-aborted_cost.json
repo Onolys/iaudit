@@ -7,7 +7,7 @@
   "seed": null,
   "created_at": "fixture-created",
   "finished_at": "fixture-finished",
-  "schema_version": "1.2.0",
+  "schema_version": "0.0.1",
   "state": "aborted_cost",
   "score_state": "done",
   "totals": {

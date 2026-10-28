@@ -1,6 +1,7 @@
 """Stage 4: resolve verbatim text to spans, enforce contract rules, validate the response."""
 
 from eaudit.config import Settings
+from eaudit.contract import SCHEMA_VERSION
 from eaudit.models import AuditRequest
 
 from . import warnings as w
@@ -89,7 +90,7 @@ def assemble(request: AuditRequest, internal: InternalAudit, cfg: Settings) -> A
     warnings = section_warnings + claim_warnings + aggregates
 
     response: dict = {
-        "schema_version": "1.2.0",
+        "schema_version": SCHEMA_VERSION,
         "status": (
             "partial" if any(x["code"] == "section_not_processed" for x in warnings) else "complete"
         ),

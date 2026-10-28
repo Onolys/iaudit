@@ -33,7 +33,6 @@ from eaudit.pipeline import (
 from eaudit.safe_log import log_event, setup_logging
 
 log = logging.getLogger("iaudit")
-SUPPORTED_VERSION = "1.2.0"
 MAX_SAFE_DEADLINE_S = 100
 _KEY_VARS = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "LITELLM_API_KEY")  # presence only
 
@@ -171,15 +170,6 @@ def create_app(
                 info["turns"] = len(raw["transcript"])
             if isinstance(raw.get("assessment"), list):
                 info["sections"] = len(raw["assessment"])
-
-            # 3. version, before schema validation
-            if "schema_version" in raw and raw["schema_version"] != SUPPORTED_VERSION:
-                raise ApiError(
-                    "unsupported_version",
-                    f"Only schema_version {SUPPORTED_VERSION} is supported.",
-                    400,
-                    request_id,
-                )
 
             # 4. cheap size limits on the parsed lists
             transcript, assessment = raw.get("transcript"), raw.get("assessment")

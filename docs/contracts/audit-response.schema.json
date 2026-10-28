@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "audit-response.schema.json",
   "title": "AuditResponse",
-  "description": "Body of one evidence-consistency audit response, schema 1.2.0. Positions only: do not copy transcript text or timestamps. One request yields one response. No streaming and no background job.",
+  "description": "Body of one evidence-consistency audit response, schema 0.0.1. Positions only: do not copy transcript text or timestamps. One request yields one response. No streaming and no background job.",
   "type": "object",
   "required": ["schema_version", "status", "warnings", "claims"],
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.2.0"
+      "const": "0.0.1"
     },
     "request_id": {
       "type": "string",

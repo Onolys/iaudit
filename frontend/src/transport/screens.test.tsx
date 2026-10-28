@@ -27,7 +27,7 @@ const titles: [LoadError, string, boolean][] = [
   [{ kind: "invalid_response", reason: "empty" }, "Invalid audit response", false],
   [{ kind: "invalid_response", reason: "not_json", message: "oops" }, "Invalid audit response", false],
   [{ kind: "invalid_response", reason: "not_object" }, "Invalid audit response", false],
-  [{ kind: "invalid_response", reason: "wrong_version" }, "Invalid audit response", false],
+  [{ kind: "invalid_response", reason: "schema" }, "Invalid audit response", false],
   [{ kind: "invalid_response", reason: "schema", issues }, "Invalid audit response", false],
   [{ kind: "invalid_response", reason: "duplicate_claim_id", claimId: "c1" }, "Invalid audit response", false],
   [{ kind: "request_id_mismatch", expected: "a", received: "b" }, "Response doesn't match this request.", false],
@@ -35,8 +35,8 @@ const titles: [LoadError, string, boolean][] = [
 
 describe("ErrorScreen", () => {
   it("shows saved-response errors without a choose-file action", () => {
-    render(<ErrorScreen error={{ kind: "invalid_response", reason: "wrong_version" }} />);
-    expect(screen.getByRole("alert").textContent).toContain("unsupported schema version");
+    render(<ErrorScreen error={{ kind: "invalid_response", reason: "schema" }} />);
+    expect(screen.getByRole("alert").textContent).toContain("does not match the audit response schema");
     expect(screen.queryByRole("button", { name: "Choose another file" })).toBeNull();
   });
 
@@ -120,7 +120,7 @@ describe("LoadingView", () => {
 });
 
 describe("WarningsBanner", () => {
-  const base: AuditResponse = { schema_version: "1.2.0", status: "complete", warnings: [], claims: [] };
+  const base: AuditResponse = { schema_version: "0.0.1", status: "complete", warnings: [], claims: [] };
 
   it("is absent for a clean complete response", () => {
     const { container } = render(<WarningsBanner response={base} />);

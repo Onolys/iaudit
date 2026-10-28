@@ -29,7 +29,7 @@ def test_tokens_and_cost_never_populated():
 
 def _resp(ri):
     return {
-        "schema_version": "1.2.0",
+        "schema_version": "0.0.1",
         "status": "complete",
         "warnings": [],
         "claims": [],

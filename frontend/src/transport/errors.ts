@@ -11,7 +11,7 @@ export type LoadError =
   | { kind: "http_5xx"; status: number; message?: string }
   | {
       kind: "invalid_response";
-      reason: "empty" | "not_json" | "not_object" | "wrong_version" | "schema" | "duplicate_claim_id" | "duplicate_evidence_id";
+      reason: "empty" | "not_json" | "not_object" | "schema" | "duplicate_claim_id" | "duplicate_evidence_id";
       message?: string;
       issues?: ValidationIssue[];
       claimId?: string;

@@ -7,11 +7,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from eaudit.contract import SCHEMA_VERSION
 from eaudit.llm.errors import LLMUnavailable
 
 log = logging.getLogger("iaudit")
-
-SCHEMA_VERSION = "1.2.0"
 
 
 class ApiError(Exception):

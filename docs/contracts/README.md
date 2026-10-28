@@ -1,4 +1,4 @@
-# Audit contract 1.2.0
+# Audit contract 0.0.1
 
 Source of truth for the evidence-audit request and response. The frontend owns this contract. The backend implements it.
 
@@ -16,19 +16,13 @@ This is the JSON **body** of one synchronous call. HTTP path, method, and auth a
 
 If this file and a schema disagree about **structure**, the schema wins. If they disagree about a **rule the schema cannot express**, this file wins. Change them in the same commit.
 
-The verdict list and the concern-type list mirror [../mission.md](../mission.md). When the mission changes, update both schemas and this file, then bump `schema_version`.
+The verdict list and the concern-type list mirror [../mission.md](../mission.md). When the mission changes, update both schemas and this file.
 
-## Versioning
+Version: `0.0.1`; no compatibility promise.
 
-`schema_version` is `MAJOR.MINOR.PATCH`.
+All schemas reset to `schema_version` `"0.0.1"`. The project is not deployed; there is no legacy, compatibility layer, or migration. A file or body that does not match the current schema shows a validation error; the user deletes it.
 
-- Removing or renaming a field, or removing an allowed value, bumps **major**.
-- Adding an optional field or an allowed value bumps **minor**.
-- Wording-only changes stay on the same version.
-
-Version history: 1.0.0 initial; 1.1.0 optional `run_info` ([ADR 0014](../decisions/0014-run-info-optional-one-shared-version.md)); 1.2.0 adds the `quantity_mismatch` concern type ([ADR 0015](../decisions/0015-add-quantity-mismatch-widen-attribution-and-context-stripping.md)). 1.0.0 and 1.1.0 are rejected.
-
-A producer must send `"schema_version": "1.2.0"`. A consumer must reject any other value and must not render a partial audit from an invalid body.
+A consumer must not render a partial audit from an invalid body.
 
 ## Conventions
 
@@ -68,7 +62,7 @@ A claim uses the same walk inside one section, so only step 3 applies, against `
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"1.2.0"`. |
+| `schema_version` | yes | Always `"0.0.1"`. |
 | `request_id` | no | Caller-chosen id. Echoed on the response. Not a content hash. |
 | `transcript` | yes | Non-empty array of turns, in order. |
 | `transcript[].id` | yes | Log id. Not an evidence anchor. |
@@ -88,7 +82,7 @@ Ids must be unique among turns, and unique among sections.
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"1.2.0"`. |
+| `schema_version` | yes | Always `"0.0.1"`. |
 | `request_id` | when sent | Exact echo of the request id. |
 | `status` | yes | `complete` or `partial`. |
 | `warnings` | yes | May be empty. |
@@ -197,7 +191,7 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Consumer rules
 
-- If the body fails the schema or `schema_version` is not `1.2.0`, show an error. Do not render half an audit.
+- If the body fails the schema or `schema_version` is not `0.0.1`, show an error. Do not render half an audit.
 - If one span is out of range, still render that claim, with a warning badge. Do not shift the other highlights.
 - Colour and layout are not part of this contract. Verdict drives the left pane. Evidence `role` drives the right pane.
 - The right pane can expand past an excerpt. Expansion uses the same transcript array; it is not a new field.
@@ -205,11 +199,11 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Error response
 
-Any non-2xx reply carries this body instead of an audit. Example: [examples/error.json](examples/error.json). It shares the contract version: request, response and error bodies all carry `1.2.0`. HTTP path and CORS stay out of scope.
+Any non-2xx reply carries this body instead of an audit. Example: [examples/error.json](examples/error.json). It shares the contract version: request, response and error bodies all carry `0.0.1`. HTTP path and CORS stay out of scope.
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"1.2.0"`. |
+| `schema_version` | yes | Always `"0.0.1"`. |
 | `request_id` | no | Echo of the request id, when known. |
 | `error.code` | yes | One value from the table below. |
 | `error.message` | yes | Human-readable plain text, shown to the reviewer as-is. |
@@ -217,7 +211,6 @@ Any non-2xx reply carries this body instead of an audit. Example: [examples/erro
 | Code | Typical HTTP status | Meaning |
 |---|---|---|
 | `invalid_request` | 400, 422 | The request body is malformed or fails the request schema. |
-| `unsupported_version` | 400 | `schema_version` is not supported. |
 | `payload_too_large` | 413 | The request is too large to process. |
 | `rate_limited` | 429 | Too many requests. Retry later. |
 | `internal_error` | 500 | The backend failed. |

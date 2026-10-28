@@ -27,7 +27,6 @@ With the `full` pipeline, a successful reply carries `run_info` (contract: [run_
 
 1. Body size, from `Content-Length` and again while the body is read (reading stops as soon as the cap is passed).
 2. The body parses as a JSON object.
-3. `schema_version` equals `1.2.0` (checked before the schema, so an old client gets `unsupported_version`).
 4. Turn count and section count.
 5. The body matches the request schema.
 6. Turn ids and section ids are unique.
@@ -40,7 +39,6 @@ Every non-2xx reply has the contract error body (`error.code`, `error.message`, 
 | HTTP | `error.code` | When |
 |---|---|---|
 | 400 | `invalid_request` | Not JSON, not an object, fails the request schema, or has duplicate ids. |
-| 400 | `unsupported_version` | `schema_version` is present and is not `1.2.0`. |
 | 413 | `payload_too_large` | Body over `IAUDIT_MAX_BODY_BYTES`, turns over `IAUDIT_MAX_TURNS`, or sections over `IAUDIT_MAX_SECTIONS`. |
 | 415 | `invalid_request` | `Content-Type` is present and is not `application/json`. |
 | 422 | `invalid_request` | Framework fallback for malformed request parameters. |

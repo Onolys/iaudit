@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from eaudit.contract import SCHEMA_VERSION
+
 DATA = Path(__file__).resolve().parent / "data" / "adhd"
 
 
@@ -18,7 +20,7 @@ def canonical_transcript(transcript: list[dict]) -> str:
 
 def make_request(spec: dict, request_id: str, sentences: list[str]) -> dict:
     return {
-        "schema_version": "1.2.0",
+        "schema_version": SCHEMA_VERSION,
         "request_id": request_id,
         "transcript": [dict(t) for t in spec["transcript"]],
         "assessment": [{**spec["section"], "text": " ".join(sentences)}],
