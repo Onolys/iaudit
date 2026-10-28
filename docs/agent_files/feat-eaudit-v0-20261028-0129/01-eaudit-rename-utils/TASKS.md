@@ -12,9 +12,9 @@ Each task is one commit and must leave the eaudit/, eval/ and frontend suites gr
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Mechanical rename backend/ to eaudit/ | none | todo |
-| 2 | Delete .party/ | 1 | todo |
-| 3 | Regroup eval datasets under eaudit/ | 1 | todo |
+| 1 | Mechanical rename backend/ to eaudit/ | none | done |
+| 2 | Delete .party/ | 1 | done |
+| 3 | Regroup eval datasets under eaudit/ | 1 | in-progress |
 | 4 | `product` field on dataset metadata | 3 | todo |
 | 5 | Python utils/ and retry() | 1 | todo |
 | 6 | Frontend utils/: codepoints move and retry() | 1 | todo |
