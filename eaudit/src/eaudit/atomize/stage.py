@@ -7,6 +7,7 @@ from eaudit.llm import LLMBadOutput, LLMError, LLMRequest, LLMTimeout
 from eaudit.models import Section, Turn
 from eaudit.safe_log import log_event
 from eaudit.scales import FrequencyBucket, SeverityBucket, resolve_quantity
+from eaudit.utils.retry import retry
 
 from .models import AtomicClaim, AtomizerOutput, Quantity, SectionAtoms
 from .prompt import Speaker, build_cache_prefix, render_user, roster_from_turns
@@ -117,30 +118,45 @@ async def _atomize(section: Section, roster: list[Speaker], ctx, *, index: int) 
         fixture_key=key,
         deadline=ctx.deadline,
     )
+    previous: tuple[AtomizerOutput, Checked] | None = None
+    retries = 0
+
+    async def attempt(n: int) -> tuple[AtomizerOutput, Checked]:
+        nonlocal previous, retries
+        call_req = req
+        if n == 2:
+            assert previous is not None
+            out, checked = previous
+            retries = 1
+            call_req = LLMRequest(
+                **{
+                    **req.__dict__,
+                    "user": _retry_user(req.user, out, checked),
+                    "fixture_key": f"{key}.retry" if key else None,
+                    "timeout_s": ctx.call_timeout("atomize") or timeout,
+                }
+            )
+        try:
+            out = await _call(call_req, ctx)
+        except LLMError:
+            if previous is None:
+                raise
+            return previous  # keep the first pass; invalid claims are dropped below
+        checked = check_output(out, section.text, roster, cfg)
+        if previous is None or _score(checked) >= _score(previous[1]):
+            previous = out, checked
+        return previous
+
     try:
-        out = await _call(req, ctx)
+        out, checked = await retry(
+            attempt,
+            should_retry=lambda result: not isinstance(result, BaseException)
+            and bool(result[1].errors),
+            attempts=2 if cfg.atomize_retry else 1,
+            can_continue=lambda: ctx.remaining() >= cfg.llm_timeout_s,
+        )
     except LLMError as exc:
         return SectionAtoms(section_index=index, status="failed", failure=_failure_reason(exc))
-    checked = check_output(out, section.text, roster, cfg)
-    retries = 0
-    if checked.errors and cfg.atomize_retry and ctx.remaining() >= cfg.llm_timeout_s:
-        retries = 1
-        retry_req = LLMRequest(
-            **{
-                **req.__dict__,
-                "user": _retry_user(req.user, out, checked),
-                "fixture_key": f"{key}.retry" if key else None,
-                "timeout_s": ctx.call_timeout("atomize") or timeout,
-            }
-        )
-        try:
-            out2 = await _call(retry_req, ctx)
-        except LLMError:
-            pass  # keep the first pass; invalid claims are dropped below
-        else:
-            checked2 = check_output(out2, section.text, roster, cfg)
-            if _score(checked2) >= _score(checked):
-                out, checked = out2, checked2
     return _finish(section, index, out, checked, retries)
 
 
