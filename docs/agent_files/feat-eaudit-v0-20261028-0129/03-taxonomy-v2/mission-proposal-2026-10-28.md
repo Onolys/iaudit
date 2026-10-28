@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Exact mission wording for seventeen checks in four groups, for owner approval before SP03 implementation.
 date: 2026-10-28
 ---
@@ -74,3 +74,7 @@ Under `### No interview administration or protocol review`, replace only the bul
 ## Approval scope
 
 Approval applies to these mission wording changes only: seventeen checks, the narrowed boundaries of checks 6/8/13, new checks 14–17, the four-group mapping, and the explanatory cross-references. Implementation and contract changes remain governed by the approved SP02/SP03 plans. `docs/mission.md` remains unchanged until this wording is approved.
+
+## Approval record
+
+2026-10-28: The user explicitly approved this mission proposal in this session and asked to continue SP03.
