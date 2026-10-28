@@ -12,7 +12,7 @@ Every task regenerates the examples and fixtures it touches, so each commit leav
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Version reset and back-compat deletion | SP01 | todo |
+| 1 | Version reset and back-compat deletion | SP01 | in-progress |
 | 2 | Eval schemas reset | 1 | todo |
 | 3 | 17 concern types and `group` | 1 | todo |
 | 4 | Group headings in the claim detail UI | 3 | todo |
