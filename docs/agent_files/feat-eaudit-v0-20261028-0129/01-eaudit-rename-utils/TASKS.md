@@ -25,7 +25,7 @@ Each task is one commit and must leave the eaudit/, eval/ and frontend suites gr
 | 11 | Frontend retry: eval GETs and audit POST | 6 | done |
 | 12 | Product registry and eaudit names in frontend | 6 | done |
 | 13 | Haiku 5.5 cheap tier | 1 | done |
-| 14 | Acceptance sweep | 1-13 | in-progress |
+| 14 | Acceptance sweep | 1-13 | done |
 
 ## Task 1 — Mechanical rename backend/ to eaudit/
 What it is / what it means: The product stops being named after the umbrella (R1, D1, D9). This commit is purely mechanical so history and review stay clean; no logic edits.
