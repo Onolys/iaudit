@@ -28,6 +28,8 @@ def roster_from_turns(turns: list[Turn]) -> list[Speaker]:
     order: list[str] = []
     roles: dict[str, set[str | None]] = {}
     for t in turns:
+        if t.speaker is None:
+            continue
         if t.speaker not in roles:
             order.append(t.speaker)
             roles[t.speaker] = set()

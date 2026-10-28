@@ -24,15 +24,17 @@ def load_fewshot() -> list[dict]:
     return json.loads(FEWSHOT_PATH.read_text(encoding="utf-8"))["examples"]
 
 
-def _turn_line(i: int, speaker: str, role: str | None, text: str) -> str:
-    return f'<turn i="{i}" speaker="{speaker}" role="{role or "unknown"}">{text}</turn>'
+def _turn_line(i: int, speaker: str | None, role: str | None, text: str) -> str:
+    return (
+        f'<turn i="{i}" speaker="{speaker or "unknown"}" role="{role or "unknown"}">{text}</turn>'
+    )
 
 
 def _gap(a: int, b: int) -> str:
     return f"[... turns {a}-{b} omitted ...]" if a != b else f"[... turn {a} omitted ...]"
 
 
-def _render(rows: list[tuple[int, str, str | None, str]], total: int | None) -> str:
+def _render(rows: list[tuple[int, str | None, str | None, str]], total: int | None) -> str:
     """rows are (index, speaker, role, text) sorted by index; gaps get an omitted marker."""
     out: list[str] = []
     prev = -1

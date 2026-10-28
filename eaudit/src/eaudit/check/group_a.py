@@ -1,6 +1,6 @@
 """Group A: code-only checks (reporter attribution, question-as-answer, missing-role rule).
 
-A turn with `role is None` is excluded from every role-dependent check: its speaker string is
+A turn missing a speaker or role is excluded from every speaker-dependent check: its identity is
 unreliable (for example after a diarization merge). The check is skipped, never guessed, and the
 turn is reported through `ambiguous` so 02 can warn.
 """
@@ -32,7 +32,7 @@ def _answer_turns(seg_turns: list[int], turns: list[IndexedTurn]) -> list[int]:
 
 
 def _turn_match(claim: AtomicClaim, t: IndexedTurn) -> Literal["match", "skip", "mismatch"]:
-    if t.role is None:
+    if t.role is None or t.speaker is None:
         return "skip"
     saw_skip = False
     for e in claim.reported_by:
@@ -62,7 +62,7 @@ def run_group_a(claim: AtomicClaim, link: LinkResult, turns: list[IndexedTurn]) 
         if check_reporters:
             res = [_turn_match(claim, turns[i]) for i in _answer_turns(seg, turns)]
             for i in _answer_turns(seg, turns):
-                if turns[i].role is None:
+                if turns[i].role is None or turns[i].speaker is None:
                     ga.role_skipped += 1
                     ga.ambiguous.append(i)
             if res and "match" not in res:
@@ -84,8 +84,8 @@ def _question_as_answer(ga: GroupA, nonendorsed: list, turns: list[IndexedTurn])
         seg = [s.turn_index for s in e.draft.segments if 0 <= s.turn_index < len(turns)]
         qs = [i for i in seg if Act.question in turns[i].acts] or seg[:1]
         for q in qs:
-            if turns[q].role is None:
+            if turns[q].role is None or turns[q].speaker is None:
                 ga.role_skipped += 1
                 ga.ambiguous.append(q)
-        if any(turns[q].role == Role.interviewer for q in qs):
+        if any(turns[q].role == Role.interviewer and turns[q].speaker is not None for q in qs):
             ga.question_as_answer.append(e.draft.key)

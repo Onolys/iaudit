@@ -32,7 +32,7 @@
   "$defs": {
     "Turn": {
       "type": "object",
-      "required": ["id", "speaker", "text"],
+      "required": ["id", "text"],
       "additionalProperties": false,
       "properties": {
         "id": {
@@ -43,7 +43,7 @@
         "speaker": {
           "type": "string",
           "minLength": 1,
-          "description": "Free text, for example clinician1, patient1, caretaker1, or any custom name. Each distinct string is a distinct speaker. There is no limit on how many."
+          "description": "Optional speaker identity. Missing means unknown; never infer it. Free text, for example clinician1, patient1, caretaker1, or any custom name. Each distinct string is a distinct speaker. There is no limit on how many."
         },
         "role": {
           "enum": ["interviewer", "respondent", "informant", "other"],

@@ -80,7 +80,7 @@ def _sentences(text: str) -> list[tuple[int, int]]:
 
 def check_output(out: AtomizerOutput, text: str, roster: list[Speaker], cfg: Settings) -> Checked:
     res = Checked()
-    known = {s.speaker for s in roster}
+    known = {s.speaker for s in roster if s.speaker}
     seen_refs: set[str] = set()
     assigned: list[tuple[int, int]] = []
     for c in out.claims:

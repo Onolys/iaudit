@@ -62,7 +62,8 @@ def answer_status(turn_ids: list[int], prep: PrepResult) -> str:
         for t in ts
         if Act.answer in t.acts
         and Act.backchannel not in t.acts
-        and any(t.speaker != q.speaker for q in qs)
+        and t.speaker is not None
+        and any(q.speaker is not None and t.speaker != q.speaker for q in qs)
     ]
     if qs and answers:
         return "endorsed"
@@ -192,5 +193,7 @@ def validate_output(
                 )
             )
     counts["items_kept"] = len(evidence)
-    ambiguous = sorted(t for t in cited if prep.turns[t].role is None)
+    ambiguous = sorted(
+        t for t in cited if prep.turns[t].role is None or prep.turns[t].speaker is None
+    )
     return Validated(evidence=evidence, ambiguous_turns=ambiguous, counts=counts)

@@ -19,7 +19,7 @@ for (const [path, text] of Object.entries(files)) {
 }
 
 /** Claim ids whose spans are expected to be flagged; every other pair has none. */
-const FLAGGED: Record<string, string[]> = { default: [], partial: [], "out-of-range": ["c-bad"] };
+const FLAGGED: Record<string, string[]> = { default: [], partial: [], "no-speaker": [], "out-of-range": ["c-bad"] };
 
 describe("mock fixtures", () => {
   it("covers exactly the expected pairs", () => {

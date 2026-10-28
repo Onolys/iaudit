@@ -62,7 +62,8 @@ def stage_block() -> str:
     shots = []
     for n, ex in enumerate(load_fewshot(), 1):
         rows = [
-            f'<turn i="{t["i"]}" speaker="{t["speaker"]}" role="{t["role"] or "unknown"}">'
+            f'<turn i="{t["i"]}" speaker="{t["speaker"] or "unknown"}" '
+            f'role="{t["role"] or "unknown"}">'
             f"{t['text']}</turn>"
             for t in ex["turns"]
         ]

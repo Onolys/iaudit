@@ -29,5 +29,5 @@ def render_user(
     lines = [f"TAG: {', '.join(str(i) for i in requested)}"]
     for t in window:
         mark = " <-" if t.index in requested else ""
-        lines.append(f"[{t.index}] {t.speaker}: {t.text}{mark}")
+        lines.append(f"[{t.index}] {t.speaker or "unknown"}: {t.text}{mark}")
     return "\n".join(lines)

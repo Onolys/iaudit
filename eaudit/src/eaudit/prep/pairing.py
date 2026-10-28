@@ -15,10 +15,12 @@ def pair_turns(turns: list[IndexedTurn]) -> tuple[list[IndexedTurn], list[QAPair
     responds: dict[int, int] = {}
     pairs: list[QAPair] = []
     for q in turns:
-        if Act.question not in q.acts:
+        if Act.question not in q.acts or q.speaker is None:
             continue
         resp: list[int] = []
         for t in turns[q.index + 1 :]:
+            if t.speaker is None:
+                continue
             if t.speaker == q.speaker:
                 break
             if Act.question in t.acts:

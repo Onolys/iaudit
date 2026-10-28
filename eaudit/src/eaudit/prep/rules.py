@@ -111,7 +111,13 @@ def index_turns(turns: list[Turn]) -> list[IndexedTurn]:
         acts: set[Act] = set()
         if questions[i]:
             acts.add(Act.question)
-        after_question = i > 0 and questions[i - 1] and turns[i - 1].speaker != t.speaker
+        after_question = (
+            i > 0
+            and questions[i - 1]
+            and turns[i - 1].speaker is not None
+            and t.speaker is not None
+            and turns[i - 1].speaker != t.speaker
+        )
         acts |= _position_acts(t.text, questions[i], after_question)
         if _is_correction(t.text):
             acts.add(Act.correction)
@@ -137,7 +143,13 @@ def rederive_position_acts(turns: list[IndexedTurn]) -> list[IndexedTurn]:
     for i, t in enumerate(turns):
         is_q = Act.question in t.acts
         prev = turns[i - 1] if i > 0 else None
-        after_q = prev is not None and Act.question in prev.acts and prev.speaker != t.speaker
+        after_q = (
+            prev is not None
+            and Act.question in prev.acts
+            and prev.speaker is not None
+            and t.speaker is not None
+            and prev.speaker != t.speaker
+        )
         acts = (t.acts - {Act.answer, Act.backchannel}) | _position_acts(t.text, is_q, after_q)
         out.append(replace(t, acts=frozenset(acts)) if acts != t.acts else t)
     return out

@@ -88,7 +88,7 @@ def _reply_speakers(e, turns: list) -> list[str]:
     left out (unless every turn is a question)."""
     idx = [s.turn_index for s in e.draft.segments if 0 <= s.turn_index < len(turns)]
     replies = [i for i in idx if Act.question not in turns[i].acts] or idx
-    return sorted({turns[i].speaker for i in replies})
+    return sorted({turns[i].speaker for i in replies if turns[i].speaker is not None})
 
 
 def _rate_ratio_conflict(

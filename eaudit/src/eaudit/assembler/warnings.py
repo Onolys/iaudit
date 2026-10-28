@@ -7,7 +7,7 @@ NOT_PROCESSED = {
     "error": "Section {i} was not processed: an internal error occurred.",
     "no_claims_located": "Section {i} was not processed: no claims could be located in it.",
 }
-AMBIGUOUS = "Speaker role was missing for turn(s) {turns}; no speaker was assumed."
+AMBIGUOUS = "Speaker or role was missing for turn(s) {turns}; none was assumed."
 OUT_OF_RANGE = "An evidence or claim span did not fit the input and was omitted."
 TRUNCATED = "The input could not be processed in full."
 UNLOCATABLE = "A claim in section {i} could not be located in the text and was omitted."

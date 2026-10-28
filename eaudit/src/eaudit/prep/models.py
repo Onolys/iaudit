@@ -18,7 +18,7 @@ class Act(StrEnum):
 class IndexedTurn:
     index: int  # array position; this is the contract span index
     id: str
-    speaker: str
+    speaker: str | None
     role: Role | None  # copied, never inferred
     text: str
     length: int  # len(text), code points

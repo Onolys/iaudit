@@ -16,7 +16,7 @@ Every task regenerates the examples and fixtures it touches, so each commit leav
 | 2 | Eval schemas reset | 1 | done |
 | 3 | 17 concern types and `group` | 1 | done |
 | 4 | Group headings in the claim detail UI | 3 | done |
-| 5 | Optional speaker | 3 | in-progress |
+| 5 | Optional speaker | 3 | done |
 | 6 | Backend error body and detail codes | 1 | todo |
 | 7 | Frontend error handling | 6 | todo |
 | 8 | Contract README tables and ADR 0016 | 3, 5, 6 | todo |

@@ -74,7 +74,7 @@ class _Model(BaseModel):
 
 class Turn(_Model):
     id: str
-    speaker: str
+    speaker: str | None = None
     role: Role | None = None
     text: str
     timestamp: str | None = None

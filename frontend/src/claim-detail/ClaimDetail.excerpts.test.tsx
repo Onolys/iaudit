@@ -90,6 +90,15 @@ describe("excerpts", () => {
     expect(r1.textContent).not.toContain(" · ");
   });
 
+  it("labels missing speaker identity without changing transcript data", () => {
+    const transcript = [{ id: "unknown", text: "Some evidence." }];
+    const request = { ...req, transcript };
+    const e = { id: "e1", role: "supporting" as const, span: span(0, 0, 0, 14) };
+    render(<ClaimDetail {...inlineProps(request, claimOf([e]))} />);
+    expect(screen.getByText("Unknown speaker")).toBeTruthy();
+    expect(transcript[0]).not.toHaveProperty("speaker");
+  });
+
   it("shows (empty turn) for an empty turn inside an excerpt", () => {
     const e = { id: "e1", role: "qualifying" as const, span: span(1, 50, 3, 4) };
     render(<ClaimDetail {...inlineProps(req, claimOf([e]))} />);

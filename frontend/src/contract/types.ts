@@ -56,7 +56,7 @@ export type Status = (typeof STATUSES)[number];
 
 export interface Turn {
   id: string;
-  speaker: string;
+  speaker?: string;
   role?: "interviewer" | "respondent" | "informant" | "other";
   text: string;
   timestamp?: string;

@@ -141,7 +141,9 @@ class TurnIndex:
                     add(r)
             for j in range(h + 1, min(h + 1 + cfg.link_correction_window, len(self.turns))):
                 u = self.turns[j]
-                if Act.correction in u.acts or (u.speaker == t.speaker and j in positive):
+                if Act.correction in u.acts or (
+                    t.speaker is not None and u.speaker == t.speaker and j in positive
+                ):
                     add(j)
         for j in self._later_corrections(claim, anchors, cfg):
             add(j)
@@ -161,13 +163,15 @@ class TurnIndex:
             return []
         have: dict[str, int] = {}
         for h in hits:
-            have[self.turns[h].speaker] = have.get(self.turns[h].speaker, 0) + 1
+            sp = self.turns[h].speaker
+            if sp is not None:
+                have[sp] = have.get(sp, 0) + 1
         adds: list[int] = []
         for i in ranked:  # best first, so each speaker's best turns come first
             if len(adds) >= budget:
                 break
             sp = self.turns[i].speaker
-            if i not in hits and have.get(sp, 0) < floor:
+            if sp is not None and i not in hits and have.get(sp, 0) < floor:
                 adds.append(i)
                 have[sp] = have.get(sp, 0) + 1
         return adds
@@ -183,6 +187,8 @@ class TurnIndex:
         out: list[int] = []
         for h in anchors:
             speaker = self.turns[h].speaker
+            if speaker is None:
+                continue
             for j in range(h + 1, len(self.turns)):
                 u = self.turns[j]
                 if (
