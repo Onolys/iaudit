@@ -12,6 +12,8 @@ This is the JSON **body** of one synchronous call. HTTP path, method, and auth a
 | [examples/request.json](examples/request.json), [examples/response.json](examples/response.json) | One fictional worked example (pair `default`). |
 | [examples/partial.request.json](examples/partial.request.json), [examples/partial.response.json](examples/partial.response.json) | Fictional `partial` audit: one section not processed, plus a second warning. |
 | [examples/out-of-range.request.json](examples/out-of-range.request.json), [examples/out-of-range.response.json](examples/out-of-range.response.json) | Fictional audit where exactly one claim span runs past the section text. It intentionally breaks rule 1 so consumers can be tested against it; no other example does. |
+| [examples/no-speaker.request.json](examples/no-speaker.request.json), [examples/no-speaker.response.json](examples/no-speaker.response.json) | Fictional audit with omitted speaker identities and an ambiguity warning. |
+| [examples/error.json](examples/error.json), [examples/multi-error.json](examples/multi-error.json) | Single-detail and multiple-detail error bodies. |
 | This file | Conventions, field meanings, allowed values, and rules a schema cannot express. |
 
 If this file and a schema disagree about **structure**, the schema wins. If they disagree about a **rule the schema cannot express**, this file wins. Change them in the same commit.
@@ -20,7 +22,7 @@ The verdict list and the concern-type list mirror [../mission.md](../mission.md)
 
 Version: `0.0.1`; no compatibility promise.
 
-All schemas reset to `schema_version` `"0.0.1"`. The project is not deployed; there is no legacy, compatibility layer, or migration. A file or body that does not match the current schema shows a validation error; the user deletes it.
+**Contract-versioning rule (whole initiative): all schemas are `"0.0.1"`; the project is not deployed; no legacy/back-compat code, version history or migration; a non-conforming file just shows a validation error and the owner deletes it.**
 
 A consumer must not render a partial audit from an invalid body.
 
@@ -66,7 +68,7 @@ A claim uses the same walk inside one section, so only step 3 applies, against `
 | `request_id` | no | Caller-chosen id. Echoed on the response. Not a content hash. |
 | `transcript` | yes | Non-empty array of turns, in order. |
 | `transcript[].id` | yes | Log id. Not an evidence anchor. |
-| `transcript[].speaker` | yes | Free-text speaker name. |
+| `transcript[].speaker` | no | Non-empty free-text speaker name when supplied. Omitted means unknown; never infer it or insert an empty string, `null`, or a placeholder. |
 | `transcript[].role` | no | `interviewer`, `respondent`, `informant`, or `other`. Fixed list so checks 3 and 9 can rely on it. Omit rather than guess. |
 | `transcript[].text` | yes | Turn text. May be empty. |
 | `transcript[].timestamp` | no | Display exactly as supplied. Never inferred. |
@@ -77,6 +79,8 @@ A claim uses the same walk inside one section, so only step 3 applies, against `
 | `assessment[].text` | yes | The clinician's reasoning for this section. |
 
 Ids must be unique among turns, and unique among sections.
+
+A turn without `speaker` stays unknown. Speaker-dependent checks and question/answer pairing skip it. A claim citing a turn without `speaker` or `role` receives `ambiguous_speaker`; neither identity nor role is assumed. The UI displays "Unknown speaker" for an omitted speaker.
 
 ## Response
 
@@ -131,25 +135,49 @@ These are the mission's results, plus outside-of-scope. The left pane distinguis
 | `insufficient_evidence` | The material does not establish the claim, or is too ambiguous. | Not verified. **Not** the same as wrong. |
 | `out_of_scope` | External criteria or unavailable observations. Not a factual verdict. | Not checkable. |
 
+### Concern
+
+| Field | Required | Meaning |
+|---|---|---|
+| `type` | yes | One of the 17 concern types below. |
+| `group` | yes | The group assigned to `type` in the table below. A different group is invalid. |
+| `explanation` | yes | Non-empty explanation of the potential discrepancy. Not a quote. |
+| `evidence_ids` | yes | Array of evidence ids on this claim. May be empty. |
+
+Group labels are display text, not fields in the concern object. The backend emits `group` from the type-to-group map; the response schema enforces the mapping and the frontend validates against that schema.
+
+| `group` value | UI label |
+|---|---|
+| `not_in_interview` | Not in interview |
+| `opposite_of_interview` | Opposite of interview |
+| `changed_detail` | Changed detail |
+| `missing_context` | Missing context |
+
+The UI groups a claim's concerns in the order above, omits empty groups, and preserves concern order within each group.
+
 ### Concern types
 
-A claim may have several. Explain the discrepancy once; do not repeat the same finding. Order matches mission checks 1–13.
+A claim may have several. Explain the discrepancy once; do not repeat the same finding. Rows follow contract enum order.
 
-| Value | Mission check |
-|---|---|
-| `unsupported_claim` | 1. Claim support |
-| `contradictory_evidence` | 2. Contradictory evidence |
-| `wrong_attribution` | 3. Wrong person, source, or entity attribution |
-| `timeframe_mismatch` | 4. Timeframe mismatch |
-| `negation_reversal` | 5. Negation reversal |
-| `certainty_inflation` | 6. Certainty inflation |
-| `frequency_severity_inflation` | 7. Frequency or severity inflation |
-| `context_stripping` | 8. Context stripping |
-| `question_as_answer` | 9. Question mistaken for an answer |
-| `correction_ignored` | 10. Correction ignored |
-| `conflicting_accounts_flattened` | 11. Conflicting accounts flattened |
-| `unsupported_causal_link` | 12. Unsupported causal links |
-| `quantity_mismatch` | 13. Quantity mismatch |
+| Value | Label | Group |
+|---|---|---|
+| `unsupported_claim` | Claim support | `not_in_interview` |
+| `contradictory_evidence` | Contradictory evidence | `opposite_of_interview` |
+| `wrong_attribution` | Wrong person, source, or entity attribution | `changed_detail` |
+| `timeframe_mismatch` | Timeframe mismatch | `changed_detail` |
+| `negation_reversal` | Negation reversal | `opposite_of_interview` |
+| `certainty_inflation` | Certainty inflation | `changed_detail` |
+| `frequency_severity_inflation` | Frequency or severity inflation | `changed_detail` |
+| `context_stripping` | Context stripping | `missing_context` |
+| `question_as_answer` | Question mistaken for an answer | `not_in_interview` |
+| `correction_ignored` | Correction ignored | `missing_context` |
+| `conflicting_accounts_flattened` | Conflicting accounts flattened | `missing_context` |
+| `unsupported_causal_link` | Unsupported causal links | `not_in_interview` |
+| `quantity_mismatch` | Quantity mismatch | `changed_detail` |
+| `opinion_as_fact` | Opinion stated as fact | `changed_detail` |
+| `calculation_error` | Calculation error | `changed_detail` |
+| `meaning_shift` | Meaning shift | `changed_detail` |
+| `unsupported_inference` | Unsupported inference | `not_in_interview` |
 
 Omitting a type means the audit did not find that concern. It is not a way to say the check was skipped. This version has no coverage field.
 
@@ -168,7 +196,7 @@ Omitting a type means the audit did not find that concern. It is not a way to sa
 |---|---|---|
 | `section_not_processed` | That assessment section was skipped. | `section_index` |
 | `span_out_of_range` | A returned span does not fit the input. | `claim_id` |
-| `ambiguous_speaker` | Speaker identity is unclear and was not guessed. | — |
+| `ambiguous_speaker` | A claim cites a turn without `speaker` or `role`; neither was assumed. Message: "Speaker or role was missing for turn(s) {turns}; none was assumed." | — |
 | `input_truncated` | The input could not be processed in full, beyond one section. | — |
 | `other` | Anything else, explained in `message`. | — |
 
@@ -191,7 +219,7 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Consumer rules
 
-- If the body fails the schema or `schema_version` is not `0.0.1`, show an error. Do not render half an audit.
+- If the body fails the current schema, show a validation error. Do not render a partial audit from an invalid body.
 - If one span is out of range, still render that claim, with a warning badge. Do not shift the other highlights.
 - Colour and layout are not part of this contract. Verdict drives the left pane. Evidence `role` drives the right pane.
 - The right pane can expand past an excerpt. Expansion uses the same transcript array; it is not a new field.
@@ -199,25 +227,42 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Error response
 
-Any non-2xx reply carries this body instead of an audit. Example: [examples/error.json](examples/error.json). It shares the contract version: request, response and error bodies all carry `0.0.1`. HTTP path and CORS stay out of scope.
+Every non-2xx reply carries this body instead of an audit. Examples: [examples/error.json](examples/error.json), [examples/multi-error.json](examples/multi-error.json). Request, response and error bodies share `schema_version: "0.0.1"`.
 
 | Field | Required | Meaning |
 |---|---|---|
 | `schema_version` | yes | Always `"0.0.1"`. |
 | `request_id` | no | Echo of the request id, when known. |
-| `error.code` | yes | One value from the table below. |
-| `error.message` | yes | Human-readable plain text, shown to the reviewer as-is. |
+| `status` | yes | Integer from 400 through 599; equals the HTTP response status. |
+| `message` | yes | Non-empty plain text shown to the reviewer as-is. Fixed backend text for the error class. |
+| `details` | yes | Array containing at least one detail. Several details may describe the failure; request schema validation reports at most five issues. |
+| `details[].code` | yes | One of the 18 detail codes below. |
+| `details[].message` | yes | Non-empty plain text containing schema paths and fixed text only, never input values. |
 
-| Code | Typical HTTP status | Meaning |
-|---|---|---|
-| `invalid_request` | 400, 422 | The request body is malformed or fails the request schema. |
-| `payload_too_large` | 413 | The request is too large to process. |
-| `rate_limited` | 429 | Too many requests. Retry later. |
-| `internal_error` | 500 | The backend failed. |
-| `unavailable` | 502, 503, 504 | The backend is down or overloaded. |
-| `other` | any | Anything else, explained in `message`. |
+The body has no top-level code or nested `error` object. A wrong `schema_version` is a `schema_violation` at the schema-version path, just like any other invalid field.
 
-Consumer rule: if the body validates against the schema, show `error.message`. If not (empty, HTML, other JSON), fall back to generic text for the HTTP status. Never render an audit from an error body.
+| Code | HTTP | Raised by | Meaning | UI message (frontend, from `message`; fallback text if body invalid) | Reviewer action |
+|---|---|---|---|---|---|
+| `invalid_json` | 400 | app.py step 2 | Body is not JSON or not a JSON object | Request rejected: the file is not valid JSON. | Fix the JSON file. |
+| `unsupported_media_type` | 415 | step 0 | Content-Type is not application/json | Request rejected: wrong content type. | Send JSON. |
+| `schema_violation` | 400 | step 5 | Body fails request schema (incl. wrong `schema_version`, missing field, bad enum) | Request rejected + each detail line (path: reason) | Fix the listed fields or delete the file. |
+| `empty_transcript` | 400 | step 5 | `transcript` is `[]` | Request rejected: the transcript has no turns. | Add turns. |
+| `empty_assessment` | 400 | step 5 | `assessment` is `[]` | Request rejected: the assessment has no sections. | Add sections. |
+| `duplicate_ids` | 400 | step 6 | Duplicate turn or section ids (counts only) | Request rejected: duplicate ids. | Make ids unique. |
+| `invalid_parameters` | 422 | validation handler | Non-body parameter error (paths only) | Request rejected: invalid parameters. | Retry with a standard client. |
+| `body_too_large` | 413 | steps 1 | Body over `max_body_bytes` | Request too large. | Split or shorten the input. |
+| `too_many_turns` | 413 | step 4 | Over `max_turns` | Transcript has too many turns. | Shorten transcript. |
+| `too_many_sections` | 413 | step 4 | Over `max_sections` | Assessment has too many sections. | Shorten assessment. |
+| `rate_limited` | 429 | reserved, not raised today (kept in enum) | Too many requests | Too many requests. | Wait and retry. |
+| `not_found` | 404 | http handler | Unknown path | Service endpoint not found. | Check the configured URL. |
+| `method_not_allowed` | 405 | http handler | Wrong HTTP method | Method not allowed. | Use POST /v1/audit. |
+| `cors_rejected` | 400/403 (as the preflight status) | CORS middleware | Preflight origin/method/header refused | Cross-origin request blocked. | Add origin to backend CORS settings. |
+| `request_rejected` | other 4xx | http handler fallback | Any other framework HTTP error | Request could not be served. | Retry; report if repeated. |
+| `upstream_unavailable` | 503 | `LLMUnavailable` | Model provider unreachable or failing after retries | Audit service temporarily unavailable. | Retry later (retryable). |
+| `deadline_exceeded` | 504 | `DeadlineExceeded`/`TimeoutError` | Audit deadline passed with no usable result | The audit ran out of time. | Retry or use a shorter input (retryable). |
+| `internal_error` | 500 | catch-all; response self-validation failure | Backend bug | Internal server error. | Report; retry once (retryable). |
+
+Consumer rule: if the body validates against the error schema and its `status` equals the HTTP response status, show `message`, followed by each `details[].message` as a list. Otherwise (including empty, HTML, or other JSON), use generic text for the HTTP status. Never render an audit from an error body. Retry decisions use HTTP status only; detail codes are for display and diagnostics. Automatic audit POST retry is limited to 429.
 
 ## Non-goals
 

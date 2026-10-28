@@ -184,8 +184,8 @@ it can still replay a valid saved response. If none exists, it says
 `No saved audit response is available.`
 
 Saved requests and responses pass the same validators as eaudit. The current audit
-contract pin is **1.2.0**: saved 1.0.0 and 1.1.0 responses show the unsupported-version error.
-This is an accepted limitation; there is no replay compatibility layer. Run lists, saved
+contract pin is **0.0.1**: bodies that fail the current schema show a validation error.
+The owner deletes non-conforming files. Run lists, saved
 metrics and comparisons remain available independently of item replay validation.
 
 ### Gold kinds
@@ -220,7 +220,7 @@ the proxy against a stub. The following live checks remain for the owner:
 - After downloading the real dataset and completing a paid pilot, open one real
   TofuEval item and compare its gold with the source CSV; inspect run detail and compare.
 - Open the largest saved item and check its load time in a real browser.
-- Verify that older (1.1.0 and earlier) items show the unsupported-version screen while
+- Verify that non-conforming saved items show a validation error while
   run lists, metrics and comparisons still work.
 
 Full-stack launches, live provider calls and real dataset downloads are owner checks;

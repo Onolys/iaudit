@@ -1,6 +1,6 @@
 # Local setup and live verification
 
-Set up every component, run the offline checks, and work through the owner live checks after taxonomy v1 (contract 1.2.0).
+Set up every component, run the offline checks, and work through the owner live checks after taxonomy v1 (contract 0.0.1).
 
 **Audience:** contributors and the repository owner.
 
@@ -71,7 +71,7 @@ npm run build
 
 Docs only: `cd eaudit && uv run pytest tests/test_docs_drift.py -q`. More: [running-tests.md](running-tests.md), [frontend.md](frontend.md), [evaluation.md](evaluation.md).
 
-## Owner live checks after taxonomy v1 / contract 1.2.0
+## Owner live checks after taxonomy v1 / contract 0.0.1
 
 These need a key, spend money and are not run by agents. Start a cost-capped pilot first where a command offers `--max-cost`.
 
@@ -81,7 +81,7 @@ These need a key, spend money and are not run by agents. Start a cost-capped pil
 - [ ] **d. TofuEval.** In the Eval tab: dataset TofuEval, split `dev`, a small N (for example 5) with a max cost, then the full dev split; check the estimate, progress, metrics and an item ([eval UI](../reference/eval-ui.md), [frontend.md](frontend.md#before-a-release)). Run the `test` split once, at the end only; the repeated use compromises the holdout (`test_split_note` in `eval/datasets/eaudit/tofueval/metadata.json`).
 - [ ] **e. ADHD buckets 3 and 8 precision, before vs after.** Bucket numbers are mission checks (3 wrong attribution, 8 context stripping). Run `uv run python -m eval.run --mode e2e --live --max-cost <USD> --out <dir>` in `eaudit/` on the new prompts, and the same on the pre-taxonomy commit, then `uv run python -m eval.compare a/report.json b/report.json`. Rows under 5 faults are "indicative only" ([evaluation.md](evaluation.md#reading-a-report)). Check that `--out` and the report file layout match your run; the repo does not document a "before" baseline.
 - [ ] **f. p95 latency vs the 100 s deadline.** `uv run python -m eval.run --mode e2e --live` and read the request p50 and max in the report; also `Server-Timing` in devtools ([latency.md](latency.md#live)). The repo documents p50 and max, not p95; derive it from the TofuEval run's per-item timings if needed. Cap is `IAUDIT_AUDIT_DEADLINE_S` (100); the eval client waits 120 s.
-- [ ] **g. End-to-end via the review UI.** `scripts/dev.sh`, upload a real request in Audit, check findings highlight. Saved 1.1.0 (and older) items no longer open in the item view and show the unsupported-version screen (accepted); run lists, metrics and comparisons still work ([frontend.md](frontend.md#before-a-release)). Other eval UI owner checks: [eval-ui.md](../reference/eval-ui.md#owner-manual-checks).
+- [ ] **g. End-to-end via the review UI.** `scripts/dev.sh`, upload a real request in Audit, check findings highlight. Saved bodies that fail the current schema show a validation error; run lists, metrics and comparisons still work ([frontend.md](frontend.md#before-a-release)). Other eval UI owner checks: [eval-ui.md](../reference/eval-ui.md#owner-manual-checks).
 - [ ] **h. Refresh recordings (prompts changed in taxonomy v1).** In `eaudit/`: `uv run python -m eval.run --mode all --live --record --max-cost 5`, then replay with `--strict-fresh` (for example `uv run python -m eval.run --mode all --strict-fresh`) must pass. Commit only synthetic ADHD recordings ([pre-release-checklist.md](pre-release-checklist.md) step 4, [recorded/README.md](../../eaudit/eval/recorded/README.md)).
 
 Then the rest of [pre-release-checklist.md](pre-release-checklist.md).

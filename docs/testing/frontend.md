@@ -46,8 +46,8 @@ Transport tests inject `fetch`, config and the mock registry; no test touches a 
 - [ ] Owner: open one real eval item after the dataset download and pilot run, compare
   GoldPanel with its source, and inspect run metrics and two-run comparison.
 - [ ] Owner: reopen Eval mid-run and verify attachment; open the largest saved item.
-- [ ] Owner: saved 1.1.0 (and older) items fail replay with the version error, while
-  metrics/list/compare remain available. Stale-version behavior is covered offline.
+- [ ] Owner: saved bodies that fail the current schema show a validation error, while
+  metrics/list/compare remain available. Invalid-body behavior is covered offline.
 - [ ] The [known limits](../concepts/review-ui.md#known-limits) are still accurate.
 
 The current `.env.example` points eaudit at `http://localhost:8000/v1/audit`.
@@ -65,7 +65,7 @@ smoke and real-browser checks above remain owner-only.
 | `app/Header.test.tsx`, `transport/screens.test.tsx`, `transport/runAudit.test.ts` | Optional upload/file action and shared response checks preserve Audit behavior. |
 | `eval/evalApi.test.ts`, `eval/fixtures.test.ts`, `eval/d2ApiFixtures.test.ts` | Injected-fetch routes/errors/encoding, metrics-null 404, and every JSON fixture registered and Ajv-valid. |
 | `eval/usePolling.test.tsx`, `eval/RunPanel.lifecycle.test.tsx`, `eval/RunsList.test.tsx`, `eval/EvalApp.runs.test.tsx` | Lifecycle, polling, resume, list navigation and cancellation. |
-| `eval/buildLoadResult.test.ts` | Actual contract pair replay, stale 1.0.0, invalid requests/responses and zero fetch/JSON parsing. |
+| `eval/buildLoadResult.test.ts` | Actual contract pair replay, invalid schema versions, invalid requests/responses and zero fetch/JSON parsing. |
 | `eval/MetricsTable.test.tsx`, `eval/RunInfoBlock.test.tsx` | Grouping, policies, authoritative item counts, paper evaluator identity, CI hints and provenance. |
 | `eval/ItemList.test.tsx` | Filter requests, raw-ID actions, empty/dim loading, Retry and stale/unmount protection. |
 | `eval/RunDetail.test.tsx`, `eval/RunDetail.item-refresh.test.tsx` | Scoring/rescore lifecycle, item refresh with filter preserved, failure/missing metrics, 409, lost contact and cleanup. |

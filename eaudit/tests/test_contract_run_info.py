@@ -22,7 +22,7 @@ def _validator(name):
 
 
 def _kind(path: Path) -> str:
-    if path.name == "error.json":
+    if path.name.endswith("error.json"):
         return "error-response"
     if path.name.endswith("request.json"):
         return "audit-request"

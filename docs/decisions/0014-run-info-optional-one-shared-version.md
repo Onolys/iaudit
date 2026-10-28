@@ -4,7 +4,7 @@
 
 **Status:** accepted.
 
-Amended by ADR 0016: contract reset to 0.0.1.
+Amended by [ADR 0016](0016-contract-reset-0-0-1-groups-optional-speaker-error-details.md): contract reset to `0.0.1`; the decisions below remain in effect.
 
 **Context.** The evaluation needs to know which models and prompts produced a run, and the backend is the only place that knows. The contract has no field for it. All three schemas pin `schema_version` and consumers validate bodies against those schemas.
 

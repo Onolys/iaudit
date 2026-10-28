@@ -25,6 +25,7 @@ With the `full` pipeline, a successful reply carries `run_info` (contract: [run_
 
 `POST /v1/audit` checks in this order and stops at the first failure.
 
+0. `Content-Type`, when supplied, is `application/json`.
 1. Body size, from `Content-Length` and again while the body is read (reading stops as soon as the cap is passed).
 2. The body parses as a JSON object.
 4. Turn count and section count.
@@ -34,24 +35,30 @@ With the `full` pipeline, a successful reply carries `run_info` (contract: [run_
 
 ## Errors
 
-Every non-2xx reply has the contract error body (`error.code`, `error.message`, and `request_id` when known). Messages never contain request text.
+Every non-2xx reply has the contract error body: `schema_version`, `status` (equal to the HTTP status), `message`, a non-empty `details` list of `{code, message}`, and `request_id` when known. Messages contain paths and fixed text, never request values. The full detail-code and reviewer-action table is in the [contract](../contracts/README.md#error-response).
 
-| HTTP | `error.code` | When |
+| HTTP | `details[].code` | When |
 |---|---|---|
-| 400 | `invalid_request` | Not JSON, not an object, fails the request schema, or has duplicate ids. |
-| 413 | `payload_too_large` | Body over `IAUDIT_MAX_BODY_BYTES`, turns over `IAUDIT_MAX_TURNS`, or sections over `IAUDIT_MAX_SECTIONS`. |
-| 415 | `invalid_request` | `Content-Type` is present and is not `application/json`. |
-| 422 | `invalid_request` | Framework fallback for malformed request parameters. |
-| 404, 405 | `other` | Unknown path or wrong method. |
+| 400 | `invalid_json` | Not JSON or not a JSON object. |
+| 400 | `schema_violation`, `empty_transcript`, `empty_assessment` | Request schema violation (including a wrong schema version), or an empty required array. |
+| 400 | `duplicate_ids` | Turn ids or section ids are duplicated; only counts are reported. |
+| 413 | `body_too_large`, `too_many_turns`, `too_many_sections` | Body over `IAUDIT_MAX_BODY_BYTES`, turns over `IAUDIT_MAX_TURNS`, or sections over `IAUDIT_MAX_SECTIONS`. |
+| 415 | `unsupported_media_type` | `Content-Type` is present and is not `application/json`. |
+| 422 | `invalid_parameters` | Framework fallback for non-body request parameters. |
+| 404 | `not_found` | Unknown path. |
+| 405 | `method_not_allowed` | Wrong HTTP method. |
+| 400, 403 | `cors_rejected` | Rejected preflight; the body status matches the preflight status. |
+| 429 | `rate_limited` | Reserved; not raised today. |
+| other 4xx | `request_rejected` | Other framework HTTP error. |
 | 500 | `internal_error` | Unexpected failure, or the reply failed the response schema. |
-| 503 | `unavailable` | Nothing usable finished because the model provider was unavailable. |
-| 504 | `unavailable` | Nothing usable finished: the deadline passed, or every unit failed (for example, unusable model output). |
+| 503 | `upstream_unavailable` | Nothing usable finished because the model provider was unavailable. |
+| 504 | `deadline_exceeded` | Nothing usable finished: the deadline passed, or every unit failed (for example, unusable model output). |
 
 A run where some sections or claims finish is **not** an error: it returns 200 with warnings (and `status: "partial"` when a section was not processed). The 503 and 504 replies apply only when no section was audited, or when every in-scope claim stalled, so an empty result cannot be mistaken for "nothing wrong".
 
 ## CORS
 
-Only the origins in `IAUDIT_CORS_ORIGINS` (default `http://localhost:5173`) may call the API from a browser. Methods are `POST`, `GET`, and `OPTIONS`; the only allowed header is `content-type`; credentials are off. A rejected preflight returns an error body with code `other`.
+Only the origins in `IAUDIT_CORS_ORIGINS` (default `http://localhost:5173`) may call the API from a browser. Methods are `POST`, `GET`, and `OPTIONS`; the only allowed header is `content-type`; credentials are off. A rejected preflight returns an error body with detail code `cors_rejected`.
 
 ## Settings
 
