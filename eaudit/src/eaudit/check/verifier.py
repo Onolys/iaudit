@@ -18,6 +18,7 @@ from eaudit.link.prompt import render_claim_block, render_turns
 from eaudit.llm import LLMBadOutput, LLMError, LLMRequest, LLMTimeout
 from eaudit.pipeline.layout import shared_layout
 from eaudit.prep import IndexedTurn, PrepResult
+from eaudit.utils.retry import retry
 
 from .models import VerifierOutput
 
@@ -261,28 +262,37 @@ async def verify(
             res.calls += 1
             return (await ctx.llm.complete_json(r, ctx.metrics)).parsed
 
+    missing: list[str] = []
+
+    async def attempt(n: int) -> tuple[VerifierOutput, list[str]]:
+        nonlocal missing
+        request = req
+        if n == 2:
+            res.retries = 1
+            request = LLMRequest(
+                **{
+                    **req.__dict__,
+                    "user": _retry_user(user, missing),
+                    "fixture_key": f"{req.fixture_key}.retry" if req.fixture_key else None,
+                    "timeout_s": ctx.call_timeout("check") or timeout,
+                }
+            )
+        out = await call(request)
+        out, missing = clean_output(out, link)
+        return out, missing
+
     try:
-        out = await call(req)
+        out, missing = await retry(
+            attempt,
+            should_retry=lambda outcome: (
+                not isinstance(outcome, BaseException) and bool(outcome[1])
+            ),
+            attempts=2 if cfg.check_retry else 1,
+            can_continue=lambda: ctx.remaining() >= cfg.llm_timeout_s,
+        )
     except LLMError as exc:
         res.stall = _stall_reason(exc)
         return res
-    out, missing = clean_output(out, link)
-    if missing and cfg.check_retry and ctx.remaining() >= cfg.llm_timeout_s:
-        res.retries = 1
-        retry = LLMRequest(
-            **{
-                **req.__dict__,
-                "user": _retry_user(user, missing),
-                "fixture_key": f"{req.fixture_key}.retry" if req.fixture_key else None,
-                "timeout_s": ctx.call_timeout("check") or timeout,
-            }
-        )
-        try:
-            out = await call(retry)
-        except LLMError as exc:
-            res.stall = _stall_reason(exc)
-            return res
-        out, missing = clean_output(out, link)
     if missing:
         res.stall, res.unjudged = "bad_output", missing
         return res

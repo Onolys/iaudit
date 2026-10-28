@@ -21,8 +21,8 @@ Each task is one commit and must leave the eaudit/, eval/ and frontend suites gr
 | 7 | Swap retry into litellm_client | 5 | done |
 | 8 | Swap retry into atomize stage | 5 | done |
 | 9 | Swap retry into linker | 5 | done |
-| 10 | Swap retry into verifier | 5 | in-progress |
-| 11 | Frontend retry: eval GETs and audit POST | 6 | todo |
+| 10 | Swap retry into verifier | 5 | done |
+| 11 | Frontend retry: eval GETs and audit POST | 6 | in-progress |
 | 12 | Product registry and eaudit names in frontend | 6 | todo |
 | 13 | Haiku 5.5 cheap tier | 1 | todo |
 | 14 | Acceptance sweep | 1-13 | todo |
