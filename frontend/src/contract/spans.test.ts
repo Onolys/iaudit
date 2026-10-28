@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { codePointLength, sliceCodePoints } from "./codepoints";
+import { codePointLength, sliceCodePoints } from "../utils/codepoints";
 import { isSpanValid, walkSpan, segmentSection } from "./spans";
 import type { AuditRequest, Claim, Span } from "./types";
 
