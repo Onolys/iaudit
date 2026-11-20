@@ -22,3 +22,4 @@ Why is it like this? Architecture decision records.
 | [0014](0014-run-info-optional-one-shared-version.md) | `run_info` is optional; one shared contract version |
 | [0015](0015-add-quantity-mismatch-widen-attribution-and-context-stripping.md) | Add `quantity_mismatch`; widen attribution and context stripping |
 | [0016](0016-contract-reset-0-0-1-groups-optional-speaker-error-details.md) | Reset the contract; group concerns; allow missing speakers; detail errors |
+| [0017](0017-workspace-routes-shared-core.md) | uv workspace, model routes and a shared `onolys_core` |

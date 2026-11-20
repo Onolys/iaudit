@@ -2,7 +2,7 @@
 
 `docs/mission.md` is the governing mission statement. Read it before any work. It wins over other docs when they conflict.
 
-Do not build outside its scope (diagnosis, scoring, protocol review, or file-format support) without the user's explicit approval.
+The platform scope covers evidence audit (`eaudit`), protocol audit with scoring and protocol review (`paudit`), and a future clinician audit (`caudit`), each in its own engine under `engines/`. Do not build outside that scope (diagnosis, clinical-correctness judgement, or file-format support) without the user's explicit approval.
 
 Never invent quotations, speaker identities, or timestamps.
 
@@ -11,6 +11,7 @@ Never invent quotations, speaker identities, or timestamps.
 | Path | Purpose | Audience |
 |---|---|---|
 | `docs/mission.md` | Governing mission and scope | Everyone |
+| `engines/` | Audit engines (`eaudit`, shared `core`; later `paudit`, `evaluation`); each has its own README | Contributors and coding agents |
 | `docs/architecture.md` | High-level design: how the system fits together | Everyone |
 | `docs/concepts/` | How should I think about this? Behavior that crosses components | Users and contributors |
 | `docs/implementation/` | How is this implemented? Private implementation details | Maintainers and coding agents |

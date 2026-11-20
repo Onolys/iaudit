@@ -34,6 +34,8 @@ jobs:
           fetch-depth: 0
       - name: Test changes.sh
         run: bash scripts/ci/test_changes.sh
+      - name: Check markdown links
+        run: python3 scripts/ci/check_links.py
       - id: flags
         env:
           EVENT: ${{ github.event_name }}
