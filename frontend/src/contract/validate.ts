@@ -1,7 +1,5 @@
-import Ajv2020 from "ajv/dist/2020";
 import type { ErrorObject } from "ajv";
-import requestSchema from "@contracts/audit-request.schema.json";
-import responseSchema from "@contracts/audit-response.schema.json";
+import { checkRequest, checkResponse } from "../generated/contract";
 import type { AuditRequest, AuditResponse } from "./types";
 
 export type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
@@ -18,9 +16,7 @@ export type ResponseError =
   | { kind: "duplicate_claim_id"; id: string }
   | { kind: "duplicate_evidence_id"; claimId: string; id: string };
 
-const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true, strictTypes: false });
-const checkRequest = ajv.compile(requestSchema);
-const checkResponse = ajv.compile(responseSchema);
+// Validators are precompiled by scripts/compile-validators.mjs (no runtime codegen; strict CSP).
 
 function issues(errors: ErrorObject[] | null | undefined): ValidationIssue[] {
   return (errors ?? []).map((e) => ({

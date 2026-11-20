@@ -1,4 +1,4 @@
-import Ajv2020 from "ajv/dist/2020";
+import * as compiled from "../generated/evalApi";
 import type { ValidateFunction } from "ajv";
 import schema from "@eval-api/eval-api.schema.json";
 import { retry } from "../utils/retry";
@@ -27,20 +27,15 @@ export interface EvalApi {
 }
 export interface EvalApiDeps { fetch: typeof fetch; baseUrl?: string }
 
-// Nested B3 reports have their own $id and local $defs; Ajv resolves them in that scope.
-const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true, strict: false });
-ajv.addSchema(schema);
-const validators = new Map<string, ValidateFunction>();
+// Validators are precompiled by scripts/compile-validators.mjs (no runtime codegen; strict CSP).
+// Nested B3 reports keep their own $id and local $defs scope there. "X[]" is exported as "XList".
+const validators = compiled as unknown as Record<string, ValidateFunction>;
 function validator(name: string): ValidateFunction {
-  let check = validators.get(name);
-  if (!check) {
-    const array = name.endsWith("[]");
-    const ref = `${schema.$id}#/$defs/${array ? name.slice(0, -2) : name}`;
-    check = ajv.compile(array ? { type: "array", items: { $ref: ref } } : { $ref: ref });
-    validators.set(name, check);
-  }
-  return check;
+  return validators[name.replace(/\[\]$/, "List")]!;
 }
+// Same text as Ajv's errorsText().
+const errorsText = (errors: ValidateFunction["errors"]) =>
+  errors?.length ? errors.map(e => `data${e.instancePath} ${e.message}`).join(", ") : "No errors";
 const badBody = (message: string): Result<never, EvalError> => ({ ok: false, error: { kind: "bad_body", message } });
 const unreachable = (): Result<never, EvalError> => ({ ok: false, error: { kind: "unreachable" } });
 const encode = encodeURIComponent;
@@ -98,7 +93,7 @@ export function createEvalApi({ fetch: doFetch, baseUrl = "/eval-api" }: EvalApi
           return response.status === 502 ? unreachable() : badBody("Response does not match the API error schema");
         }
         const check = validator(schema["x-routes"][route]);
-        if (!check(data)) return badBody(`Response does not match ${schema["x-routes"][route]}: ${ajv.errorsText(check.errors)}`);
+        if (!check(data)) return badBody(`Response does not match ${schema["x-routes"][route]}: ${errorsText(check.errors)}`);
         return { ok: true, value: data as T };
       } catch { return unreachable(); }
     };

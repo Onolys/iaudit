@@ -11,6 +11,7 @@ npm run dev
 ```
 
 Other scripts: `npm run build`, `npm run preview`, `npm test`, `npm run typecheck`.
+Ajv validators are precompiled (no runtime `new Function`, so the strict CSP holds): `scripts/compile-validators.mjs` writes the gitignored `src/generated/`, run automatically by `predev`/`prebuild`/`pretest`/`pretypecheck`.
 
 `VITE_EVAL_ENABLED`: the Eval tab (and all eval requests) is on unless this is exactly `false`. `frontend/.env.production`
 sets it to `false`, so `npm run build` (the deployed build) never shows Eval; local `npm run dev` is unchanged.

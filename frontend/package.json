@@ -4,10 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/compile-validators.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/compile-validators.mjs",
     "build": "tsc --noEmit -p . && vite build",
     "preview": "vite preview",
+    "pretest": "node scripts/compile-validators.mjs",
     "test": "vitest run",
+    "pretypecheck": "node scripts/compile-validators.mjs",
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {

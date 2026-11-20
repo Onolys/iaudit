@@ -1,5 +1,4 @@
-import Ajv2020 from "ajv/dist/2020";
-import resultSchema from "@paudit-schema/paudit-result.schema.json";
+import { checkResult } from "../generated/paudit";
 import type { AppConfig } from "../config";
 import { readErrorBody, type ErrorDetail } from "../transport/errorBody";
 import sampleResult from "./fixtures/sample-result.json";
@@ -19,9 +18,6 @@ export interface PauditDeps {
 export type ApiResult<T> =
   | { ok: true; value: T }
   | { ok: false; message: string; details?: ErrorDetail[] };
-
-const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true, strict: false });
-const checkResult = ajv.compile(resultSchema);
 
 const MOCK_FIXTURE: Fixture = {
   name: "good_practice",
