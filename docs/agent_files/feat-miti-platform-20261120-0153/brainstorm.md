@@ -42,6 +42,7 @@ Clinicians learning MI rate their own practice sessions but get no second opinio
 | DNS records for `app.` and `admin.onolys.com`: Tejit adds them; agents supply exact records (Tejit) | Agents edit DNS | Owner task |
 | Test data: Tejit supplies transcripts now, more test data later; agents also write synthetic fixtures (Tejit) | Agents source data | Tejit owns data |
 | Spend: Tejit sets a monthly GCP budget; app enforces a configurable per-user daily run cap, default 20 (Tejit + Claude default) | No cap | Cost safety |
+| Move engines under one `engines/` folder (`engines/core`, `engines/eaudit`, `engines/paudit`); rework of CI/eval paths accepted (Tejit) | Keep top-level siblings | Tejit: one engines folder |
 
 ## Design
 
