@@ -37,3 +37,15 @@ output "api_url" {
 output "worker_url" {
   value = google_cloud_run_v2_service.worker.uri
 }
+
+output "api_service_name" {
+  value = google_cloud_run_v2_service.api.name
+}
+
+output "worker_service_name" {
+  value = google_cloud_run_v2_service.worker.name
+}
+
+output "firestore_db_resource" {
+  value = local.firestore_db_resource
+}

@@ -20,6 +20,7 @@ locals {
     "billingbudgets.googleapis.com",
     "logging.googleapis.com",
     "monitoring.googleapis.com",
+    "policytroubleshooter.googleapis.com",
   ]
 }
 

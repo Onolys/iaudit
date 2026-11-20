@@ -69,3 +69,9 @@ variable "admin_staging_site_id" {
   type    = string
   default = "onolys-admin-staging"
 }
+
+variable "github_repository" {
+  description = "GitHub repo (owner/name) allowed to impersonate the deployer SAs via WIF."
+  type        = string
+  default     = "Onolys/onolys"
+}
