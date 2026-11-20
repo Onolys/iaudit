@@ -5,11 +5,17 @@ name: deploy-staging
 #   WIF_PROVIDER, DEPLOYER_STAGING_SA, GCP_PROJECT (optional, default onolys), GCP_REGION (optional, default us-central1),
 #   STAGING_VITE_FIREBASE_API_KEY, STAGING_VITE_FIREBASE_AUTH_DOMAIN, STAGING_VITE_FIREBASE_APP_ID,
 #   STAGING_VITE_FIREBASE_STORAGE_BUCKET, STAGING_VITE_FIREBASE_MESSAGING_SENDER_ID, STAGING_VITE_CONTACT_EMAIL (optional)
+# TEMP (owner-approved 2026-11-20): deploy staging from feat/miti-platform before merge. REMOVE before merging PR #35.
+# (the push trigger below + the `github.event_name == 'push'` condition in the build job). workflow_run cannot be used
+# for this: GitHub runs the default branch's copy of the file, and this file is not on main yet. CI runs in parallel on
+# the PR, so the pushed commit is NOT gated on CI; the config guards below still run.
 on:
   workflow_run:
     workflows: [CI]
     types: [completed]
     branches: [main]
+  push:
+    branches: [feat/miti-platform] # TEMP, see above
   workflow_dispatch:
 
 concurrency:
@@ -27,7 +33,7 @@ env:
 
 jobs:
   build:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
