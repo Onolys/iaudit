@@ -12,8 +12,8 @@ Source of truth: [PRD.md](PRD.md). Lane C. Built on MSW mocks from day one (D5);
 | 2 | API client, error mapping, MSW handlers, fixtures, state machine, status-listener seam | 1 | done |
 | 3 | Auth: sign-up, login, reset, verify-email, guards, token retry | 1, 2 | done |
 | 4 | Session page: status listener, derived timeline, error cards, delete | 2, 3 | done |
-| 5 | Create session form and uploader | 4 | in-progress |
-| 6 | Rating card with autosave and `miti-items` parity | 4 | todo |
+| 5 | Create session form and uploader | 4 | done |
+| 6 | Rating card with autosave and `miti-items` parity | 4 | in-progress |
 | 7 | Speaker gate and "Change who the clinician is" | 4 | todo |
 | 8 | Transcript view with code-point segmenter | 2 | todo |
 | 9 | Report page | 8 | todo |
