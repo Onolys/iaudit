@@ -235,7 +235,7 @@ resource "google_cloud_run_v2_service" "admin_backend" {
         value = "on"
       }
       env {
-        name  = "AUTH_PROJECT"
+        name  = "ADMIN_AUTH_PROJECT"
         value = var.project
       }
       env {

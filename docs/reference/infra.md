@@ -57,6 +57,7 @@ Set by Terraform (`infra/modules/environment/services.tf`). Values below are the
 | `SERVICE_MODE` | yes | yes | `api` or `worker` |
 | `ENV` | yes | yes | `staging` / `prod` |
 | `GCP_PROJECT`, `AUTH_PROJECT` | yes | yes | `onolys` |
+| `ADMIN_AUTH_PROJECT` | no | no | `onolys`; admin-backend only (admin auth does not read `AUTH_PROJECT`) |
 | `REGION` | yes | yes | `us-central1` |
 | `FIRESTORE_DATABASE` | yes | yes | `staging` / `(default)` |
 | `AUDIO_BUCKET` | yes | yes | `onolys-audio-{env}` |
