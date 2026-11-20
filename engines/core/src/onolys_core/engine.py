@@ -5,6 +5,7 @@ from typing import Any, Protocol
 
 from pydantic import BaseModel
 
+from onolys_core.run_info import RunInfo
 from onolys_core.transcript import Transcript
 
 
@@ -16,8 +17,7 @@ class PackRef(BaseModel):
 
 class EngineResult(BaseModel):
     result: BaseModel
-    # RunInfo lands in a later core task; typed as BaseModel until then.
-    run_info: BaseModel
+    run_info: RunInfo
 
 
 @dataclass

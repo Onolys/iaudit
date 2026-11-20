@@ -23,13 +23,15 @@ from onolys_core import (
     Turn,
     Word,
 )
+from onolys_core.run_info import RunInfo
 
 pytestmark = pytest.mark.unit
 
 
 def _run() -> SttRun:
-    return SttRun(provider="google", model="chirp_3", language_requested="auto",
-                  adapter_version="1")
+    return SttRun(
+        provider="google", model="chirp_3", language_requested="auto", adapter_version="1"
+    )
 
 
 def test_turn_defaults_and_required():
@@ -41,8 +43,12 @@ def test_turn_defaults_and_required():
 
 
 def test_transcript_roundtrip():
-    tr = Transcript(turns=[Turn(id="t1", text="hi", start_ms=0, end_ms=5)],
-                    language="en-US", duration_ms=5, stt_run=_run())
+    tr = Transcript(
+        turns=[Turn(id="t1", text="hi", start_ms=0, end_ms=5)],
+        language="en-US",
+        duration_ms=5,
+        stt_run=_run(),
+    )
     assert Transcript.model_validate(json.loads(tr.model_dump_json())) == tr
     assert Transcript(turns=[]).stt_run is None
 
@@ -56,7 +62,12 @@ def test_span_requires_all_fields():
 def test_stt_params_defaults():
     p = SttParams(provider="google", model="chirp_3")
     assert (p.language, p.diarization, p.speakers_min, p.speakers_max, p.options) == (
-        "auto", True, 2, 2, {})
+        "auto",
+        True,
+        2,
+        2,
+        {},
+    )
     with pytest.raises(ValidationError):
         SttParams(provider="google")  # type: ignore[call-arg]
 
@@ -101,13 +112,17 @@ async def test_engine_protocol_and_result():
         name = "eaudit"
 
         async def run(self, transcript, pack, params, ctx):
-            return EngineResult(result=_Out(x=1), run_info=_Out(x=2))
+            return EngineResult(
+                result=_Out(x=1), run_info=RunInfo(engine="eaudit", code_version="x")
+            )
 
     e: Engine = E()
     ctx = RunContext(llm=object(), metrics=object(), request_id="r1")
     assert ctx.deadline is None
     res = await e.run(Transcript(turns=[]), PackRef(id="p", version="1", path="/p"), {}, ctx)
     assert res.result == _Out(x=1)
+    with pytest.raises(ValidationError):
+        EngineResult(result=_Out(x=1), run_info=_Out(x=2))  # not a RunInfo
     with pytest.raises(ValidationError):
         EngineResult(result=_Out(x=1))  # type: ignore[call-arg]
     with pytest.raises(ValidationError):
@@ -134,6 +149,7 @@ def test_core_imports_no_eaudit_paudit_api():
 
     src = Path(__file__).resolve().parents[1] / "src" / "onolys_core"
     import ast
+
     for f in src.rglob("*.py"):
         for node in ast.walk(ast.parse(f.read_text())):
             names = []
