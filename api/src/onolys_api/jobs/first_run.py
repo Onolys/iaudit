@@ -13,6 +13,7 @@ no-ops). If that enqueue fails, the committed run is failed and its slot refunde
 import logging
 from uuid import uuid4
 
+from onolys_api import logs
 from onolys_api.config import Settings
 from onolys_api.jobs import caps
 from onolys_api.jobs.machine import RUN_START_PROGRESS, advance
@@ -20,15 +21,13 @@ from onolys_api.jobs.queue import TaskPayload, TaskQueue
 from onolys_api.repo.base import Repo
 from onolys_api.repo.models import SessionError
 
-log = logging.getLogger("onolys_api.first_run")
-
 
 def maybe_start_first_run(
     repo: Repo, queue: TaskQueue | None, uid: str, sid: str, settings: Settings,
     request_id: str | None = None,
 ) -> None:  # fmt: skip
     if queue is None:  # nowhere to send the `run` task: leave the session as it is
-        log.error("first_run_no_queue session_id=%s", sid)
+        logs.emit("first_run_no_queue", logging.ERROR, session_id=sid, request_id=request_id)
         return
     run_id = uuid4().hex
     date = caps.utc_date()
@@ -38,16 +37,21 @@ def maybe_start_first_run(
     )  # fmt: skip
     if outcome != "started":
         if outcome in ("daily_cap", "concurrent"):
-            log.info("first_run_held session_id=%s error_code=daily_cap_reached", sid)
+            logs.emit(
+                "first_run_held",
+                session_id=sid,
+                error_code="daily_cap_reached",
+                request_id=request_id,
+            )
         return
     try:
         queue.enqueue(
             TaskPayload(kind="run", uid=uid, sid=sid, run_id=run_id, request_id=request_id)
         )
     except Exception as e:
-        log.error(
-            "first_run_enqueue_failed session_id=%s run_id=%s exc_class=%s",
-            sid, run_id, type(e).__name__,
+        logs.failed(
+            "run_failed", session_id=sid, run_id=run_id, step="run",
+            error_code="upstream_unavailable", exc_class=type(e).__name__, request_id=request_id,
         )  # fmt: skip
         repo.update_run(uid, sid, run_id, {"status": "failed", "error": "upstream_unavailable"})
         caps.release_run(repo, uid, date, refund=True)

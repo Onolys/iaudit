@@ -5,7 +5,6 @@ Task names make enqueue idempotent inside Cloud Tasks' dedup window: `{sid}-vali
 request id (never any text). `enqueue` is sync: routes and handlers run in threadpool workers.
 """
 
-import logging
 import threading
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
@@ -13,9 +12,8 @@ from typing import Literal, Protocol
 
 from pydantic import BaseModel
 
+from onolys_api import logs
 from onolys_api.config import Settings
-
-log = logging.getLogger("onolys_api.queue")
 
 TaskKind = Literal["validate", "transcribe", "transcribe-poll", "run", "delete"]
 KINDS: tuple[str, ...] = ("validate", "transcribe", "transcribe-poll", "run", "delete")
@@ -91,7 +89,12 @@ class CloudTasksQueue:
         try:
             client.create_task(request={"parent": parent, "task": task})
         except AlreadyExists:
-            log.info("task_deduplicated kind=%s request_id=%s", payload.kind, payload.request_id)
+            logs.emit(
+                "task_deduplicated",
+                session_id=payload.sid,
+                step=payload.kind,
+                request_id=payload.request_id,
+            )
 
 
 Dispatcher = Callable[[TaskPayload, int], int]  # (payload, retry_count) -> HTTP status

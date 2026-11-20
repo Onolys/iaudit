@@ -2,6 +2,7 @@
 
 import logging
 import re
+import time
 import uuid
 
 from fastapi import APIRouter, FastAPI, Request
@@ -13,6 +14,7 @@ from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from onolys_api import logs
 from onolys_api.adapters import Adapters, build_adapters
 from onolys_api.audio import AudioTools, FfmpegTools
 from onolys_api.auth.deps import Authenticator
@@ -78,6 +80,47 @@ class RequestIdMiddleware:
             await send(message)
 
         await self.app(scope, receive, send_with_id)
+
+
+class RequestLogMiddleware:
+    """One content-free line per request: method, route template, status, latency (R10).
+
+    Sits inside `RequestIdMiddleware` so the line carries the request id. The route is the
+    template (`/v1/sessions/{id}`), never the concrete path or query string.
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        start = time.perf_counter()
+        status = 500
+
+        async def send_status(message: Message) -> None:
+            nonlocal status
+            if message["type"] == "http.response.start":
+                status = message["status"]
+            await send(message)
+
+        try:
+            await self.app(scope, receive, send_status)
+        finally:
+            state = scope.get("state") or {}
+            template = getattr(scope.get("route"), "path", None)
+            if template and scope["path"].startswith("/v1/") and not template.startswith("/v1"):
+                template = "/v1" + template  # FastAPI's included routers drop the outer prefix
+            logs.emit(
+                "request",
+                method=scope.get("method"),
+                route=template or "unmatched",
+                status=status,
+                duration_ms=round((time.perf_counter() - start) * 1000, 1),
+                auth_kind=state.get("auth_kind"),
+                request_id=state.get("request_id"),
+            )
 
 
 class ContractCORSMiddleware(CORSMiddleware):
@@ -148,9 +191,10 @@ def register_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def _any(request: Request, exc: Exception):
-        log.error(
-            "unhandled_exception exc_class=%s request_id=%s", type(exc).__name__, _rid(request)
-        )
+        logs.emit(
+            "unhandled_exception", logging.ERROR, exc_class=type(exc).__name__,
+            request_id=_rid(request),
+        )  # fmt: skip
         message = "Internal server error."
         return _response(request, 500, message, [{"code": "internal_error", "message": message}])
 
@@ -170,6 +214,7 @@ def create_app(
     adapters: Adapters | None = None,
 ) -> FastAPI:
     settings = settings or Settings.from_env()
+    logs.configure(settings)
     app = FastAPI(
         title="Onolys API",
         version="0.1.0",
@@ -236,6 +281,7 @@ def create_app(
         allow_headers=["Authorization", "X-API-Key", "Idempotency-Key", "Content-Type"],
         expose_headers=["X-Request-ID"],
     )
+    app.add_middleware(RequestLogMiddleware)
     app.add_middleware(RequestIdMiddleware)
     register_error_handlers(app)
 

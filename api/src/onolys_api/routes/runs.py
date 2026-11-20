@@ -7,7 +7,6 @@ session to `running` (clears the cap error) and enqueues the `run` task; the wor
 `preset` changes LLM routes only: the transcript and its STT are reused.
 """
 
-import logging
 from datetime import datetime
 from typing import Annotated, Any
 from uuid import uuid4
@@ -15,6 +14,7 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, Request, Response
 from pydantic import BaseModel, Field
 
+from onolys_api import logs
 from onolys_api.auth.deps import AuthUser, current_user
 from onolys_api.errors import ApiError, ErrorResponse
 from onolys_api.jobs import caps
@@ -25,7 +25,6 @@ from onolys_api.presets import UnknownPreset
 from onolys_api.repo.base import NotFoundError
 from onolys_api.repo.models import RunDoc, SessionDoc, SessionError, SessionState, SttInfo
 
-log = logging.getLogger("onolys_api.runs")
 ERRORS = {"default": {"model": ErrorResponse, "description": "Error"}}
 router = APIRouter(prefix="/sessions/{id}", tags=["runs"], responses=ERRORS)
 runs_router = APIRouter(tags=["runs"], responses=ERRORS)
@@ -159,8 +158,11 @@ def start_run(id: str, request: Request, user: User, body: RunRequest | None = N
             )
         )  # fmt: skip
     except Exception as e:
-        log.error("run_enqueue_failed session_id=%s run_id=%s exc_class=%s", id, run_id,
-                  type(e).__name__)  # fmt: skip
+        logs.failed(
+            "run_failed", session_id=id, run_id=run_id, step="run",
+            error_code="upstream_unavailable", exc_class=type(e).__name__,
+            request_id=getattr(request.state, "request_id", None),
+        )  # fmt: skip
         _compensate(repo, uid, id, run_id, date)
         advance(
             repo, uid, id, to="failed", step=None,

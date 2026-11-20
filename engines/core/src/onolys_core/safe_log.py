@@ -83,7 +83,12 @@ def _fmt(value) -> str:
     return json.dumps(str(value)[:MAX_VALUE_CHARS])
 
 
+def safe_fields(fields: dict) -> dict:
+    """Only allowlisted, non-text-like names survive (for callers that format their own line)."""
+    return {k: v for k, v in fields.items() if k in ALLOWED_FIELDS and not _blocked(k)}
+
+
 def log_event(event: str, level: int = logging.INFO, **fields) -> None:
-    kept = {k: v for k, v in fields.items() if k in ALLOWED_FIELDS and not _blocked(k)}
+    kept = safe_fields(fields)
     pairs = " ".join(f"{k}={_fmt(v)}" for k, v in sorted(kept.items()))
     log.log(level, "%s %s", event, pairs)

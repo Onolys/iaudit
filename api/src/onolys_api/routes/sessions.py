@@ -10,6 +10,7 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, Header, Query, Request, Response
 from pydantic import BaseModel, Field, field_validator
 
+from onolys_api import logs
 from onolys_api.auth.deps import AuthUser, current_user
 from onolys_api.errors import ApiError, ErrorResponse
 from onolys_api.jobs.delete import delete_session_data
@@ -19,7 +20,6 @@ from onolys_api.presets import UnknownPreset
 from onolys_api.repo.base import NotFoundError
 from onolys_api.repo.models import IdempotencyDoc, SessionDoc, SessionState, SessionStatusDoc
 
-log = logging.getLogger("onolys_api.sessions")
 IDEMPOTENCY_TTL = timedelta(hours=24)
 MAX_KEY_LEN = 200
 _BCP47 = re.compile(r"^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8}){0,3}$")
@@ -276,13 +276,25 @@ def delete_session(id: str, request: Request, user: User) -> Response:
     try:
         delete_session_data(repo, blobs, user.uid, id, rid)
     except Exception as e:
-        log.error("session_delete_failed exc_class=%s request_id=%s", type(e).__name__, rid)
+        logs.emit(
+            "session_delete_failed",
+            logging.ERROR,
+            session_id=id,
+            exc_class=type(e).__name__,
+            request_id=rid,
+        )
         queue = getattr(request.app.state, "queue", None)
         try:
             if queue is not None:
                 queue.enqueue(TaskPayload(kind="delete", uid=user.uid, sid=id, request_id=rid))
         except Exception as qe:
-            log.error("delete_enqueue_failed exc_class=%s request_id=%s", type(qe).__name__, rid)
+            logs.emit(
+                "delete_enqueue_failed",
+                logging.ERROR,
+                session_id=id,
+                exc_class=type(qe).__name__,
+                request_id=rid,
+            )
         raise ApiError.of(
             503, "upstream_unavailable", "Deletion is in progress; it will finish shortly."
         ) from None

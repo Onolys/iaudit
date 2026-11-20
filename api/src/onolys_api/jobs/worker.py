@@ -17,13 +17,12 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Literal
 
+from onolys_api import logs
 from onolys_api.errors import ApiError
 from onolys_api.jobs.machine import advance
 from onolys_api.jobs.queue import MAX_ATTEMPTS, TaskPayload, TaskQueue
 from onolys_api.repo.base import NotFoundError, Repo
 from onolys_api.repo.models import SessionError
-
-log = logging.getLogger("onolys_api.worker")
 
 DEADLINE_S = 8 * 60  # internal deadline (RunContext.deadline) for validate and run
 LEASE_GRACE_S = 60  # lease = deadline + 60 s
@@ -127,7 +126,13 @@ class TaskRunner:
     def handle(self, payload: TaskPayload, retry_count: int = 0) -> TaskResult:
         spec = self._registry.get(payload.kind)
         if spec is None:
-            log.error("no_handler kind=%s request_id=%s", payload.kind, payload.request_id)
+            logs.emit(
+                "no_handler",
+                logging.ERROR,
+                session_id=payload.sid,
+                request_id=payload.request_id,
+                step=payload.kind,
+            )
             return TaskResult(200, "skipped")  # nothing a retry could fix
         attempt = retry_count + 1
         last = attempt >= MAX_ATTEMPTS
@@ -157,11 +162,7 @@ class TaskRunner:
         except TaskError as e:
             return self._on_error(spec, payload, e, last)
         except Exception as e:
-            log.error(
-                "handler_exception kind=%s exc_class=%s request_id=%s",
-                payload.kind, type(e).__name__, payload.request_id,
-            )  # fmt: skip
-            return self._on_error(spec, payload, PermanentError("internal_error"), last)
+            return self._on_error(spec, payload, PermanentError("internal_error"), last, e)
 
     # ---- records ----
 
@@ -185,17 +186,30 @@ class TaskRunner:
     def _mark_done(self, spec: HandlerSpec, p: TaskPayload) -> None:
         self._record(spec, p, status="done", ended=self.clock(), error=None)
 
-    def _on_error(self, spec: HandlerSpec, p: TaskPayload, e: TaskError, last: bool) -> TaskResult:
+    def _on_error(
+        self, spec: HandlerSpec, p: TaskPayload, e: TaskError, last: bool,
+        cause: BaseException | None = None,
+    ) -> TaskResult:  # fmt: skip
+        # the class name of the underlying exception (never its message)
+        exc_class = type(cause or e.__context__ or e).__name__
         if e.retryable and not last:
             if spec.claim:  # release so the retry can claim it again
                 self._safe(self._record, spec, p, status="pending", error=e.code)
-            log.warning("task_retry kind=%s code=%s request_id=%s", p.kind, e.code, p.request_id)
+            logs.emit(
+                "task_retry", logging.WARNING, session_id=p.sid, run_id=p.run_id,
+                step=spec.step or "run", error_code=e.code, exc_class=exc_class,
+                request_id=p.request_id,
+            )  # fmt: skip
             return TaskResult(503, "retry")
-        self._fail(spec, p, e.code)
+        self._fail(spec, p, e.code, exc_class)
         return TaskResult(200, "failed")
 
-    def _fail(self, spec: HandlerSpec, p: TaskPayload, code: str) -> None:
-        log.warning("task_failed kind=%s code=%s request_id=%s", p.kind, code, p.request_id)
+    def _fail(self, spec: HandlerSpec, p: TaskPayload, code: str, exc_class: str) -> None:
+        logs.failed(
+            "run_failed" if spec.scope == "run" else "step_failed", session_id=p.sid,
+            run_id=p.run_id, step=spec.step or "run", error_code=code, exc_class=exc_class,
+            request_id=p.request_id,
+        )  # fmt: skip
         self._safe(self._record, spec, p, status="failed", ended=self.clock(), error=code)
         label = spec.step or "run"
         self._safe(
@@ -211,4 +225,4 @@ class TaskRunner:
         except (ApiError, NotFoundError):
             pass  # e.g. session deleted or already failed: the transition is not allowed
         except Exception as e:
-            log.error("bookkeeping_failed exc_class=%s", type(e).__name__)
+            logs.emit("bookkeeping_failed", logging.ERROR, exc_class=type(e).__name__)

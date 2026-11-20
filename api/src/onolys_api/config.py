@@ -33,6 +33,7 @@ class Settings:
     routes_file: str = ""
     default_preset: str = ""
     git_sha: str = "dev"
+    uid_hmac_key: str = ""  # keys the `uid_hash` log field (Secret Manager `uid-hmac-key-{env}`)
 
     @classmethod
     def from_env(cls, environ: Mapping[str, str] | None = None) -> "Settings":
@@ -70,6 +71,7 @@ class Settings:
             routes_file=e.get("ROUTES_FILE", ""),
             default_preset=e.get("DEFAULT_PRESET", ""),
             git_sha=e.get("GIT_SHA", "dev"),
+            uid_hmac_key=e.get("UID_HMAC_KEY", ""),
         )
         s.validate()
         return s

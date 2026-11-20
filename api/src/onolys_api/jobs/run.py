@@ -29,6 +29,7 @@ from typing import Any
 from jsonschema import Draft202012Validator
 from onolys_core.engine import RunContext
 
+from onolys_api import logs
 from onolys_api.adapters.base import AdapterError, Evaluation
 from onolys_api.jobs import caps
 from onolys_api.jobs.machine import RUN_START_PROGRESS, STAGE_WEIGHTS, advance
@@ -46,8 +47,6 @@ from onolys_api.jobs.worker import (
 from onolys_api.repo.base import NotFoundError
 from onolys_api.repo.models import ReportDoc
 from onolys_api.storage.base import BlobStore
-
-log = logging.getLogger("onolys_api.run")
 
 REAL_REPORT_SCHEMA = (
     Path(__file__).resolve().parents[4] / "engines/evaluation/schemas/report.schema.json"
@@ -172,7 +171,13 @@ def _evaluate(ctx, blobs, evaluation, run_doc, session, started) -> ReportDoc:
         except NotFoundError:
             raise
         except Exception as e:  # progress is best effort: never fail the run for it
-            log.warning("progress_write_failed exc_class=%s", type(e).__name__)
+            logs.emit(
+                "progress_write_failed",
+                logging.WARNING,
+                session_id=sid,
+                run_id=run_id,
+                exc_class=type(e).__name__,
+            )
 
     rctx = RunContext(
         llm=None, metrics=None, request_id=ctx.request_id or "",
@@ -192,7 +197,7 @@ def _evaluate(ctx, blobs, evaluation, run_doc, session, started) -> ReportDoc:
         raise PermanentError("internal_error") from None  # engine -> public code map: SP09
 
     if any(True for _ in report_validator().iter_errors(out.report)):
-        log.error("report_schema_invalid run_id=%s", run_id)
+        logs.emit("report_schema_invalid", logging.ERROR, session_id=sid, run_id=run_id)
         raise PermanentError("internal_error")
 
     prefix = f"{uid}/{sid}/runs/{run_id}/"

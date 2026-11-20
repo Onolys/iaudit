@@ -6,6 +6,7 @@ collection or subcollection of the session remains. The delete race / mid-run ca
 (PRD), so the in-flight cases here only prove the cap slot is released exactly once.
 """
 
+import json
 import logging
 
 import pytest
@@ -19,7 +20,7 @@ from onolys_api.repo.base import NotFoundError
 
 pytestmark = pytest.mark.integration
 env = test_run.env  # the fake/firestore stub-flow fixture
-DELETE_LOG = "onolys_api.delete"
+EVENTS_LOG = "onolys_api.events"
 
 
 def remaining_docs(env: Env, sid: str) -> list[str]:
@@ -53,12 +54,12 @@ def session_blob_keys(env: Env, sid: str) -> list[str]:
     ]
 
 
-def deleted_lines(caplog) -> list[str]:
-    return [
-        r.getMessage()
-        for r in caplog.records
-        if r.name == DELETE_LOG and "action=session_deleted" in r.getMessage()
-    ]
+def deleted_lines(caplog) -> list[dict]:
+    out = []
+    for r in caplog.records:
+        if r.name == EVENTS_LOG and '"event": "session_deleted"' in r.getMessage():
+            out.append(json.loads(r.getMessage()))
+    return out
 
 
 async def rich_session(env: Env, title: str = "SENTINEL-TITLE") -> str:
@@ -109,9 +110,9 @@ async def test_full_flow_delete_leaves_nothing_anywhere(env, caplog):
 
     # exactly one content-free log line
     (line,) = deleted_lines(caplog)
-    assert f"session_id={sid}" in line and "uid_hash=" in line and "request_id=" in line
+    assert line["session_id"] == sid and len(line["uid_hash"]) == 16 and line["request_id"]
     for secret in (env.uid, "SENTINEL-TITLE"):
-        assert secret not in line
+        assert secret not in json.dumps(line)
     # nothing left for the cleanup task either, and it adds no second line
     env.drain()
     assert len(deleted_lines(caplog)) == 1

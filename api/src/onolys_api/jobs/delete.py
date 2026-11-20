@@ -17,18 +17,14 @@
 Not handled in v1 (deferred in the PRD): an in-flight run may still write after the delete.
 """
 
-import hashlib
-import hmac
 import logging
-import os
 
+from onolys_api import logs
 from onolys_api.jobs.machine import advance
 from onolys_api.jobs.run import release_once
 from onolys_api.jobs.worker import Handler, RetryableError, TaskContext, TaskError
 from onolys_api.repo.base import NotFoundError, Repo
 from onolys_api.storage.base import BlobStore
-
-log = logging.getLogger("onolys_api.delete")
 
 
 class DeleteIncomplete(Exception):
@@ -37,12 +33,6 @@ class DeleteIncomplete(Exception):
 
 def session_prefixes(uid: str, sid: str) -> tuple[str, str]:
     return f"{uid}/{sid}/", f"uploads/{uid}/{sid}/"
-
-
-def uid_hash(uid: str) -> str:
-    """Keyed hash for logs (key: UID_HMAC_KEY, a Secret Manager value in the cloud)."""
-    key = os.environ.get("UID_HMAC_KEY", "").encode()
-    return hmac.new(key, uid.encode(), hashlib.sha256).hexdigest()[:16]
 
 
 def _release_run_slots(repo: Repo, uid: str, sid: str) -> None:
@@ -75,10 +65,9 @@ def delete_session_data(
 
     removed = repo.delete_session(uid, sid)
     if removed:
-        log.info(
-            "action=session_deleted session_id=%s uid_hash=%s request_id=%s",
-            sid, uid_hash(uid), request_id,
-        )  # fmt: skip
+        logs.emit(
+            "session_deleted", session_id=sid, uid_hash=logs.uid_hash(uid), request_id=request_id
+        )
     return removed
 
 
@@ -91,8 +80,10 @@ def make_delete_handler(blobs: BlobStore) -> Handler:
         except TaskError:
             raise
         except Exception as e:
-            log.warning("session_delete_failed exc_class=%s request_id=%s", type(e).__name__,
-                        ctx.request_id)  # fmt: skip
+            logs.emit(
+                "session_delete_failed", logging.WARNING, session_id=ctx.sid,
+                exc_class=type(e).__name__, request_id=ctx.request_id,
+            )  # fmt: skip
             raise RetryableError("upstream_unavailable") from None
 
     return delete
