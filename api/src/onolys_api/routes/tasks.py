@@ -11,6 +11,7 @@ from onolys_api.auth.idtoken import InvalidToken
 from onolys_api.config import LOCAL_ENVS
 from onolys_api.errors import ApiError
 from onolys_api.jobs.queue import KINDS, TaskPayload
+from onolys_api.jobs.sweep import sweep_stale
 from onolys_api.jobs.worker import TaskRunner
 
 router = APIRouter(include_in_schema=False)
@@ -30,6 +31,17 @@ def check_oidc(request: Request, authorization: str | None) -> None:
         request.app.state.oidc.verify(token)
     except InvalidToken:
         raise _unauthenticated() from None
+
+
+@router.post("/tasks/sweep-stale")
+def sweep_stale_route(
+    request: Request, authorization: str | None = Header(default=None)
+) -> dict[str, int]:
+    """Cloud Scheduler (every 10 min): fail sessions stuck in an in-progress state. Same OIDC
+    check as the task endpoints; idempotent. Declared before `/tasks/{kind}` so it wins."""
+    check_oidc(request, authorization)
+    runner: TaskRunner = request.app.state.runner
+    return sweep_stale(request.app.state.repo, runner.clock)
 
 
 @router.post("/tasks/{kind}")

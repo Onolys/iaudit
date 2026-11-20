@@ -34,6 +34,7 @@ from onolys_api.repo.models import (
     ReportDoc,
     RunDoc,
     SessionDoc,
+    SessionError,
     SessionStatusDoc,
     TranscriptDoc,
     UsageDoc,
@@ -190,6 +191,40 @@ class FakeRepo:
         more = len(page) > limit
         items = page[:limit]
         return Page(items, _encode_cursor(items[-1].id) if more and items else None)
+
+    def list_stale_sessions(
+        self, state: str, before: datetime, limit: int = 50
+    ) -> list[SessionDoc]:
+        stale = sorted(
+            (
+                (p.removeprefix("sessions/"), d)
+                for p, d in self._docs.items()
+                if p.count("/") == 1 and p.startswith("sessions/")
+                and d.get("state") == state and d["updated_at"] < before
+            ),
+            key=lambda t: (t[1]["updated_at"], t[0]),
+        )  # fmt: skip
+        return [self._load(SessionDoc, i, copy.deepcopy(d)) for i, d in stale[: max(1, limit)]]
+
+    def fail_stale_session(
+        self, uid: str, sid: str, state: str, before: datetime, error: SessionError
+    ) -> bool:
+        with self._claim_lock:  # the fake's "transaction"
+            sess = self._owned(f"sessions/{sid}", uid)
+            assert sess is not None
+            if sess.get("state") != state or sess["updated_at"] >= before:
+                return False
+            now = utcnow()
+            sess.update(state="failed", error=error.model_dump(), updated_at=now)
+            if error.step and error.step in (sess.get("steps") or {}):
+                for k, v in (("status", "failed"), ("ended", now), ("error", error.code)):
+                    _set_path(sess, f"steps.{error.step}.{k}", v)
+            self._put(f"sessions/{sid}", sess)
+            status = self._get(f"session_status/{sid}") or {}
+            status.update(state="failed", error_code=error.code, uid=uid, updated_at=now)
+            self._put(f"session_status/{sid}", status)
+            self._record_status(uid, sid)
+            return True
 
     def delete_session(self, uid: str, sid: str) -> bool:
         s = self._owned(f"sessions/{sid}", uid, missing_ok=True)
