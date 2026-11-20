@@ -4,7 +4,7 @@
  * `onSnapshot` (a later task); mock mode uses the in-memory emitter below,
  * driven by the MSW state machine.
  */
-import type { SessionState } from "./schema";
+import type { SessionState } from "./types";
 
 export interface SessionStatusDoc {
   uid: string;

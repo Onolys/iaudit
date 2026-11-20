@@ -225,16 +225,16 @@ function build(turns: Turn[], picks: Picks): Report {
       {
         id: "pct_cr",
         label: "Complex reflections / all reflections",
-        clinician: { value: 0.25, label: "25%" },
-        onolys: { value: 0.75, label: "75%" },
+        clinician: { value: 0.25, label: "below_fair" },
+        onolys: { value: 0.75, label: "good" },
         reference: { fair: 0.4, good: 0.5 },
         note: "Reference levels, not pass marks.",
       },
       {
         id: "r_to_q",
         label: "Reflections per question",
-        clinician: { value: 1, label: "1.0" },
-        onolys: { value: 1, label: "1.0" },
+        clinician: { value: 1, label: "fair" },
+        onolys: { value: 1, label: "fair" },
         reference: { fair: 1, good: 2 },
         note: "Reference levels, not pass marks.",
       },
@@ -313,7 +313,11 @@ function build(turns: Turn[], picks: Picks): Report {
       counts_flagged: 1,
     },
     warnings: [],
-    run_info: { evaluation: {}, paudit: {}, eaudit: {} },
+    run_info: {
+      evaluation: { engine: "evaluation", code_version: "mock" },
+      paudit: { engine: "paudit", code_version: "mock" },
+      eaudit: { engine: "eaudit", code_version: "mock" },
+    },
   };
 }
 

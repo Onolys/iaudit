@@ -5,7 +5,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", "coverage", "node_modules", "public/mockServiceWorker.js"] },
+  { ignores: ["dist", "coverage", "node_modules", "public/mockServiceWorker.js", "src/api/schema.d.ts", "src/api/report.d.ts"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   jsxA11y.flatConfigs.recommended,

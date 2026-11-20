@@ -23,7 +23,7 @@ function detailToDoc(d: Detail): SessionStatusDoc {
     step: d.step ?? null,
     progress: d.progress,
     error_code: d.error?.code ?? null,
-    latest_report_version: d.latest_report_version,
+    latest_report_version: d.latest_report_version ?? null,
     updated_at: new Date().toISOString(),
     ...d.flags,
   };

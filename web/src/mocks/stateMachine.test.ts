@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createMemoryStatusEmitter, type SessionStatusDoc } from "../api/statusListener";
-import type { SessionState } from "../api/schema";
+import type { SessionState } from "../api/types";
 import { MockBackend, MockHttpError } from "./stateMachine";
 
 const U = "u1";
@@ -82,7 +82,7 @@ describe("happy path walks every state", () => {
     while (status(backend, sid).status === "running") {
       backend.advance(sid);
       progress.push(status(backend, sid).progress);
-      steps.push(status(backend, sid).step);
+      steps.push(status(backend, sid).step ?? null);
     }
     expect(progress).toEqual([70, 85, 93, 97, 100]);
     expect(steps.slice(0, 4)).toEqual(["eaudit", "tips", "compare", "assemble"]);
@@ -398,7 +398,7 @@ describe("re-runs and report versions", () => {
     expect(run).toMatchObject({ status: "done", n_runs: 1 });
     expect(run.rating_id).toBeTruthy();
     expect(run.code_version).toBeTruthy();
-    expect(run.stt.provider).toBeTruthy();
+    expect(run.stt?.provider).toBeTruthy();
     expect(backend.getRun(U, run.run_id).run_id).toBe(run.run_id);
   });
 
@@ -588,7 +588,7 @@ describe("tenancy, list, delete, idempotency", () => {
     const page1 = backend.listSessions(U, { limit: 2 });
     expect(page1.items.map((i) => i.id)).toEqual([ids[2], ids[1]]);
     expect(page1.next_cursor).toBeTruthy();
-    const page2 = backend.listSessions(U, { limit: 2, cursor: page1.next_cursor });
+    const page2 = backend.listSessions(U, { limit: 2, cursor: page1.next_cursor ?? undefined });
     expect(page2.items.map((i) => i.id)).toEqual([ids[0]]);
     expect(page2.next_cursor).toBeUndefined();
     expect(page1.items[0]).toMatchObject({ status: "created", latest_report_version: null, error_code: null });

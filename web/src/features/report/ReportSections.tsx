@@ -4,7 +4,8 @@
  * fetching, so `/sample-report` can reuse it.
  */
 import type { ReactNode } from "react";
-import type { ClaimVerdict, Line, Report } from "../../api/report";
+import type { Line, Report } from "../../api/report";
+import type { ClaimVerdict } from "../../api/types";
 import { diffChip } from "./chips";
 import { lineId } from "./lines";
 
@@ -34,6 +35,11 @@ const WARNING_TEXT: Record<string, string> = {
   short_session: "This was a short session, so the readings are less certain.",
 };
 const SKIPPED_WARNINGS = new Set(["reasons_audit_failed"]); // already explained inside its section
+
+/** `below_fair|fair|good` from the report schema, as words (the report carries the level, not display text). */
+const LEVEL_TEXT: Record<string, string> = { below_fair: "below fair", fair: "fair", good: "good" };
+const level = (v: { value: number | null; label: string | null }) =>
+  `${num(v.value)}${v.label ? ` (${LEVEL_TEXT[v.label] ?? v.label})` : ""}`;
 
 const num = (n: number | null | undefined) => (n === null || n === undefined ? "–" : String(n));
 
@@ -222,18 +228,20 @@ function Summaries({ r, title }: { r: Report; title: string }) {
       <p className="form-note">These are reference levels, not pass marks.</p>
       <ul className="summary-list">
         {items.map((s) => {
-          const top = Math.max(s.reference.good, s.onolys.value ?? 0, s.clinician?.value ?? 0) * 1.25 || 1;
+          const ref = s.reference;
+          const top = Math.max(ref?.good ?? 0, s.onolys.value ?? 0, s.clinician?.value ?? 0) * 1.25 || 1;
           const pos = (v: number) => `${Math.min(100, (v / top) * 100)}%`;
           return (
             <li key={s.id}>
               <h3>{s.label}</h3>
               <p>
-                Onolys {s.onolys.label}
-                {s.clinician ? ` · You ${s.clinician.label}` : ""} · Fair {s.reference.fair} · Good {s.reference.good}
+                Onolys {level(s.onolys)}
+                {s.clinician ? ` · You ${level(s.clinician)}` : ""}
+                {ref ? ` · Fair ${ref.fair} · Good ${ref.good}` : ""}
               </p>
               <div className="ref-track" aria-hidden="true">
-                <span className="ref-tick" style={{ left: pos(s.reference.fair) }} data-kind="fair" />
-                <span className="ref-tick" style={{ left: pos(s.reference.good) }} data-kind="good" />
+                {ref ? <span className="ref-tick" style={{ left: pos(ref.fair) }} data-kind="fair" /> : null}
+                {ref ? <span className="ref-tick" style={{ left: pos(ref.good) }} data-kind="good" /> : null}
                 {s.clinician?.value != null ? <span className="ref-dot" style={{ left: pos(s.clinician.value) }} data-kind="you" /> : null}
                 {s.onolys.value != null ? <span className="ref-dot" style={{ left: pos(s.onolys.value) }} data-kind="onolys" /> : null}
               </div>

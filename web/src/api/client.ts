@@ -5,7 +5,7 @@
  */
 import createClient from "openapi-fetch";
 import { parseErrorBody } from "./errors";
-import type { paths } from "./schema";
+import type { ApiPaths } from "./types";
 
 export const DEFAULT_BASE_URL = "/v1";
 
@@ -60,7 +60,7 @@ export function createApiClient(opts: ApiClientOptions) {
     return second;
   };
 
-  return createClient<paths>({ baseUrl, fetch: authedFetch });
+  return createClient<ApiPaths>({ baseUrl, fetch: authedFetch });
 }
 
 export type ApiClient = ReturnType<typeof createApiClient>;

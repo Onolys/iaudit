@@ -8,7 +8,7 @@ const V1 = "*/v1";
 const REQUEST_ID = "req_mock";
 const FAKE_BEARER = /^Bearer test:([A-Za-z0-9_.-]+)$/;
 
-function errorResponse(status: number, details: components["schemas"]["ErrorDetail"][], message: string) {
+function errorResponse(status: number, details: components["schemas"]["ErrorDetailModel"][], message: string) {
   return HttpResponse.json(
     { schema_version: "0.0.1", status, message, details, request_id: REQUEST_ID },
     { status },
@@ -50,7 +50,7 @@ export function createHandlers(b: MockBackend): HttpHandler[] {
     http.post(`${V1}/sessions`, guarded(async ({ uid, request }) =>
       json(
         b.createSession(uid, await body(request), request.headers.get("idempotency-key") ?? undefined),
-        201,
+        202,
       ),
     )),
     http.get(`${V1}/sessions/:id`, guarded(({ uid, params }) => json(b.getSession(uid, params.id)))),

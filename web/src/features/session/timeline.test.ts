@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { SessionState } from "../../api/schema";
+import type { SessionState } from "../../api/types";
 import { deriveTimeline, STEP_LABELS } from "./timeline";
 
 const STATES: SessionState[] = [

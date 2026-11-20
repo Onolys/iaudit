@@ -1,9 +1,9 @@
 /** Rating form state <-> API card (`rating.schema.json`), local checks and 422 mapping (PRD R4). */
 import type { ApiError } from "../../api/errors";
-import type { components } from "../../api/schema";
+import type { RatingCard } from "../../api/types";
 import { COUNTS, GLOBALS, LIMITS } from "../../protocol/miti-items";
 
-export type Card = components["schemas"]["RatingCard"];
+export type Card = RatingCard;
 
 export interface GlobalForm { score: string; reason: string; exTime: string; exText: string }
 export interface CountForm { count: string; note: string }

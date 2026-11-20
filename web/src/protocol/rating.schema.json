@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$comment": "Copy of api/src/onolys_api/schemas/rating.local.schema.json, a stand-in for engines/paudit/schemas/rating.schema.json (SP02 T2). Re-copy from engines/paudit once SP02 T2 lands; the parity test in miti-items.test.ts then checks the form against the real schema.",
-  "$id": "onolys-api-rating-local",
-  "title": "Rating card (local stand-in for engines/paudit/schemas/rating.schema.json, SP02 T2)",
+  "$id": "https://onolys.invalid/schemas/miti-4.2.1/rating.schema.json",
+  "title": "MITI 4.2.1 rating card (in-app rating input; keys must equal pack item ids)",
+  "$comment": "Stable contract for SP03/SP04/SP05. Every item key optional/nullable (partial ratings are valid); change_goal is required to start a run by the API gate, not by this schema. coded_span.from_s/to_s are seconds.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

@@ -131,7 +131,7 @@ describe("Idempotency-Key", () => {
           path: new URL(request.url).pathname,
           key: request.headers.get("idempotency-key"),
         });
-        return HttpResponse.json({ session: { id: "s1", status: "created" } }, { status: 201 });
+        return HttpResponse.json({ session: { id: "s1", status: "created" } }, { status: 202 });
       }),
     );
     return seen;
@@ -182,7 +182,7 @@ describe("Idempotency-Key", () => {
         keys.push(request.headers.get("idempotency-key"));
         if (request.headers.get("authorization") === "Bearer stale")
           return HttpResponse.json(errBody(401, "unauthenticated"), { status: 401 });
-        return HttpResponse.json({ session: { id: "s1", status: "created" } }, { status: 201 });
+        return HttpResponse.json({ session: { id: "s1", status: "created" } }, { status: 202 });
       }),
     );
     const { client } = setup();

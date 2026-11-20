@@ -17,49 +17,7 @@ type Turn = components["schemas"]["TranscriptTurn"];
 const cpSlice = (text: string, start: number, end: number) =>
   Array.from(text).slice(start, end).join("");
 
-const DIFF_STATUS = ["agree", "differs", "flagged", "not_rated", "no_onolys_value"];
-const VERDICTS = ["supported", "partially_supported", "contradicted", "insufficient_evidence", "out_of_scope"];
-const ROLES = ["supporting", "contradicting", "qualifying"];
 const SECTIONS = ["scorecard", "disagreements", "globals", "behaviours", "summaries", "reasons_audit", "tips", "method"];
-
-/**
- * Typed shape check standing in for validation against
- * `engines/evaluation/schemas/report.schema.json` (not in the repo yet).
- * Swap for an Ajv validation once the schema exists (SP05 T13).
- */
-function checkReportShape(r: Report): string[] {
-  const errs: string[] = [];
-  const need = (ok: boolean, msg: string) => ok || errs.push(msg);
-  need(r.schema_version === "0.0.1", "schema_version");
-  need(typeof r.created_at === "string", "created_at");
-  for (const k of ["change_goal", "language", "subject_speaker", "preset", "code_version"] as const)
-    need(typeof r.header[k] === "string", `header.${k}`);
-  need(r.header.protocol.label.length > 0, "header.protocol.label");
-  need(typeof r.header.stt.provider === "string", "header.stt");
-  need(r.header.n_runs >= 1, "header.n_runs");
-  need(r.layout.length > 0 && r.layout.every((l) => l.section && l.title), "layout");
-  for (const s of r.scorecard) {
-    need(["global", "count"].includes(s.kind), `scorecard.${s.item_id}.kind`);
-    need(DIFF_STATUS.includes(s.diff.status), `scorecard.${s.item_id}.diff.status`);
-    need(Array.isArray(s.onolys.values), `scorecard.${s.item_id}.onolys.values`);
-  }
-  for (const g of r.globals) need(DIFF_STATUS.includes(g.diff.status), `globals.${g.item_id}`);
-  for (const b of r.behaviours) {
-    need(b.instances_total >= b.instances.length, `behaviours.${b.item_id}.instances_total`);
-    need(DIFF_STATUS.includes(b.diff.status), `behaviours.${b.item_id}`);
-  }
-  need(["ran", "partial", "skipped", "failed"].includes(r.reasons_audit.status), "reasons_audit.status");
-  for (const it of r.reasons_audit.items)
-    for (const c of it.claims) {
-      need(VERDICTS.includes(c.verdict), "claim.verdict");
-      for (const e of c.evidence) need(ROLES.includes(e.role), "evidence.role");
-    }
-  r.tips.forEach((t, i) => need(t.rank === i + 1, "tips.rank"));
-  need(r.method.not_official_miti_coding === true, "method.not_official_miti_coding");
-  need(r.method.limits.length > 0, "method.limits");
-  need(Array.isArray(r.warnings), "warnings");
-  return errs;
-}
 
 function allLines(r: Report): Line[] {
   const lines: Line[] = [];
@@ -83,10 +41,6 @@ const variants: [string, Report, Turn[]][] = [
 ];
 
 describe.each(variants)("report fixture: %s", (_name, report, turns) => {
-  it("has the documented report shape", () => {
-    expect(checkReportShape(report)).toEqual([]);
-  });
-
   it("every quote equals the transcript slice at its code-point offsets", () => {
     const lines = allLines(report);
     expect(lines.length).toBeGreaterThan(0);
@@ -106,7 +60,7 @@ describe("sample report content", () => {
       "gi", "persuade", "persuade_permission", "question", "sr", "cr", "affirm", "seek_collab", "emphasize_autonomy", "confront",
     ]);
     expect(sampleReport.layout.map((l) => l.section)).toEqual(SECTIONS);
-    expect(sampleReport.header.stt.provider).toBeTruthy();
+    expect(sampleReport.header.stt?.provider).toBeTruthy();
     expect(sampleReport.header.preset).toBeTruthy();
     expect(sampleReport.header.code_version).toBeTruthy();
   });
@@ -129,7 +83,7 @@ describe("sample report content", () => {
   it("includes reasons audit (ran), 3 tips, and reference levels", () => {
     expect(sampleReport.reasons_audit.status).toBe("ran");
     expect(sampleReport.tips).toHaveLength(3);
-    expect(sampleReport.summaries.every((s) => s.reference.good > s.reference.fair)).toBe(true);
+    expect(sampleReport.summaries.every((s) => s.reference !== null && s.reference.good > s.reference.fair)).toBe(true);
   });
 
   it("is synthetic: no PHI-like content", () => {

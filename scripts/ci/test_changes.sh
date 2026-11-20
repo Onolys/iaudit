@@ -28,6 +28,9 @@ run false "eaudit=false core=false paudit=false evaluation=false api=true fronte
 touch "$T/web/package.json"; mkdir -p "$T/infra"   # web (package.json) and infra (dir) now exist
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=true infra=false" web/src/a.ts
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=false infra=true" infra/main.tf
+# generated-type inputs (api/openapi.json, report.schema.json) must trigger the web gen:api staleness check
+run false "eaudit=false core=false paudit=false evaluation=false api=true frontend=false web=true infra=false" api/openapi.json
+run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=true infra=false" engines/evaluation/schemas/report.schema.json
 run true  "eaudit=true core=true paudit=false evaluation=false api=true frontend=true web=true infra=true" docs/readme.md
 rm "$T/web/package.json" "$T/infra" -r
 touch "$T/engines/paudit/pyproject.toml"   # now paudit exists

@@ -5,7 +5,10 @@
  * to a PHI-free `session_status` doc through the status emitter.
  */
 import type { Report } from "../api/report";
-import type { components, RunStage, SessionState } from "../api/schema";
+import type { components } from "../api/schema";
+import type { ErrorCode, RatingCard, SessionState } from "../api/types";
+
+type RunStage = "paudit" | "eaudit" | "tips" | "compare" | "assemble";
 import type { MemoryStatusEmitter, SessionStatusDoc } from "../api/statusListener";
 import {
   edgeTranscript,
@@ -21,13 +24,13 @@ type S = components["schemas"];
 export class MockHttpError extends Error {
   readonly status: number;
   readonly code: string;
-  readonly details: S["ErrorDetail"][];
-  constructor(status: number, code: string, message: string, details?: S["ErrorDetail"][]) {
+  readonly details: S["ErrorDetailModel"][];
+  constructor(status: number, code: string, message: string, details?: S["ErrorDetailModel"][]) {
     super(message);
     this.name = "MockHttpError";
     this.status = status;
     this.code = code;
-    this.details = details ?? [{ code, message }];
+    this.details = details ?? [{ code: code as ErrorCode, message }];
   }
 }
 
@@ -60,11 +63,11 @@ interface Rating {
   rating_id: string;
   no_rating: boolean;
   has_content: boolean;
-  card: S["RatingCard"];
+  card: RatingCard;
   seq: number;
 }
 
-type RunRec = S["Run"] & { stageIdx: number };
+type RunRec = S["RunView"] & { stageIdx: number };
 
 interface ReportRec {
   version: number;
@@ -83,23 +86,24 @@ interface SessionRec {
   n_runs: number;
   preset: string;
   created_at: string;
+  updated_at: string;
   state: SessionState;
   step: string | null;
   progress: number;
   error: { code: string; step?: string } | null;
-  flags: S["SessionFlags"];
+  flags: S["Flags"];
   clinician_speaker: string | null;
   first_run_id: string | null;
   holdFirstStart: boolean;
   uploadId: string | null;
   uploadType: string | null;
   finals: Rating[];
-  draft: { card: S["RatingCard"]; updated_at: string; seq: number } | null;
+  draft: { card: RatingCard; updated_at: string; seq: number } | null;
   runs: RunRec[];
   reports: ReportRec[];
 }
 
-function bad(status: number, code: string, message: string, details?: S["ErrorDetail"][]): never {
+function bad(status: number, code: string, message: string, details?: S["ErrorDetailModel"][]): never {
   throw new MockHttpError(status, code, message, details);
 }
 
@@ -155,6 +159,7 @@ export class MockBackend {
   }
 
   private emit(s: SessionRec): void {
+    s.updated_at = this.now().toISOString();
     const doc: SessionStatusDoc = {
       uid: s.uid,
       state: s.state,
@@ -206,9 +211,9 @@ export class MockBackend {
   ): S["CreateSessionResponse"] {
     if (body.language !== undefined && body.language !== "auto" && !/^[a-z]{2,3}(-[A-Z]{2})?$/.test(body.language))
       invalidParam("language is not a valid BCP-47 tag or auto");
-    if (body.n_runs !== undefined && (!Number.isInteger(body.n_runs) || body.n_runs < 1 || body.n_runs > 5))
+    if (body.n_runs != null && (!Number.isInteger(body.n_runs) || body.n_runs < 1 || body.n_runs > 5))
       invalidParam("n_runs must be an integer from 1 to 5");
-    if (body.preset !== undefined && !PRESETS.includes(body.preset)) invalidParam("preset is not allowed");
+    if (body.preset != null && !PRESETS.includes(body.preset)) invalidParam("preset is not allowed");
     if (body.title != null && (typeof body.title !== "string" || body.title.length > 200))
       invalidParam("title is too long");
 
@@ -233,6 +238,7 @@ export class MockBackend {
       n_runs: body.n_runs ?? 1,
       preset: body.preset ?? "default",
       created_at: this.now().toISOString(),
+      updated_at: this.now().toISOString(),
       state: "created",
       step: null,
       progress: 0,
@@ -283,6 +289,12 @@ export class MockBackend {
       flags: { ...s.flags },
       warnings: [],
       latest_report_version: s.reports.at(-1)?.version ?? null,
+      created_at: s.created_at,
+      updated_at: s.updated_at,
+      language: s.language,
+      n_runs: s.n_runs,
+      preset: s.preset,
+      links: { self: `/v1/sessions/${s.id}` },
     };
     if (s.error) detail.error = { ...s.error };
     return detail;
@@ -344,19 +356,20 @@ export class MockBackend {
 
   // ---- rating -------------------------------------------------------------
 
-  putRating(uid: string, sid: string, body: S["RatingPut"]): S["RatingPutResponse"] {
+  putRating(uid: string, sid: string, body: S["RatingRequest"]): S["RatingSaved"] {
     const s = this.own(uid, sid);
     if (s.state === "deleting") bad(409, "invalid_state", "Session is being deleted.");
-    const card = body.card ?? {};
+    const card = (body.card ?? {}) as RatingCard;
     validateCard(card, body.final === true);
     const seq = this.n + 1;
     this.n += 1;
     if (!body.final) {
-      s.draft = { card, updated_at: this.now().toISOString(), seq };
-      return { draft: true };
+      const updated_at = this.now().toISOString();
+      s.draft = { card, updated_at, seq };
+      return { final: false, updated_at };
     }
     const noRating = body.no_rating === true;
-    const stored: S["RatingCard"] = noRating
+    const stored: RatingCard = noRating
       ? { change_goal: card.change_goal, coded_span: card.coded_span ?? null }
       : card;
     const rating: Rating = {
@@ -371,13 +384,19 @@ export class MockBackend {
     s.flags.has_rating = rating.has_content;
     this.emit(s);
     this.maybeStartFirstRun(s);
-    return { rating_id: rating.rating_id, draft: false };
+    return {
+      final: true,
+      rating_id: rating.rating_id,
+      no_rating: rating.no_rating,
+      has_rating: rating.has_content,
+      updated_at: this.now().toISOString(),
+    };
   }
 
-  getRating(uid: string, sid: string): S["RatingGet"] {
+  getRating(uid: string, sid: string): S["RatingView"] {
     const s = this.own(uid, sid);
     const final = s.finals.at(-1);
-    const out: S["RatingGet"] = {};
+    const out: S["RatingView"] = {};
     if (final) out.final = { rating_id: final.rating_id, no_rating: final.no_rating, card: final.card };
     if (s.draft && (!final || s.draft.seq > final.seq))
       out.draft = { card: s.draft.card, updated_at: s.draft.updated_at };
@@ -386,7 +405,7 @@ export class MockBackend {
 
   // ---- speakers, transcript ----------------------------------------------
 
-  getSpeakers(uid: string, sid: string): S["SpeakersResponse"] {
+  getSpeakers(uid: string, sid: string): S["SpeakersView"] {
     const s = this.own(uid, sid);
     if (!s.flags.transcript_ready) bad(409, "invalid_state", "Transcript is not ready.");
     return { speakers: sampleLines(this.turns(s)), clinician_speaker: s.clinician_speaker };
@@ -442,6 +461,9 @@ export class MockBackend {
   private createRun(s: SessionRec, p: S["RunRequest"]): RunRec {
     const run: RunRec = {
       run_id: this.id("r"),
+      session_id: s.id,
+      attempts: 1,
+      started: this.now().toISOString(),
       status: "running",
       n_runs: p.n_runs ?? s.n_runs,
       preset: p.preset ?? s.preset,
@@ -464,25 +486,26 @@ export class MockBackend {
     return run;
   }
 
-  startRun(uid: string, sid: string, body: S["RunRequest"]): S["RunCreated"] {
+  startRun(uid: string, sid: string, body: S["RunRequest"]): S["RunStarted"] {
     const s = this.own(uid, sid);
     const ok = s.state === "awaiting_input" || s.state === "report_ready" || s.state === "failed";
     if (!ok || !s.flags.transcript_ready || !s.flags.speaker_confirmed)
       bad(409, "invalid_state", "A run cannot start in this state.");
-    if (body.n_runs !== undefined && (!Number.isInteger(body.n_runs) || body.n_runs < 1 || body.n_runs > 5))
+    if (body.n_runs != null && (!Number.isInteger(body.n_runs) || body.n_runs < 1 || body.n_runs > 5))
       invalidParam("n_runs must be an integer from 1 to 5");
-    if (body.preset !== undefined && !PRESETS.includes(body.preset)) invalidParam("preset is not allowed");
+    if (body.preset != null && !PRESETS.includes(body.preset)) invalidParam("preset is not allowed");
     s.holdFirstStart = false; // the user pressed Start
     if (this.runsToday(uid) >= this.dailyCap)
       bad(429, "daily_cap_reached", "Daily run limit reached.");
-    return { run_id: this.createRun(s, body).run_id };
+    const run = this.createRun(s, body);
+    return { run_id: run.run_id, session: { id: s.id, status: s.state } };
   }
 
-  listRuns(uid: string, sid: string): S["Run"][] {
+  listRuns(uid: string, sid: string): S["RunView"][] {
     return this.own(uid, sid).runs.map(publicRun);
   }
 
-  getRun(uid: string, runId: string): S["Run"] {
+  getRun(uid: string, runId: string): S["RunView"] {
     for (const s of this.sessions.values()) {
       const r = s.uid === uid ? s.runs.find((x) => x.run_id === runId) : undefined;
       if (r) return publicRun(r);
@@ -490,7 +513,7 @@ export class MockBackend {
     return notFound();
   }
 
-  listReports(uid: string, sid: string): S["ReportVersion"][] {
+  listReports(uid: string, sid: string): S["ReportListItem"][] {
     return this.own(uid, sid).reports.map(({ version, report_id, run_id, created_at }) => ({
       version,
       report_id,
@@ -514,7 +537,7 @@ export class MockBackend {
       run_id: r.run_id,
       created_at: r.created_at,
       report_schema_version: r.report.schema_version,
-      report: structuredClone(r.report),
+      report: structuredClone(r.report) as unknown as S["ReportView"]["report"],
     };
   }
 
@@ -612,7 +635,7 @@ export class MockBackend {
       createdAt: created_at,
     });
     report.header.n_runs = run.n_runs;
-    report.header.preset = run.preset;
+    report.header.preset = run.preset ?? null;
     s.reports.push({
       version: s.reports.length + 1,
       report_id: this.id("rp"),
@@ -635,12 +658,12 @@ export class MockBackend {
   }
 }
 
-function publicRun({ stageIdx: _ignored, ...run }: RunRec): S["Run"] {
+function publicRun({ stageIdx: _ignored, ...run }: RunRec): S["RunView"] {
   void _ignored;
   return { ...run };
 }
 
-function cardHasContent(card: S["RatingCard"]): boolean {
+function cardHasContent(card: RatingCard): boolean {
   const g = Object.values(card.globals ?? {}).some(
     (x) => (x.score ?? null) !== null || !!x.reason?.trim() || !!x.example?.text?.trim(),
   );
@@ -651,7 +674,7 @@ function cardHasContent(card: S["RatingCard"]): boolean {
 }
 
 /** Hard limits (SP04 R2): UI only warns, the API rejects with `rating_invalid`. */
-function validateCard(card: S["RatingCard"], final: boolean): void {
+function validateCard(card: RatingCard, final: boolean): void {
   const errors: string[] = [];
   const max = (path: string, v: unknown, n: number) => {
     if (typeof v === "string" && v.length > n) errors.push(`${path} exceeds ${n} characters`);

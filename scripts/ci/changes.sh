@@ -27,6 +27,8 @@ PY_SHARED_RE='^(pyproject\.toml|uv\.lock|engines/core/)'
 CI_SHARED_RE='^(\.github/workflows/|scripts/ci/)'
 # Extra paths per package: Firestore rules and their emulator tests run in the api job.
 API_EXTRA_RE='^(firestore\.rules|firebase\.json|firestore-rules-test/)'
+# The web job also runs on the contracts its generated types come from (gen:api staleness check).
+WEB_EXTRA_RE='^(api/openapi\.json|engines/evaluation/schemas/report\.schema\.json)$'
 
 mapfile -t FILES
 
@@ -43,7 +45,8 @@ for entry in "${PACKAGES[@]}"; do
       for f in "${FILES[@]}"; do
         if [[ "$f" == "$dir/"* || "$f" =~ $CI_SHARED_RE ||
               ( "$kind" == python && "$f" =~ $PY_SHARED_RE ) ||
-              ( "$name" == api && "$f" =~ $API_EXTRA_RE ) ]]; then
+              ( "$name" == api && "$f" =~ $API_EXTRA_RE ) ||
+              ( "$name" == web && "$f" =~ $WEB_EXTRA_RE ) ]]; then
           run=true
           break
         fi

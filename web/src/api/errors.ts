@@ -66,7 +66,7 @@ export function failureAction(code: string | undefined): FailureAction {
   return code !== undefined && UPLOAD_NEW.has(code) ? "upload_new" : "run_again";
 }
 
-type ErrorDetail = components["schemas"]["ErrorDetail"];
+type ErrorDetail = components["schemas"]["ErrorDetailModel"];
 
 export class ApiError extends Error {
   readonly status: number;
@@ -105,7 +105,7 @@ export function parseErrorBody(status: number, body: unknown): ApiError {
     }
     if (typeof body.request_id === "string") requestId = body.request_id;
   }
-  let code = details[0]?.code;
+  let code: string | undefined = details[0]?.code;
   if (code === undefined) code = status === 429 ? "rate_limited" : "unknown";
   return new ApiError(status, code, details, requestId);
 }
