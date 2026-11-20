@@ -1,0 +1,162 @@
+{
+  "components": {
+    "schemas": {
+      "ErrorDetailModel": {
+        "properties": {
+          "code": {
+            "enum": [
+              "invalid_json",
+              "unsupported_media_type",
+              "schema_violation",
+              "empty_transcript",
+              "empty_assessment",
+              "duplicate_ids",
+              "invalid_parameters",
+              "body_too_large",
+              "too_many_turns",
+              "too_many_sections",
+              "rate_limited",
+              "not_found",
+              "method_not_allowed",
+              "cors_rejected",
+              "request_rejected",
+              "upstream_unavailable",
+              "deadline_exceeded",
+              "internal_error",
+              "unauthenticated",
+              "forbidden",
+              "invalid_state",
+              "unsupported_audio",
+              "audio_too_long",
+              "audio_too_large",
+              "audio_unreadable",
+              "no_speech",
+              "speakers_not_separated",
+              "transcription_failed",
+              "rating_invalid",
+              "daily_cap_reached",
+              "conflict"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorDetailModel",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "description": "Body of every non-2xx response (docs/contracts/public/public-error-response.schema.json).",
+        "properties": {
+          "details": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorDetailModel"
+            },
+            "title": "Details",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "schema_version": {
+            "const": "0.0.1",
+            "default": "0.0.1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status",
+          "message",
+          "details"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "Healthz": {
+        "properties": {
+          "code_version": {
+            "title": "Code Version",
+            "type": "string"
+          },
+          "service_mode": {
+            "title": "Service Mode",
+            "type": "string"
+          },
+          "status": {
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_mode",
+          "code_version"
+        ],
+        "title": "Healthz",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Onolys API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/healthz": {
+      "get": {
+        "operationId": "getHealthz",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Healthz"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Liveness (no auth)",
+        "tags": [
+          "system"
+        ]
+      }
+    }
+  }
+}
