@@ -61,8 +61,11 @@ def worker_env_problems(env):
         out.append("ANTHROPIC_API_KEY missing")
     elif "valueSource" not in ref or "value" in ref:
         out.append("ANTHROPIC_API_KEY is not a pure secret ref")
+    hm = byname.get("UID_HMAC_KEY")
+    if hm is not None and ("valueSource" not in hm or "value" in hm):
+        out.append("UID_HMAC_KEY is not a pure secret ref")
     for n, e in byname.items():
-        if n != "ANTHROPIC_API_KEY" and (n.endswith("_API_KEY") or n.startswith("STT_") or "valueSource" in e):
+        if n not in ("ANTHROPIC_API_KEY", "UID_HMAC_KEY") and (n.endswith("_API_KEY") or n.startswith("STT_") or "valueSource" in e):
             out.append(f"unexpected provider/secret env: {n}")
     return out
 
@@ -191,7 +194,7 @@ def main(argv=None):
         uris[svc] = d["uri"]
         if svc == "worker":
             rec("worker env refs", not worker_env_problems(d["template"]["containers"][0].get("env", [])),
-                "; ".join(worker_env_problems(d["template"]["containers"][0].get("env", []))) or "ANTHROPIC_API_KEY secret ref only")
+                "; ".join(worker_env_problems(d["template"]["containers"][0].get("env", []))) or "ANTHROPIC_API_KEY (+UID_HMAC_KEY) secret refs only")
     s, _ = call("GET", uris["api"] + "/")
     rec("anonymous api", anon_api_ok(s), f"HTTP {s}")
     s, _ = call("GET", uris["worker"] + "/")

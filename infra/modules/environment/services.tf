@@ -61,6 +61,15 @@ resource "google_cloud_run_v2_service" "api" {
         value = "api"
       }
       env {
+        name = "UID_HMAC_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.uid_hmac.secret_id
+            version = "latest"
+          }
+        }
+      }
+      env {
         name  = "CORS_ORIGINS"
         value = join(",", var.cors_origins)
       }
@@ -129,6 +138,15 @@ resource "google_cloud_run_v2_service" "worker" {
       env {
         name  = "SERVICE_MODE"
         value = "worker"
+      }
+      env {
+        name = "UID_HMAC_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.uid_hmac.secret_id
+            version = "latest"
+          }
+        }
       }
       dynamic "env" {
         for_each = local.platform_env

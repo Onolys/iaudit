@@ -94,3 +94,12 @@ def test_wif_binding_prod_only_production_env():
     # staging deployer: repo-wide, must not include production environment principal
     assert chk.wif_binding_problems("staging", repo_wide) == []
     assert chk.wif_binding_problems("staging", prod_ok)
+
+
+# ---- UID_HMAC_KEY wiring ----
+def test_worker_env_allows_uid_hmac_secret_ref():
+    ref = lambda n, s: {"name": n, "valueSource": {"secretKeyRef": {"secret": s}}}
+    base = [ref("ANTHROPIC_API_KEY", "anthropic-api-key"), {"name": "ENV", "value": "staging"}]
+    assert chk.worker_env_problems(base + [ref("UID_HMAC_KEY", "uid-hmac-key-staging")]) == []
+    assert chk.worker_env_problems(base + [{"name": "UID_HMAC_KEY", "value": "plain"}])  # plaintext rejected
+    assert chk.worker_env_problems(base + [ref("OTHER_SECRET", "x")])  # other refs still rejected
