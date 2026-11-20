@@ -3,6 +3,7 @@
 import asyncio
 from abc import ABC, abstractmethod
 
+from onolys_core.safe_log import log_event
 from onolys_core.stt import AudioRef, SttParams, SttRun, Word
 from onolys_core.transcript import Transcript, Turn
 
@@ -59,14 +60,36 @@ class BaseSttAdapter(ABC):
         """Return (words, run), or None while still running. Must not re-submit."""
 
     async def start(self, audio: AudioRef, params: SttParams) -> str:
-        return await self._submit(audio, params)
+        handle = await self._submit(audio, params)
+        log_event(
+            "stt_submit",
+            step="submit",
+            stt_provider=params.provider,
+            stt_model=params.model,
+            language=params.language,
+            audio_ms=audio.duration_ms,
+            job_id=handle,
+        )
+        return handle
 
     async def poll(self, handle: str) -> Transcript | None:
         got = await self._fetch(handle)
         if got is None:
+            log_event("stt_poll", step="poll", status="running", job_id=handle)
             return None
         words, run = got
         turns = words_to_turns(words, self.max_gap_ms)
+        log_event(
+            "stt_done",
+            step="done",
+            status="done",
+            job_id=handle,
+            stt_provider=run.provider,
+            stt_model=run.model,
+            language=run.language_detected or run.language_requested,
+            speakers=len({w.speaker for w in words if w.speaker is not None}),
+            audio_ms=max((w.end_ms for w in words), default=None),
+        )
         return Transcript(
             turns=turns,
             language=run.language_detected

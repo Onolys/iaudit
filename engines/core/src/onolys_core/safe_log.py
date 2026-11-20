@@ -33,69 +33,38 @@ def setup_logging(level: str = "INFO") -> None:
         log.addHandler(h)
 
 
-ALLOWED_FIELDS = frozenset(
-    {
-        "request_id",
-        "audit_uuid",
-        "turns",
-        "sections",
-        "body_bytes",
-        "status",
-        "outcome",
-        "total_ms",
-        "calls",
-        "calls_ok",
-        "input_tokens",
-        "output_tokens",
-        "cache_read_tokens",
-        "cache_write_tokens",
-        "models",
-        "tier_calls",
-        "pairs",
-        "undecided",
-        "chunks",
-        "degraded_chunks",
-        "claim_id",
-        "mode",
-        "shortlist_size",
-        "items_returned",
-        "items_kept",
-        "coerced",
-        "section_index",
-        "claims",
-        "dropped",
-        "gaps",
-        "retries",
-        "failure",
-        "exc_class",
-        "prep_ms",
-        "atomize_ms",
-        "link_ms",
-        "check_ms",
-        "assemble_ms",
-        "sections_ok",
-        "sections_failed",
-        "claims_in_scope",
-        "claims_oos",
-        "claims_stalled",
-        "claims_ok",
-        "truncated",
-        "deadline_hit",
-        "cancelled",
-        "called",
-        "verdict",
-        "row",
-        "flags_seen",
-        "flags_below_floor",
-        "flags_suppressed",
-        "items_below_floor",
-        "inferences_below_floor",
-        "items_dropped",
-        "role_skipped",
-        "role_disagreements",
-        "frames",
-    }
-)
+# Generic base allowlist; engines add theirs via register_fields().
+# Audio URIs, transcript text and ratings are deliberately never loggable.
+ALLOWED_FIELDS: set[str] = {
+    "request_id",
+    "status",
+    "outcome",
+    "total_ms",
+    "calls",
+    "calls_ok",
+    "input_tokens",
+    "output_tokens",
+    "cache_read_tokens",
+    "cache_write_tokens",
+    "models",
+    "retries",
+    "failure",
+    "exc_class",
+    "audio_ms",
+    "stt_provider",
+    "stt_model",
+    "language",
+    "speakers",
+    "job_id",
+    "step",
+}
+
+
+def register_fields(fields: frozenset[str] | set[str]) -> None:
+    """Add engine-specific loggable field names (blocked name parts still always drop)."""
+    ALLOWED_FIELDS.update(fields)
+
+
 _BLOCKED_PARTS = ("text", "body", "transcript", "excerpt", "message")
 
 
