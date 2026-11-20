@@ -186,7 +186,8 @@ jobs:
           SITE: ${{ needs.target.outputs.site }}
         run: |
           origin="${BACKEND_URL%/}"
-          for path in /healthz /v1/paudit/fixtures; do
+          # Not /healthz: Cloud Run reserves paths ending in z (like /healthz) and answers 404 before the app.
+          for path in /v1/audit /v1/paudit/fixtures; do
             code=000
             for i in $(seq 1 10); do
               code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "${origin}${path}" || true)"
