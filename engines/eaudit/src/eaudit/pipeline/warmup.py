@@ -8,6 +8,7 @@ most `warmup_max_wait_s` for `warm_ready`.
 import asyncio
 
 from onolys_core.llm import LLMError, LLMRequest
+from onolys_core.llm.warm import warm_then_fanout
 from onolys_core.safe_log import log_event
 from pydantic import BaseModel
 
@@ -63,10 +64,12 @@ async def warmup_flow(st: RunState, req: AuditRequest, ctx) -> None:
         check_stage = stage_text(verifier.common_system(), verifier.stage_block())
         if choose_mode(estimate_tokens(req.transcript), cfg) == "whole":
             p1 = transcript_prefix(req.transcript)
-            await _call(ctx, _tiny(ctx, cache_prefixes=[p1]))
-            await asyncio.gather(
-                _call(ctx, _tiny(ctx, cache_prefixes=[p1, link_stage])),
-                _call(ctx, _tiny(ctx, cache_prefixes=[p1, check_stage])),
+            await warm_then_fanout(
+                lambda: _call(ctx, _tiny(ctx, cache_prefixes=[p1])),
+                [
+                    lambda: _call(ctx, _tiny(ctx, cache_prefixes=[p1, link_stage])),
+                    lambda: _call(ctx, _tiny(ctx, cache_prefixes=[p1, check_stage])),
+                ],
             )
         else:  # shortlist mode: no transcript prefix, just the two stage blocks
             link_only = stage_text(link_prompt.common_system(), link_prompt.stage_block())
