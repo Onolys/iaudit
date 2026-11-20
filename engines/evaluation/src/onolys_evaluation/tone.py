@@ -147,3 +147,4 @@ def load_report_config(path: str | Path) -> ReportConfig:
     except yaml.YAMLError as exc:
         raise ReportConfigError(f"report.yaml is not valid YAML: {exc}") from exc
     return parse_report_config(data)
+# scratch CI skip proof (SP00 T6); throwaway, not merged
