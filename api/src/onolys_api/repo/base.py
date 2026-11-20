@@ -21,7 +21,6 @@ from onolys_api.repo.models import (
     ReportDoc,
     RunDoc,
     SessionDoc,
-    SessionError,
     SessionStatusDoc,
     TranscriptDoc,
     UsageDoc,
@@ -90,19 +89,6 @@ class Repo(Protocol):
         self, uid: str, limit: int = 20, cursor: str | None = None
     ) -> Page[SessionDoc]: ...
     def delete_session(self, uid: str, sid: str) -> bool: ...
-
-    # Stale-status sweeper (SP04): the ONE other unscoped read besides `get_api_key`. A system
-    # job, not a user request, looks across all users for sessions stuck in `state` whose last
-    # write (`updated_at`) is before `before`. Oldest first, at most `limit`.
-    def list_stale_sessions(
-        self, state: str, before: datetime, limit: int = 50
-    ) -> list[SessionDoc]: ...
-    # One transaction: if the session is still in `state` with `updated_at < before`, set it
-    # `failed` with `error` (mirrored to session_status; `steps.<error.step>` marked failed) and
-    # return True. Anything else (moved on, written to since, already failed): nothing, False.
-    def fail_stale_session(
-        self, uid: str, sid: str, state: str, before: datetime, error: SessionError
-    ) -> bool: ...
 
     # children of a session
     def add_recording(self, uid: str, sid: str, rid: str, rec: RecordingDoc) -> None: ...

@@ -24,7 +24,6 @@ staging: same shape, site onolys-app-staging, Firestore DB `staging`, *-staging 
 | Firestore database (Native, `us-central1`) | `staging` | `(default)` (delete-protection on) |
 | GCS bucket (private) | `onolys-audio-staging` | `onolys-audio-prod` |
 | Cloud Tasks queue | `steps-staging` | `steps-prod` |
-| Cloud Scheduler job (stale sweeper, every 10 min) | `sweep-stale-staging` | `sweep-stale-prod` |
 | Service accounts (`@onolys.iam.gserviceaccount.com`) | `api-staging`, `worker-staging`, `tasks-invoker-staging`, `deployer-staging` | `api-prod`, `worker-prod`, `tasks-invoker-prod`, `deployer-prod` |
 | Secret `uid-hmac-key-{env}` | `uid-hmac-key-staging` | `uid-hmac-key-prod` |
 | Secret `<base>-{env}` per `llm_secrets` / `stt_secrets` entry (default base `anthropic-api-key`) | `anthropic-api-key-staging` | `anthropic-api-key-prod` |
@@ -221,12 +220,6 @@ The web error card shows a **reference id** (the `request_id`). All app logs are
 Verified 2026-11-20 against the task-10 test lines (staging, `error_code t10_test`, written for the alert check) through the REST API `POST https://logging.googleapis.com/v2/entries:list` with body `{"resourceNames":["projects/onolys"],"filter":"jsonPayload.request_id=\"t10b-1795181702\"","orderBy":"timestamp desc"}`: it returned the one `onolys-worker-staging` line (`status failed`, `session_id synthetic`, `step test`); the filter `jsonPayload.session_id="synthetic"` returned that line plus the `onolys-api-staging` one (`request_id t10-1795181472`); the alert filter (`resource.type="cloud_run_revision"`, service name in the two staging services, `jsonPayload.status="failed"`) matched both.
 
 Alerts (prod always on; staging only with `staging_alerts=true`): an email for each `status="failed"` line (at most one per 5 min) and for more than 5 api 5xx responses in 5 min. The email channel needs its verification click.
-
-### Slow or stuck transcription
-
-`transcribe` logs `stt_started` (`stt_operation` = the Chirp operation name, `stt_started`) and every poll logs `stt_poll` (`poll_n`, `elapsed_s`, `stt_operation`, `outcome` pending|ready). Trail: `jsonPayload.session_id="<sid>" jsonPayload.event=("stt_started" OR "stt_poll")`; look the operation name up in the Speech-to-Text v2 operations API to see Chirp's own state.
-
-The stale sweeper (`jobs/sweep.py`, Cloud Scheduler `sweep-stale-{env}` -> worker `POST /tasks/sweep-stale`, OIDC as `tasks-invoker-{env}`) fails a session still `transcribing` 30 min after its last write (20 min STT limit + 10 min margin) with `transcription_failed`, and one still `validating` after 26 min with `deadline_exceeded`, for the case where the poll chain broke. It logs `sweep_stale` per state and one `session_swept` (`status=failed`, `exc_class=StaleSession`) per session. `running` is not swept. The query needs the Firestore composite index `sessions(state, updated_at)` from `api/firestore.indexes.json` (deploy rules/indexes before the first sweep). Manual run: `gcloud scheduler jobs run sweep-stale-staging --location us-central1`.
 
 ### `error_code` table
 

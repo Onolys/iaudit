@@ -10,7 +10,6 @@ locals {
     "firestore.googleapis.com",
     "storage.googleapis.com",
     "cloudtasks.googleapis.com",
-    "cloudscheduler.googleapis.com",
     "secretmanager.googleapis.com",
     "identitytoolkit.googleapis.com",
     "firebase.googleapis.com",

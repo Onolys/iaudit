@@ -10,8 +10,7 @@ QUERY_CALLS = {"where", "order_by", "stream", "limit", "list_documents", "collec
 # Helpers whose body establishes the uid scope; any other function that queries must call one.
 SCOPE_HELPERS = {"_uid_query", "_owned_session", "_session_ref", "_owned_status"}
 # Auth bootstrap: looks a key up by its id before the uid is known (documented in base.py).
-# list_stale_sessions: the stale-status sweeper (a system job) scans all users by state + age.
-UNSCOPED_ALLOWED = {"get_api_key", "_uid_query", "_owned_session", "list_stale_sessions"}
+UNSCOPED_ALLOWED = {"get_api_key", "_uid_query", "_owned_session"}
 
 
 def _functions(tree):
@@ -61,7 +60,7 @@ def _top_level_collection_calls(fn):
 
 def test_top_level_collections_only_via_uid_query_or_by_id_helpers():
     tree = ast.parse((REPO_DIR / "firestore.py").read_text())
-    by_id_helpers = {"_top", "get_api_key", "list_stale_sessions"}  # document addressed by id; ownership checked after
+    by_id_helpers = {"_top", "get_api_key"}  # document addressed by id; ownership checked after
     bad = [
         fn.name
         for fn in _functions(tree)
