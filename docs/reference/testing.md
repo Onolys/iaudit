@@ -86,6 +86,20 @@ Web: add `@vitest/coverage-v8` to the package's dev dependencies, then `npx vite
 3. Keep the job skipped while the package directory is absent, so main stays green.
 4. Never run `live` tests in PR CI.
 
+## CI behaviour record
+
+Evidence for the foundation CI guarantees. Observed from real PR runs (`gh run view -R Onolys/onolys`, PR #35, branch `feat/miti-platform`), not scratch PRs. Recorded 2026-11-20.
+
+| Scenario | Result | Evidence |
+|---|---|---|
+| A failing check in one package fails only its job | Pass | Run 44817430417 (sha 35fa3b0): `core` failed at `ruff check` (its pytest step skipped); `api`, `eaudit`, `paudit`, `evaluation`, `admin-auth`, `admin-backend`, `frontend`, `web`, `infra` all succeeded. Run 44809066444 (746a61b): only `web` failed, the other 10 jobs green. Run 44823615891 (5ee3d02): `api` and `eaudit` failed (a docs-drift test in `eaudit`), the rest green. Each failure is confined to the package that owns it. |
+| Live tests never run in PR CI | Pass | PR jobs pass `-m "not live"` (`core`, `api`, `paudit`, `evaluation`); package `addopts` also exclude it. Run 44826772322 `api` log: `collected 823 items / 1 deselected / 822 selected`, `822 passed, 1 deselected`. Run 44823615891 `eaudit` log: `1 failed, 1381 passed, 1 deselected`. The only job that runs `-m live` is `api-real-mode` in `nightly.yml` (schedule/dispatch only). |
+| No PR job reads LLM/STT keys | Pass, now enforced | `scripts/ci/check_no_llm_keys_in_pr_workflows.py` runs in the `changes` job of `ci.yml`. It fails on any provider key name (`ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`, `LITELLM_*`, `DEEPGRAM_*`, `STT_*` and similar, or a `secrets.*` with such a name) in a workflow triggered by `pull_request`/`pull_request_target`, including local reusable workflows they call. Today the only reference is in `nightly.yml`, which is not PR-triggered. Tests: `scripts/ci/test_check_no_llm_keys_in_pr_workflows.py` (passes on the repo, fails on the planted fixtures in `scripts/ci/key_guard_fixtures/bad`). `ci.yml` also runs the guard on that planted fixture and fails if the guard does not fail. |
+| Only some packages exist: green, with skipped jobs | Pending real-run proof | Mechanism: `scripts/ci/changes.sh` sets a package flag only if its marker (`pyproject.toml`, `package.json` or the directory) exists, and each job has `if: needs.changes.outputs.<pkg> == 'true'`, so an absent package gives a skipped job (counts as passing). Proven offline by `scripts/ci/test_changes.sh` (absent `web`, `infra`, `evaluation`, `paudit` stay false until created). Not yet seen in a real run: PR #35 edits `.github/workflows/` and `scripts/ci/`, which are CI-shared paths, so every existing package runs; the all-jobs-skipped runs on this branch (e.g. 44801478016) came from a failed `changes` job, not path filtering. Needs: a PR that touches only one package path (or a branch where a package directory is absent) and shows the other jobs as `skipped`. |
+| Fork PR runs CI but not the preview | Pending (task 7) | `ci.yml` uses `pull_request` with read-only permissions and no secrets, so fork PRs run it. `pr-preview.yml` does not exist yet (SP00 task 7). Needs: that workflow with a same-repo guard, then a fork PR showing CI green and no preview comment/deploy. |
+
+Branch protection (require `CI` checks on `main`) is an owner step.
+
 ## Preview auth domains
 
 Staging PR previews (Hosting channels on `onolys-app-staging`) need their host in the Identity Platform authorised domains, or sign-in fails there. Checked live 2026-11-20 (SP06 task 6): the wildcard `onolys-app-staging--pr-*.web.app` is **rejected** by the API (`400 INVALID_AUTHORIZED_DOMAIN : ... should only contain the valid domain`). So the preview workflow must add each channel host after `firebase hosting:channel:deploy` reports it:

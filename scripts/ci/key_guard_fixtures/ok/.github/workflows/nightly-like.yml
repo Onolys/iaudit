@@ -1,0 +1,11 @@
+name: NightlyLike
+on:
+  schedule:
+    - cron: "0 1 * * *"
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - run: echo hi

@@ -38,6 +38,12 @@ jobs:
         run: bash scripts/ci/test_changes.sh
       - name: Check markdown links
         run: python3 scripts/ci/check_links.py
+      - name: No LLM/STT keys in PR workflows (guard + planted-reference check)
+        run: |
+          python3 scripts/ci/check_no_llm_keys_in_pr_workflows.py
+          if python3 scripts/ci/check_no_llm_keys_in_pr_workflows.py scripts/ci/key_guard_fixtures/bad >/dev/null; then
+            echo "key guard did not fail on the planted fixture"; exit 1
+          fi
       - name: Test config guard
         run: bash scripts/ci/test_check_config.sh
       - name: Test deploy-prod workflow guard
