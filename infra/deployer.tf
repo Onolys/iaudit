@@ -1,5 +1,5 @@
 # Keyless GitHub deploys (PRD R9, R13, D5): Workload Identity pool + provider `github`, and the
-# `deployer-staging` service account (also used by SP00's PR previews). Prod deployer is a later task.
+# `deployer-staging` service account (also used by SP00's PR previews) and `deployer-prod` (production environment only).
 
 resource "google_iam_workload_identity_pool" "github" {
   project                   = var.project
@@ -152,4 +152,105 @@ output "wif_provider" {
 output "deployer_staging_email" {
   description = "Value for google-github-actions/auth `service_account` (staging + previews)."
   value       = google_service_account.deployer_staging.email
+}
+
+# --- deployer-prod (PRD R9, R13, D6) ---
+resource "google_service_account" "deployer_prod" {
+  project      = var.project
+  account_id   = "deployer-prod"
+  display_name = "Onolys GitHub deployer (prod)"
+}
+
+# Only jobs running in the GitHub `production` environment may impersonate. The provider condition
+# already pins the repository; a staging job (environment `staging` or none) never matches this principal.
+resource "google_service_account_iam_member" "deployer_prod_wif" {
+  service_account_id = google_service_account.deployer_prod.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.environment/production"
+}
+
+locals {
+  deployer_prod_member = "serviceAccount:${google_service_account.deployer_prod.email}"
+  prod_services = {
+    api    = module.prod.api_service_name
+    worker = module.prod.worker_service_name
+  }
+  # Exact site or its children only: a bare startsWith would also match `onolys-app-staging`.
+  hosting_prod_site = "projects/${var.project}/sites/${var.app_site_id}"
+  hosting_prod_expr = join(" || ", flatten([
+    for s in [local.hosting_prod_site, "projects/-/sites/${var.app_site_id}"] :
+    ["resource.name == \"${s}\"", "resource.name.startsWith(\"${s}/\")"]
+  ]))
+}
+
+resource "google_cloud_run_v2_service_iam_member" "deployer_prod_developer" {
+  for_each = local.prod_services
+  project  = var.project
+  location = var.region
+  name     = each.value
+  role     = "roles/run.developer"
+  member   = local.deployer_prod_member
+}
+
+resource "google_service_account_iam_member" "deployer_prod_runtime_user" {
+  for_each           = { api = module.prod.api_sa_email, worker = module.prod.worker_sa_email }
+  service_account_id = "projects/${var.project}/serviceAccounts/${each.value}"
+  role               = "roles/iam.serviceAccountUser"
+  member             = local.deployer_prod_member
+}
+
+# Prod pulls the image built by staging CI; it never pushes.
+resource "google_artifact_registry_repository_iam_member" "deployer_prod_reader" {
+  project    = var.project
+  location   = var.region
+  repository = google_artifact_registry_repository.onolys.repository_id
+  role       = "roles/artifactregistry.reader"
+  member     = local.deployer_prod_member
+}
+
+resource "google_project_iam_member" "deployer_prod_usage" {
+  project = var.project
+  role    = "roles/serviceusage.serviceUsageConsumer"
+  member  = local.deployer_prod_member
+}
+
+resource "google_project_iam_member" "deployer_prod_hosting" {
+  project = var.project
+  role    = "roles/firebasehosting.admin"
+  member  = local.deployer_prod_member
+
+  condition {
+    title       = "hosting-app-prod-only"
+    description = "Only the ${var.app_site_id} site (and its channels/versions)"
+    expression  = local.hosting_prod_expr
+  }
+}
+
+resource "google_project_iam_member" "deployer_prod_index_admin" {
+  project = var.project
+  role    = "roles/datastore.indexAdmin"
+  member  = local.deployer_prod_member
+
+  condition {
+    title       = "firestore-prod-only"
+    description = "Only the (default) database"
+    expression  = "resource.name.startsWith(\"${module.prod.firestore_db_resource}\")"
+  }
+}
+
+resource "google_project_iam_member" "deployer_prod_rules_admin" {
+  project = var.project
+  role    = "roles/firebaserules.admin"
+  member  = local.deployer_prod_member
+
+  condition {
+    title       = "firestore-rules-prod-only"
+    description = "Rulesets (needed to create) and the (default) database release only"
+    expression  = "resource.name.startsWith(\"projects/${var.project}/rulesets/\") || resource.name == \"projects/${var.project}/releases/cloud.firestore\""
+  }
+}
+
+output "deployer_prod_email" {
+  description = "Value for google-github-actions/auth `service_account` (prod, `production` environment jobs only)."
+  value       = google_service_account.deployer_prod.email
 }

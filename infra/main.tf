@@ -125,3 +125,26 @@ module "staging" {
 
   depends_on = [google_project_service.api]
 }
+
+# Prod: second instance of the module, isolated from staging by DB, bucket, queue, SAs and secrets (PRD R5-R9, D2).
+module "prod" {
+  source = "./modules/environment"
+
+  project                  = var.project
+  region                   = var.region
+  env                      = "prod"
+  database_id              = "(default)"
+  delete_protection        = true
+  worker_concurrency       = var.worker_concurrency
+  worker_max_instances     = var.worker_max_instances
+  api_max_instances        = 10
+  llm_secrets              = local.llm_secret_ids
+  stt_secrets              = local.stt_secret_ids
+  admin_enabled            = var.admin_enabled
+  alerts_enabled           = true
+  notification_channel_ids = [google_monitoring_notification_channel.owner_email.id]
+  admin_cors_origins       = ["https://${var.admin_site_id}.web.app"]
+  cors_origins             = ["https://app.onolys.com"]
+
+  depends_on = [google_project_service.api]
+}
