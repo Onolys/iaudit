@@ -88,6 +88,31 @@ Header (change goal, MITI 4.2.1, models, date); scorecard (yours vs Onolys per i
 ### Stack and cost
 Cloud Run (api + worker), Cloud Tasks, Firestore, Cloud Storage, Identity Platform (no PHI in profiles or client SDK calls; PHI only through own API), Secret Manager, Speech-to-Text v2 Chirp 3, Gemini on Vertex; Claude via LiteLLM as a config swap. Estimate per 25-min session ≈ $0.14-0.47 (STT + Gemini Flash), fixed ≈ $0-10/month at launch (prices seen 2026-11-20; STT and Vertex figures partly unverified).
 
+## Builder-check answers
+Answered from the conversation or repo:
+- Repos already renamed on GitHub (2026-11-20): `Onolys/onolys` (local folder still `iaudit`), `Onolys/onolys-landing` (local folder still `miti`). Landing edits happen in place in that repo.
+- MITI permission is granted (Tejit); pack may embed manual definitions with citation.
+- Admin UI product registry (`frontend/src/products.ts`) gains a `paudit` entry; `web/` is a separate app.
+
+Claude's calls (minor, change nothing material; override freely):
+| Topic | Call |
+|---|---|
+| Phasing | dev-design splits into sub-projects with separate PRs: core+engines, api+jobs, web app, landing CTA, admin deploy |
+| Existing behaviour | Keep sync `POST /v1/audit`, eval harness and admin UI working through the move to `engines/eaudit/` |
+| Admin auth | Identity Platform login with an email allowlist + MFA (no IAP/load balancer in v1) |
+| Environments | One GCP project, separate `staging` and `prod` Cloud Run services and buckets |
+| Landing buttons | Links only: "Sign up" → `app.onolys.com/signup`, "Log in" → `/login`, "Try it out" → `/signup` |
+| API keys | One active key per user; create, revoke, regenerate; hashed at rest; simple per-key rate limit |
+| Web stack | React + Vite + TypeScript (matches `frontend/`); reuse landing colours/fonts; reuse review-UI transcript highlighting for clickable instances |
+| Rating schema v1 | change_goal, coded_span{from,to}, globals{cct,sst,partnership,empathy: 1-5 or null}, counts{10 codes: int or null}, reasons (free text, optional per item), notes |
+| Unreadable upload | Image-only/unreadable file → ask the user to paste instead; no OCR in v1 |
+| Difference rule | Globals: differ if abs diff ≥1; counts: any diff shown, flagged if abs diff ≥2 or ≥25%; "within one point" = abs diff ≤1 |
+| N>1 runs | Compare against the mean; show spread; dashboard uses mean; no rating → difference tiles show "–" |
+| Audio | mp3, wav, m4a, webm, ogg; ≤100 MB; ≤25 min; audio only (no video) in v1 |
+| Job UX | Status polling every 3 s; target ≤5 min per session; one automatic retry per failed step, then a clear error with "run again" |
+| PHI-ready controls v1 | Allowlist logging (existing pattern), no transcript/audio text in logs or analytics, private buckets with signed URLs, Google-managed encryption, single US region, access audit log on report/audio reads |
+| Models | dev-design pins current Gemini Flash (coding, parsing) and Pro (globals, tips) on Vertex; Claude routes kept as alternates |
+
 ## Goals, non-goals, anti-goals
 - **Goals:** the people who asked each sign up on miti.onolys.com, upload one recording + rating, and get a report on app.onolys.com without Tejit's help. Every feature reachable by API. Swapping STT/LLM/language/N is config only.
 - **Non-goals (v1):** teams/orgs, billing, PDF export, email, dashboard trends, transcript editing, non-English reports, caudit, other protocols.
