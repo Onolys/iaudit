@@ -21,8 +21,8 @@ Source of truth: [PRD.md](PRD.md). Lane B (platform). Built and accepted on fake
 | 11 | Speakers, transcript read, `maybe_start_first_run` transaction | 8, 9, 10 | done |
 | 12 | `run` task, progress, partial failure, reports, `POST /runs` | 6, 9, 11 | done |
 | 13 | Delete (hard) + cleanup task | 7, 12 | done |
-| 14 | Logging/privacy registration and sentinel test | 12 | in-progress |
-| 15 | OpenAPI finalisation, `/v1/docs`, contracts, public-api doc, ADR 0020 | 12, 13 | todo |
+| 14 | Logging/privacy registration and sentinel test | 12 | done |
+| 15 | OpenAPI finalisation, `/v1/docs`, contracts, public-api doc, ADR 0020 | 12, 13 | in-progress |
 | 16 | Dockerfile, dev script, end-to-end acceptance sweep | 13, 14, 15 | todo |
 
 Parallel lanes: Task 1 goes first and alone; push it as soon as it is green because SP05 (Lane C) generates its client from `api/openapi.json` and SP00's PR-preview task (SP00 T7) needs `SERVICE_MODE=combined` runnable. It depends only on SP01 Task 1 (workspace + shared types), the sync point with Lane A. After Task 1, three people can split: (a) Task 2 then 3 (storage, auth/keys), (b) Task 5 (queue/worker semantics) then 7 and 8 (upload/transcode, transcribe), (c) Task 6 (adapters/fakes) then 10 (rating card) and 9 (cap, after 2). Task 4 needs 2 and 3 and unlocks 7 and 10; the state-machine and first-run logic (4, 11, 12) are best kept to one person because they share `jobs/machine.py`. Tasks 13, 14 and 15 are independent of each other after 12 and can run concurrently. Cross-lane sync points: Task 1 (to SP05 and SP00), Task 15 (final `openapi.json` to SP05, report schema from SP03 stored verbatim), SP06 (staging env for the first preview and for SP09's deploy checks, not for this sub-project's acceptance), SP09 (takes over the adapter seam in Task 6).
