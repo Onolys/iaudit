@@ -15,7 +15,7 @@ Source of truth: [PRD.md](PRD.md). Lane C. Built on MSW mocks from day one (D5);
 | 5 | Create session form and uploader | 4 | done |
 | 6 | Rating card with autosave and `miti-items` parity | 4 | done |
 | 7 | Speaker gate and "Change who the clinician is" | 4 | done |
-| 8 | Transcript view with code-point segmenter | 2 | in-progress |
+| 8 | Transcript view with code-point segmenter | 2 | done |
 | 9 | Report page | 8 | todo |
 | 10 | Dashboard and `/sample-report` | 3, 9 | todo |
 | 11 | Settings and API key | 3 | todo |
