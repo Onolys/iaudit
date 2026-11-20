@@ -129,3 +129,16 @@ def test_adapter_names_no_model_or_provider():
     assert not re.search(
         r"claude|anthropic|gemini|gpt|openai|vertex|sonnet|haiku|opus|litellm_id", part
     )
+
+
+async def test_float_coded_span_is_passed_to_engine_as_whole_seconds():
+    # the session stores float seconds; paudit's CodedSpan accepts ints only (found by the live test)
+    engine = Engine()
+    params = {**PARAMS, "coded_span": {"from_s": 0.0, "to_s": 600.0}}
+    await make(engine).run(ctx(), None, transcript(), SPEAKERS, params, None)
+    span = engine.calls[0][0][4]["coded_span"]
+    assert span == {"from_s": 0, "to_s": 600}
+    assert all(type(v) is int for v in span.values())
+    params = {**PARAMS, "coded_span": {"from_s": 1.5, "to_s": 9.2}}
+    await make(engine).run(ctx(), None, transcript(), SPEAKERS, params, None)
+    assert engine.calls[1][0][4]["coded_span"] == {"from_s": 1, "to_s": 10}

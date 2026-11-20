@@ -19,6 +19,7 @@ to `internal_error`, not retryable, and the worker logs the class, never the mes
 """
 
 import json
+import math
 import time
 from collections.abc import Callable, Mapping
 from typing import Any
@@ -121,6 +122,12 @@ class RealEvaluation:
             deadline=deadline,
         )
         engine_params = {k: params.get(k) for k in _ENGINE_PARAMS}
+        span = engine_params["coded_span"]
+        if span:  # the session stores float seconds; the engine's CodedSpan wants whole seconds
+            engine_params["coded_span"] = {
+                "from_s": None if span.get("from_s") is None else math.floor(span["from_s"]),
+                "to_s": None if span.get("to_s") is None else math.ceil(span["to_s"]),
+            }
         out = await run_evaluation(
             rctx, load_pack(PACK_REF), transcript, speaker_map, engine_params, rating, None,
             progress_cb,
