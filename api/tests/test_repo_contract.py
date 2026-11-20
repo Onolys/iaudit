@@ -464,3 +464,77 @@ def test_idempotency_delete_is_scoped_and_repeatable(repo):
     repo.delete_idempotency(uid, "k1")  # repeatable
     assert repo.get_idempotency(uid, "k1") is None
     assert repo.put_idempotency(uid, "k1", doc) is True
+
+
+# ---- step/run claim with lease (R5) ----
+
+LEASE = 540.0
+
+
+def test_claim_step_new_then_busy_then_reclaimable_after_lease(repo):
+    uid, sid = seed(repo)
+    t0 = datetime.now(UTC)
+    c = repo.claim_step(uid, sid, "validate", t0, LEASE)
+    assert (c.outcome, c.attempts) == ("claimed", 1)
+    rec = repo.get_session(uid, sid).steps["validate"]
+    assert rec.status == "running" and rec.attempts == 1 and rec.started is not None
+    assert (
+        repo.claim_step(uid, sid, "validate", t0 + timedelta(seconds=60), LEASE).outcome == "busy"
+    )
+    late = repo.claim_step(uid, sid, "validate", t0 + timedelta(seconds=LEASE + 1), LEASE)
+    assert (late.outcome, late.attempts) == ("claimed", 2)
+
+
+def test_claim_step_done_and_failed_are_terminal_and_keep_other_fields(repo):
+    uid, sid = seed(repo)
+    now = datetime.now(UTC)
+    repo.update_session(uid, sid, {"steps.transcribe.stt_operation": "op-1"})
+    assert repo.claim_step(uid, sid, "transcribe", now, LEASE).outcome == "claimed"
+    assert repo.get_session(uid, sid).steps["transcribe"].stt_operation == "op-1"
+    repo.update_session(uid, sid, {"steps.transcribe.status": "done"})
+    assert repo.claim_step(uid, sid, "transcribe", now, LEASE).outcome == "done"
+    repo.update_session(uid, sid, {"steps.validate.status": "failed"})
+    assert repo.claim_step(uid, sid, "validate", now, LEASE).outcome == "failed"
+
+
+def test_claim_step_released_to_pending_is_claimable_again(repo):
+    uid, sid = seed(repo)
+    now = datetime.now(UTC)
+    repo.claim_step(uid, sid, "validate", now, LEASE)
+    repo.update_session(uid, sid, {"steps.validate.status": "pending"})
+    c = repo.claim_step(uid, sid, "validate", now, LEASE)
+    assert (c.outcome, c.attempts) == ("claimed", 2)
+
+
+def test_claim_run_lifecycle(repo):
+    uid, sid = seed(repo)
+    run_id = f"run-{uuid.uuid4().hex[:8]}"
+    now = datetime.now(UTC)
+    repo.create_run(uid, sid, run_id, RunDoc(uid=uid, session_id=sid, run_id=run_id))
+    assert repo.claim_run(uid, sid, run_id, now, LEASE).outcome == "claimed"
+    r = repo.get_run(uid, sid, run_id)
+    assert r.status == "running" and r.attempts == 1 and r.started is not None
+    assert repo.claim_run(uid, sid, run_id, now, LEASE).outcome == "busy"
+    repo.update_run(uid, sid, run_id, {"status": "done"})
+    assert repo.claim_run(uid, sid, run_id, now, LEASE).outcome == "done"
+
+
+def test_claim_is_uid_scoped(repo):
+    uid, sid = seed(repo)
+    other = new_ids()[0]
+    with pytest.raises(NotFoundError):
+        repo.claim_step(other, sid, "validate", datetime.now(UTC), LEASE)
+    with pytest.raises(NotFoundError):
+        repo.claim_run(other, sid, "nope", datetime.now(UTC), LEASE)
+
+
+def test_two_concurrent_claims_one_wins(repo):
+    from concurrent.futures import ThreadPoolExecutor
+
+    uid, sid = seed(repo)
+    now = datetime.now(UTC)
+    with ThreadPoolExecutor(4) as ex:
+        outs = list(
+            ex.map(lambda _: repo.claim_step(uid, sid, "validate", now, LEASE).outcome, range(4))
+        )
+    assert outs.count("claimed") == 1 and outs.count("busy") == 3

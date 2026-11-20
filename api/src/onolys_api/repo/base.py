@@ -6,8 +6,8 @@ Sync on purpose: routes/handlers call it from threadpool workers.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any, Protocol
+from datetime import datetime, timedelta
+from typing import Any, Literal, Protocol
 
 from onolys_core.transcript import Transcript
 
@@ -46,6 +46,29 @@ class Page[T]:
     next_cursor: str | None = None
 
 
+ClaimOutcome = Literal["claimed", "done", "failed", "busy"]
+
+
+@dataclass(frozen=True)
+class Claim:
+    """Result of claiming a step/run record: `claimed` (caller owns it now, `attempts` counts
+    claims), `done`/`failed` (terminal: a duplicate delivery), `busy` (running inside its lease)."""
+
+    outcome: ClaimOutcome
+    attempts: int = 0
+
+
+def decide_claim(
+    status: str | None, started: datetime | None, attempts: int, now: datetime, lease_s: float
+) -> Claim:
+    """Shared claim rule. A `running` record older than the lease is re-claimable."""
+    if status in ("done", "failed"):
+        return Claim(status, attempts)  # type: ignore[arg-type]
+    if status == "running" and started is not None and now < started + timedelta(seconds=lease_s):
+        return Claim("busy", attempts)
+    return Claim("claimed", attempts + 1)
+
+
 class Repo(Protocol):
     # users
     def get_user(self, uid: str) -> UserDoc | None: ...
@@ -81,6 +104,11 @@ class Repo(Protocol):
     def get_run(self, uid: str, sid: str, run_id: str) -> RunDoc: ...
     def update_run(self, uid: str, sid: str, run_id: str, fields: dict[str, Any]) -> None: ...
     def list_runs(self, uid: str, sid: str) -> list[RunDoc]: ...
+    # atomic claim with lease (R5): pending|expired-running -> running, attempts+1
+    def claim_step(self, uid: str, sid: str, step: str, now: datetime, lease_s: float) -> Claim: ...
+    def claim_run(
+        self, uid: str, sid: str, run_id: str, now: datetime, lease_s: float
+    ) -> Claim: ...
     def get_run_by_id(self, uid: str, run_id: str) -> RunDoc: ...
     def put_report(self, uid: str, sid: str, report_id: str, doc: ReportDoc) -> None: ...
     def get_report(self, uid: str, sid: str, report_id: str, resolve: bool = True) -> ReportDoc: ...

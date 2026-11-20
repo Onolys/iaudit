@@ -1,13 +1,14 @@
 """In-memory `Repo` with the same semantics as FirestoreRepo. Records `session_status` writes."""
 
 import copy
+import threading
 from datetime import datetime
 from typing import Any
 
 from onolys_core.transcript import Transcript
 
 from onolys_api.repo import large
-from onolys_api.repo.base import ConflictError, NotFoundError, Page
+from onolys_api.repo.base import Claim, ConflictError, NotFoundError, Page, decide_claim
 from onolys_api.repo.firestore import (
     DRAFT_ID,
     MAX_LIMIT,
@@ -46,6 +47,7 @@ class FakeRepo:
         self._blobs = blobs
         self._docs: dict[str, dict[str, Any]] = {}  # full path -> stored dict
         self.status_writes: list[tuple[str, str, dict[str, Any]]] = []
+        self._claim_lock = threading.Lock()
 
     # ---- storage primitives ----
 
@@ -263,6 +265,38 @@ class FakeRepo:
         for k, v in fields.items():
             _set_path(d, k, v)
         self._put(f"sessions/{sid}/runs/{run_id}", d)
+
+    def claim_step(self, uid: str, sid: str, step: str, now: datetime, lease_s: float) -> Claim:
+        with self._claim_lock:
+            doc = self._owned(f"sessions/{sid}", uid)
+            rec = (doc.get("steps") or {}).get(step) or {}
+            claim = decide_claim(
+                rec.get("status"), rec.get("started"), rec.get("attempts", 0), now, lease_s
+            )
+            if claim.outcome == "claimed":
+                for k, v in (
+                    ("status", "running"),
+                    ("attempts", claim.attempts),
+                    ("started", now),
+                    ("error", None),
+                ):
+                    _set_path(doc, f"steps.{step}.{k}", v)
+                self._put(f"sessions/{sid}", doc)
+            return claim
+
+    def claim_run(self, uid: str, sid: str, run_id: str, now: datetime, lease_s: float) -> Claim:
+        self._own(uid, sid)
+        with self._claim_lock:
+            d = self._get(f"sessions/{sid}/runs/{run_id}")
+            if d is None:
+                raise NotFoundError()
+            claim = decide_claim(
+                d.get("status"), d.get("started"), d.get("attempts", 0), now, lease_s
+            )
+            if claim.outcome == "claimed":
+                d.update(status="running", attempts=claim.attempts, started=now, error=None)
+                self._put(f"sessions/{sid}/runs/{run_id}", d)
+            return claim
 
     def list_runs(self, uid: str, sid: str) -> list[RunDoc]:
         self._own(uid, sid)

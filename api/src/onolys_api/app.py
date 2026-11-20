@@ -8,20 +8,24 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from onolys_core.errors import ConfigError
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from onolys_api.auth.deps import Authenticator
 from onolys_api.auth.idtoken import TokenVerifier
-from onolys_api.config import Settings
+from onolys_api.auth.oidc import OidcVerifier
+from onolys_api.config import LOCAL_ENVS, Settings
 from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse, error_body
 from onolys_api.factory import build_blobs, build_repo
+from onolys_api.jobs.queue import build_queue
+from onolys_api.jobs.worker import TaskRunner
 from onolys_api.presets import PresetResolver
-from onolys_api.queue import InMemoryQueue
 from onolys_api.repo.base import Repo
 from onolys_api.routes import api_key as api_key_routes
 from onolys_api.routes import sessions as session_routes
+from onolys_api.routes import tasks as task_routes
 from onolys_api.storage.base import BlobStore
 from onolys_api.storage.fake import FakeBlobStore
 from onolys_api.storage.fake_routes import make_fake_blob_router
@@ -140,11 +144,17 @@ def register_error_handlers(app: FastAPI) -> None:
         return _response(request, 500, message, [{"code": "internal_error", "message": message}])
 
 
+class _NoQueue:
+    def enqueue(self, payload, delay_s: float = 0.0) -> None:
+        raise RuntimeError("TASKS_QUEUE is not configured")
+
+
 def create_app(
     settings: Settings | None = None,
     repo: Repo | None = None,
     blobs: BlobStore | None = None,
     token_verifier: TokenVerifier | None = None,
+    oidc_verifier: OidcVerifier | None = None,
 ) -> FastAPI:
     settings = settings or Settings.from_env()
     app = FastAPI(
@@ -159,8 +169,18 @@ def create_app(
     app.state.repo = repo or build_repo(settings, app.state.blobs)
     app.state.presets = PresetResolver(settings)
     app.state.auth = Authenticator(settings, app.state.repo, token_verifier)
-    if settings.service_mode == "combined":
-        app.state.queue = InMemoryQueue()  # handlers registered in Task 5
+    queue = build_queue(settings)
+    if queue is not None:
+        app.state.queue = queue
+    runs_tasks = settings.service_mode in ("worker", "combined")
+    if runs_tasks:
+        assert queue is not None or settings.service_mode == "worker"
+        # worker without TASKS_QUEUE (local only): follow-up tasks have nowhere to go
+        app.state.runner = TaskRunner(app.state.repo, queue or _NoQueue())
+        if settings.env not in LOCAL_ENVS:
+            if not settings.worker_url or not settings.tasks_sa:
+                raise ConfigError("WORKER_URL and TASKS_SA are required for the worker")
+            app.state.oidc = oidc_verifier or OidcVerifier(settings.worker_url, settings.tasks_sa)
 
     app.add_middleware(
         ContractCORSMiddleware,
@@ -188,6 +208,8 @@ def create_app(
     router.include_router(api_key_routes.router)
     router.include_router(session_routes.router)
     app.include_router(router)
+    if runs_tasks:
+        app.include_router(task_routes.router)  # /tasks/{kind}: Cloud Tasks only, not in schema
     if isinstance(app.state.blobs, FakeBlobStore):  # dev/tests: serve the fake signed URLs
         app.include_router(make_fake_blob_router(app.state.blobs))
     return app

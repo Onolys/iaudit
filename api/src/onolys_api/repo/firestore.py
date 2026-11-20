@@ -20,7 +20,7 @@ from onolys_core.transcript import Transcript
 
 from onolys_api.config import Settings
 from onolys_api.repo import large
-from onolys_api.repo.base import ConflictError, NotFoundError, Page
+from onolys_api.repo.base import Claim, ConflictError, NotFoundError, Page, decide_claim
 from onolys_api.repo.models import (
     ApiKeyDoc,
     Doc,
@@ -276,6 +276,58 @@ class FirestoreRepo:
         if not ref.get().exists:
             raise NotFoundError()
         ref.update(fields)
+
+    def claim_step(self, uid: str, sid: str, step: str, now: datetime, lease_s: float) -> Claim:
+        ref = self._session_ref(uid, sid)
+
+        @firestore.transactional
+        def txn_fn(txn) -> Claim:
+            snap = ref.get(transaction=txn)
+            if not snap.exists or (snap.to_dict() or {}).get("uid") != uid:
+                raise NotFoundError()
+            rec = ((snap.to_dict() or {}).get("steps") or {}).get(step) or {}
+            claim = decide_claim(
+                rec.get("status"), rec.get("started"), rec.get("attempts", 0), now, lease_s
+            )
+            if claim.outcome == "claimed":
+                txn.update(
+                    ref,
+                    {
+                        f"steps.{step}.status": "running",
+                        f"steps.{step}.attempts": claim.attempts,
+                        f"steps.{step}.started": now,
+                        f"steps.{step}.error": None,
+                    },
+                )
+            return claim
+
+        return txn_fn(self._client.transaction())
+
+    def claim_run(self, uid: str, sid: str, run_id: str, now: datetime, lease_s: float) -> Claim:
+        ref = self._run_ref(uid, sid, run_id)
+
+        @firestore.transactional
+        def txn_fn(txn) -> Claim:
+            snap = ref.get(transaction=txn)
+            if not snap.exists:
+                raise NotFoundError()
+            d = snap.to_dict() or {}
+            claim = decide_claim(
+                d.get("status"), d.get("started"), d.get("attempts", 0), now, lease_s
+            )
+            if claim.outcome == "claimed":
+                txn.update(
+                    ref,
+                    {
+                        "status": "running",
+                        "attempts": claim.attempts,
+                        "started": now,
+                        "error": None,
+                    },
+                )
+            return claim
+
+        return txn_fn(self._client.transaction())
 
     def list_runs(self, uid: str, sid: str) -> list[RunDoc]:
         coll = self._session_ref(uid, sid).collection("runs")
