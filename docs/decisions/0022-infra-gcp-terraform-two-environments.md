@@ -13,6 +13,7 @@
 - **D3 Region**: `us-central1` everywhere except STT, which uses the `us` multi-region because Chirp 3 is not offered in `us-central1`.
 - **D4 Same-origin API**: Hosting site with a `/v1/**` rewrite to Cloud Run (no CORS, no load balancer).
 - **D5 Deploy auth**: Workload Identity Federation with one deployer service account per env; prod trusts only the `production` GitHub environment.
+  - Firebase deploys also need `firebase.projects.get` (custom role `firebaseProjectGet`, both deployers) and `firebaserules.admin` at project level: firebase-tools calls rulesets `:test`/create on the bare project resource, which IAM conditions on `resource.name` did not match (403 in CI). Trade-off: `deployer-staging` could release prod rules; accepted (same repo trust, workflow targets `firestore:staging` only). `datastore.indexAdmin` stays limited per database.
 - **D6 Prod promotion**: the same image digest that ran in staging, after manual approval; no rebuild.
 - **D7 Backups**: PITR off, no backups, GCS soft-delete 0, prod DB delete-protection on, so "delete removes everything" holds. An erroneous prod delete cannot be recovered (accepted v1 risk).
 - **D8 Admin**: Hosting site plus Cloud Run, app-level email allowlist, no MFA; behind `admin_enabled` (default off, after launch).

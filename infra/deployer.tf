@@ -71,6 +71,23 @@ locals {
   )
 }
 
+# firebase-tools reads the Firebase project (firebase.projects.get) before every deploy. That permission is
+# project level, so the Hosting grant (conditioned on site resource names) never covers it. A single-permission
+# custom role keeps it narrower than roles/firebase.viewer.
+resource "google_project_iam_custom_role" "firebase_project_get" {
+  project     = var.project
+  role_id     = "firebaseProjectGet"
+  title       = "Firebase project get (deployers)"
+  description = "Read the Firebase project; required by firebase-tools deploy."
+  permissions = ["firebase.projects.get"]
+}
+
+resource "google_project_iam_member" "deployer_staging_firebase_project_get" {
+  project = var.project
+  role    = google_project_iam_custom_role.firebase_project_get.name
+  member  = local.deployer_staging_member
+}
+
 # --- Staging deploys ---
 resource "google_cloud_run_v2_service_iam_member" "deployer_staging_developer" {
   for_each = local.staging_services
@@ -117,7 +134,11 @@ resource "google_project_iam_member" "deployer_staging_hosting" {
   }
 }
 
-# Firestore rules/indexes on the staging database only.
+# Firestore rules/indexes. Indexes are limited to the staging database by condition. Rules are project level on
+# purpose: firebase-tools calls rulesets.test/create on the bare project resource, and IAM conditions on
+# resource.name (tried: project id and project number) never matched it (run 44810006543, 403 on :test).
+# Trade-off: deployer-staging could release prod rules (releases/cloud.firestore). Accepted: same GitHub repo
+# trust, and the workflow only targets `firestore:staging`. See ADR 0022 (D5).
 resource "google_project_iam_member" "deployer_staging_index_admin" {
   project = var.project
   role    = "roles/datastore.indexAdmin"
@@ -134,12 +155,6 @@ resource "google_project_iam_member" "deployer_staging_rules_admin" {
   project = var.project
   role    = "roles/firebaserules.admin"
   member  = local.deployer_staging_member
-
-  condition {
-    title       = "firestore-rules-staging-only"
-    description = "Rulesets (needed to create) and the staging database release only"
-    expression  = "resource.name.startsWith(\"projects/${var.project}/rulesets/\") || resource.name.startsWith(\"projects/${var.project}/releases/cloud.firestore/staging\")"
-  }
 }
 
 # --- PR previews (SP00 R3, PRD R13) ---
@@ -241,6 +256,12 @@ resource "google_project_iam_member" "deployer_prod_usage" {
   member  = local.deployer_prod_member
 }
 
+resource "google_project_iam_member" "deployer_prod_firebase_project_get" {
+  project = var.project
+  role    = google_project_iam_custom_role.firebase_project_get.name
+  member  = local.deployer_prod_member
+}
+
 resource "google_project_iam_member" "deployer_prod_hosting" {
   project = var.project
   role    = "roles/firebasehosting.admin"
@@ -269,12 +290,6 @@ resource "google_project_iam_member" "deployer_prod_rules_admin" {
   project = var.project
   role    = "roles/firebaserules.admin"
   member  = local.deployer_prod_member
-
-  condition {
-    title       = "firestore-rules-prod-only"
-    description = "Rulesets (needed to create) and the (default) database release only"
-    expression  = "resource.name.startsWith(\"projects/${var.project}/rulesets/\") || resource.name == \"projects/${var.project}/releases/cloud.firestore\""
-  }
 }
 
 output "deployer_prod_email" {
