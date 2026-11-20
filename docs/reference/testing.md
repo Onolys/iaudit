@@ -85,3 +85,15 @@ Web: add `@vitest/coverage-v8` to the package's dev dependencies, then `npx vite
 2. Add a job to `.github/workflows/ci.yml`, modeled on the `eaudit` job: `uv sync --frozen --package <name>` from the repo root, `ruff check`, `pytest -q` (live is excluded by the default `addopts`). Web packages follow the `frontend` job (`npm ci`, `npm run typecheck`, `npm test`).
 3. Keep the job skipped while the package directory is absent, so main stays green.
 4. Never run `live` tests in PR CI.
+
+## Preview auth domains
+
+Staging PR previews (Hosting channels on `onolys-app-staging`) need their host in the Identity Platform authorised domains, or sign-in fails there. Checked live 2026-11-20 (SP06 task 6): the wildcard `onolys-app-staging--pr-*.web.app` is **rejected** by the API (`400 INVALID_AUTHORIZED_DOMAIN : ... should only contain the valid domain`). So the preview workflow must add each channel host after `firebase hosting:channel:deploy` reports it:
+
+```
+python3 infra/scripts/identity-config.py --domains-only --add-domain <channel-host>
+```
+
+- Auth: ADC for project `onolys` (the staging deployer SA needs Identity Platform admin: `roles/firebaseauth.admin`).
+- Idempotent and add-only (union with the live list; it never removes). Terraform ignores `authorized_domains` drift, so added hosts are not pruned on apply.
+- Hosts accumulate (limit 1000); prune closed-PR hosts occasionally by PATCHing `authorizedDomains` on `https://identitytoolkit.googleapis.com/admin/v2/projects/onolys/config`.
