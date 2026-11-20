@@ -36,6 +36,9 @@ FROM python:3.12-slim-bookworm
 RUN useradd --system --uid 10001 --create-home onolys
 COPY --from=build /opt/venv /opt/venv
 COPY protocols /app/protocols
+# Model routes: infra sets ROUTES_FILE=config/<env>/routes.yaml (relative to WORKDIR /app); paudit's live
+# client needs it (eaudit builds its own routes). Same line as api/Dockerfile.
+COPY config /app/config
 # eaudit validates requests/responses against these schemas at startup (IAUDIT_CONTRACTS_DIR).
 COPY docs/contracts/*.schema.json /app/contracts/
 ENV PATH=/opt/venv/bin:$PATH PYTHONUNBUFFERED=1 PORT=8080 ENV=prod ADMIN_AUTH=on \
