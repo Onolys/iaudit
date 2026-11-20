@@ -96,7 +96,7 @@ Same sample, staging, deployed sha `a47d593`, one session (N=1, language `auto`,
 | # | Run | Result | Run doc | Time |
 |---|---|---|---|---|
 | 0 | `default` (auto after speakers confirm) | `report_ready`, report v1 | `done`, 1 attempt | 67.3 s |
-| 1 | `test-broken-llm` | **session `failed`, `error_code=internal_error`** (expected `upstream_unavailable`): NOT MET | `failed`, 1 attempt (expected both attempts) | 0.9 s (POST -> ended) |
+| 1 | `test-broken-llm` | **session `failed`, `error_code=internal_error`** (expected `upstream_unavailable`): NOT MET on `a47d593`; met on `94c97ec` (see re-check below) | `failed`, 1 attempt (expected both attempts) | 0.9 s (POST -> ended) |
 | 2 | `default` (run again, same session) | `report_ready`, report v2 | `done`, 1 attempt | 42.3 s |
 | 3 | `test-broken-eaudit` | `report_ready`, report v3; `reasons_audit.status=failed` (0 items); warnings `short_session`, `reflection_before_client_speech`, `reasons_audit_failed`; `run_info.eaudit` null | `done`, 1 attempt | 44.6 s |
 
@@ -109,9 +109,21 @@ Broken-LLM failure (run 1), request_id `4202fe4c62b746d0bbbbb5209c436e3d` (the `
 
 Cleanup: session deleted (204, then 404), bucket prefix for the user empty (`onolys-audio-staging`), `users` and `usage` docs removed (no `api_keys` doc was created), test user deleted (lookup returns no account).
 
-## Open
+### Task 10 re-check on `94c97ec` (broken-LLM outcome met)
 
-- **Task 10: broken-LLM run ends `internal_error`, one attempt, not `upstream_unavailable` after two (R3, D3, AC7).** `paudit.engine.run` catches each run's `LLMError` and raises a fresh `AllRunsFailed` outside the `except`, so the cause is lost; `error_map._classify` then sees a plain `OnolysError` -> `internal_error`. Proposed fix (test-first, paudit + api): in `engine.run`, keep the first caught exception and `raise AllRunsFailed(...) from first_exc`; in `error_map._classify`, before the `OnolysError` branch, walk `__cause__` and map a chained `LLMError` (not `FixtureMiss`) to `(UPSTREAM, True)`. Re-verify on staging after deploy. Offline mapping tests (Tasks 1, 5) did not cover an engine-wrapped LLM failure.
+Staging sha `94c97ec` (run doc `code_version`), fresh synthetic user, same sample, N=1. Baseline `default` run: `report_ready` (speaker confirm auto-ran; transcript 83.2 s, report 66.7 s). Then `POST /runs {preset:"test-broken-llm"}`, request_id `d369776c07844885b3c3036156b0729b`:
+
+- Session `failed`, `error.code=upstream_unavailable` (retryable). Run doc `failed`, `attempts=2`, `error=upstream_unavailable`, started 22:18:12.731Z, ended 22:18:13.595Z. POST -> `failed` seen by the poll in 8.0 s (the worker retried once ~1 s after the first failure, then ended).
+- Runbook query (`request_id` + `status="failed"`, `timestamp>=` bound, `orderBy timestamp desc`) returns exactly one line: `onolys-worker-staging`, 22:18:13.594Z, `event run_failed`, `step run`, `error_code upstream_unavailable`, `exc_class AllRunsFailed`. The request_id alone returns 3 lines: api `request` 202 (22:18:06.845Z), worker `task_retry` (22:18:07.701Z, `upstream_unavailable`), and the `run_failed` line.
+- Alert: policy `Onolys failed step/run (staging)` (id `3934617429481960380`). The incident from the earlier run (alert `0.of8xgp0aphrb`, opened 22:02:11Z) was still OPEN when this run failed at 22:18:13Z (inside the 1800 s auto-close window), so no new incident opened; checked via Monitoring API `alerts` (about 2 and 4 min after the log line, still one OPEN alert, opened 22:02:11Z, plus the closed 21:06:27Z-21:40:50Z one). This run's failed line fell inside the open incident. Email not checked by the agent.
+
+Cleanup: session deleted (204, then 404), bucket prefix empty, `users`/`usage`/`api_keys` collections hold no doc for the user (listed, none found), test user deleted (lookup returns no account).
+
+## Resolved
+
+- **Task 10: broken-LLM run ended `internal_error` after one attempt (R3, D3, AC7)**: fixed by `94c97ec` (engine keeps the LLM cause, `error_map` maps a chained `LLMError` to `upstream_unavailable`, retryable). Verified on staging: `failed`, `upstream_unavailable`, 2 attempts (re-check above).
+
+## Open
 
 - The task's 10-25 min recording size is not met: the only real sample is 6.7 min. Run time scales with audio length, so a 10-25 min recording should be re-measured when one is available (the 85 s transcribe step is the part that grows).
 - No SP01 p95 figure to compare against (see above).
