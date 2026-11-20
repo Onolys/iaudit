@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Onolys public /v1 API and job worker (one image, SERVICE_MODE api|worker|combined)"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "onolys-core",
+    "onolys-core[stt-google]",
     "onolys-evaluation",
     "fastapi>=0.115",
     "uvicorn>=0.30",

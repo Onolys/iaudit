@@ -7,8 +7,7 @@ from types import SimpleNamespace as NS
 import pytest
 
 from onolys_core.errors import InputError
-from onolys_core.stt import AudioRef, SttParams
-from onolys_core.stt import Word
+from onolys_core.stt import AudioRef, SttParams, Word
 from onolys_core.stt.base import transcribe, words_to_turns
 from onolys_core.stt.google_chirp import (
     GoogleChirp3,

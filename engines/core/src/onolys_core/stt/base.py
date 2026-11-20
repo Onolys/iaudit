@@ -39,7 +39,10 @@ def words_to_turns(words: list[Word], max_gap_ms: int = DEFAULT_MAX_GAP_MS) -> l
     for w in words:
         if w.speaker is not None:
             labels.setdefault(w.speaker, f"S{len(labels) + 1}")
-        if cur and (w.speaker != cur[-1].speaker or w.start_ms - max(cur[-1].start_ms, cur[-1].end_ms) > max_gap_ms):
+        if cur and (
+            w.speaker != cur[-1].speaker
+            or w.start_ms - max(cur[-1].start_ms, cur[-1].end_ms) > max_gap_ms
+        ):
             flush()
         cur.append(w)
     flush()
