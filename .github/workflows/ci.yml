@@ -12,6 +12,11 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  # SP01 Task 2 moves eaudit into the workspace: change only this value
+  # (and the matching `paths` in scripts/ci/changes.sh).
+  EAUDIT_DIR: eaudit
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -52,16 +57,82 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
-        working-directory: eaudit
+        working-directory: ${{ env.EAUDIT_DIR }}
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: eaudit/uv.lock
+          cache-dependency-glob: ${{ env.EAUDIT_DIR }}/uv.lock
       - run: uv sync --frozen
       - run: uv run --no-sync ruff check src tests
       - run: uv run --no-sync pytest -q
+
+  core:
+    needs: changes
+    if: needs.changes.outputs.core == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-core
+      - run: uv run --no-sync --package onolys-core ruff check engines/core
+      - name: pytest with coverage
+        run: |
+          uv run --no-sync --package onolys-core pytest engines/core -m "not live" \
+            --cov=engines/core/src --cov-report=
+          {
+            echo "### Coverage: onolys-core"
+            uv run --no-sync --package onolys-core coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  paudit:
+    needs: changes
+    if: needs.changes.outputs.paudit == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-paudit
+      - run: uv run --no-sync --package onolys-paudit ruff check engines/paudit
+      - name: pytest with coverage
+        run: |
+          uv run --no-sync --package onolys-paudit pytest engines/paudit -m "not live" \
+            --cov=engines/paudit/src --cov-report=
+          {
+            echo "### Coverage: onolys-paudit"
+            uv run --no-sync --package onolys-paudit coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  evaluation:
+    needs: changes
+    if: needs.changes.outputs.evaluation == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-evaluation
+      - run: uv run --no-sync --package onolys-evaluation ruff check engines/evaluation
+      - name: pytest with coverage
+        run: |
+          uv run --no-sync --package onolys-evaluation pytest engines/evaluation -m "not live" \
+            --cov=engines/evaluation/src --cov-report=
+          {
+            echo "### Coverage: onolys-evaluation"
+            uv run --no-sync --package onolys-evaluation coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
 
   frontend:
     needs: changes

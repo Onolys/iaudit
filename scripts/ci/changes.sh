@@ -3,7 +3,7 @@
 # Env: FORCE_ALL=true -> every existing package runs (push to main).
 #      ROOT=<dir>     -> repo root for directory-exists checks (default: .).
 #      GITHUB_OUTPUT  -> where flags are appended (default: stdout).
-# A flag is true iff the package dir exists AND (FORCE_ALL, or its paths or
+# A flag is true iff the package exists (python kind: <dir>/pyproject.toml; else the dir) AND (FORCE_ALL, or its paths or
 # shared paths changed). Moving a package = edit its dir in PACKAGES below.
 set -euo pipefail
 
@@ -31,7 +31,9 @@ mapfile -t FILES
 for entry in "${PACKAGES[@]}"; do
   IFS=: read -r name dir kind <<<"$entry"
   run=false
-  if [[ -d "$ROOT/$dir" ]]; then
+  marker="$ROOT/$dir"
+  [[ "$kind" == python ]] && marker="$ROOT/$dir/pyproject.toml"
+  if [[ -e "$marker" ]]; then
     if [[ "${FORCE_ALL:-false}" == "true" ]]; then
       run=true
     else

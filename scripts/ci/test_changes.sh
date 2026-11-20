@@ -3,7 +3,9 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
-mkdir -p "$T/eaudit" "$T/frontend" "$T/engines/core" "$T/api"   # paudit/web/infra/evaluation absent
+mkdir -p "$T/eaudit" "$T/frontend" "$T/engines/core" "$T/api" "$T/engines/paudit"
+touch "$T/eaudit/pyproject.toml" "$T/engines/core/pyproject.toml" "$T/api/pyproject.toml"
+# paudit dir exists but has no pyproject.toml; web/infra/evaluation absent
 fail=0
 # run <force> <expected "name=val ..."> <files...>
 run() {
@@ -20,4 +22,6 @@ run false "eaudit=true core=true paudit=false evaluation=false api=true frontend
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=false infra=false" docs/readme.md
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=false infra=false" infra/main.tf web/a.ts engines/paudit/a.py
 run true  "eaudit=true core=true paudit=false evaluation=false api=true frontend=true web=false infra=false" docs/readme.md
+touch "$T/engines/paudit/pyproject.toml"   # now paudit exists
+run false "eaudit=false core=false paudit=true evaluation=false api=false frontend=false web=false infra=false" engines/paudit/a.py
 exit $fail
