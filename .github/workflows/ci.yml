@@ -13,7 +13,41 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      eaudit: ${{ steps.flags.outputs.eaudit }}
+      core: ${{ steps.flags.outputs.core }}
+      paudit: ${{ steps.flags.outputs.paudit }}
+      evaluation: ${{ steps.flags.outputs.evaluation }}
+      api: ${{ steps.flags.outputs.api }}
+      frontend: ${{ steps.flags.outputs.frontend }}
+      web: ${{ steps.flags.outputs.web }}
+      infra: ${{ steps.flags.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Test changes.sh
+        run: bash scripts/ci/test_changes.sh
+      - id: flags
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" = "push" ]; then
+            export FORCE_ALL=true
+            files=""
+          else
+            files="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
+          fi
+          printf '%s\n' "$files" | bash scripts/ci/changes.sh
+
   eaudit:
+    needs: changes
+    if: needs.changes.outputs.eaudit == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -30,6 +64,8 @@ jobs:
       - run: uv run --no-sync pytest -q
 
   frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
