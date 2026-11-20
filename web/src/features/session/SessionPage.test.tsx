@@ -190,7 +190,7 @@ describe("session page: slots", () => {
 describe("session page: error cards", () => {
   const UPLOAD_NEW = [
     ["unsupported_audio", /can't use this file type/i],
-    ["audio_too_long", /longer than 25 minutes/i],
+    ["audio_too_long", /longer than 20 minutes/i],
     ["audio_too_large", /over 300 MB/i],
     ["audio_unreadable", /couldn't read this audio file/i],
     ["no_speech", /couldn't hear enough speech in this recording/i],

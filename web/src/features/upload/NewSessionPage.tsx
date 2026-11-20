@@ -122,7 +122,7 @@ export function NewSessionPage() {
             />
           </label>
           <p className="form-note">
-            Drop a file here or choose one. mp3, wav, m4a, webm or ogg, up to 300 MB, 10 to 25 minutes.
+            Drop a file here or choose one. mp3, wav, m4a, webm or ogg, up to 300 MB, 10 to 20 minutes.
           </p>
           {file ? <p className="form-note">{file.name}</p> : null}
         </div>

@@ -2,7 +2,7 @@
 
 **Audience:** contributors.
 
-**Status:** accepted. Gate run 2026-11-20; one open finding (STT 20-minute file cap), see below.
+**Status:** accepted. Gate run 2026-11-20; STT 20-minute file cap resolved by a launch decision, see below.
 
 **Context.** The platform (protocol audit, evaluation, API) needs the LLM client, speech-to-text and transcript types that lived inside `eaudit`, and `eval/` may not import `eaudit`. Model choice was three env vars with Anthropic-only quirks in the client, and no STT code existed. The owner widened the mission to the platform scope on 2026-11-20 (see [mission](../mission.md)).
 
@@ -32,7 +32,7 @@ Run 2026-11-20 with live credentials, preset `default`, by the Task 13 agent. **
 | (b) Does diarization work with `language: auto`? | Yes on synthetic audio: 2 speakers found, language detected as `en`. `auto` stays in the SP05 list. Real-audio confirmation pending (caveat above). |
 | (c) p95 latency for 25 minutes of audio | Cannot be measured as a single call: `BatchRecognize` rejects files over 20 minutes. For files under the cap, 2 runs of 17.4 min took 165 s and 252 s (about 0.16-0.24 s of wall time per audio second; two samples cannot give a real p95, so treat it as an estimate). Extrapolated to the 20 minute cap: about 3-5 min, and a 25 min recording split into two chunks run in parallel: about the same. Both are well inside the SP04 poll window (about 20 min). |
 
-**Open finding (action needed before SP04 relies on 25-minute sessions).** The default STT path cannot take a recording longer than 20 minutes. The documented fallbacks in the table below (another model or provider) do not obviously fix it, so this was not changed here: it needs a design choice, either the adapter or SP04 splits audio into chunks under 20 minutes (with speaker labels and offsets stitched across the join), or another recognition mode or provider is used for long files. Owner/SP04 decision.
+**Launch decision (owner, 2026-11-20): 20-minute cap; chunking deferred.** Session audio is capped at 20 minutes (`max_audio_s: 1200` on the STT provider entry; `validate` fails longer audio with `audio_too_long`; the web uploader blocks it first). A chunking provider can raise the value later. Original finding: The default STT path cannot take a recording longer than 20 minutes. The documented fallbacks in the table below (another model or provider) do not obviously fix it, so this was not changed here: it needs a design choice, either the adapter or SP04 splits audio into chunks under 20 minutes (with speaker labels and offsets stitched across the join), or another recognition mode or provider is used for long files. Owner/SP04 decision.
 
 **Environment note.** The ADC quota project is another project (`juno-medical-clarity`), which has Speech-to-Text disabled. The first STT call failed with `SERVICE_DISABLED` until `GOOGLE_CLOUD_QUOTA_PROJECT=onolys` was set. Set it wherever the adapter runs with user credentials. APIs used (`speech`, `texttospeech`, `storage`) were already enabled on `onolys`; nothing was enabled by this run.
 

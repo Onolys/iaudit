@@ -1,6 +1,6 @@
 /** Advisory client pre-checks (PRD R3 step 2). The server stays authoritative. */
 export const MAX_AUDIO_BYTES = 300 * 1024 * 1024;
-export const MAX_DURATION_S = 25 * 60;
+export const MAX_DURATION_S = 20 * 60;
 export const MIN_DURATION_S = 10 * 60;
 
 const EXTENSIONS = new Set(["mp3", "wav", "m4a", "webm", "ogg"]);
@@ -20,7 +20,7 @@ const MIME_TYPES = new Set([
 
 export const SIZE_MESSAGE = "This file is over 300 MB. Export it as m4a or mp3 and upload that instead.";
 export const TYPE_MESSAGE = "We can't use this file type. Upload an mp3, wav, m4a, webm or ogg recording.";
-export const LONG_MESSAGE = "This recording is longer than 25 minutes. Upload a shorter one.";
+export const LONG_MESSAGE = "This recording is longer than 20 minutes. Upload a shorter one.";
 export const SHORT_WARNING =
   "This recording is under 10 minutes. Global scores can be unreliable on short sessions.";
 

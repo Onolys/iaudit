@@ -18,10 +18,10 @@ from onolys_api.repo.models import RecordingDoc
 from onolys_api.storage.base import BlobStore
 
 MIN_DURATION_S = 1.0
-MAX_DURATION_S = 25 * 60.0
+DEFAULT_MAX_DURATION_S = 20 * 60.0  # fallback; the real limit is `max_audio_s` on the STT provider
 SHORT_RECORDING_S = 10 * 60.0
-# when the container carries no duration (browser WebM), cap the transcode just past the limit
-UNKNOWN_DURATION_CAP_S = MAX_DURATION_S + 30.0
+# when the container carries no duration (browser WebM), cap the transcode this far past the limit
+UNKNOWN_DURATION_MARGIN_S = 30.0
 FLAC_RATE_HZ = 16_000
 CANONICAL_MIME = "audio/flac"
 PROBE_TIMEOUT_S = 60

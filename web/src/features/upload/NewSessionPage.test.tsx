@@ -57,11 +57,11 @@ describe("New session form", () => {
     expect(screen.getByRole("button", { name: /start/i })).toBeDisabled();
   });
 
-  it("blocks a recording over 25 minutes and warns under 10 from the audio metadata", async () => {
+  it("blocks a recording over 20 minutes and warns under 10 from the audio metadata", async () => {
     await open();
     seconds = 26 * 60;
     await choose(mp3());
-    expect(await screen.findByRole("alert")).toHaveTextContent("longer than 25 minutes");
+    expect(await screen.findByRole("alert")).toHaveTextContent("longer than 20 minutes");
     expect(screen.getByRole("button", { name: /start/i })).toBeDisabled();
     seconds = 5 * 60;
     await choose(new File([new Uint8Array(100)], "short.mp3", { type: "audio/mpeg" }));

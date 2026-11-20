@@ -117,3 +117,12 @@ def test_packaged_default_and_routes_file_dir(tmp_path, monkeypatch):
     monkeypatch.setenv("ROUTES_FILE", str(tmp_path / "routes.yaml"))
     assert locate_config_file() == tmp_path / "stt_providers.yaml"
     assert select_stt(None, None).provider == "px"
+
+
+def test_max_audio_s_defaults_to_twenty_minutes_and_is_read_from_the_entry():
+    assert SttParams(provider="f", model="f").max_audio_s == 1200
+    cfg = {"providers": {"k": {"provider": "f", "model": "m", "max_audio_s": 1500}}, "default": "k"}
+    assert select_stt(None, config=cfg).max_audio_s == 1500
+    from onolys_core.stt.select import load_stt_config
+
+    assert load_stt_config()["providers"]["google_chirp3"]["max_audio_s"] == 1200

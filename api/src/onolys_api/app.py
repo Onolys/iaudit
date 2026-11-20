@@ -242,7 +242,9 @@ def create_app(
         app.state.runner.register(
             "validate",
             HandlerSpec(
-                make_validate_handler(app.state.blobs, audio_tools or FfmpegTools()),
+                make_validate_handler(
+                    app.state.blobs, audio_tools or FfmpegTools(), app.state.presets.max_audio_s
+                ),
                 step="validate",
             ),
         )

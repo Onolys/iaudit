@@ -64,7 +64,7 @@ Every non-2xx body is `ErrorResponse` ([schema](../contracts/public/public-error
 | 503 | `upstream_unavailable` (retry shortly) |
 | 500 | `internal_error` |
 
-Failures found by the worker (not an HTTP error) appear as `error.code` on the session: `unsupported_audio`, `audio_too_long`, `audio_unreadable`, `no_speech`, `speakers_not_separated`, `transcription_failed`, `upstream_unavailable`, `deadline_exceeded`.
+Failures found by the worker (not an HTTP error) appear as `error.code` on the session: `unsupported_audio`, `audio_too_long` (recording over 20 minutes, the Chirp 3 batch limit; set by `max_audio_s` on the STT provider in `stt_providers.yaml`), `audio_unreadable`, `no_speech`, `speakers_not_separated`, `transcription_failed`, `upstream_unavailable`, `deadline_exceeded`.
 
 ## Quickstart
 

@@ -30,14 +30,14 @@ describe("checkFile (advisory pre-checks)", () => {
     expect(checkFile(f("recording", 10, "audio/x-m4a"), 900).blocked).toBeNull();
   });
 
-  it("blocks over 25 minutes", () => {
-    expect(checkFile(f("a.mp3"), 25 * 60 + 1).blocked).toBe(
-      "This recording is longer than 25 minutes. Upload a shorter one.",
+  it("blocks over 20 minutes", () => {
+    expect(checkFile(f("a.mp3"), 20 * 60 + 1).blocked).toBe(
+      "This recording is longer than 20 minutes. Upload a shorter one.",
     );
   });
 
-  it("allows exactly 25 minutes and exactly 10 minutes without a warning", () => {
-    expect(checkFile(f("a.mp3"), 25 * 60)).toEqual({ blocked: null, warning: null });
+  it("allows exactly 20 minutes and exactly 10 minutes without a warning", () => {
+    expect(checkFile(f("a.mp3"), 20 * 60)).toEqual({ blocked: null, warning: null });
     expect(checkFile(f("a.mp3"), 10 * 60)).toEqual({ blocked: null, warning: null });
   });
 

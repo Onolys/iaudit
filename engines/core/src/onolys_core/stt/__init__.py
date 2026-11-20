@@ -18,6 +18,7 @@ class SttParams(BaseModel):
     speakers_min: int = 2
     speakers_max: int = 2
     options: dict = {}  # provider-only fields
+    max_audio_s: float = 1200.0  # longest audio per call (Chirp 3 batch: 20 min)
 
 
 class AudioRef(BaseModel):

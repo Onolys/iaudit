@@ -1,6 +1,7 @@
 """The `validate` step (PRD R3, D5): bytes in safely, one canonical format out.
 
-Checks in order: object size, magic bytes, ffprobe (audio stream, no video, 1 s to 25 min).
+Checks in order: object size, magic bytes, ffprobe (audio stream, no video, 1 s to the
+STT provider's `max_audio_s`, 20 min for Chirp 3).
 A passing upload moves to `{uid}/{sid}/audio/original.{ext}`, is transcoded to
 `canonical.flac` (16 kHz mono), the staged object is deleted, the recording doc is written,
 and `transcribe` is enqueued. A failure removes every object of the session's audio and
@@ -10,14 +11,15 @@ Logs carry codes only, never file names or content.
 
 import hashlib
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 from onolys_api.audio import (
     CANONICAL_TYPES,
-    MAX_DURATION_S,
+    DEFAULT_MAX_DURATION_S,
     MIN_DURATION_S,
     SHORT_RECORDING_S,
-    UNKNOWN_DURATION_CAP_S,
+    UNKNOWN_DURATION_MARGIN_S,
     AudioTools,
     ToolError,
     canonical_key,
@@ -42,7 +44,13 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def make_validate_handler(blobs: BlobStore, tools: AudioTools) -> Handler:
+def make_validate_handler(
+    blobs: BlobStore,
+    tools: AudioTools,
+    max_audio_s: Callable[[str | None, str | None], float] | None = None,
+) -> Handler:
+    """`max_audio_s(provider, model)` gives the longest accepted audio for the session's STT."""
+
     def purge(uid: str, sid: str) -> None:
         blobs.delete_prefix(f"uploads/{uid}/{sid}/")
         blobs.delete_prefix(f"{uid}/{sid}/audio/")
@@ -63,8 +71,8 @@ def make_validate_handler(blobs: BlobStore, tools: AudioTools) -> Handler:
                 return key, True
         return None
 
-    def check_duration(ctx: TaskContext, seconds: float) -> None:
-        if seconds > MAX_DURATION_S:
+    def check_duration(ctx: TaskContext, seconds: float, limit: float) -> None:
+        if seconds > limit:
             raise fail(ctx, "audio_too_long")
         if seconds < MIN_DURATION_S:
             raise fail(ctx, "audio_unreadable")
@@ -76,6 +84,10 @@ def make_validate_handler(blobs: BlobStore, tools: AudioTools) -> Handler:
         if source is None:
             raise fail(ctx, "audio_unreadable")
         src_key, moved = source
+        stt = session.stt
+        limit = (
+            max_audio_s(stt.provider, stt.model) if max_audio_s and stt else DEFAULT_MAX_DURATION_S
+        )
 
         size = blobs.size(src_key)
         if size is None:
@@ -104,17 +116,18 @@ def make_validate_handler(blobs: BlobStore, tools: AudioTools) -> Handler:
                 raise fail(ctx, "audio_unreadable")
             seconds = probe.duration_s
             if seconds is not None:
-                check_duration(ctx, seconds)
+                check_duration(ctx, seconds, limit)
 
             try:
-                tools.to_flac(local, flac, None if seconds is not None else UNKNOWN_DURATION_CAP_S)
+                cap = None if seconds is not None else limit + UNKNOWN_DURATION_MARGIN_S
+                tools.to_flac(local, flac, cap)
                 if seconds is None:  # header carried no duration: measure the transcoded file
                     seconds = tools.probe(flac).duration_s
             except ToolError:
                 raise fail(ctx, "audio_unreadable") from None
             if seconds is None:
                 raise fail(ctx, "audio_unreadable")
-            check_duration(ctx, seconds)
+            check_duration(ctx, seconds, limit)
             ctx.check_deadline()
 
             orig = original_key(uid, sid, fmt)

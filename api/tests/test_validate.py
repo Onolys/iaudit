@@ -1,6 +1,8 @@
 """The `validate` step (R3, AC5): each rejection code and warning, success layout. ffprobe and
 ffmpeg are stubbed; fixtures are tiny generated files."""
 
+import dataclasses
+
 import pytest
 from audio_helpers import MAGIC, A, StubTools, tiny_wav
 
@@ -110,7 +112,7 @@ async def test_ffprobe_failure_audio_unreadable(settings, repo, blobs):
 
 
 @pytest.mark.parametrize(
-    ("seconds", "ok"), [(0.99, False), (1.0, True), (25 * 60.0, True), (25 * 60 + 0.5, False)]
+    ("seconds", "ok"), [(0.99, False), (1.0, True), (20 * 60.0, True), (20 * 60 + 0.5, False)]
 )
 async def test_duration_bounds(settings, repo, blobs, seconds, ok):
     tools = StubTools(probe=ProbeResult(duration_s=seconds, audio_streams=1))
@@ -151,14 +153,14 @@ async def test_unknown_duration_is_bounded_then_measured_on_the_flac(settings, r
     _, sid = await run_validate(settings, repo, blobs, MAGIC["webm"], tools, ct="audio/webm")
     s = repo.get_session("alice", sid)
     assert s.warnings == ["short_recording"] and s.state == "transcribing"
-    assert tools.transcoded[0][1] is not None and tools.transcoded[0][1] > 25 * 60
+    assert tools.transcoded[0][1] is not None and tools.transcoded[0][1] > 20 * 60
     assert repo.list_recordings("alice", sid)[0].duration_ms == 300_000
 
 
 async def test_unknown_duration_too_long_after_cap(settings, repo, blobs):
     tools = StubTools(
         probe=ProbeResult(duration_s=None, audio_streams=1),
-        flac_probe=ProbeResult(duration_s=25 * 60 + 5.0, audio_streams=1),
+        flac_probe=ProbeResult(duration_s=20 * 60 + 5.0, audio_streams=1),
     )
     _, sid = await run_validate(settings, repo, blobs, MAGIC["webm"], tools, ct="audio/webm")
     assert_failed(repo, blobs, sid, "audio_too_long")
@@ -197,3 +199,25 @@ async def test_missing_object_audio_unreadable(settings, repo, blobs):
         blobs.delete(f"uploads/alice/{sid2}/{up['upload_id']}")
     app.state.queue.drain()
     assert_failed(repo, blobs, sid2, "audio_unreadable")
+
+
+async def test_limit_comes_from_the_provider_config(settings, repo, blobs, tmp_path, monkeypatch):
+    """`max_audio_s` on the STT provider entry is the one limit: a chunking provider can raise it."""
+    (tmp_path / "routes.yaml").write_text(
+        (settings_routes(settings)).read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    (tmp_path / "stt_providers.yaml").write_text(
+        "providers:\n  p:\n    provider: google\n    model: chirp_3\n    max_audio_s: 1500\n"
+        "default: p\nby_language: {}\n",
+        encoding="utf-8",
+    )
+    s2 = dataclasses.replace(settings, routes_file=str(tmp_path / "routes.yaml"))
+    tools = StubTools(probe=ProbeResult(duration_s=25 * 60.0, audio_streams=1))
+    _, sid = await run_validate(s2, repo, blobs, MAGIC["wav"], tools)
+    assert repo.get_session("alice", sid).state == "transcribing"
+
+
+def settings_routes(settings):
+    from importlib import resources
+
+    return resources.files("onolys_core.llm").joinpath("routes.default.yaml")

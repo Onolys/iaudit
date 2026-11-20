@@ -17,6 +17,7 @@ from onolys_core.llm.routes import (
 )
 from onolys_core.stt.select import STT_FILE_NAME, load_stt_config, locate_config_file, select_stt
 
+from onolys_api.audio import DEFAULT_MAX_DURATION_S
 from onolys_api.config import Settings
 from onolys_api.repo.models import SttInfo
 
@@ -54,3 +55,11 @@ class PresetResolver:
             raise UnknownPreset(name) from None
         params = select_stt(stt_key, language, config=stt_config)
         return name, SttInfo(provider=params.provider, model=params.model, language=params.language)
+
+    def max_audio_s(self, provider: str | None, model: str | None) -> float:
+        """Longest audio the session STT takes (`max_audio_s` on its entry, else 20 min)."""
+        _, stt_config = self._load()
+        for entry in stt_config["providers"].values():
+            if entry.get("provider") == provider and entry.get("model") == model:
+                return float(entry.get("max_audio_s", DEFAULT_MAX_DURATION_S))
+        return DEFAULT_MAX_DURATION_S

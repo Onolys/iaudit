@@ -10,7 +10,7 @@ export const GENERIC_MESSAGE = "Something went wrong. Please try again.";
 const MESSAGES = {
   unsupported_audio:
     "We can't use this file type. Upload an mp3, wav, m4a, webm or ogg recording.",
-  audio_too_long: "This recording is longer than 25 minutes. Upload a shorter one.",
+  audio_too_long: "This recording is longer than 20 minutes. Upload a shorter one.",
   audio_too_large:
     "This file is over 300 MB. Export it as m4a or mp3 and upload that instead.",
   audio_unreadable: "We couldn't read this audio file. Try exporting it again as m4a or mp3.",
