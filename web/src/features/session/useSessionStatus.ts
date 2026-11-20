@@ -29,6 +29,11 @@ function detailToDoc(d: Detail): SessionStatusDoc {
   };
 }
 
+/** A session stuck in `transcribing` this long gets a `GET /sessions/{id}`, which makes the API settle it. */
+export const STALE_NUDGE_AFTER_MS = 6 * 60_000;
+/** While it stays `transcribing`, nudge at most this often. */
+export const STALE_NUDGE_EVERY_MS = 60_000;
+
 /**
  * Subscribe to `session_status/{id}` for the life of the page (PRD R4, D7). No polling:
  * on listener error / permission-denied / missing doc it makes ONE `GET /sessions/{id}`.
@@ -42,10 +47,39 @@ export function useSessionStatus(id: string, quiet: RefObject<boolean>): StatusV
     let done = false;
     let fellBack = false;
     const sub: { off?: () => void } = {};
+    // Stale nudge: the listener alone never triggers the API's lazy stale check.
+    let nudgeTimer: ReturnType<typeof setTimeout> | undefined;
+    let lastNudgeAt = 0;
+    let firstSeenAt = 0;
+    const stopNudge = () => {
+      clearTimeout(nudgeTimer);
+      nudgeTimer = undefined;
+      firstSeenAt = 0;
+    };
+    const armNudge = (doc: SessionStatusDoc) => {
+      clearTimeout(nudgeTimer);
+      const now = Date.now();
+      firstSeenAt ||= now;
+      const since = Date.parse(doc.updated_at);
+      const dueAt = Math.max(
+        (Number.isNaN(since) ? firstSeenAt : since) + STALE_NUDGE_AFTER_MS,
+        lastNudgeAt ? lastNudgeAt + STALE_NUDGE_EVERY_MS : 0,
+      );
+      nudgeTimer = setTimeout(() => {
+        if (done || fellBack) return;
+        lastNudgeAt = Date.now();
+        // The listener shows the resulting `failed` by itself; the response and errors are ignored.
+        void client
+          .GET("/sessions/{id}", { params: { path: { id } } })
+          .catch((e: unknown) => console.warn("stale nudge failed", describeError(e)));
+        armNudge(doc);
+      }, Math.max(0, dueAt - now));
+    };
 
     const fallback = () => {
       if (done || fellBack || quiet.current) return;
       fellBack = true;
+      stopNudge();
       sub.off?.();
       void client
         .GET("/sessions/{id}", { params: { path: { id } } })
@@ -63,6 +97,8 @@ export function useSessionStatus(id: string, quiet: RefObject<boolean>): StatusV
       (doc) => {
         if (done || fellBack || quiet.current) return;
         if (doc === null) return fallback();
+        if (doc.state === "transcribing") armNudge(doc);
+        else stopNudge();
         setView((prev) => ({
           phase: "live",
           doc,
@@ -80,6 +116,7 @@ export function useSessionStatus(id: string, quiet: RefObject<boolean>): StatusV
 
     return () => {
       done = true;
+      stopNudge();
       sub.off?.();
     };
   }, [id, client, quiet]);
