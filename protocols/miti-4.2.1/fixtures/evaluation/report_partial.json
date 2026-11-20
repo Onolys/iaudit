@@ -136,10 +136,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     },
     {
@@ -183,10 +183,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     },
     {
@@ -206,10 +206,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     },
     {
@@ -229,10 +229,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     },
     {
@@ -252,10 +252,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     },
     {
@@ -298,10 +298,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     },
     {
@@ -321,10 +321,10 @@
         ]
       },
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
-        "status": "differs"
+        "direction": "onolys_higher",
+        "status": "flagged"
       }
     },
     {
@@ -344,10 +344,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     },
     {
@@ -367,10 +367,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     },
     {
@@ -390,10 +390,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     },
     {
@@ -413,10 +413,10 @@
         ]
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       }
     }
   ],
@@ -454,8 +454,9 @@
         "within_one": true
       },
       "explanation": {
-        "headline": "Cultivating Change Talk: Onolys 4, clinician 4",
+        "headline": "Onolys agrees",
         "body": [
+          "Onolys scored 4; you scored 4.",
           "Attends to and evokes the client's own language about walking and confidence."
         ],
         "onolys_lines": [
@@ -500,14 +501,15 @@
         "value": null
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Softening Sustain Talk: Onolys 4",
+        "headline": "Onolys's reading",
         "body": [
+          "Onolys scored 4.",
           "Keeps a clear, client-centred direction toward the walking goal."
         ],
         "onolys_lines": [
@@ -559,8 +561,9 @@
         "within_one": true
       },
       "explanation": {
-        "headline": "Partnership: Onolys 5, clinician 5",
+        "headline": "Onolys agrees",
         "body": [
+          "Onolys scored 5; you scored 5.",
           "Asks permission, treats the client as the expert on their own week."
         ],
         "onolys_lines": [
@@ -605,14 +608,15 @@
         "value": null
       },
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Empathy: Onolys 4",
+        "headline": "Onolys's reading",
         "body": [
+          "Onolys scored 4.",
           "Reflects the client's feelings and view accurately and often."
         ],
         "onolys_lines": [
@@ -657,14 +661,16 @@
       ],
       "instances_total": 1,
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Giving Information: Onolys counted 1",
-        "body": [],
+        "headline": "Onolys's reading",
+        "body": [
+          "Onolys counted 1."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t15",
@@ -690,14 +696,16 @@
       "instances": [],
       "instances_total": 0,
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Persuade: Onolys counted 0",
-        "body": [],
+        "headline": "Onolys's reading",
+        "body": [
+          "Onolys counted 0."
+        ],
         "onolys_lines": [],
         "clinician_support_lines": []
       }
@@ -725,14 +733,16 @@
       ],
       "instances_total": 1,
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Persuade with Permission: Onolys counted 1",
-        "body": [],
+        "headline": "Onolys's reading",
+        "body": [
+          "Onolys counted 1."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t15",
@@ -813,8 +823,10 @@
         "status": "agree"
       },
       "explanation": {
-        "headline": "Question: Onolys counted 6, clinician 6",
-        "body": [],
+        "headline": "Onolys agrees",
+        "body": [
+          "Onolys counted 6; you counted 6."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t4",
@@ -887,14 +899,16 @@
       ],
       "instances_total": 2,
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Simple Reflection: Onolys counted 2",
-        "body": [],
+        "headline": "Onolys's reading",
+        "body": [
+          "Onolys counted 2."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t8",
@@ -959,14 +973,16 @@
       ],
       "instances_total": 4,
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
-        "status": "differs"
+        "direction": "onolys_higher",
+        "status": "flagged"
       },
       "explanation": {
-        "headline": "Complex Reflection: Onolys counted 4, clinician 3",
-        "body": [],
+        "headline": "Onolys disagrees, here's why",
+        "body": [
+          "Onolys counted 4; you counted 3."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t6",
@@ -1027,14 +1043,16 @@
       ],
       "instances_total": 2,
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Affirm: Onolys counted 2",
-        "body": [],
+        "headline": "Onolys's reading",
+        "body": [
+          "Onolys counted 2."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t8",
@@ -1083,14 +1101,16 @@
       ],
       "instances_total": 2,
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Seeking Collaboration: Onolys counted 2",
-        "body": [],
+        "headline": "Onolys's reading",
+        "body": [
+          "Onolys counted 2."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t2",
@@ -1139,14 +1159,16 @@
       ],
       "instances_total": 2,
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Emphasizing Autonomy: Onolys counted 2",
-        "body": [],
+        "headline": "Onolys's reading",
+        "body": [
+          "Onolys counted 2."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t15",
@@ -1178,14 +1200,16 @@
       "instances": [],
       "instances_total": 0,
       "diff": {
+        "status": "not_rated",
         "signed": null,
         "abs": null,
-        "direction": null,
-        "status": "not_rated"
+        "direction": null
       },
       "explanation": {
-        "headline": "Confront: Onolys counted 0",
-        "body": [],
+        "headline": "Onolys's reading",
+        "body": [
+          "Onolys counted 0."
+        ],
         "onolys_lines": [],
         "clinician_support_lines": []
       }
@@ -1201,10 +1225,10 @@
         "label": "good"
       },
       "reference": {
-        "fair": 3,
-        "good": 4
+        "fair": 3.0,
+        "good": 4.0
       },
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "relational",
@@ -1216,9 +1240,9 @@
       },
       "reference": {
         "fair": 3.5,
-        "good": 4
+        "good": 4.0
       },
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "pct_cr",
@@ -1232,7 +1256,7 @@
         "fair": 0.4,
         "good": 0.5
       },
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "reflection_question_ratio",
@@ -1243,10 +1267,10 @@
         "label": "fair"
       },
       "reference": {
-        "fair": 1,
-        "good": 2
+        "fair": 1.0,
+        "good": 2.0
       },
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "total_mia",
@@ -1257,7 +1281,7 @@
         "label": null
       },
       "reference": null,
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "total_mina",
@@ -1268,7 +1292,7 @@
         "label": null
       },
       "reference": null,
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     }
   ],
   "reasons_audit": {
@@ -1351,7 +1375,7 @@
     "globals_compared": 2,
     "avg_abs_global_difference": 0.0,
     "within_one_share": 1.0,
-    "counts_flagged": 0
+    "counts_flagged": 1
   },
   "warnings": [
     {

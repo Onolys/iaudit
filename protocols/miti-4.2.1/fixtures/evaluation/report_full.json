@@ -112,9 +112,9 @@
         ]
       },
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
+        "direction": "onolys_higher",
         "status": "differs",
         "within_one": true
       }
@@ -184,9 +184,9 @@
         ]
       },
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
+        "direction": "onolys_higher",
         "status": "differs",
         "within_one": true
       }
@@ -208,10 +208,10 @@
         ]
       },
       "diff": {
-        "signed": 1.0,
+        "signed": -1.0,
         "abs": 1.0,
-        "direction": "clinician_higher",
-        "status": "differs"
+        "direction": "onolys_lower",
+        "status": "flagged"
       }
     },
     {
@@ -300,9 +300,9 @@
         ]
       },
       "diff": {
-        "signed": 2.0,
+        "signed": -2.0,
         "abs": 2.0,
-        "direction": "clinician_higher",
+        "direction": "onolys_lower",
         "status": "flagged"
       }
     },
@@ -323,10 +323,10 @@
         ]
       },
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
-        "status": "differs"
+        "direction": "onolys_higher",
+        "status": "flagged"
       }
     },
     {
@@ -392,10 +392,10 @@
         ]
       },
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
-        "status": "differs"
+        "direction": "onolys_higher",
+        "status": "flagged"
       }
     },
     {
@@ -453,15 +453,16 @@
         }
       },
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
+        "direction": "onolys_higher",
         "status": "differs",
         "within_one": true
       },
       "explanation": {
-        "headline": "Cultivating Change Talk: Onolys 4, clinician 3",
+        "headline": "Onolys disagrees, here's why",
         "body": [
+          "Onolys scored 4; you scored 3.",
           "Attends to and evokes the client's own language about walking and confidence."
         ],
         "onolys_lines": [
@@ -521,8 +522,9 @@
         "within_one": true
       },
       "explanation": {
-        "headline": "Softening Sustain Talk: Onolys 4, clinician 4",
+        "headline": "Onolys agrees",
         "body": [
+          "Onolys scored 4; you scored 4.",
           "Keeps a clear, client-centred direction toward the walking goal."
         ],
         "onolys_lines": [
@@ -575,8 +577,9 @@
         "within_one": true
       },
       "explanation": {
-        "headline": "Partnership: Onolys 5, clinician 5",
+        "headline": "Onolys agrees",
         "body": [
+          "Onolys scored 5; you scored 5.",
           "Asks permission, treats the client as the expert on their own week."
         ],
         "onolys_lines": [
@@ -622,15 +625,16 @@
         "reason": "Several reflections, but few went beyond what the client had said."
       },
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
+        "direction": "onolys_higher",
         "status": "differs",
         "within_one": true
       },
       "explanation": {
-        "headline": "Empathy: Onolys 4, clinician 3",
+        "headline": "Onolys disagrees, here's why",
         "body": [
+          "Onolys scored 4; you scored 3.",
           "Reflects the client's feelings and view accurately and often."
         ],
         "onolys_lines": [
@@ -675,14 +679,16 @@
       ],
       "instances_total": 1,
       "diff": {
-        "signed": 1.0,
+        "signed": -1.0,
         "abs": 1.0,
-        "direction": "clinician_higher",
-        "status": "differs"
+        "direction": "onolys_lower",
+        "status": "flagged"
       },
       "explanation": {
-        "headline": "Giving Information: Onolys counted 1, clinician 2",
-        "body": [],
+        "headline": "Onolys disagrees, here's why",
+        "body": [
+          "Onolys counted 1; you counted 2."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t15",
@@ -714,8 +720,10 @@
         "status": "agree"
       },
       "explanation": {
-        "headline": "Persuade: Onolys counted 0, clinician 0",
-        "body": [],
+        "headline": "Onolys agrees",
+        "body": [
+          "Onolys counted 0; you counted 0."
+        ],
         "onolys_lines": [],
         "clinician_support_lines": []
       }
@@ -749,8 +757,10 @@
         "status": "agree"
       },
       "explanation": {
-        "headline": "Persuade with Permission: Onolys counted 1, clinician 1",
-        "body": [],
+        "headline": "Onolys agrees",
+        "body": [
+          "Onolys counted 1; you counted 1."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t15",
@@ -831,8 +841,10 @@
         "status": "agree"
       },
       "explanation": {
-        "headline": "Question: Onolys counted 6, clinician 6",
-        "body": [],
+        "headline": "Onolys agrees",
+        "body": [
+          "Onolys counted 6; you counted 6."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t4",
@@ -905,14 +917,16 @@
       ],
       "instances_total": 2,
       "diff": {
-        "signed": 2.0,
+        "signed": -2.0,
         "abs": 2.0,
-        "direction": "clinician_higher",
+        "direction": "onolys_lower",
         "status": "flagged"
       },
       "explanation": {
-        "headline": "Simple Reflection: Onolys counted 2, clinician 4",
-        "body": [],
+        "headline": "Onolys disagrees, here's why",
+        "body": [
+          "Onolys counted 2; you counted 4."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t8",
@@ -978,14 +992,16 @@
       ],
       "instances_total": 4,
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
-        "status": "differs"
+        "direction": "onolys_higher",
+        "status": "flagged"
       },
       "explanation": {
-        "headline": "Complex Reflection: Onolys counted 4, clinician 3",
-        "body": [],
+        "headline": "Onolys disagrees, here's why",
+        "body": [
+          "Onolys counted 4; you counted 3."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t6",
@@ -1052,8 +1068,10 @@
         "status": "agree"
       },
       "explanation": {
-        "headline": "Affirm: Onolys counted 2, clinician 2",
-        "body": [],
+        "headline": "Onolys agrees",
+        "body": [
+          "Onolys counted 2; you counted 2."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t8",
@@ -1108,8 +1126,10 @@
         "status": "agree"
       },
       "explanation": {
-        "headline": "Seeking Collaboration: Onolys counted 2, clinician 2",
-        "body": [],
+        "headline": "Onolys agrees",
+        "body": [
+          "Onolys counted 2; you counted 2."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t2",
@@ -1158,14 +1178,16 @@
       ],
       "instances_total": 2,
       "diff": {
-        "signed": -1.0,
+        "signed": 1.0,
         "abs": 1.0,
-        "direction": "clinician_lower",
-        "status": "differs"
+        "direction": "onolys_higher",
+        "status": "flagged"
       },
       "explanation": {
-        "headline": "Emphasizing Autonomy: Onolys counted 2, clinician 1",
-        "body": [],
+        "headline": "Onolys disagrees, here's why",
+        "body": [
+          "Onolys counted 2; you counted 1."
+        ],
         "onolys_lines": [
           {
             "turn_id": "t15",
@@ -1203,8 +1225,10 @@
         "status": "agree"
       },
       "explanation": {
-        "headline": "Confront: Onolys counted 0, clinician 0",
-        "body": [],
+        "headline": "Onolys agrees",
+        "body": [
+          "Onolys counted 0; you counted 0."
+        ],
         "onolys_lines": [],
         "clinician_support_lines": []
       }
@@ -1223,10 +1247,10 @@
         "label": "good"
       },
       "reference": {
-        "fair": 3,
-        "good": 4
+        "fair": 3.0,
+        "good": 4.0
       },
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "relational",
@@ -1241,9 +1265,9 @@
       },
       "reference": {
         "fair": 3.5,
-        "good": 4
+        "good": 4.0
       },
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "pct_cr",
@@ -1260,7 +1284,7 @@
         "fair": 0.4,
         "good": 0.5
       },
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "reflection_question_ratio",
@@ -1274,10 +1298,10 @@
         "label": "fair"
       },
       "reference": {
-        "fair": 1,
-        "good": 2
+        "fair": 1.0,
+        "good": 2.0
       },
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "total_mia",
@@ -1291,7 +1315,7 @@
         "label": null
       },
       "reference": null,
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     },
     {
       "id": "total_mina",
@@ -1305,7 +1329,7 @@
         "label": null
       },
       "reference": null,
-      "note": "Computed from the same formula for both sides."
+      "note": "Both values use the same formula. Reference levels, not pass marks."
     }
   ],
   "reasons_audit": {
@@ -1458,7 +1482,7 @@
     "globals_compared": 4,
     "avg_abs_global_difference": 0.5,
     "within_one_share": 1.0,
-    "counts_flagged": 1
+    "counts_flagged": 4
   },
   "warnings": [],
   "run_info": {

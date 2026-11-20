@@ -21,6 +21,7 @@ SCHEMA_VERSION = "0.0.1"
 # Engine-defined warning codes; paudit warnings pass through and packs may add more.
 WARNING_CODES = (
     "reasons_audit_failed",
+    "reason_withheld_tone",
     "reasons_audit_partial",
     "tips_failed",
     "fewer_tips",

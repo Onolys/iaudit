@@ -16,11 +16,20 @@ from typing import Any
 import yaml
 from onolys_core.run_info import RunInfo
 from onolys_core.stt import SttRun
-from paudit.formula import evaluate, label_for
+from paudit.pack import load_pack
+from paudit.result import PauditResult
+
+from onolys_evaluation.compare import compare_item, compare_rules, compare_summaries, explain
+from onolys_evaluation.report import Diff, Line
+from onolys_evaluation.tone import load_report_config, tone_rules
 
 REPO = Path(__file__).resolve().parents[3]
 PACK = REPO / "protocols" / "miti-4.2.1"
 OUT = PACK / "fixtures" / "evaluation"
+_PACK = load_pack(PACK)
+RULES = compare_rules(_PACK)
+TONE = tone_rules(_PACK)
+CFG = load_report_config(PACK / "report.yaml")
 CREATED_AT = "2026-11-20T00:00:00Z"
 
 GLOBALS = ["cct", "sst", "partnership", "empathy"]
@@ -90,21 +99,17 @@ def _line(turns: dict[str, str], turn_id: str, sub: str) -> dict[str, Any]:
     return {"turn_id": turn_id, "start": start, "end": start + len(sub), "quote": sub}
 
 
-def _diff(kind: str, clin: float | None, onolys: float | None) -> dict[str, Any]:
-    if onolys is None:
-        return {"signed": None, "abs": None, "direction": None, "status": "no_onolys_value"}
-    if clin is None:
-        return {"signed": None, "abs": None, "direction": None, "status": "not_rated"}
-    signed = clin - onolys
-    a = abs(signed)
-    direction = "same" if signed == 0 else "clinician_higher" if signed > 0 else "clinician_lower"
-    out: dict[str, Any] = {"signed": signed, "abs": a, "direction": direction}
-    if kind == "global":
-        out.update(status="agree" if a == 0 else "differs", within_one=a <= 1)
-    else:
-        flagged = a >= 2 and a / max(abs(clin), abs(onolys)) >= 0.25
-        out["status"] = "agree" if a == 0 else "flagged" if flagged else "differs"
-    return out
+def _diff(kind: str, clin: float | None, onolys: float | None, item_id: str) -> dict[str, Any]:
+    d = compare_item(RULES[item_id], clin, onolys)
+    return d.model_dump(exclude_none=True) | {
+        k: None for k in ("signed", "abs", "direction") if getattr(d, k) is None}
+
+
+def _expl(item_id, kind, label, d, o, c, reason, lines, support) -> dict[str, Any]:
+    e, _ = explain(item_id=item_id, kind=kind, label=label, diff=Diff(**d), onolys_value=o,
+                   clinician_value=c, reason=reason, onolys_lines=[Line(**{k: x[k] for k in ("turn_id", "start", "end", "quote")}) for x in lines],
+                   support_lines=[Line(**x) for x in support], rules=TONE, cfg=CFG)
+    return e.model_dump(mode="json")
 
 
 def _stats(s: dict[str, Any]) -> dict[str, Any]:
@@ -134,7 +139,7 @@ def build(variant: str) -> dict[str, Any]:
     for g in GLOBALS:
         o = agg["globals"][g]
         c = clin.get(g)
-        d = _diff("global", c, o["mean"])
+        d = _diff("global", c, o["mean"], g)
         scorecard.append({"item_id": g, "kind": "global", "label": labels[g],
                           "clinician": {"value": c}, "onolys": {"value": rep["globals"][g]["score"], **_stats(o)}, "diff": d})
         crit = (rating or {}).get("globals", {}).get(g, {}) if rating else {}
@@ -150,16 +155,12 @@ def build(variant: str) -> dict[str, Any]:
             "onolys": {"score": gl["score"], "source": gl["source"], "reason": gl["reason"],
                        "evidence": [{k: e[k] for k in ("turn_id", "start", "end", "quote")} for e in gl["evidence"]]},
             "clinician": clinician, "diff": d,
-            "explanation": {
-                "headline": f"{labels[g]}: Onolys {gl['score']}" + (f", clinician {c}" if c is not None else ""),
-                "body": [gl["reason"]],
-                "onolys_lines": [{k: e[k] for k in ("turn_id", "start", "end", "quote")} for e in gl["evidence"]],
-                "clinician_support_lines": support,
-            }})
+            "explanation": _expl(g, "global", labels[g], d, o["mean"], c, gl["reason"],
+                                 gl["evidence"], support)})
     for k in COUNTS:
         o = agg["counts"][k]
         c = clin.get(k)
-        d = _diff("count", c, o["mean"])
+        d = _diff("count", c, o["mean"], k)
         scorecard.append({"item_id": k, "kind": "count", "label": labels[k],
                           "clinician": {"value": c}, "onolys": {"value": o["mean"], **_stats(o)}, "diff": d})
         inst = [{"id": i["id"], "turn_id": i["turn_id"], "start": i["start"], "end": i["end"],
@@ -168,26 +169,16 @@ def build(variant: str) -> dict[str, Any]:
         entry: dict[str, Any] = {
             "item_id": k, "clinician_count": c, "onolys_count": _stats(o), "instances": inst,
             "instances_total": len(inst), "diff": d,
-            "explanation": {"headline": f"{labels[k]}: Onolys counted {int(o['mean'])}" + (f", clinician {c}" if c is not None else ""),
-                            "body": [], "onolys_lines": [{x: i[x] for x in ("turn_id", "start", "end", "quote")} for i in inst],
-                            "clinician_support_lines": []}}
+            "explanation": _expl(k, "count", labels[k], d, o["mean"], c, None, inst, [])}
         note = ((rating or {}).get("count_notes") or {}).get(k)
         if note:
             entry["clinician_note"] = note
         behaviours.append(entry)
 
     # summaries: clinician side from the same pack formulas; null when any input is missing
-    summaries = []
-    for s in pack["summaries"]:
-        o = agg["summaries"][s["id"]]
-        ref = s.get("reference")
-        cv = evaluate(s["expr"], {k: clin.get(k) for k in GLOBALS + COUNTS}) if rating else None
-        summaries.append({
-            "id": s["id"], "label": s["label"],
-            "clinician": None if cv is None else {"value": cv, "label": label_for(cv, ref)},
-            "onolys": {"value": o["mean"], "label": o["label"]},
-            "reference": None if not ref else {"fair": ref["fair"], "good": ref["good"]},
-            "note": "Computed from the same formula for both sides." if rating else "Onolys values only."})
+    summaries = [x.model_dump(mode="json") for x in compare_summaries(
+        _PACK, {k: clin.get(k) for k in GLOBALS + COUNTS} if rating else None,
+        PauditResult.model_validate(paudit).aggregate.summaries)]
 
     # reasons audit
     items, status, warnings = [], "skipped", [{"code": w["code"]} for w in paudit["warnings"]]

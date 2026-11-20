@@ -1489,6 +1489,7 @@
           "description": "Engine code (see WARNING_CODES), a paudit code, or a pack-defined code.",
           "examples": [
             "reasons_audit_failed",
+            "reason_withheld_tone",
             "reasons_audit_partial",
             "tips_failed",
             "fewer_tips"
