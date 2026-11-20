@@ -107,7 +107,13 @@ def request_upload(
 )
 def complete_upload(id: str, request: Request, user: User) -> dict[str, SessionRef]:
     repo, blobs = request.app.state.repo, request.app.state.blobs
-    session = _owned_open(request, user, id)
+    try:
+        session = _owned_open(request, user, id)
+    except NotFoundError:
+        # a signed PUT that landed after a DELETE staged a blob nothing else would sweep
+        # (the bucket lifecycle rule is the backstop); `user.uid` scopes this to the caller
+        blobs.delete_prefix(f"uploads/{user.uid}/{id}/")
+        raise
     if session.state not in ("uploading", "validating") or session.upload is None:
         raise invalid_state()
     if not blobs.exists(staging_key(user.uid, id, session.upload.upload_id)):

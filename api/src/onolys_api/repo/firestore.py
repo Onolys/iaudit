@@ -16,6 +16,7 @@ from datetime import datetime
 from typing import Any
 
 from google.api_core.exceptions import AlreadyExists
+from google.api_core.exceptions import NotFound as GoogleNotFound
 from google.cloud import firestore
 from google.cloud.firestore_v1 import FieldFilter, Increment
 from onolys_core.transcript import Transcript
@@ -125,6 +126,31 @@ class FirestoreRepo:
     def _session_ref(self, uid: str, sid: str):
         return self._owned_session(uid, sid)[0]
 
+    def _create_child(
+        self, uid: str, sid: str, ref, data: dict[str, Any], *, exclusive: bool
+    ) -> None:
+        """Write one child doc in a transaction that also reads the parent session: it must exist,
+        belong to `uid` and not be `deleting`. A DELETE racing the write either runs first (the
+        write answers NotFoundError) or after it (the recursive delete removes the doc): no
+        orphan. `exclusive` makes an existing doc a ConflictError (create semantics)."""
+        sref = self._top("sessions", sid)
+
+        @firestore.transactional
+        def txn_fn(txn) -> None:
+            snap = sref.get(transaction=txn)
+            sess = snap.to_dict() or {}
+            if not snap.exists or sess.get("uid") != uid or sess.get("state") == "deleting":
+                raise NotFoundError()
+            if exclusive and ref.get(transaction=txn).exists:
+                raise ConflictError()
+            txn.set(ref, data)
+
+        self._contended(txn_fn)
+
+    def _drop_pointer(self, pointer) -> None:
+        if pointer is not None:
+            self._blobs.delete(pointer.key)
+
     # ---- users ----
 
     def get_user(self, uid: str) -> UserDoc | None:
@@ -203,7 +229,8 @@ class FirestoreRepo:
     # ---- recordings ----
 
     def add_recording(self, uid: str, sid: str, rid: str, rec: RecordingDoc) -> None:
-        self._session_ref(uid, sid).collection("recordings").document(rid).set(rec.to_store())
+        ref = self._session_ref(uid, sid).collection("recordings").document(rid)
+        self._create_child(uid, sid, ref, rec.to_store(), exclusive=False)
 
     def list_recordings(self, uid: str, sid: str) -> list[RecordingDoc]:
         coll = self._session_ref(uid, sid).collection("recordings")
@@ -217,7 +244,11 @@ class FirestoreRepo:
             self._blobs, large.transcript_key(uid, sid), transcript.model_dump(mode="json")
         )
         doc = TranscriptDoc(transcript=None if pointer else transcript, pointer=pointer)
-        ref.set(doc.to_store())
+        try:
+            self._create_child(uid, sid, ref, doc.to_store(), exclusive=False)
+        except NotFoundError:
+            self._drop_pointer(pointer)  # the session went away while the blob was written
+            raise
 
     def get_transcript(self, uid: str, sid: str, tid: str, resolve: bool = True) -> TranscriptDoc:
         ref = self._session_ref(uid, sid).collection("transcripts").document(tid)
@@ -235,10 +266,7 @@ class FirestoreRepo:
         if rating_id == DRAFT_ID:
             raise ValueError("reserved rating id")
         ref = self._session_ref(uid, sid).collection("ratings").document(rating_id)
-        try:
-            ref.create(doc.to_store())
-        except AlreadyExists:
-            raise ConflictError() from None
+        self._create_child(uid, sid, ref, doc.to_store(), exclusive=True)
 
     def get_rating(self, uid: str, sid: str, rating_id: str) -> RatingDoc:
         if rating_id == DRAFT_ID:
@@ -257,7 +285,7 @@ class FirestoreRepo:
 
     def put_rating_draft(self, uid: str, sid: str, draft: RatingDraftDoc) -> None:
         ref = self._session_ref(uid, sid).collection("ratings").document(DRAFT_ID)
-        ref.set(draft.to_store())
+        self._create_child(uid, sid, ref, draft.to_store(), exclusive=False)
 
     def get_rating_draft(self, uid: str, sid: str) -> RatingDraftDoc | None:
         snap = self._session_ref(uid, sid).collection("ratings").document(DRAFT_ID).get()
@@ -269,10 +297,7 @@ class FirestoreRepo:
         if run.uid != uid:
             raise ValueError("document uid does not match the caller")
         ref = self._session_ref(uid, sid).collection("runs").document(run_id)
-        try:
-            ref.create(run.to_store())
-        except AlreadyExists:
-            raise ConflictError() from None
+        self._create_child(uid, sid, ref, run.to_store(), exclusive=True)
 
     def _run_ref(self, uid: str, sid: str, run_id: str):
         return self._session_ref(uid, sid).collection("runs").document(run_id)
@@ -287,7 +312,10 @@ class FirestoreRepo:
         ref = self._run_ref(uid, sid, run_id)
         if not ref.get().exists:
             raise NotFoundError()
-        ref.update(fields)
+        try:  # fails when the run (or its session) was deleted since the check: no resurrection
+            ref.update(fields)
+        except GoogleNotFound:
+            raise NotFoundError() from None
 
     def claim_step(self, uid: str, sid: str, step: str, now: datetime, lease_s: float) -> Claim:
         ref = self._session_ref(uid, sid)
@@ -363,7 +391,11 @@ class FirestoreRepo:
         stored = doc.model_copy(
             update={"report": None if pointer else doc.report, "pointer": pointer}
         )
-        ref.set(stored.to_store())
+        try:
+            self._create_child(uid, sid, ref, stored.to_store(), exclusive=False)
+        except NotFoundError:
+            self._drop_pointer(pointer)
+            raise
 
     def _resolve_report(self, doc: ReportDoc, resolve: bool) -> ReportDoc:
         if resolve and doc.pointer is not None:

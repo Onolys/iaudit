@@ -320,6 +320,84 @@ def test_delete_session_removes_doc_status_and_every_subcollection(repo):
     assert repo.delete_session(uid, sid) is False  # idempotent for retried cleanup
 
 
+# ---- no orphan docs after a delete (privacy: a late write must not resurrect a session) ----
+
+
+def _child_writes(repo, uid, sid):
+    """Every create-style child write, as (name, callable)."""
+    now = datetime.now(UTC)
+    return {
+        "recording": lambda: repo.add_recording(uid, sid, "r1", RecordingDoc(gcs_uri="gs://b/x")),
+        "transcript": lambda: repo.put_transcript(uid, sid, "tr1", transcript()),
+        "rating": lambda: repo.put_rating_revision(uid, sid, "rt1", RatingDoc(card={}, created_at=now)),
+        "draft": lambda: repo.put_rating_draft(uid, sid, RatingDraftDoc(card={}, updated_at=now)),
+        "run": lambda: repo.create_run(uid, sid, "run1", RunDoc(uid=uid, session_id=sid, run_id="run1")),
+        "report": lambda: repo.put_report(uid, sid, "rp1", ReportDoc(version=1, run_id="run1", report={}, created_at=now)),
+    }  # fmt: skip
+
+
+CHILD_WRITES = ["recording", "transcript", "rating", "draft", "run", "report"]
+
+
+@pytest.mark.parametrize("name", CHILD_WRITES)
+def test_child_write_on_deleted_session_leaves_no_orphan(repo, name):
+    uid, sid = seed(repo)
+    writes = _child_writes(repo, uid, sid)
+    repo.delete_session(uid, sid)
+    with pytest.raises(NotFoundError):
+        writes[name]()
+    assert session_paths(repo, sid) == []
+
+
+@pytest.mark.parametrize("name", CHILD_WRITES)
+def test_child_write_on_deleting_session_is_refused(repo, name):
+    uid, sid = seed(repo)
+    repo.update_session(uid, sid, {"state": "deleting"}, status={"state": "deleting"})
+    with pytest.raises(NotFoundError):
+        _child_writes(repo, uid, sid)[name]()
+    assert sorted(session_paths(repo, sid)) == sorted([f"sessions/{sid}", f"session_status/{sid}"])
+
+
+class DeleteOnPut(FakeBlobStore):
+    """Runs `hook` on the next blob write: the DELETE lands between a repo call's start and
+    its Firestore write (the big-payload path writes the blob first)."""
+
+    hook = None
+
+    def put_bytes(self, key, data, content_type="application/octet-stream"):
+        hook, self.hook = self.hook, None
+        super().put_bytes(key, data, content_type)
+        if hook:
+            hook()
+
+
+@pytest.mark.parametrize("kind", ["report", "transcript"])
+def test_delete_racing_a_big_write_leaves_no_doc_and_no_blob(repo, tmp_path, kind):
+    blobs = DeleteOnPut(tmp_path / "race", bucket="test-bucket")
+    repo._blobs = blobs
+    uid, sid = seed(repo)
+    big = {"x": "y" * (MAX_INLINE_BYTES + 10)}
+    from onolys_api.jobs.delete import delete_session_data
+
+    blobs.hook = lambda: delete_session_data(repo, blobs, uid, sid)
+    with pytest.raises(NotFoundError):
+        if kind == "report":
+            repo.put_report(uid, sid, "rp1", ReportDoc(version=1, run_id="r", report=big))
+        else:
+            repo.put_transcript(uid, sid, "tr1", transcript(text="z" * (MAX_INLINE_BYTES + 10)))
+    assert session_paths(repo, sid) == []
+    assert [k for k in blobs.list_keys("") if f"{sid}/" in k] == []
+
+
+def test_update_run_on_deleted_session_is_not_found_and_creates_nothing(repo):
+    uid, sid = seed(repo)
+    repo.create_run(uid, sid, "run1", RunDoc(uid=uid, session_id=sid, run_id="run1"))
+    repo.delete_session(uid, sid)
+    with pytest.raises(NotFoundError):
+        repo.update_run(uid, sid, "run1", {"released": True})
+    assert session_paths(repo, sid) == []
+
+
 # ---- users / api keys / usage / idempotency ----
 
 

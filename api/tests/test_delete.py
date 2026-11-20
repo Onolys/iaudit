@@ -284,3 +284,21 @@ async def test_delete_mid_run_leaves_no_blobs_or_docs_behind(env):
     env.drain()
     assert session_blob_keys(env, sid) == []
     assert remaining_docs(env, sid) == []
+
+
+async def test_delete_after_alive_check_leaves_no_report_doc_or_blob(env):
+    """DELETE lands after the run's last alive check, right before `put_report` (big report)."""
+    swap_eval(env, BigEval())
+    holder: dict = {}
+    real = env.repo.list_reports
+
+    def list_then_delete(uid, sid):
+        out = real(uid, sid)  # the run reads versions just before writing the report
+        delete_session_data(env.repo, env.blobs, uid, sid)
+        return out
+
+    env.repo.list_reports = list_then_delete
+    sid = holder["sid"] = await env.start()
+    env.drain()
+    assert session_blob_keys(env, sid) == []
+    assert remaining_docs(env, sid) == []

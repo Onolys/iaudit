@@ -96,6 +96,20 @@ class FakeRepo:
     def _own(self, uid: str, sid: str) -> None:
         self._owned(f"sessions/{sid}", uid)
 
+    def _own_open(self, uid: str, sid: str) -> None:
+        """Owned and not being deleted: the guard of every write that creates a child doc."""
+        if self._owned(f"sessions/{sid}", uid).get("state") == "deleting":
+            raise NotFoundError()
+
+    def _guarded(self, uid: str, sid: str, pointer) -> None:
+        """Re-check after a blob write: a DELETE in between must not keep the blob."""
+        try:
+            self._own_open(uid, sid)
+        except NotFoundError:
+            if pointer is not None:
+                self._blobs.delete(pointer.key)
+            raise
+
     def _record_status(self, uid: str, sid: str) -> None:
         self.status_writes.append((uid, sid, copy.deepcopy(self._docs[f"session_status/{sid}"])))
 
@@ -191,7 +205,7 @@ class FakeRepo:
     # ---- recordings ----
 
     def add_recording(self, uid: str, sid: str, rid: str, rec: RecordingDoc) -> None:
-        self._own(uid, sid)
+        self._own_open(uid, sid)
         self._put(f"sessions/{sid}/recordings/{rid}", rec.to_store())
 
     def list_recordings(self, uid: str, sid: str) -> list[RecordingDoc]:
@@ -201,11 +215,12 @@ class FakeRepo:
     # ---- transcripts ----
 
     def put_transcript(self, uid: str, sid: str, tid: str, transcript: Transcript) -> None:
-        self._own(uid, sid)
+        self._own_open(uid, sid)
         pointer = large.pack(
             self._blobs, large.transcript_key(uid, sid), transcript.model_dump(mode="json")
         )
         doc = TranscriptDoc(transcript=None if pointer else transcript, pointer=pointer)
+        self._guarded(uid, sid, pointer)
         self._put(f"sessions/{sid}/transcripts/{tid}", doc.to_store())
 
     def get_transcript(self, uid: str, sid: str, tid: str, resolve: bool = True) -> TranscriptDoc:
@@ -223,7 +238,7 @@ class FakeRepo:
     def put_rating_revision(self, uid: str, sid: str, rating_id: str, doc: RatingDoc) -> None:
         if rating_id == DRAFT_ID:
             raise ValueError("reserved rating id")
-        self._own(uid, sid)
+        self._own_open(uid, sid)
         self._create(f"sessions/{sid}/ratings/{rating_id}", doc.to_store())
 
     def get_rating(self, uid: str, sid: str, rating_id: str) -> RatingDoc:
@@ -242,7 +257,7 @@ class FakeRepo:
         return self._load(RatingDoc, i, d)
 
     def put_rating_draft(self, uid: str, sid: str, draft: RatingDraftDoc) -> None:
-        self._own(uid, sid)
+        self._own_open(uid, sid)
         self._put(f"sessions/{sid}/ratings/{DRAFT_ID}", draft.to_store())
 
     def get_rating_draft(self, uid: str, sid: str) -> RatingDraftDoc | None:
@@ -255,7 +270,7 @@ class FakeRepo:
     def create_run(self, uid: str, sid: str, run_id: str, run: RunDoc) -> None:
         if run.uid != uid:
             raise ValueError("document uid does not match the caller")
-        self._own(uid, sid)
+        self._own_open(uid, sid)
         self._create(f"sessions/{sid}/runs/{run_id}", run.to_store())
 
     def get_run(self, uid: str, sid: str, run_id: str) -> RunDoc:
@@ -329,11 +344,12 @@ class FakeRepo:
     # ---- reports ----
 
     def put_report(self, uid: str, sid: str, report_id: str, doc: ReportDoc) -> None:
-        self._own(uid, sid)
+        self._own_open(uid, sid)
         pointer = large.pack(self._blobs, large.report_key(uid, sid, report_id), doc.report or {})
         stored = doc.model_copy(
             update={"report": None if pointer else doc.report, "pointer": pointer}
         )
+        self._guarded(uid, sid, pointer)
         self._put(f"sessions/{sid}/reports/{report_id}", stored.to_store())
 
     def _resolve_report(self, doc: ReportDoc, resolve: bool) -> ReportDoc:

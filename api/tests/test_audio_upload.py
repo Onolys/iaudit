@@ -206,3 +206,23 @@ async def test_get_audio_returns_signed_read_of_the_original(client, app, blobs)
     assert key in j["url"] and "expires_at" in j
     got = await client.get(j["url"].removeprefix("http://localhost:8000"))
     assert got.status_code == 200 and got.content == b"x"
+
+
+@pytest.mark.parametrize("gone", ["deleting", "removed"])
+async def test_complete_after_delete_purges_the_late_staged_blob(client, repo, blobs, gone):
+    """A signed PUT landing after the DELETE leaves a staged object: `complete` removes it."""
+    from onolys_api.audio import staging_key
+    from onolys_api.jobs.delete import delete_session_data
+    from onolys_api.jobs.machine import advance
+
+    sid = await new_session(client)
+    upload_id = (await request_upload(client, sid, content_type="audio/wav")).json()["upload_id"]
+    if gone == "removed":
+        delete_session_data(repo, blobs, "alice", sid)
+    else:
+        advance(repo, "alice", sid, to="deleting")
+    key = staging_key("alice", sid, upload_id)
+    blobs.put_bytes(key, MAGIC["wav"], "audio/wav")  # the client's PUT, after the delete
+    r = await client.post(f"/v1/sessions/{sid}/audio/complete", headers=A)
+    assert r.status_code == 404
+    assert not blobs.exists(key)
