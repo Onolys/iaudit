@@ -9,7 +9,13 @@
 file name without extension); `--replay DIR` replays recorded requests through core's
 `FixtureClient` (offline); with neither, the live client for `--preset` is used.
 `--record DIR` wraps a stub or live client and writes recordings into DIR for later replay.
-Never prints a key. `check` (live fixture check) is added by a later task.
+
+    python -m paudit.cli check --pack <id@version> --preset NAME [--thresholds FILE] [--stub]
+
+`check` runs the pack's fixtures (`<pack>/fixtures/expected.yaml`) on the live client, prints
+count MAE, globals within 1, bad-output/retry rate, p95 latency and tokens, and exits 1 when a
+value is past `thresholds.yaml` (see paudit.check). `--stub` answers from expected.yaml (offline).
+Never prints a key.
 """
 
 import argparse
@@ -22,6 +28,7 @@ from onolys_core import OnolysError
 from onolys_core.llm import FixtureClient, LLMConfig, RecordingClient, make_client
 from onolys_core.transcript import Transcript
 
+from paudit import check as check_mod
 from paudit.engine import run
 from paudit.pack import load_pack
 from paudit.stub import ExpectedStubClient
@@ -57,6 +64,26 @@ def _cmd_run(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_check(args: argparse.Namespace) -> int:
+    pack = load_pack(args.pack)
+    fixtures = pack.root / "fixtures"
+    th = check_mod.load_thresholds(Path(args.thresholds or fixtures / "thresholds.yaml"))
+    if args.stub:
+
+        def client_for(name: str):
+            return ExpectedStubClient(fixtures / "expected.yaml", name)
+
+    else:
+        live = make_client(LLMConfig(llm_mode="live", preset=args.preset))
+
+        def client_for(name: str):
+            return live
+
+    rep = asyncio.run(check_mod.run_check(pack, fixtures, client_for, th))
+    print(check_mod.format_report(rep))
+    return 0 if rep.passed else 1
+
+
 def _parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="paudit.cli", description=__doc__.split("\n")[0])
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -71,6 +98,12 @@ def _parser() -> argparse.ArgumentParser:
     r.add_argument("--preset", help="route preset (live runs; provenance otherwise)")
     r.add_argument("--out", help="write the result JSON here instead of stdout")
     r.set_defaults(func=_cmd_run)
+    c = sub.add_parser("check", help="run pack fixtures on the live model; gate on thresholds")
+    c.add_argument("--pack", required=True, help="pack id@version or a pack directory")
+    c.add_argument("--preset", help="route preset (default: the default preset)")
+    c.add_argument("--thresholds", metavar="FILE", help="default: <pack>/fixtures/thresholds.yaml")
+    c.add_argument("--stub", action="store_true", help="offline: answer from expected.yaml")
+    c.set_defaults(func=_cmd_check)
     return p
 
 
