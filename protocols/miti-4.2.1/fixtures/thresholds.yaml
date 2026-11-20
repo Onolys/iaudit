@@ -1,0 +1,16 @@
+# Pass/fail limits for `python -m paudit.cli check` (Task 12), which runs the three fixtures on a
+# real model and compares with expected.yaml. Exit non-zero when any value is past its limit.
+# The PRD gives no numbers except the 90 s p95 latency target; the rest are conservative first
+# guesses for a synthetic set, to be tightened once measured (see PRD Risks, "OPEN until measured").
+#
+# count_mae_max: mean over the codes and fixtures of |counted - expected| (per-code count MAE).
+count_mae_max: 1.5
+# globals_within_1_min: share of globals (4 per fixture) whose score is within 1 point of the
+# expected range (0 if inside the range); 0.75 = 9 of 12.
+globals_within_1_min: 0.75
+# bad_output_rate_max: share of model calls that needed a retry or halving (truncated/invalid JSON).
+bad_output_rate_max: 0.10
+# p95_latency_s_max: 95th percentile wall time of one run, seconds (PRD R4 target: 90).
+p95_latency_s_max: 90
+# tokens_per_run_max: input + output tokens of one run (PRD R4 estimate 30-40k input).
+tokens_per_run_max: 120000

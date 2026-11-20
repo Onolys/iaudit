@@ -1,0 +1,85 @@
+{
+  "synthetic": true,
+  "description": "SYNTHETIC role-play (invented, fictional people; written for testing). Short 8-minute session.",
+  "language": "en",
+  "duration_ms": 479000,
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "B",
+      "text": "Hello. I was told to come and talk about my pills.",
+      "start_ms": 0,
+      "end_ms": 39000
+    },
+    {
+      "id": "t2",
+      "speaker": "A",
+      "text": "Thanks for coming. What would you like to say about taking your medicine?",
+      "start_ms": 44000,
+      "end_ms": 83000
+    },
+    {
+      "id": "t3",
+      "speaker": "B",
+      "text": "I forget them a lot, mostly in the morning when I'm rushing.",
+      "start_ms": 88000,
+      "end_ms": 127000
+    },
+    {
+      "id": "t4",
+      "speaker": "A",
+      "text": "Mornings get busy and the pills slip your mind.",
+      "start_ms": 132000,
+      "end_ms": 171000
+    },
+    {
+      "id": "t5",
+      "speaker": "B",
+      "text": "Yes. I want to take them though, I don't want a stroke like my uncle.",
+      "start_ms": 176000,
+      "end_ms": 215000
+    },
+    {
+      "id": "t6",
+      "speaker": "A",
+      "text": "You've been looking after yourself by showing up today. Some people keep the pills next to the toothbrush.",
+      "start_ms": 220000,
+      "end_ms": 259000
+    },
+    {
+      "id": "t7",
+      "speaker": "B",
+      "text": "That could work. My toothbrush is by the sink where I always stand.",
+      "start_ms": 264000,
+      "end_ms": 303000
+    },
+    {
+      "id": "t8",
+      "speaker": "A",
+      "text": "Seeing the box when you brush your teeth could remind you. How does that sound to you?",
+      "start_ms": 308000,
+      "end_ms": 347000
+    },
+    {
+      "id": "t9",
+      "speaker": "B",
+      "text": "Good. I'll put them there tonight.",
+      "start_ms": 352000,
+      "end_ms": 391000
+    },
+    {
+      "id": "t10",
+      "speaker": "A",
+      "text": "You'll set it up tonight. We can see how it goes next time.",
+      "start_ms": 396000,
+      "end_ms": 435000
+    },
+    {
+      "id": "t11",
+      "speaker": "B",
+      "text": "Thank you.",
+      "start_ms": 440000,
+      "end_ms": 479000
+    }
+  ]
+}

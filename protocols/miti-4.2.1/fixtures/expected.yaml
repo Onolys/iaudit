@@ -1,0 +1,464 @@
+schema: 1
+synthetic: true
+note: SYNTHETIC fixtures; intended codes are what the offline stub answers. Counts apply the MITI one-per-volley rules by hand (independent of the engine).
+fixtures:
+  good_practice:
+    transcript: good_practice.json
+    params: good_practice.params.json
+    change_goal: walk more during the working week
+    warnings: []
+    counts:
+      gi: 1
+      persuade: 0
+      persuade_permission: 1
+      question: 6
+      sr: 2
+      cr: 4
+      affirm: 2
+      seek_collab: 2
+      emphasize_autonomy: 2
+      confront: 0
+    summaries:
+      technical: 4.0
+      relational: 4.5
+      pct_cr: 0.6666666666666666
+      reflection_question_ratio: 1.0
+      total_mia: 6
+      total_mina: 0
+    globals:
+      cct:
+        score: 4
+        range:
+        - 3
+        - 5
+        reason: Attends to and evokes the client's own language about walking and confidence.
+        evidence:
+        - turn_id: t5
+          quote: my blood pressure is creeping up
+        - turn_id: t16
+          quote: I think I can really do this
+        poor_practice_cited: []
+      sst:
+        score: 4
+        range:
+        - 3
+        - 5
+        reason: Keeps a clear, client-centred direction toward the walking goal.
+        evidence:
+        - turn_id: t4
+          quote: What makes walking more important to you right now?
+        - turn_id: t15
+          quote: Would it be helpful if I shared some ideas
+        poor_practice_cited: []
+      partnership:
+        score: 5
+        range:
+        - 4
+        - 5
+        reason: Asks permission, treats the client as the expert on their own week.
+        evidence:
+        - turn_id: t15
+          quote: you know your workplace best
+        - turn_id: t19
+          quote: It's entirely your decision how to start.
+        poor_practice_cited: []
+      empathy:
+        score: 4
+        range:
+        - 3
+        - 5
+        reason: Reflects the client's feelings and view accurately and often.
+        evidence:
+        - turn_id: t6
+          quote: You want to be there for your kids
+        - turn_id: t21
+          quote: You came in tired and you're leaving hopeful.
+        poor_practice_cited: []
+    utterances:
+    - turn_id: t2
+      quote: Thanks for coming in.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
+    - turn_id: t2
+      quote: Is it all right if we spend our time on that?
+      code: seek_collab
+      rationale: 'Intended code: seek_collab (synthetic).'
+    - turn_id: t4
+      quote: What makes walking more important to you right now?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t6
+      quote: You want to be there for your kids, and you remember feeling great when walking was part of your day.
+      code: cr
+      rationale: 'Intended code: cr (synthetic).'
+    - turn_id: t6
+      quote: What was different back then?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t8
+      quote: A forty-minute loop on a Saturday took real commitment, and it shows you can do it when you set your mind to it.
+      code: affirm
+      rationale: 'Intended code: affirm (synthetic).'
+    - turn_id: t8
+      quote: You're tired in the evenings.
+      code: sr
+      rationale: 'Intended code: sr (synthetic).'
+    - turn_id: t9
+      quote: Where would a walk fit best in your week?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t11
+      quote: Three days a week at lunchtime feels doable to you.
+      code: sr
+      rationale: 'Intended code: sr (synthetic).'
+    - turn_id: t11
+      quote: You also want to protect that time from meetings.
+      code: cr
+      rationale: 'Intended code: cr (synthetic).'
+    - turn_id: t11
+      quote: How confident are you, from one to ten, that you can make three lunch walks happen?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t13
+      quote: Why a six and not a three?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t13
+      quote: You've already thought about blocking your calendar, which shows you're taking this seriously.
+      code: affirm
+      rationale: 'Intended code: affirm (synthetic).'
+    - turn_id: t15
+      quote: Would it be helpful if I shared some ideas other people have used for rainy days?
+      code: seek_collab
+      rationale: 'Intended code: seek_collab (synthetic).'
+    - turn_id: t15
+      quote: Some people keep walking shoes at the office, walk indoor laps, or take a call while walking.
+      code: persuade_permission
+      rationale: 'Intended code: persuade_permission (synthetic).'
+    - turn_id: t15
+      quote: The guidelines suggest about thirty minutes of activity on most days.
+      code: gi
+      rationale: 'Intended code: gi (synthetic).'
+    - turn_id: t15
+      quote: Even ten-minute walks count toward that.
+      code: gi
+      rationale: 'Intended code: gi (synthetic).'
+    - turn_id: t15
+      quote: Both ideas are only options, and you know your workplace best.
+      code: emphasize_autonomy
+      rationale: 'Intended code: emphasize_autonomy (synthetic).'
+    - turn_id: t17
+      quote: You have a plan for sunny and rainy days, and the confidence you're showing comes from what you already did on those Saturdays.
+      code: cr
+      rationale: 'Intended code: cr (synthetic).'
+    - turn_id: t17
+      quote: What would you like to do first?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t19
+      quote: It's entirely your decision how to start.
+      code: emphasize_autonomy
+      rationale: 'Intended code: emphasize_autonomy (synthetic).'
+    - turn_id: t19
+      quote: Blocking those days sounds like a strong first step.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
+    - turn_id: t19
+      quote: 'So you want to be there for your kids, you miss how you felt when you walked, and you have a plan: three lunch walks, with indoor laps when it rains.'
+      code: cr
+      rationale: 'Intended code: cr (synthetic).'
+    - turn_id: t21
+      quote: You came in tired and you're leaving hopeful.
+      code: sr
+      rationale: 'Intended code: sr (synthetic).'
+    - turn_id: t21
+      quote: Let's check in again in two weeks.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
+  poor_practice:
+    transcript: poor_practice.json
+    params: poor_practice.params.json
+    change_goal: cut back on evening drinking
+    warnings: []
+    counts:
+      gi: 2
+      persuade: 5
+      persuade_permission: 0
+      question: 3
+      sr: 0
+      cr: 0
+      affirm: 0
+      seek_collab: 0
+      emphasize_autonomy: 0
+      confront: 4
+    summaries:
+      technical: 1.0
+      relational: 1.5
+      pct_cr: null
+      reflection_question_ratio: 0.0
+      total_mia: 0
+      total_mina: 9
+    globals:
+      cct:
+        score: 1
+        range:
+        - 1
+        - 2
+        reason: Never evokes the client's own reasons; argues for change instead.
+        evidence:
+        - turn_id: t6
+          quote: Four glasses a night is a problem
+        - turn_id: t10
+          quote: Here is what you should do
+        poor_practice_cited:
+        - turn_id: t6
+          quote: you need to cut it down right away
+        - turn_id: t8
+          quote: Then what are you doing here?
+      sst:
+        score: 1
+        range:
+        - 1
+        - 2
+        reason: Direction is imposed by the clinician, not built on the client's language.
+        evidence:
+        - turn_id: t4
+          quote: I doubt that's the real number.
+        - turn_id: t18
+          quote: Just stop.
+        poor_practice_cited:
+        - turn_id: t18
+          quote: Just stop.
+      partnership:
+        score: 1
+        range:
+        - 1
+        - 2
+        reason: Clinician holds the power; client's view is overridden and challenged.
+        evidence:
+        - turn_id: t10
+          quote: Here is what you should do
+        - turn_id: t20
+          quote: It is easy if you want it badly enough.
+        poor_practice_cited:
+        - turn_id: t4
+          quote: How about being honest with me?
+        - turn_id: t20
+          quote: Maybe you don't.
+      empathy:
+        score: 2
+        range:
+        - 1
+        - 2
+        reason: Little effort to understand; the client's perspective is dismissed.
+        evidence:
+        - turn_id: t8
+          quote: Then what are you doing here?
+        - turn_id: t16
+          quote: You drink alone every night and you think that's fine?
+        poor_practice_cited:
+        - turn_id: t16
+          quote: you think that's fine?
+    utterances:
+    - turn_id: t2
+      quote: Let's get started.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
+    - turn_id: t2
+      quote: How many drinks do you have a night?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t4
+      quote: A couple? People always say a couple.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
+    - turn_id: t4
+      quote: I doubt that's the real number.
+      code: confront
+      rationale: 'Intended code: confront (synthetic).'
+    - turn_id: t4
+      quote: How about being honest with me?
+      code: confront
+      rationale: 'Intended code: confront (synthetic).'
+    - turn_id: t6
+      quote: Four glasses a night is a problem, and you need to cut it down right away.
+      code: persuade
+      rationale: 'Intended code: persuade (synthetic).'
+    - turn_id: t6
+      quote: Alcohol will wreck your liver and your sleep.
+      code: persuade
+      rationale: 'Intended code: persuade (synthetic).'
+    - turn_id: t8
+      quote: Not ready? Then what are you doing here?
+      code: confront
+      rationale: 'Intended code: confront (synthetic).'
+    - turn_id: t10
+      quote: Your wife is right to worry.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
+    - turn_id: t10
+      quote: 'Here is what you should do: pour out everything in the house and go to a meeting every night.'
+      code: persuade
+      rationale: 'Intended code: persuade (synthetic).'
+    - turn_id: t12
+      quote: The guidelines say men should have no more than fourteen units a week.
+      code: gi
+      rationale: 'Intended code: gi (synthetic).'
+    - turn_id: t12
+      quote: Do you know how many units that is?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t14
+      quote: It's a lot less.
+      code: gi
+      rationale: 'Intended code: gi (synthetic).'
+    - turn_id: t14
+      quote: Do you drink on weekends too?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t14
+      quote: Do you drink alone?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t14
+      quote: Do you drink before noon?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t16
+      quote: You drink alone every night and you think that's fine?
+      code: confront
+      rationale: 'Intended code: confront (synthetic).'
+    - turn_id: t18
+      quote: Plenty of people manage without drinking, so you can too. Just stop.
+      code: persuade
+      rationale: 'Intended code: persuade (synthetic).'
+    - turn_id: t20
+      quote: It is easy if you want it badly enough.
+      code: persuade
+      rationale: 'Intended code: persuade (synthetic).'
+    - turn_id: t20
+      quote: Maybe you don't.
+      code: confront
+      rationale: 'Intended code: confront (synthetic).'
+    - turn_id: t22
+      quote: Good.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
+    - turn_id: t22
+      quote: Write down every drink for the next month and bring it back, no excuses.
+      code: persuade
+      rationale: 'Intended code: persuade (synthetic).'
+    - turn_id: t24
+      quote: Come back next week. Don't miss the appointment.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
+  short_session:
+    transcript: short_session.json
+    params: short_session.params.json
+    change_goal: take blood pressure medicine every day
+    warnings:
+    - short_session
+    counts:
+      gi: 1
+      persuade: 0
+      persuade_permission: 0
+      question: 1
+      sr: 2
+      cr: 1
+      affirm: 1
+      seek_collab: 1
+      emphasize_autonomy: 0
+      confront: 0
+    summaries:
+      technical: 3.0
+      relational: 3.0
+      pct_cr: 0.3333333333333333
+      reflection_question_ratio: 3.0
+      total_mia: 2
+      total_mina: 0
+    globals:
+      cct:
+        score: 3
+        range:
+        - 2
+        - 4
+        reason: Some attention to the client's reasons for taking the medicine.
+        evidence:
+        - turn_id: t5
+          quote: I don't want a stroke like my uncle.
+        - turn_id: t3
+          quote: I forget them a lot
+        poor_practice_cited: []
+      sst:
+        score: 3
+        range:
+        - 2
+        - 4
+        reason: Direction is present but brief.
+        evidence:
+        - turn_id: t2
+          quote: What would you like to say about taking your medicine?
+        - turn_id: t8
+          quote: How does that sound to you?
+        poor_practice_cited: []
+      partnership:
+        score: 3
+        range:
+        - 2
+        - 4
+        reason: Some collaboration; short session limits evidence.
+        evidence:
+        - turn_id: t8
+          quote: How does that sound to you?
+        - turn_id: t6
+          quote: Some people keep the pills next to the toothbrush.
+        poor_practice_cited: []
+      empathy:
+        score: 3
+        range:
+        - 2
+        - 4
+        reason: Reflections are accurate but few.
+        evidence:
+        - turn_id: t4
+          quote: Mornings get busy
+        - turn_id: t10
+          quote: You'll set it up tonight.
+        poor_practice_cited: []
+    utterances:
+    - turn_id: t2
+      quote: Thanks for coming.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
+    - turn_id: t2
+      quote: What would you like to say about taking your medicine?
+      code: question
+      rationale: 'Intended code: question (synthetic).'
+    - turn_id: t4
+      quote: Mornings get busy and the pills slip your mind.
+      code: sr
+      rationale: 'Intended code: sr (synthetic).'
+    - turn_id: t6
+      quote: You've been looking after yourself by showing up today.
+      code: affirm
+      rationale: 'Intended code: affirm (synthetic).'
+    - turn_id: t6
+      quote: Some people keep the pills next to the toothbrush.
+      code: gi
+      rationale: 'Intended code: gi (synthetic).'
+    - turn_id: t8
+      quote: Seeing the box when you brush your teeth could remind you.
+      code: cr
+      rationale: 'Intended code: cr (synthetic).'
+    - turn_id: t8
+      quote: How does that sound to you?
+      code: seek_collab
+      rationale: 'Intended code: seek_collab (synthetic).'
+    - turn_id: t10
+      quote: You'll set it up tonight.
+      code: sr
+      rationale: 'Intended code: sr (synthetic).'
+    - turn_id: t10
+      quote: We can see how it goes next time.
+      code: null
+      rationale: 'Intended code: none (synthetic).'
