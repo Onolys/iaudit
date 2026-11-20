@@ -20,8 +20,8 @@ Source of truth: [PRD.md](PRD.md). Lane B (platform). Built and accepted on fake
 | 10 | Rating card: drafts, final revisions | 4 | done |
 | 11 | Speakers, transcript read, `maybe_start_first_run` transaction | 8, 9, 10 | done |
 | 12 | `run` task, progress, partial failure, reports, `POST /runs` | 6, 9, 11 | done |
-| 13 | Delete (hard) + cleanup task | 7, 12 | in-progress |
-| 14 | Logging/privacy registration and sentinel test | 12 | todo |
+| 13 | Delete (hard) + cleanup task | 7, 12 | done |
+| 14 | Logging/privacy registration and sentinel test | 12 | in-progress |
 | 15 | OpenAPI finalisation, `/v1/docs`, contracts, public-api doc, ADR 0020 | 12, 13 | todo |
 | 16 | Dockerfile, dev script, end-to-end acceptance sweep | 13, 14, 15 | todo |
 
