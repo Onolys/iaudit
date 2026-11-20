@@ -12,7 +12,8 @@ locals {
       "${var.app_site_id}.web.app",
       "${var.app_staging_site_id}.web.app",
     ],
-    var.admin_enabled ? ["admin.onolys.com", "${var.admin_site_id}.web.app", "${var.admin_staging_site_id}.web.app"] : [],
+    var.admin_enabled["prod"] ? ["admin.onolys.com", "${var.admin_site_id}.web.app"] : [],
+    var.admin_enabled["staging"] ? ["${var.admin_staging_site_id}.web.app"] : [],
   ))
 }
 
@@ -90,7 +91,7 @@ resource "google_firebase_web_app" "app_staging" {
 }
 
 resource "google_firebase_web_app" "admin" {
-  count           = var.admin_enabled ? 1 : 0
+  count           = var.admin_enabled["prod"] ? 1 : 0
   provider        = google-beta
   project         = var.project
   display_name    = "onolys-admin"
@@ -100,7 +101,7 @@ resource "google_firebase_web_app" "admin" {
 }
 
 resource "google_firebase_web_app" "admin_staging" {
-  count           = var.admin_enabled ? 1 : 0
+  count           = var.admin_enabled["staging"] ? 1 : 0
   provider        = google-beta
   project         = var.project
   display_name    = "onolys-admin-staging"
@@ -122,14 +123,14 @@ data "google_firebase_web_app_config" "app_staging" {
 }
 
 data "google_firebase_web_app_config" "admin" {
-  count      = var.admin_enabled ? 1 : 0
+  count      = var.admin_enabled["prod"] ? 1 : 0
   provider   = google-beta
   project    = var.project
   web_app_id = google_firebase_web_app.admin[0].app_id
 }
 
 data "google_firebase_web_app_config" "admin_staging" {
-  count      = var.admin_enabled ? 1 : 0
+  count      = var.admin_enabled["staging"] ? 1 : 0
   provider   = google-beta
   project    = var.project
   web_app_id = google_firebase_web_app.admin_staging[0].app_id
@@ -164,7 +165,7 @@ output "web_env_prod" {
 
 output "web_env_admin_staging" {
   description = "VITE_* build vars for the admin staging web app (SP07, after launch)."
-  value = var.admin_enabled ? {
+  value = var.admin_enabled["staging"] ? {
     VITE_FIREBASE_API_KEY             = data.google_firebase_web_app_config.admin_staging[0].api_key
     VITE_FIREBASE_AUTH_DOMAIN         = data.google_firebase_web_app_config.admin_staging[0].auth_domain
     VITE_FIREBASE_PROJECT_ID          = var.project
@@ -176,7 +177,7 @@ output "web_env_admin_staging" {
 
 output "web_env_admin_prod" {
   description = "VITE_* build vars for the admin prod web app (SP07, after launch)."
-  value = var.admin_enabled ? {
+  value = var.admin_enabled["prod"] ? {
     VITE_FIREBASE_API_KEY             = data.google_firebase_web_app_config.admin[0].api_key
     VITE_FIREBASE_AUTH_DOMAIN         = data.google_firebase_web_app_config.admin[0].auth_domain
     VITE_FIREBASE_PROJECT_ID          = var.project

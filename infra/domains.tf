@@ -8,9 +8,9 @@ resource "google_firebase_hosting_custom_domain" "app" {
   wait_dns_verification = false
 }
 
-# Admin domain (SP07, after launch): gated by var.admin_enabled.
+# Admin domain (SP07, after launch): gated by admin_enabled (prod).
 resource "google_firebase_hosting_custom_domain" "admin" {
-  count                 = var.admin_enabled ? 1 : 0
+  count                 = var.admin_enabled["prod"] ? 1 : 0
   provider              = google-beta
   project               = var.project
   site_id               = google_firebase_hosting_site.admin[0].site_id

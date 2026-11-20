@@ -34,7 +34,7 @@ def test_app_domain_on_prod_site_ungated():
 def test_admin_domain_gated_by_admin_enabled():
     b = norm(block(src(), 'resource "google_firebase_hosting_custom_domain" "admin"'))
     assert 'custom_domain = "admin.onolys.com"' in b
-    assert "var.admin_enabled ? 1 : 0" in b
+    assert "var.admin_enabled[\"prod\"] ? 1 : 0" in b
     assert "google_firebase_hosting_site.admin[0].site_id" in b
 
 

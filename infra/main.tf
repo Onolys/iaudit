@@ -60,9 +60,9 @@ resource "google_firebase_hosting_site" "app_staging" {
   depends_on = [google_project_service.api]
 }
 
-# Admin sites (SP07, after launch): gated by var.admin_enabled.
+# Admin sites (SP07, after launch): gated by admin_enabled (per env).
 resource "google_firebase_hosting_site" "admin" {
-  count    = var.admin_enabled ? 1 : 0
+  count    = var.admin_enabled["prod"] ? 1 : 0
   provider = google-beta
   project  = var.project
   site_id  = var.admin_site_id
@@ -71,7 +71,7 @@ resource "google_firebase_hosting_site" "admin" {
 }
 
 resource "google_firebase_hosting_site" "admin_staging" {
-  count    = var.admin_enabled ? 1 : 0
+  count    = var.admin_enabled["staging"] ? 1 : 0
   provider = google-beta
   project  = var.project
   site_id  = var.admin_staging_site_id
@@ -103,7 +103,7 @@ module "staging" {
   api_max_instances        = 3
   llm_secrets              = var.llm_secrets
   stt_secrets              = var.stt_secrets
-  admin_enabled            = var.admin_enabled
+  admin_enabled            = var.admin_enabled["staging"]
   alerts_enabled           = var.staging_alerts
   notification_channel_ids = [google_monitoring_notification_channel.owner_email.id]
   admin_cors_origins = [
@@ -132,7 +132,7 @@ module "prod" {
   api_max_instances        = 10
   llm_secrets              = var.llm_secrets
   stt_secrets              = var.stt_secrets
-  admin_enabled            = var.admin_enabled
+  admin_enabled            = var.admin_enabled["prod"]
   alerts_enabled           = true
   notification_channel_ids = [google_monitoring_notification_channel.owner_email.id]
   admin_cors_origins       = ["https://${var.admin_site_id}.web.app"]

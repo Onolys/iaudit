@@ -20,7 +20,7 @@ staging: same shape, site onolys-app-staging, Firestore DB `staging`, *-staging 
 |---|---|---|
 | Cloud Run api | `onolys-api-staging` | `onolys-api-prod` |
 | Cloud Run worker | `onolys-worker-staging` | `onolys-worker-prod` |
-| Cloud Run admin backend | not created (`admin_enabled=false`) | not created |
+| Cloud Run admin backend | `onolys-admin-backend-staging` (`admin_enabled.staging=true`) | not created (`admin_enabled.prod=false`) |
 | Firestore database (Native, `us-central1`) | `staging` | `(default)` (delete-protection on) |
 | GCS bucket (private) | `onolys-audio-staging` | `onolys-audio-prod` |
 | Cloud Tasks queue | `steps-staging` | `steps-prod` |
@@ -33,7 +33,7 @@ staging: same shape, site onolys-app-staging, Firestore DB `staging`, *-staging 
 
 Shared (project level): Artifact Registry repo `onolys` (`us-central1-docker.pkg.dev/onolys/onolys`, no cleanup policy, so any earlier sha stays deployable), budget `onolys monthly`, Monitoring channel `Onolys owner email`, Workload Identity pool `github` with provider `github` (condition `assertion.repository=='Onolys/onolys'`), Speech-to-Text service agent `service-1054076260967@gcp-sa-speech.iam.gserviceaccount.com` (`objectViewer` on both buckets), Identity Platform config (email+password, min length 8, open sign-up, no MFA).
 
-Admin (SP07) resources (`onolys-admin`, `onolys-admin-staging` sites, `admin.onolys.com`, `onolys-admin-backend-{env}`, `admin-allowed-emails-{env}`) exist only when `admin_enabled=true` (default `false`, after launch).
+Admin (SP07) resources (`onolys-admin`, `onolys-admin-staging` sites, `admin.onolys.com`, `onolys-admin-backend-{env}`, `admin-allowed-emails-{env}`) exist only per env while `admin_enabled` (a map, default `{ staging = true, prod = false }`) is true for that env: staging owns `onolys-admin-staging`, its web app, `onolys-admin-backend-staging`, `admin-allowed-emails-staging` and the `onolys-admin-staging.web.app` authorised domain; prod ones (`onolys-admin`, `admin.onolys.com`, `onolys-admin-backend-prod`) stay off until launch. `onolys-admin-backend-staging` is public at Cloud Run (`allUsers` invoker) on purpose; access is enforced in the app (Firebase ID token + allowlist), timeout 130 s, runs as `admin-backend-staging`.
 
 Sizing (checked on the live services):
 
@@ -85,7 +85,7 @@ Run `cd infra && terraform output` (needs ADC; see Operating Terraform).
 | `deployer_prod_email` | GitHub var `DEPLOYER_PROD_SA`. Now: `deployer-prod@onolys.iam.gserviceaccount.com` |
 | `web_env_staging` | map with `VITE_FIREBASE_API_KEY`, `_AUTH_DOMAIN`, `_APP_ID`, `_STORAGE_BUCKET`, `_MESSAGING_SENDER_ID`, `_PROJECT_ID`, and `VITE_FIRESTORE_DATABASE` (= `staging`). Sensitive: read with `terraform output -json web_env_staging` |
 | `web_env_prod` | same keys; `VITE_FIRESTORE_DATABASE` = `(default)` |
-| `web_env_admin_staging`, `web_env_admin_prod` | `null` until `admin_enabled=true` |
+| `web_env_admin_staging`, `web_env_admin_prod` | `null` until `admin_enabled` is true for that env |
 | `required_dns_updates` | DNS records the owner adds (next section) |
 | `custom_domain_status` | Hosting verification state per custom domain |
 
@@ -129,7 +129,7 @@ Environments: create `production` with Tejit as required reviewer (all prod jobs
 
 Secrets: the only one is `ANTHROPIC_API_KEY`, read by `nightly.yml` (job `api-real-mode`, a live Claude run); it should hold the staging/test key, never the prod key (prod's key lives only in Secret Manager as `anthropic-api-key-prod`). Deploys use WIF, so no JSON key and no deploy secret exists. Do not add a GCP key.
 
-Workflows: `deploy-staging.yml` runs after the `CI` workflow succeeds on `main` (also manual). `deploy-prod.yml` is manual (`workflow_dispatch`, input `sha`) or on a `v*` tag. `deploy-admin.yml` is for SP07 and needs `admin_enabled=true` first. `nightly.yml` runs 06:17 UTC daily.
+Workflows: `deploy-staging.yml` runs after the `CI` workflow succeeds on `main` (also manual). `deploy-prod.yml` is manual (`workflow_dispatch`, input `sha`) or on a `v*` tag. `deploy-admin.yml` is for SP07 and needs `admin_enabled` true for that env first. `nightly.yml` runs 06:17 UTC daily.
 
 ## Operating Terraform
 
@@ -168,6 +168,22 @@ cd infra && terraform plan && terraform apply
 ```
 
 Then dispatch `deploy-staging` / `deploy-prod` (or just confirm the new worker revisions are healthy) and, once both envs work on the new keys, delete the orphaned shared secret `anthropic-api-key` in the console (or `gcloud secrets delete`). Rotate the old key since it was shared.
+
+## Admin access
+
+Who may use the admin app is a comma-separated list of emails in Secret Manager `admin-allowed-emails-{env}` (case-insensitive, spaces around commas ignored). The admin backend reads it as env `ADMIN_ALLOWED_EMAILS` (secret ref, `latest`). Anyone signed in but not on the list gets 403; no token gets 401.
+
+Today (staging, same list intended for prod): `tejitpabari99@gmail.com`, `gitika.bose@gmail.com`, `falakpabari386@gmail.com`.
+
+Edit in the console: Secret Manager, open `admin-allowed-emails-{env}`, **+ New version**, paste the FULL list (it replaces the old one), Add. A running revision keeps the old value, so make Cloud Run pick it up: Cloud Run, `onolys-admin-backend-{env}`, **Edit & deploy new revision**, **Deploy** (or re-run `deploy-admin.yml`).
+
+Edit with the script (value never printed; staging shown, `--env prod` once prod admin is enabled):
+
+```bash
+ADMIN_ALLOWED_EMAILS="a@x.com,b@y.com" python3 infra/scripts/seed-secrets.py --env staging --admin
+```
+
+Then deploy a new revision as above. First-time order for an env: `terraform apply -target='module.<env>.google_secret_manager_secret.admin_allowed_emails'`, run the seed command, then the full `terraform apply` (a revision that references a secret with no version fails).
 
 ## Adding an LLM or STT provider
 

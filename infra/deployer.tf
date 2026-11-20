@@ -47,24 +47,24 @@ resource "google_service_account_iam_member" "deployer_staging_wif" {
 
 locals {
   deployer_staging_member = "serviceAccount:${google_service_account.deployer_staging.email}"
-  # Admin entries (SP07) exist only while var.admin_enabled; nothing changes while it is false.
+  # Admin entries (SP07) exist only while admin_enabled (staging) is true; nothing changes while it is false.
   staging_services = merge(
     {
       api    = module.staging.api_service_name
       worker = module.staging.worker_service_name
     },
-    var.admin_enabled ? { admin = module.staging.admin_backend_service_name } : {},
+    var.admin_enabled["staging"] ? { admin = module.staging.admin_backend_service_name } : {},
   )
   staging_runtime_sas = merge(
     { api = module.staging.api_sa_email, worker = module.staging.worker_sa_email },
-    var.admin_enabled ? { admin = module.staging.admin_backend_sa_email } : {},
+    var.admin_enabled["staging"] ? { admin = module.staging.admin_backend_sa_email } : {},
   )
   hosting_staging_sites = concat(
     [
       "projects/${var.project}/sites/${var.app_staging_site_id}",
       "projects/-/sites/${var.app_staging_site_id}",
     ],
-    var.admin_enabled ? [
+    var.admin_enabled["staging"] ? [
       "projects/${var.project}/sites/${var.admin_staging_site_id}",
       "projects/-/sites/${var.admin_staging_site_id}",
     ] : [],
@@ -112,7 +112,7 @@ resource "google_project_iam_member" "deployer_staging_hosting" {
 
   condition {
     title       = "hosting-app-staging-only"
-    description = "Only the ${var.app_staging_site_id}${var.admin_enabled ? " and ${var.admin_staging_site_id}" : ""} site${var.admin_enabled ? "s" : ""} (and ${var.admin_enabled ? "their" : "its"} channels/versions)"
+    description = "Only the ${var.app_staging_site_id}${var.admin_enabled["staging"] ? " and ${var.admin_staging_site_id}" : ""} site${var.admin_enabled["staging"] ? "s" : ""} (and ${var.admin_enabled["staging"] ? "their" : "its"} channels/versions)"
     expression  = join(" || ", [for s in local.hosting_staging_sites : "resource.name.startsWith(\"${s}\")"])
   }
 }
@@ -190,17 +190,17 @@ locals {
       api    = module.prod.api_service_name
       worker = module.prod.worker_service_name
     },
-    var.admin_enabled ? { admin = module.prod.admin_backend_service_name } : {},
+    var.admin_enabled["prod"] ? { admin = module.prod.admin_backend_service_name } : {},
   )
   prod_runtime_sas = merge(
     { api = module.prod.api_sa_email, worker = module.prod.worker_sa_email },
-    var.admin_enabled ? { admin = module.prod.admin_backend_sa_email } : {},
+    var.admin_enabled["prod"] ? { admin = module.prod.admin_backend_sa_email } : {},
   )
   # Exact site or its children only: a bare startsWith would also match `onolys-app-staging`
   # (and `onolys-admin` would match `onolys-admin-staging`).
   hosting_prod_sites = concat(
     [var.app_site_id],
-    var.admin_enabled ? [var.admin_site_id] : [],
+    var.admin_enabled["prod"] ? [var.admin_site_id] : [],
   )
   hosting_prod_expr = join(" || ", flatten([
     for id in local.hosting_prod_sites : [
@@ -248,7 +248,7 @@ resource "google_project_iam_member" "deployer_prod_hosting" {
 
   condition {
     title       = "hosting-app-prod-only"
-    description = "Only the ${var.app_site_id}${var.admin_enabled ? " and ${var.admin_site_id}" : ""} site${var.admin_enabled ? "s" : ""} (and ${var.admin_enabled ? "their" : "its"} channels/versions)"
+    description = "Only the ${var.app_site_id}${var.admin_enabled["prod"] ? " and ${var.admin_site_id}" : ""} site${var.admin_enabled["prod"] ? "s" : ""} (and ${var.admin_enabled["prod"] ? "their" : "its"} channels/versions)"
     expression  = local.hosting_prod_expr
   }
 }

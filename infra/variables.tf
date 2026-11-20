@@ -9,9 +9,17 @@ variable "region" {
 }
 
 variable "admin_enabled" {
-  description = "Gates every admin (SP07) resource."
-  type        = bool
-  default     = false
+  description = "Gates the admin (SP07) resources per environment: staging builds the staging admin backend, site, web app and authorised domain; prod stays off until launch."
+  type        = map(bool)
+  default = {
+    staging = true
+    prod    = false
+  }
+
+  validation {
+    condition     = toset(keys(var.admin_enabled)) == toset(["staging", "prod"])
+    error_message = "admin_enabled needs exactly the keys staging and prod."
+  }
 }
 
 variable "staging_alerts" {
