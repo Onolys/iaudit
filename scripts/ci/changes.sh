@@ -3,14 +3,14 @@
 # Env: FORCE_ALL=true -> every existing package runs (push to main).
 #      ROOT=<dir>     -> repo root for directory-exists checks (default: .).
 #      GITHUB_OUTPUT  -> where flags are appended (default: stdout).
-# A flag is true iff the package exists (python kind: <dir>/pyproject.toml; else the dir) AND (FORCE_ALL, or its paths or
+# A flag is true iff the package exists (python kind: <dir>/pyproject.toml; node kind: <dir>/package.json; else the dir) AND (FORCE_ALL, or its paths or
 # shared paths changed). Moving a package = edit its dir in PACKAGES below.
 set -euo pipefail
 
 ROOT="${ROOT:-.}"
 OUT="${GITHUB_OUTPUT:-/dev/stdout}"
 
-# name:dir:kind (kind python => also triggered by Python-shared paths)
+# name:dir:kind (kind python => also triggered by Python-shared paths; node => needs package.json)
 PACKAGES=(
   "eaudit:eaudit:python"
   "core:engines/core:python"
@@ -18,7 +18,7 @@ PACKAGES=(
   "evaluation:engines/evaluation:python"
   "api:api:python"
   "frontend:frontend:other"
-  "web:web:other"
+  "web:web:node"
   "infra:infra:other"
 )
 
@@ -33,6 +33,7 @@ for entry in "${PACKAGES[@]}"; do
   run=false
   marker="$ROOT/$dir"
   [[ "$kind" == python ]] && marker="$ROOT/$dir/pyproject.toml"
+  [[ "$kind" == node ]] && marker="$ROOT/$dir/package.json"
   if [[ -e "$marker" ]]; then
     if [[ "${FORCE_ALL:-false}" == "true" ]]; then
       run=true

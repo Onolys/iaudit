@@ -6,6 +6,7 @@ T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
 mkdir -p "$T/eaudit" "$T/frontend" "$T/engines/core" "$T/api" "$T/engines/paudit"
 touch "$T/eaudit/pyproject.toml" "$T/engines/core/pyproject.toml" "$T/api/pyproject.toml"
 # paudit dir exists but has no pyproject.toml; web/infra/evaluation absent
+mkdir -p "$T/web/src"   # web dir without package.json must still skip
 fail=0
 # run <force> <expected "name=val ..."> <files...>
 run() {
@@ -22,6 +23,11 @@ run false "eaudit=true core=true paudit=false evaluation=false api=true frontend
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=false infra=false" docs/readme.md
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=false infra=false" infra/main.tf web/a.ts engines/paudit/a.py
 run true  "eaudit=true core=true paudit=false evaluation=false api=true frontend=true web=false infra=false" docs/readme.md
+touch "$T/web/package.json"; mkdir -p "$T/infra"   # web (package.json) and infra (dir) now exist
+run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=true infra=false" web/src/a.ts
+run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=false infra=true" infra/main.tf
+run true  "eaudit=true core=true paudit=false evaluation=false api=true frontend=true web=true infra=true" docs/readme.md
+rm "$T/web/package.json" "$T/infra" -r
 touch "$T/engines/paudit/pyproject.toml"   # now paudit exists
 run false "eaudit=false core=false paudit=true evaluation=false api=false frontend=false web=false infra=false" engines/paudit/a.py
 exit $fail
