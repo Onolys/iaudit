@@ -136,6 +136,7 @@ async def _check(
     turns: list[IndexedTurn],
     ctx,
     causal_links: list[CausalLink] | tuple[CausalLink, ...] = (),
+    suppress: frozenset[ConcernType] = frozenset(),
 ) -> tuple[ClaimDraft, dict[str, int]]:
     cfg = ctx.settings
     ga = run_group_a(claim, link, turns)
@@ -149,8 +150,18 @@ async def _check(
         counts["failure"] = res.stall
         return _stall(claim, res.stall, ctx), counts
     vout, floor_counts = apply_floors(res.output, cfg)
-    judged, sig = judge(claim, link, ga, turns, vout, floor_counts, cfg, causal_links=causal_links)
-    dec = decide(claim, judged, sig, cfg)
+    judged, sig = judge(
+        claim,
+        link,
+        ga,
+        turns,
+        vout,
+        floor_counts,
+        cfg,
+        causal_links=causal_links,
+        suppress=suppress,
+    )
+    dec = decide(claim, judged, sig, cfg, suppress=suppress)
     for k, n in {**sig.counts, **dec.counts}.items():
         counts[k] = counts.get(k, 0) + n
     counts["verdict"] = dec.verdict.value
@@ -165,6 +176,7 @@ async def check_one(
     ctx,
     *,
     causal_links: list[CausalLink] | tuple[CausalLink, ...] = (),
+    suppress: frozenset[ConcernType] = frozenset(),
 ) -> ClaimDraft:
     """Check one claim. Never raises for per-claim failures; logs counts only."""
     if claim.scope != "in_scope":
@@ -176,7 +188,7 @@ async def check_one(
     if not link.evidence:
         return _no_evidence_draft(claim, link, ctx.settings)
     try:
-        draft, counts = await _check(claim, link, prep, turns, ctx, causal_links)
+        draft, counts = await _check(claim, link, prep, turns, ctx, causal_links, suppress)
     except Exception as exc:  # a bug in one claim must not take down the others
         log_event("check_claim", claim_id=claim.id, failure="error", exc_class=type(exc).__name__)
         return _stall(claim, "error", ctx)
@@ -192,13 +204,22 @@ async def check_claims(
     ctx,
     *,
     causal_links: list[CausalLink] | tuple[CausalLink, ...] = (),
+    suppress: frozenset[ConcernType] = frozenset(),
 ) -> list[ClaimDraft]:
     """One draft per claim, in input order."""
     by_id = {r.claim_id: r for r in links}
     return list(
         await asyncio.gather(
             *(
-                check_one(c, by_id.get(c.id), prep, turns, ctx, causal_links=causal_links)
+                check_one(
+                    c,
+                    by_id.get(c.id),
+                    prep,
+                    turns,
+                    ctx,
+                    causal_links=causal_links,
+                    suppress=suppress,
+                )
                 for c in claims
             )
         )

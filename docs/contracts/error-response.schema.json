@@ -13,7 +13,7 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "0.0.1"
+      "const": "0.0.2"
     },
     "request_id": {
       "type": "string",

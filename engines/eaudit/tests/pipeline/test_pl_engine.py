@@ -42,12 +42,12 @@ async def test_wrapper_result_equals_direct_pipeline(make_ctx, profile):
     assert len(out.result.claims) == 11
 
 
-async def test_profile_is_passed_through_unchanged(monkeypatch):
+async def test_profile_reaches_the_request(monkeypatch):
     seen = {}
 
     class Spy:
         async def run(self, req, ctx):
-            seen["profile"] = ctx.extras.get("profile")
+            seen["profile"] = req.profile
             from eaudit.models import AuditResponse, Status
 
             return AuditResponse(
@@ -59,7 +59,7 @@ async def test_profile_is_passed_through_unchanged(monkeypatch):
     rctx = RunContext(llm=s, metrics=MetricsCollector(), request_id="r")
     eng = EauditEngine(Settings(llm_mode="stub"), pipeline=Spy())
     await eng.run(transcript, None, {**params, "profile": PROFILE}, rctx)
-    assert seen["profile"] is not None and seen["profile"] == PROFILE
+    assert seen["profile"].model_dump(mode="json") == PROFILE
     await eng.run(transcript, None, params, rctx)
     assert seen["profile"] is None
 

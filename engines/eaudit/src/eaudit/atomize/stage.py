@@ -81,9 +81,14 @@ def _score(c: Checked) -> tuple[int, int]:
 
 
 async def atomize_section(
-    section: Section, roster: list[Speaker], ctx, *, index: int
+    section: Section,
+    roster: list[Speaker],
+    ctx,
+    *,
+    index: int,
+    context_note: str | None = None,
 ) -> SectionAtoms:
-    res = await _atomize(section, roster, ctx, index=index)
+    res = await _atomize(section, roster, ctx, index=index, context_note=context_note)
     log_event(
         "atomize_section",
         request_id=ctx.request_id,
@@ -97,7 +102,9 @@ async def atomize_section(
     return res
 
 
-async def _atomize(section: Section, roster: list[Speaker], ctx, *, index: int) -> SectionAtoms:
+async def _atomize(
+    section: Section, roster: list[Speaker], ctx, *, index: int, context_note: str | None = None
+) -> SectionAtoms:
     if not section.text.strip():
         return SectionAtoms(section_index=index, status="ok")
     timeout = ctx.call_timeout("atomize")
@@ -108,7 +115,7 @@ async def _atomize(section: Section, roster: list[Speaker], ctx, *, index: int) 
     req = LLMRequest(
         tier="mid",
         system=_SYSTEM,
-        user=render_user(section.text, roster),
+        user=render_user(section.text, roster, context_note),
         response_model=AtomizerOutput,
         call_tag="atomize",
         unit=f"s{index}",
@@ -151,8 +158,9 @@ async def _atomize(section: Section, roster: list[Speaker], ctx, *, index: int) 
     try:
         out, checked = await retry(
             attempt,
-            should_retry=lambda result: not isinstance(result, BaseException)
-            and bool(result[1].errors),
+            should_retry=lambda result: (
+                not isinstance(result, BaseException) and bool(result[1].errors)
+            ),
             attempts=2 if cfg.atomize_retry else 1,
             can_continue=lambda: ctx.remaining() >= cfg.llm_timeout_s,
         )

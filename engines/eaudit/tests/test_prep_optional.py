@@ -148,7 +148,7 @@ async def test_soft_timeout_falls_back_to_rules_only(make_ctx, monkeypatch):
 
     req = AuditRequest.model_validate(
         {
-            "schema_version": "0.0.1",
+            "schema_version": "0.0.2",
             "transcript": [
                 t.model_dump(mode="json", exclude_none=True) for t in turns(PLAIN, PLAIN)
             ],

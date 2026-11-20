@@ -65,5 +65,12 @@ def build_cache_prefix(max_claims: int = 30) -> str:
     )
 
 
-def render_user(section_text: str, roster: list[Speaker] | list[dict]) -> str:
-    return f"Roster: {_roster_json(roster)}\n\nSection text:\n<<<\n{section_text}\n>>>"
+def render_user(
+    section_text: str, roster: list[Speaker] | list[dict], context_note: str | None = None
+) -> str:
+    """Per-section user turn. A `context_note` (request profile) is appended only when present,
+    so requests without a profile render byte-identically."""
+    user = f"Roster: {_roster_json(roster)}\n\nSection text:\n<<<\n{section_text}\n>>>"
+    if context_note:
+        user += f"\n\nContext note:\n{context_note}"
+    return user

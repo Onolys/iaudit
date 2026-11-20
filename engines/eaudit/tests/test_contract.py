@@ -17,7 +17,7 @@ def test_example_response_valid(example_response):
 
 def test_error_example_valid():
     body = {
-        "schema_version": "0.0.1",
+        "schema_version": "0.0.2",
         "status": 400,
         "message": "x",
         "details": [{"code": "schema_violation", "message": "x"}],
@@ -93,7 +93,7 @@ def test_all_error_detail_codes_are_valid(code):
     assert (
         contract.validate_error(
             {
-                "schema_version": "0.0.1",
+                "schema_version": "0.0.2",
                 "status": 400,
                 "message": "Request rejected.",
                 "details": [{"code": code, "message": "Fixed text."}],
@@ -125,7 +125,7 @@ def test_error_code_enum_is_exact():
 )
 def test_invalid_error_fields_rejected(field, value):
     body = {
-        "schema_version": "0.0.1",
+        "schema_version": "0.0.2",
         "status": 400,
         "message": "x",
         "details": [{"code": "schema_violation", "message": "x"}],

@@ -87,11 +87,27 @@ class Section(_Model):
     text: str
 
 
+class Profile(_Model):
+    """Optional request-level audit profile (contract 0.0.2)."""
+
+    suppress_concerns: list[ConcernType] = []
+    context_note: str | None = None
+
+
 class AuditRequest(_Model):
     schema_version: SchemaVersion
     request_id: str | None = None
     transcript: list[Turn]
     assessment: list[Section]
+    profile: Profile | None = None
+
+    @property
+    def suppress(self) -> frozenset[ConcernType]:
+        return frozenset(self.profile.suppress_concerns) if self.profile else frozenset()
+
+    @property
+    def context_note(self) -> str | None:
+        return (self.profile.context_note or None) if self.profile else None
 
 
 class Pointer(_Model):

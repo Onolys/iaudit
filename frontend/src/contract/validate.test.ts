@@ -40,11 +40,11 @@ describe("validateResponse", () => {
       ok: false, error: { kind: "schema", issues: [{ path: "/schema_version" }] },
     });
   });
-  it("accepts a 0.0.1 response with run_info", () => {
+  it("accepts a 0.0.2 response with run_info", () => {
     expect(res().run_info).toBeDefined();
     expect(validateResponse(res(), req()).ok).toBe(true);
   });
-  it("accepts a 0.0.1 response without run_info", () => {
+  it("accepts a 0.0.2 response without run_info", () => {
     const ok = res();
     delete ok.run_info;
     expect(validateResponse(ok, req()).ok).toBe(true);

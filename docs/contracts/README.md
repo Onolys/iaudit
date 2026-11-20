@@ -1,4 +1,4 @@
-# Audit contract 0.0.1
+# Audit contract 0.0.2
 
 Source of truth for the evidence-audit request and response. The frontend owns this contract. The backend implements it.
 
@@ -20,11 +20,11 @@ If this file and a schema disagree about **structure**, the schema wins. If they
 
 The verdict list and the concern-type list mirror [../mission.md](../mission.md). When the mission changes, update both schemas and this file.
 
-Version: `0.0.1`; no compatibility promise.
+Version: `0.0.2`; no compatibility promise.
 
 Protocol-audit (`paudit`) packs and results are separate from this contract; see [ADR 0018](../decisions/0018-protocol-pack-data-vs-code.md) and [engines/paudit](../../engines/paudit/README.md).
 
-**Contract-versioning rule (whole initiative): all schemas are `"0.0.1"`; the project is not deployed; no legacy/back-compat code, version history or migration; a non-conforming file just shows a validation error and the owner deletes it.**
+**Contract-versioning rule (whole initiative): all schemas are `"0.0.1"` except the audit contract (request, response, error), which is `"0.0.2"` since the optional `profile` was added; the project is not deployed; no legacy/back-compat code, version history or migration; a non-conforming file just shows a validation error and the owner deletes it.**
 
 A consumer must not render a partial audit from an invalid body.
 
@@ -66,7 +66,7 @@ A claim uses the same walk inside one section, so only step 3 applies, against `
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"0.0.1"`. |
+| `schema_version` | yes | Always `"0.0.2"`. |
 | `request_id` | no | Caller-chosen id. Echoed on the response. Not a content hash. |
 | `transcript` | yes | Non-empty array of turns, in order. |
 | `transcript[].id` | yes | Log id. Not an evidence anchor. |
@@ -79,6 +79,9 @@ A claim uses the same walk inside one section, so only step 3 applies, against `
 | `assessment[].label` | no | Domain or sub-domain name. Display only. |
 | `assessment[].score` | no | Number or string. Display only. Never audited. |
 | `assessment[].text` | yes | The clinician's reasoning for this section. |
+| `profile` | no | Optional audit profile; without it the audit runs as before. Example: [examples/profile.request.json](examples/profile.request.json). |
+| `profile.suppress_concerns` | no | Concern types to drop. Applied before the decision table, so verdicts are recomputed from the remaining signals. Structural types (`contradictory_evidence`, `wrong_attribution`, `negation_reversal`, `question_as_answer`, and `unsupported_claim` from missing evidence) are kept even if listed. |
+| `profile.context_note` | no | Plain-text note appended to the atomize prompt (for example who "I" is). Prompts without it are unchanged. |
 
 Ids must be unique among turns, and unique among sections.
 
@@ -88,7 +91,7 @@ A turn without `speaker` stays unknown. Speaker-dependent checks and question/an
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"0.0.1"`. |
+| `schema_version` | yes | Always `"0.0.2"`. |
 | `request_id` | when sent | Exact echo of the request id. |
 | `status` | yes | `complete` or `partial`. |
 | `warnings` | yes | May be empty. |
@@ -229,11 +232,11 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Error response
 
-Every non-2xx reply carries this body instead of an audit. Examples: [examples/error.json](examples/error.json), [examples/multi-error.json](examples/multi-error.json). Request, response and error bodies share `schema_version: "0.0.1"`.
+Every non-2xx reply carries this body instead of an audit. Examples: [examples/error.json](examples/error.json), [examples/multi-error.json](examples/multi-error.json). Request, response and error bodies share `schema_version: "0.0.2"`.
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"0.0.1"`. |
+| `schema_version` | yes | Always `"0.0.2"`. |
 | `request_id` | no | Echo of the request id, when known. |
 | `status` | yes | Integer from 400 through 599; equals the HTTP response status. |
 | `message` | yes | Non-empty plain text shown to the reviewer as-is. Fixed backend text for the error class. |

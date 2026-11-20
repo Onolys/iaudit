@@ -31,7 +31,9 @@ async def section_flow(
     st: RunState, req: AuditRequest, roster, index: int, section: Section, ctx
 ) -> None:
     with st.span("atomize"):
-        atoms = await atomize_section(section, roster, ctx, index=index)
+        atoms = await atomize_section(
+            section, roster, ctx, index=index, context_note=req.context_note
+        )
     st.write_atoms(index, atoms)
     if atoms.status != "ok":
         return
@@ -65,5 +67,6 @@ async def claim_flow(st: RunState, req: AuditRequest, claim: AtomicClaim, ctx) -
             st.prep.turns,
             ctx,
             causal_links=atoms.links if atoms is not None else (),
+            suppress=req.suppress,
         )
     st.write_draft(claim.id, draft)

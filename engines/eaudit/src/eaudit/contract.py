@@ -19,7 +19,7 @@ _NAMES = {
 }
 _MAX_ISSUES = 5
 
-SchemaVersion = Literal["0.0.1"]
+SchemaVersion = Literal["0.0.2"]
 SCHEMA_VERSION = get_args(SchemaVersion)[0]
 
 

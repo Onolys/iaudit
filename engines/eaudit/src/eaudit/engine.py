@@ -1,9 +1,8 @@
 """EauditEngine: the core `Engine` seam over today's pipeline (core PRD R6, R10).
 
 `POST /v1/audit` does not go through this. `params`: `assessment` (list of Section dicts,
-required), optional `preset`, `n_runs` and `profile`. `profile` is passed to the pipeline
-unchanged (as `ctx.extras["profile"]`); the request model has no such field until SP03 adds
-it with the suppression filter, so without that it has no effect on the result.
+required), optional `preset`, `n_runs` and `profile`. `profile` ({suppress_concerns,
+context_note}) goes into the `AuditRequest` as its optional `profile` (contract 0.0.2).
 """
 
 import time
@@ -40,6 +39,7 @@ class EauditEngine:
                 "request_id": ctx.request_id,
                 "transcript": transcript.to_eaudit_turns(),
                 "assessment": params["assessment"],
+                **({"profile": params["profile"]} if params.get("profile") is not None else {}),
             }
         )
         rctx = RequestContext(
@@ -49,8 +49,6 @@ class EauditEngine:
             request_id=ctx.request_id,
             deadline=ctx.deadline or time.monotonic() + settings.audit_deadline_s,
         )
-        if params.get("profile") is not None:
-            rctx.extras["profile"] = params["profile"]
         response = await run_with_backstop(self.pipeline, req, rctx, settings)
         return EngineResult(result=response, run_info=self._run_info(params, ctx))
 

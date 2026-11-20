@@ -240,8 +240,14 @@ def judge(
     cfg: Settings | None = None,
     *,
     causal_links: list[CausalLink] | tuple[CausalLink, ...] = (),
+    suppress: frozenset[ConcernType] = frozenset(),
 ) -> tuple[list[JudgedEvidence], Signals]:
-    """Join the link items, group A results and floored observations; run the per-item checks."""
+    """Join the link items, group A results and floored observations; run the per-item checks.
+
+    `suppress` (request profile) is applied here, before the decision table: flags of suppressed
+    types are dropped, and the item-level checks behind timeframe and inference concerns are
+    skipped, so `decide` recomputes the verdict from what remains.
+    """
     sig = Signals(counts=dict(counts or {}))
     obs = {i.key: i for i in vout.items}
     items = [
@@ -259,6 +265,11 @@ def judge(
     ]
     known = {it.key for it in items}
     for f in vout.flags:
+        if _FLAG_TYPE_CONCERN[f.type] in suppress:
+            sig.counts["flags_profile_suppressed"] = (
+                sig.counts.get("flags_profile_suppressed", 0) + 1
+            )
+            continue
         if f.type == "unsupported_causal_link" and not has_causal_cue(claim):
             sig.counts["flags_suppressed"] = sig.counts.get("flags_suppressed", 0) + 1
             continue
@@ -287,11 +298,14 @@ def judge(
             sig.counts["flags_suppressed"] = sig.counts.get("flags_suppressed", 0) + 1
             continue
         sig.flags.append(f.model_copy(update={"keys": kept_keys}))
-    apply_timeframe(claim, items, sig.flags)
-    _rate_ratio_conflict(claim, items, sig, (cfg or Settings()).check_rate_ratio)
-    sig.failed_inference, sig.rejected_inference_keys = resolve_inferences(
-        link, {it.key: it for it in items}, vout.inferences
-    )
+    if ConcernType.timeframe_mismatch not in suppress:
+        apply_timeframe(claim, items, sig.flags)
+    if ConcernType.conflicting_accounts_flattened not in suppress:
+        _rate_ratio_conflict(claim, items, sig, (cfg or Settings()).check_rate_ratio)
+    if ConcernType.unsupported_inference not in suppress:
+        sig.failed_inference, sig.rejected_inference_keys = resolve_inferences(
+            link, {it.key: it for it in items}, vout.inferences
+        )
     cited = {
         k
         for f in sig.flags
@@ -324,6 +338,14 @@ _FLAG_CONCERN = {
     "calculation_error": ConcernType.calculation_error,
     "meaning_shift": ConcernType.meaning_shift,
     "unsupported_inference": ConcernType.unsupported_inference,
+}
+
+
+# Every verifier flag type -> the concern type it can raise (the suppress filter's key).
+_FLAG_TYPE_CONCERN: dict[str, ConcernType] = {
+    **_FLAG_CONCERN,
+    "timeframe_mismatch": ConcernType.timeframe_mismatch,
+    "certainty_inflation": ConcernType.certainty_inflation,
 }
 
 
@@ -438,7 +460,11 @@ def dedup(concerns: list[Concern]) -> list[Concern]:
 
 
 def _candidates(
-    claim: AtomicClaim, items: list[JudgedEvidence], sig: Signals, cfg: Settings
+    claim: AtomicClaim,
+    items: list[JudgedEvidence],
+    sig: Signals,
+    cfg: Settings,
+    suppress: frozenset[ConcernType] = frozenset(),
 ) -> list[Concern]:
     out: list[Concern] = []
     base = [it for it in items if counts_as_support_base(it)]
@@ -473,7 +499,10 @@ def _candidates(
     if contra:
         out.append(Concern(ConcernType.contradictory_evidence, [it.key for it in contra]))
     flagged = {f.type for f in sig.flags}
-    if "conflicting_accounts_flattened" not in flagged:
+    if (
+        "conflicting_accounts_flattened" not in flagged
+        and ConcernType.frequency_severity_inflation not in suppress
+    ):
         by_key = {it.key: it for it in items}
         for f in compare_amounts(claim, base, cfg):
             if f.escalate:
@@ -481,7 +510,11 @@ def _candidates(
             out.append(
                 Concern(ConcernType.frequency_severity_inflation, [f.key], f.direction, f.kind)
             )
-    ck = certainty_keys(claim, items, sig.flags, cfg.check_min_conf_p1, cfg.check_conf_values)
+    ck = (
+        []
+        if ConcernType.certainty_inflation in suppress
+        else certainty_keys(claim, items, sig.flags, cfg.check_min_conf_p1, cfg.check_conf_values)
+    )
     if ck:
         out.append(Concern(ConcernType.certainty_inflation, ck))
     out += flag_concerns(items, sig.flags)
@@ -489,7 +522,11 @@ def _candidates(
 
 
 def decide(
-    claim: AtomicClaim, judged: list[JudgedEvidence], signals: Signals, cfg: Settings
+    claim: AtomicClaim,
+    judged: list[JudgedEvidence],
+    signals: Signals,
+    cfg: Settings,
+    suppress: frozenset[ConcernType] = frozenset(),
 ) -> Decision:
     """Pure: observations in, verdict + concerns + evidence roles out (decision table D0-D9)."""
     if claim.scope != "in_scope":
@@ -498,7 +535,9 @@ def decide(
         return Decision(
             Verdict.insufficient_evidence, [Concern(ConcernType.unsupported_claim)], row="D2"
         )
-    cands = _candidates(claim, judged, signals, cfg)  # may escalate items to contradicting
+    cands = _candidates(
+        claim, judged, signals, cfg, suppress
+    )  # may escalate items to contradicting
     roles = {it.key: _role(it) for it in judged}
     sup = [k for k, r in roles.items() if r == _Role.supporting]
     con = [k for k, r in roles.items() if r == _Role.contradicting]
