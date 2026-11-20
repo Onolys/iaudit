@@ -138,7 +138,18 @@ def extract_words(response: Any) -> tuple[list[Word], str | None]:
                         speaker=w.speaker_label or None,
                     )
                 )
+    _clamp_ends(words)
     return words, detected
+
+
+def _clamp_ends(words: list[Word]) -> None:
+    """Chirp sometimes returns end=0 (or end < start). Use the next word's start when it is
+    >= this word's start, else this word's start. Order is never changed."""
+    for i, w in enumerate(words):
+        if w.end_ms >= w.start_ms:
+            continue
+        nxt = words[i + 1].start_ms if i + 1 < len(words) else w.start_ms
+        w.end_ms = nxt if nxt >= w.start_ms else w.start_ms
 
 
 class GoogleChirp3(BaseSttAdapter):

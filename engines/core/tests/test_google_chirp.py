@@ -8,11 +8,13 @@ import pytest
 
 from onolys_core.errors import InputError
 from onolys_core.stt import AudioRef, SttParams
-from onolys_core.stt.base import transcribe
+from onolys_core.stt import Word
+from onolys_core.stt.base import transcribe, words_to_turns
 from onolys_core.stt.google_chirp import (
     GoogleChirp3,
     SttProviderError,
     build_batch_request,
+    extract_words,
     location_endpoint,
     resolve_location,
 )
@@ -162,3 +164,43 @@ def test_core_import_does_not_load_google():
         "sys.exit(1 if any(m == 'google' or m.startswith('google.') for m in sys.modules) else 0)"
     )
     assert subprocess.run([sys.executable, "-c", code]).returncode == 0
+
+
+def test_extract_words_clamps_zero_end_mid_and_last():
+    resp = _response(
+        [
+            _word("a", 100, 200, "1"),
+            _word("b", 300, 0, "1"),  # zero end mid-list -> next word's start
+            _word("c", 500, 600, "1"),
+            _word("d", 700, 0, "1"),  # zero end at the end -> own start
+        ]
+    )
+    words, _ = extract_words(resp)
+    assert [(w.text, w.start_ms, w.end_ms) for w in words] == [
+        ("a", 100, 200),
+        ("b", 300, 500),
+        ("c", 500, 600),
+        ("d", 700, 700),
+    ]
+
+
+def test_extract_words_end_before_start_and_next_before_start():
+    resp = _response([_word("a", 300, 100, None), _word("b", 200, 250, None)])
+    words, _ = extract_words(resp)  # never reordered; next start < start -> own start
+    assert [(w.text, w.start_ms, w.end_ms) for w in words] == [("a", 300, 300), ("b", 200, 250)]
+
+
+def test_words_to_turns_end_is_max_word_end_and_not_before_start():
+    words = [
+        Word(text="a", start_ms=100, end_ms=500, speaker="1"),
+        Word(text="b", start_ms=200, end_ms=0, speaker="1"),
+        Word(text="c", start_ms=900, end_ms=0, speaker="2"),
+    ]
+    turns = words_to_turns(words)
+    assert [(t.start_ms, t.end_ms) for t in turns] == [(100, 500), (900, 900)]
+
+
+async def test_zero_end_word_end_to_end_turns_valid():
+    resp = _response([_word("a", 100, 200, "1"), _word("b", 300, 0, "1")])
+    t = await transcribe(GoogleChirp3(FakeBackend(resp)), AUDIO, params(), interval_s=0)
+    assert all(x.start_ms <= x.end_ms for x in t.turns)
