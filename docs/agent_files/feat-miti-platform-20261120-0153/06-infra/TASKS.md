@@ -21,7 +21,7 @@ Source of truth: 06-infra/PRD.md. Tasks 1-9 are the STAGING MINIMAL slice (SP00 
 | 11 | Prod environment + `deployer-prod` | 8, 10 | done |
 | 12 | Custom domain `app.onolys.com` + DNS output | 11 (owner step: DNS) | done |
 | 13 | `deploy-prod.yml`: gated promotion + rollback drill | 9, 11 (owner step: GitHub env) | blocked (code done; real run/rollback drill need merge + owner production env + prod vars) |
-| 14 | `docs/reference/infra.md` runbook + ADR 0022 | 10, 12, 13 | todo |
+| 14 | `docs/reference/infra.md` runbook + ADR 0022 | 10, 12, 13 | done |
 | 15 | Acceptance sweep + recorded measurements | 12, 13, 14, SP09 T8 | todo |
 
 Parallel lanes: all of this is Lane B (platform) and goes first in that lane. After task 2, three streams can run at once: (a) 3 then 4 then 7 (module and IAM), (b) 5 (root Firestore rules; only needs 1 and the emulator), (c) 6 (project-level Identity Platform). 3/4/7 all touch the environment module, so keep them sequential; 6 only touches project-level files. 10 and 11 both edit the module, so run them one after another; 12 and 13 can then run in parallel. Sync points: SP00 `infra` job (`terraform fmt -check` + `validate`) must be green on every task that adds `infra/` files; SP00 previews wait on 2, 3, 4, 6, 7, 9; SP04 needs task 8 (staging) and ships the Dockerfile, `/v1/healthz` and `api/firestore.indexes.json`; SP05 needs task 6 outputs, task 9 and owns `web/firebase.json`; SP01 owns the contents of `config/{env}/*.yaml`; SP09 needs staging (task 8/9) and supplies the real-audio run that settles the worker-capacity measurement in task 15; SP08 prod release waits on 12/13; SP07 later flips `admin_enabled`.
