@@ -1,17 +1,18 @@
 ---
 status: draft
-summary: "Design: 9 PRDs (SP07 admin after launch), r7 audit decisions applied, ready for dev-tasks"
+summary: "Design: 10 PRDs (SP00 foundation: CI, testing, PR previews; SP07 admin after launch), r7 audit + r8 decisions applied (no Playwright, 3 build lanes), ready for dev-tasks"
 date: 2026-11-20
 ---
 
 # feat/miti-platform
 
-Branch folder for the Onolys MITI platform (`app.onolys.com`). Brief: [brainstorm.md](brainstorm.md) (approved 2026-11-20). Nine PRDs are written and reconciled against each other (seams, names, fields, states, error codes, env vars, paths, commands). Tejit's round-5, round-6 and round-7 answers (2026-11-20) are applied; round 7 followed an audit by two reviewers (fixes, 4 scope cuts, 3 additions). Next step is `dev-tasks`. Goal: the platform up and running fast, professional enough for the first early-access users. Hard requirement: the LLM and speech-to-text (STT) models are swappable by config or one small adapter. The eval harness is not a priority and may break.
+Branch folder for the Onolys MITI platform (`app.onolys.com`). Brief: [brainstorm.md](brainstorm.md) (approved 2026-11-20). Ten PRDs are written and reconciled against each other (seams, names, fields, states, error codes, env vars, paths, commands). Tejit's round-5 to round-8 answers (2026-11-20) are applied; round 8 added SP00 (CI + testing first, per-PR previews, no Playwright, 3 parallel lanes); round 7 followed an audit by two reviewers (fixes, 4 scope cuts, 3 additions). Next step is `dev-tasks`. Goal: the platform up and running fast, professional enough for the first early-access users. Hard requirement: the LLM and speech-to-text (STT) models are swappable by config or one small adapter. The eval harness is not a priority and may break.
 
 ## Sub-projects
 
 | # | Folder | PRD | Scope | Depends on | When |
 |---|---|---|---|---|---|
+| 00 | `00-foundation/` | [PRD](00-foundation/PRD.md) (draft) | CI + test conventions first (pytest markers `unit`/`integration`/`live`, vitest, per-package `ci.yml` jobs skipped until the package exists, no Playwright); per-PR preview (`pr-preview.yml`: Cloud Run `onolys-pr-<N>` combined mode + fake adapters, Hosting channel `pr-<N>`, PR comment) and cleanup on close; `docs/reference/testing.md`. | CI: none; preview: 06 staging minimal, 04 combined mode, 05 `web/` | Start of build (CI), preview once 04/05/06 minimal exist |
 | 01 | `01-core/` | [PRD](01-core/PRD.md) (draft) | One PR: move `eaudit/` → `engines/eaudit/`; shared `engines/core/` (`onolys_core`): LLM client with task-named routes + presets (all default routes Claude Sonnet via the Anthropic API), provider-neutral STT (`SttAdapter.start/poll`, adapters return words, `words_to_turns`, `stt_providers.yaml`, Google Chirp 3 adapter), transcript types, `locate`, typed errors, `RunInfo`, PHI-safe logging; live STT check + LLM smoke as a gate before SP02; `docs/mission.md` + `AGENTS.md` widened. Existing `POST /v1/audit` tests still pass. | — | Slice 0 (parallel track) |
 | 02 | `02-paudit-miti-pack/` | [PRD](02-paudit-miti-pack/PRD.md) (draft) | Protocol pack format; `protocols/miti-4.2.1/`; `engines/paudit/`: volley/utterance coding, globals with cited lines, summary scores, `n_runs` (default 1); routes `paudit_code`/`paudit_globals`; `rating.schema.json` = the in-app rating card; live `python -m paudit.cli check`. | 01 (gate passed) | Slice 0 (parallel track) |
 | 03 | `03-evaluation/` | [PRD](03-evaluation/PRD.md) (draft) | `engines/evaluation/`: `validate_rating` (draft/final), reasons audit via eaudit with optional `profile` (suppress list + context note), per-item compare, 3-5 tips (route `tips`), versioned report JSON; one entry point `run_evaluation(..., progress_cb)`; live `python -m onolys_evaluation.check`. | 01, 02 | before Slice 1 |
@@ -22,18 +23,25 @@ Branch folder for the Onolys MITI platform (`app.onolys.com`). Brief: [brainstor
 | 08 | `08-landing/` | [PRD](08-landing/PRD.md) (draft) | Repo `onolys-landing` (local `/root/projects/onolys/miti`): top right = "Sign up" + "Log in" → app; every other "Get early access" CTA becomes "Try it out" → `${PUBLIC_APP_URL}/signup`; early-access components kept, unused; click analytics after launch. PRD lives here; code goes to that repo. | — (release after 05/06 live) | any; release with prod |
 | 09 | `09-integration/` | [PRD](09-integration/PRD.md) (draft) | Real `Stt` + `Evaluation` adapters in the worker, engine-error → public-code mapping, run artifacts + `run_info`, staging end-to-end on real audio (web + API key), the staging checks SP04/05/06 handed over. | 02, 03, 04, 06 (05 for the web check) | Slice 1 |
 
-## Dependency graph and build order
+## Dependency graph and build order (3 parallel lanes, r8)
 ```
-Slice 0  (a working stub platform on staging)
-  platform track: 06 infra minimal (project, staging env, Cloud Run, Hosting) ─► 04 api+jobs (stub pipeline) ─► 05 web against it ─► deployed to staging
-  engine track:   01 core ─► gate (STT check + LLM smoke) ─► 02 paudit (`paudit.cli` on one real transcript) ─► 03 evaluation
-Slice 1  09 integration: real adapters, staging end-to-end on real audio
-Prod     06 prod env + DNS ─► deploy-prod ─► 08 landing release
+Start     00 CI + test conventions (Lane C, first; nothing else starts before CI is green on main)
+Lane A  engine:    01 core (workspace PR lands first) ─► gate (STT check + LLM smoke) ─► 02 paudit ─► 03 evaluation
+Lane B  platform:  06 infra minimal (staging) ─► 04 api+jobs (stub pipeline) ─► 09 integration (needs 02, 03, 04, 06)
+Lane C  web:       00 CI ─► 05 web on MSW mocks ─► 00 PR preview (needs 06 staging minimal + 04 combined mode + 05 buildable) ─► 08 landing
+Prod      06 prod env + DNS ─► deploy-prod ─► 08 landing release
 After launch: 07 admin
 ```
-- **Slice 0:** SP06 minimal + SP04 stub pipeline + SP05 against it, deployed to staging; in parallel the SP01 gate (STT check + LLM smoke) and SP02 `paudit.cli` on one real transcript. SP04 needs only SP01's interfaces (types, workspace), so SP01's PR lands first.
-- **Slice 1:** SP09 real adapters (needs SP03 done).
-- **Then prod.** Max 2 sub-projects built at once.
+| Sync point | Why |
+|---|---|
+| SP01 workspace PR lands first | SP04 needs its types/workspace; SP00's eaudit CI path changes with the move |
+| SP03 report schema -> SP05 | web types are generated from `report.schema.json` |
+| SP04 `api/openapi.json` -> SP05 | generated client; until then SP05 builds on MSW mocks |
+| SP06 staging minimal + SP04 skeleton + SP05 buildable -> SP00 preview | preview deploys api image + `web/` |
+| SP09 needs 02, 03, 04, 06 | real adapters, staging end-to-end |
+- **Slice 0:** CI first; SP06 minimal + SP04 stub pipeline + SP05 on mocks, deployed to staging; in parallel the SP01 gate and SP02 `paudit.cli` on one real transcript.
+- **Slice 1:** SP09 real adapters (needs SP03 done). **Then prod.**
+- Three people, three lanes (A, B, C); each lane builds its sub-projects one after another. The old max-2 cap is replaced by this (r8).
 
 ## Swapping models
 | Swap | What changes | Checks to run |
@@ -52,7 +60,8 @@ See the Decision log in [brainstorm.md](brainstorm.md) (round-6 and round-7 rows
 - Engines generic (`engines/{core,eaudit,paudit,evaluation}`), MITI lives in `protocols/miti-4.2.1/`; "models propose, code decides".
 - Open sign-up; staging + prod in one project (Firestore DB `staging` / `(default)`); `app.` is a Hosting site with `/v1/**` rewritten to Cloud Run (same origin).
 - Delete = hard delete (audio, transcript, ratings, all report versions, run artifacts); PITR off; auto-expiry off by default.
-- After launch (r7 cuts): the admin site (SP07); web Advanced settings, `GET /presets`, multi-run range UI; preview/plan CI workflows, access log, per-request rate counters, toy second pack + malformed-pack tests, dual contract versions, two-PR split with shims, landing analytics events, dashboard stat tiles, browser API-key restriction; timestamp-hinted retrieval in eaudit.
+- After launch (r7 cuts): the admin site (SP07); web Advanced settings, `GET /presets`, multi-run range UI; plan CI workflow (`infra-plan.yml`), access log, per-request rate counters, toy second pack + malformed-pack tests, dual contract versions, two-PR split with shims, landing analytics events, dashboard stat tiles, browser API-key restriction; timestamp-hinted retrieval in eaudit.
+- r8 [RESOLVED: Tejit r8 (2026-11-20)]: CI + testing set up first (SP00); every PR gets a preview deployment (`pr-preview.yml`, fake adapters by default); no Playwright for now (Vitest/MSW flow tests + manual click-through on the preview); three people build in parallel in 3 lanes.
 - Cut earlier: PDF export, teams, billing, email notifications, dashboard trends, transcript editing, non-English reports.
 
 ### Seams (names as they stand after r7)
@@ -124,7 +133,8 @@ Owner-only tasks, consolidated from the PRDs (agents supply exact values where n
 10. **Sign-offs:** MITI citation/permission wording in `pack.yaml › source`; tone `banned` list, report headline and method/limits text (SP02/SP03); certified-coder review of coding prompts (SP02, deferred with the data in step 9).
 11. **Product:** his Onolys contact address for account-removal requests, filled in before launch (SP05); check for an official MITI self-rating form (brainstorm).
 12. **Branch protection:** none today; if added, required job names are `eaudit` and `frontend` (SP01).
-13. **After launch, with SP07 only:** DNS for `admin.onolys.com` and the admin allowlist emails (secret `admin-allowed-emails-{env}`).
+13. **PR previews (SP00, before the first preview):** in the Identity Platform console add the staging channel hosts (`onolys-app-staging--pr-*.web.app`; per channel host if wildcards are refused) to authorised domains, unless SP06 Terraform manages them; GitHub repo variables for the preview workflows come from the same Terraform outputs as step 7.
+14. **After launch, with SP07 only:** DNS for `admin.onolys.com` and the admin allowlist emails (secret `admin-allowed-emails-{env}`).
 
 ## Status
-Design phase done: 9 PRDs written and reconciled; round-5, round-6 and round-7 answers applied. 4 `[OPEN until …]` items remain, all settled by measurement during the build (table above). SP07 is after launch. Next: `dev-tasks` per approved PRD, in the Slice 0 → Slice 1 → prod order.
+Design phase done: 10 PRDs written and reconciled; round-5 to round-8 answers applied. 4 `[OPEN until …]` items remain, all settled by measurement during the build (table above). SP07 is after launch. Next: `dev-tasks` per approved PRD, in the Slice 0 → Slice 1 → prod order.
