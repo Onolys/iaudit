@@ -264,6 +264,8 @@ async def run(
 
     events = [asyncio.Event() for _ in range(n_runs)]
 
+    first_failure: list[BaseException] = []  # first run failure: the cause of AllRunsFailed
+
     async def guarded(i: int) -> RunResult | None:
         if i > 0:  # later runs start once the first run's warm call has returned
             await events[0].wait()
@@ -274,6 +276,7 @@ async def run(
             log_event("paudit.run", request_id=request_id, run_index=i, status="ok")
             return res
         except _FAILURES as exc:
+            first_failure.append(exc)
             warnings.append(
                 ResultWarning(code="run_failed", detail=f"run {i} failed: {type(exc).__name__}")
             )
@@ -293,7 +296,9 @@ async def run(
     runs = [r for r in outcomes if r is not None]
     if not runs:
         log_event("paudit.done", logging.ERROR, request_id=request_id, status="failed", runs_ok=0)
-        raise AllRunsFailed(f"all {n_runs} run(s) failed")
+        raise AllRunsFailed(f"all {n_runs} run(s) failed") from (
+            first_failure[0] if first_failure else None
+        )
     log_event(
         "paudit.done",
         request_id=request_id,

@@ -89,15 +89,35 @@ def _classify(exc: BaseException, stage: Stage) -> tuple[str, bool]:
         if _stt_transient(exc):
             return UPSTREAM, True
     if isinstance(exc, LLMError):
-        # unavailable, timeout, rate limited, bad output (D3): all retryable; FixtureMiss is a
-        # test-only miss and never a provider outage
-        if type(exc).__name__ == "FixtureMiss":
-            return INTERNAL, False
-        return UPSTREAM, True
+        return _classify_llm(exc)
     if isinstance(exc, TimeoutError) or _named(exc, "eaudit", "DeadlineExceeded"):
         return DEADLINE, True
     if isinstance(exc, OnolysError):
+        # an engine that wrapped a provider failure (paudit AllRunsFailed from LLMUnavailable)
+        # keeps it as `__cause__`/`__context__`: map it like the direct LLM error
+        cause = _llm_cause(exc)
+        if cause is not None:
+            return _classify_llm(cause)
         # paudit CodePassFailed / GlobalsPassFailed / AllRunsFailed (`code = "run_failed"`): the
         # engine already halved/retried; R3 "anything else": not retried, owner alerted
         return INTERNAL, False
     return INTERNAL, False
+
+
+def _llm_cause(exc: BaseException) -> LLMError | None:
+    seen: set[int] = set()
+    cur = exc.__cause__ or exc.__context__
+    while cur is not None and id(cur) not in seen:
+        if isinstance(cur, LLMError):
+            return cur
+        seen.add(id(cur))
+        cur = cur.__cause__ or cur.__context__
+    return None
+
+
+def _classify_llm(exc: LLMError) -> tuple[str, bool]:
+    # unavailable, timeout, rate limited, bad output (D3): all retryable; FixtureMiss is a
+    # test-only miss and never a provider outage
+    if type(exc).__name__ == "FixtureMiss":
+        return INTERNAL, False
+    return UPSTREAM, True

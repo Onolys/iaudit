@@ -8,7 +8,7 @@ import jsonschema
 import pytest
 from conftest import write_pack
 from onolys_core import RunContext
-from onolys_core.llm import LLMBadOutput, LLMResult, MetricsCollector, Usage
+from onolys_core.llm import LLMBadOutput, LLMResult, LLMUnavailable, MetricsCollector, Usage
 from onolys_core.llm.routes import allowed_presets
 from onolys_core.transcript import Transcript, Turn
 
@@ -193,6 +193,15 @@ def test_all_runs_failed_is_error(tmp_path):
     with pytest.raises(AllRunsFailed) as e:
         do_run(FakeClient(glob=bad), make_pack(tmp_path), {**PARAMS, "n_runs": 2})
     assert e.value.code == "run_failed"
+
+
+def test_all_runs_failed_chains_the_run_failure(tmp_path):
+    def code(req, run_idx):
+        raise LLMUnavailable("model not found")
+
+    with pytest.raises(AllRunsFailed) as e:
+        do_run(FakeClient(code=code), make_pack(tmp_path), {**PARAMS, "n_runs": 2})
+    assert isinstance(e.value.__cause__, LLMUnavailable)
 
 
 def test_n2_aggregate_values(tmp_path):

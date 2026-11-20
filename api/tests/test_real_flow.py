@@ -216,6 +216,31 @@ async def test_permanent_failure_ends_failed_with_mapped_code(make_env, failure,
     assert env.engine.paudit_calls == 1  # not retried
 
 
+def _all_runs_failed_from(cause):
+    try:
+        raise cause
+    except Exception as c:
+        try:
+            raise AllRunsFailed("all 1 run(s) failed") from c
+        except Exception as e:
+            return e
+
+
+async def test_engine_wrapped_llm_failure_is_retried_then_upstream_unavailable(make_env):
+    # paudit raises AllRunsFailed from the LLMUnavailable of its only run (broken preset model)
+    env = await make_env(
+        paudit_failures=[
+            _all_runs_failed_from(LLMUnavailable("NotFound")),
+            _all_runs_failed_from(LLMUnavailable("NotFound")),
+        ]
+    )
+    sid = await env.to_awaiting_input()
+    await env.run(sid, valid_card())
+    s = await env.status(sid)
+    assert s["status"] == "failed" and s["error"]["code"] == "upstream_unavailable"
+    assert env.engine.paudit_calls == 2
+
+
 async def test_transient_failure_twice_ends_failed_upstream_unavailable(make_env):
     env = await make_env(paudit_failures=[LLMUnavailable("x"), LLMUnavailable("x")])
     sid = await env.to_awaiting_input()

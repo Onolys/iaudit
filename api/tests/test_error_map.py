@@ -75,6 +75,43 @@ CASES = [
 ]  # fmt: skip
 
 
+def _chained(outer, cause):
+    try:
+        raise cause
+    except Exception as c:
+        try:
+            raise outer from c
+        except Exception as e:
+            return e
+
+
+def _context_only(outer, inner):
+    try:
+        raise inner
+    except Exception:
+        try:
+            raise outer  # implicit __context__, no explicit cause
+        except Exception as e:
+            return e
+
+
+CASES += [
+    ("all_runs_from_llm_unavailable",
+     lambda: _chained(AllRunsFailed(SECRET), LLMUnavailable(SECRET)), "run", 1, UPSTREAM, True),
+    ("all_runs_from_llm_timeout",
+     lambda: _chained(AllRunsFailed(SECRET), LLMTimeout(SECRET)), "run", 1, UPSTREAM, True),
+    ("all_runs_from_fixture_miss",
+     lambda: _chained(AllRunsFailed(SECRET), FixtureMiss(SECRET)), "run", 1,
+     "internal_error", False),
+    ("all_runs_from_onolys_base",
+     lambda: _chained(AllRunsFailed(SECRET), OnolysError(SECRET)), "run", 1,
+     "internal_error", False),
+    ("all_runs_context_llm",
+     lambda: _context_only(AllRunsFailed(SECRET), LLMUnavailable(SECRET)), "run", 1, UPSTREAM, True),
+    ("all_runs_no_cause", lambda: AllRunsFailed(SECRET), "run", 1, "internal_error", False),
+]  # fmt: skip
+
+
 def _transient_provider_error() -> SttProviderError:
     e = SttProviderError(SECRET)
     e.transient = True  # type: ignore[attr-defined]
