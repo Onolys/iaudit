@@ -52,6 +52,8 @@ jobs:
         run: bash scripts/ci/test_deploy_admin.sh
       - name: Test Hosting targets resolve per app (.firebaserc)
         run: bash scripts/ci/test_hosting_targets.sh
+      - name: Test PR preview workflows and helpers
+        run: bash scripts/ci/test_pr_preview.sh
       - name: actionlint (workflows)
         run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7 && ./actionlint -color
       - id: flags

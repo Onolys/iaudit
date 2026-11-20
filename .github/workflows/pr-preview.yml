@@ -1,0 +1,154 @@
+name: pr-preview
+
+# One preview per same-repo PR (SP00 R3, D4-D7): Cloud Run onolys-pr-<N> (combined mode, fake adapters, staging DB)
+# + Firebase Hosting channel pr-<N> on onolys-app-staging (7 days) + ONE marker PR comment, edited in place.
+# Fork PRs get no preview (no secrets, no WIF). Cleanup: pr-preview-cleanup.yml.
+# Repo variables (same as deploy-staging.yml): WIF_PROVIDER, DEPLOYER_STAGING_SA, GCP_PROJECT / GCP_REGION (optional),
+#   STAGING_VITE_FIREBASE_API_KEY, STAGING_VITE_FIREBASE_AUTH_DOMAIN, STAGING_VITE_FIREBASE_APP_ID,
+#   STAGING_VITE_FIREBASE_STORAGE_BUCKET, STAGING_VITE_FIREBASE_MESSAGING_SENDER_ID, STAGING_VITE_CONTACT_EMAIL (optional)
+# This workflow never reads LLM/STT keys (scripts/ci/check_no_llm_keys_in_pr_workflows.py).
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: pr-preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: ${{ vars.GCP_PROJECT || 'onolys' }}
+  REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+  STAGING_SITE: onolys-app-staging
+  FIREBASE_TOOLS_VERSION: 15.37.0
+  # `preview-real` label is wired but inert until SP09 ships the real adapters: flip to "true" then.
+  PREVIEW_REAL_ENABLED: "false"
+
+jobs:
+  preview:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    env:
+      PR: ${{ github.event.number }}
+      SHA: ${{ github.event.pull_request.head.sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - id: vars
+        env:
+          HAS_REAL_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'preview-real') }}
+        run: |
+          adapters=stub; mode=fake
+          if [ "$HAS_REAL_LABEL" = "true" ]; then
+            if [ "$PREVIEW_REAL_ENABLED" = "true" ]; then adapters=real; mode=real
+            else echo "::notice::preview-real label ignored: real adapters are not available on previews yet (SP09)"; fi
+          fi
+          {
+            echo "adapters=$adapters"
+            echo "mode=$mode"
+            echo "repo=${REGION}-docker.pkg.dev/${PROJECT}/onolys/api"
+            echo "service=onolys-pr-${PR}"
+            echo "channel=pr-${PR}"
+          } >> "$GITHUB_OUTPUT"
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+          token_format: access_token
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Build and push pr-<N>-<sha>
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: api/Dockerfile
+          push: true
+          tags: ${{ steps.vars.outputs.repo }}:pr-${{ github.event.number }}-${{ github.event.pull_request.head.sha }}
+          build-args: GIT_SHA=${{ github.event.pull_request.head.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Deploy Cloud Run onolys-pr-<N> (combined mode, staging DB, CPU always allocated)
+        id: run
+        env:
+          IMAGE: ${{ steps.vars.outputs.repo }}@${{ steps.push.outputs.digest }}
+          SERVICE: ${{ steps.vars.outputs.service }}
+          ADAPTERS: ${{ steps.vars.outputs.adapters }}
+        run: |
+          case "$IMAGE" in *@sha256:*) ;; *) echo "image must be pinned by digest" >&2; exit 1 ;; esac
+          # Runs as the staging api SA (deployer-staging has actAs on it; infra/deployer.tf). Combined mode runs tasks
+          # in process (no Cloud Tasks); WORKER_URL/TASKS_SA only satisfy the non-local config check, the SA is a
+          # placeholder nobody holds, so /tasks/* accepts nothing.
+          gcloud run deploy "$SERVICE" \
+            --project "$PROJECT" --region "$REGION" --image "$IMAGE" \
+            --service-account "api-staging@${PROJECT}.iam.gserviceaccount.com" \
+            --allow-unauthenticated \
+            --min-instances 0 --max-instances 1 --no-cpu-throttling \
+            --cpu 1 --memory 1Gi --timeout 60 \
+            --labels "onolys-preview=pr-${PR}" \
+            --set-env-vars "^@^ENV=staging@SERVICE_MODE=combined@ADAPTERS=${ADAPTERS}@FIRESTORE_DATABASE=staging@GCP_PROJECT=${PROJECT}@AUTH_PROJECT=${PROJECT}@REGION=${REGION}@AUDIO_BUCKET=onolys-audio-staging@BLOB_SIGNER_EMAIL=api-staging@${PROJECT}.iam.gserviceaccount.com@ROUTES_FILE=config/staging/routes.yaml@DAILY_RUN_CAP=20@WORKER_URL=https://${SERVICE}.invalid@TASKS_SA=preview-unused@${PROJECT}.iam.gserviceaccount.com@CORS_ORIGINS=http://localhost:5173@GIT_SHA=${SHA}" \
+            --set-secrets "UID_HMAC_KEY=uid-hmac-key-staging:latest" \
+            --quiet
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build web (staging settings)
+        working-directory: web
+        env:
+          VITE_API_BASE_URL: /v1
+          VITE_FIREBASE_PROJECT_ID: ${{ env.PROJECT }}
+          VITE_FIREBASE_API_KEY: ${{ vars.STAGING_VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.STAGING_VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_APP_ID: ${{ vars.STAGING_VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.STAGING_VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.STAGING_VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_CONTACT_EMAIL: ${{ vars.STAGING_VITE_CONTACT_EMAIL }}
+          VITE_FIRESTORE_DATABASE: staging
+        run: |
+          npm ci
+          npm run build
+      - name: Generate firebase config (/v1/** -> onolys-pr-<N> before the SPA fallback)
+        run: bash scripts/ci/pr_preview.sh firebase-config "$PR" web/firebase.json web/firebase.preview.json
+      - name: Deploy Hosting channel pr-<N> (7 days)
+        id: hosting
+        env:
+          CHANNEL: ${{ steps.vars.outputs.channel }}
+        run: |
+          npx --yes firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }} hosting:channel:deploy "$CHANNEL" \
+            --config web/firebase.preview.json --only app-staging --expires 7d \
+            --project "$PROJECT" --non-interactive --json > channel.json
+          url="$(jq -r --arg s "$STAGING_SITE" '.result[$s].url // empty' channel.json)"
+          [ -n "$url" ] || { echo "no channel url in firebase output" >&2; cat channel.json >&2; exit 1; }
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Smoke GET /v1/healthz through the channel
+        env:
+          URL: ${{ steps.hosting.outputs.url }}
+        run: |
+          for i in $(seq 1 10); do
+            if body="$(curl -sf --max-time 20 "${URL}/v1/healthz")"; then break; fi
+            echo "attempt $i failed; retrying"; sleep 6; body=""
+          done
+          [ -n "$body" ] || { echo "healthz did not return 200 at ${URL}/v1/healthz" >&2; exit 1; }
+          echo "$body"
+          echo "$body" | jq -e --arg sha "$SHA" '.code_version == $sha'
+      - name: Create or update the marker PR comment
+        env:
+          URL: ${{ steps.hosting.outputs.url }}
+          MODE: ${{ steps.vars.outputs.mode }}
+        run: bash scripts/ci/pr_preview.sh comment "$PR" "$URL" "$SHA" "$MODE"
