@@ -25,6 +25,7 @@ jobs:
       paudit: ${{ steps.flags.outputs.paudit }}
       evaluation: ${{ steps.flags.outputs.evaluation }}
       api: ${{ steps.flags.outputs.api }}
+      admin-auth: ${{ steps.flags.outputs.admin-auth }}
       frontend: ${{ steps.flags.outputs.frontend }}
       web: ${{ steps.flags.outputs.web }}
       infra: ${{ steps.flags.outputs.infra }}
@@ -151,6 +152,21 @@ jobs:
             | jq -e --arg sha "$GITHUB_SHA" '.service_mode == "combined" and .code_version == $sha'
           docker logs onolys-api
           docker rm -f onolys-api
+
+  admin-auth:
+    needs: changes
+    if: needs.changes.outputs.admin-auth == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-admin-auth
+      - run: uv run --no-sync --package onolys-admin-auth ruff check admin/auth
+      - run: uv run --no-sync --package onolys-admin-auth pytest admin/auth
 
   paudit:
     needs: changes

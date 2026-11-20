@@ -17,6 +17,7 @@ PACKAGES=(
   "paudit:engines/paudit:python"
   "evaluation:engines/evaluation:python"
   "api:api:python"
+  "admin-auth:admin/auth:python"
   "frontend:frontend:other"
   "web:web:node"
   "infra:infra:other"
