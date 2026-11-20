@@ -8,7 +8,7 @@ Source of truth: [PRD.md](PRD.md). Tests follow SP00 conventions: pytest markers
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Package skeleton, report types, `report.schema.json` and fixtures | SP01 T1; SP02 T2, SP02 T3 (`rating.schema.json`, `PauditResult` shape) | todo |
+| 1 | Package skeleton, report types, `report.schema.json` and fixtures | SP01 T1; SP02 T2, SP02 T3 (`rating.schema.json`, `PauditResult` shape) | in-progress |
 | 2 | `validate_rating` (draft vs final) | 1 | todo |
 | 3 | eaudit: optional `profile`, suppress filter, contract `0.0.2` | SP01 T3 (core extraction) | todo |
 | 4 | Reasons-audit mapping, evidence mapping, pack `evaluation:` block | 1, 3, SP01 T10 | todo |
