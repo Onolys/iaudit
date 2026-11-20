@@ -16,7 +16,7 @@ Source of truth: 07-admin/PRD.md. **AFTER LAUNCH (r7): none of this is v1 work; 
 | 6 | Login gate and bearer transport (`auth/`, `transport/`) | 5 | done |
 | 7 | paudit tab (`paudit/`), types and schema vitest, mock mode | 5, 6, 3 (contract) | done |
 | 8 | Hosting config: SPA fallback and security headers | 5 | done |
-| 9 | Flip `admin_enabled`, secrets, staging admin resources | 4, SP06 T2, SP06 T4 (owner step: allowlist emails) | blocked (owner: admin allowlist emails) |
+| 9 | Flip `admin_enabled`, secrets, staging admin resources | 4, SP06 T2, SP06 T4 (owner step: allowlist emails) | in-progress |
 | 10 | `deploy-admin.yml` and PR CI for `admin/` | 4, 8, 9 | blocked (code done; real staging run needs T9 + owner repo vars + merge) |
 | 11 | Staging verification (auth, timeout, audit, paudit) | 7, 10 | todo |
 | 12 | Docs: `backend-api.md` admin section and ADR 0023 | 11 | todo |
