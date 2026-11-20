@@ -4,6 +4,7 @@ import { Login } from "../auth/pages/Login";
 import { Signup } from "../auth/pages/Signup";
 import { VerifyEmail } from "../auth/pages/VerifyEmail";
 import { PublicOnly, RequireUnverified, RequireVerified } from "../auth/guards";
+import { NewSessionPage } from "../features/upload/NewSessionPage";
 import { SessionPage } from "../features/session/SessionPage";
 import { Layout } from "./Layout";
 import * as P from "./placeholders";
@@ -25,7 +26,7 @@ export const routes: RouteObject[] = [
         element: <RequireVerified />,
         children: [
           { path: "/", element: <P.Dashboard /> },
-          { path: "/sessions/new", element: <P.NewSession /> },
+          { path: "/sessions/new", element: <NewSessionPage /> },
           { path: "/sessions/:id", element: <SessionPage /> },
           { path: "/sessions/:id/reports/:version", element: <P.ReportPage /> },
           { path: "/settings", element: <P.Settings /> },

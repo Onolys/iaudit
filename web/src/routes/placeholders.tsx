@@ -11,7 +11,6 @@ function Page({ title, children }: { title: string; children?: ReactNode }) {
 }
 
 export const Dashboard = () => <Page title="Sessions" />;
-export const NewSession = () => <Page title="New session" />;
 export const ReportPage = () => {
   const { id, version } = useParams();
   return (
