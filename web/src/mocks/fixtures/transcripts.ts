@@ -69,7 +69,7 @@ export const threeSpeakerTranscript: Turn[] = (() => {
 /** Three lines per speaker for the speaker gate (first three of each, in order). */
 export function sampleLines(turns: Turn[]): { speaker: string; turn_count: number; samples: string[] }[] {
   const order: string[] = [];
-  for (const t of turns) if (!order.includes(t.speaker)) order.push(t.speaker);
+  for (const t of turns) if (t.speaker && !order.includes(t.speaker)) order.push(t.speaker);
   return order.map((speaker) => ({
     speaker,
     turn_count: turns.filter((t) => t.speaker === speaker).length,

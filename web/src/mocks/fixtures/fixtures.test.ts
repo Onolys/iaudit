@@ -185,7 +185,7 @@ describe("transcripts", () => {
 
   it("three-speaker transcript has exactly three speakers, each with at least 3 turns", () => {
     const counts = new Map<string, number>();
-    for (const t of threeSpeakerTranscript) counts.set(t.speaker, (counts.get(t.speaker) ?? 0) + 1);
+    for (const t of threeSpeakerTranscript) counts.set(t.speaker ?? "", (counts.get(t.speaker ?? "") ?? 0) + 1);
     expect([...counts.keys()].sort()).toEqual(["spk_0", "spk_1", "spk_2"]);
     for (const n of counts.values()) expect(n).toBeGreaterThanOrEqual(3);
   });

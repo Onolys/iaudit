@@ -106,17 +106,18 @@ export interface components {
     SpeakerConfirmRequest: { clinician_speaker: string };
     TranscriptTurn: {
       id: string;
-      speaker: string;
-      role: "clinician" | "client" | null;
-      start_ms?: number;
-      end_ms?: number;
+      speaker?: string | null;
+      /** `clinician`/`client`; null until the clinician is confirmed. */
+      role?: string | null;
+      start_ms?: number | null;
+      end_ms?: number | null;
       text: string;
     };
-    TranscriptResponse: {
+    TranscriptView: {
       turns: components["schemas"]["TranscriptTurn"][];
-      language: string;
-      duration_ms: number;
-      clinician_speaker: string | null;
+      language?: string | null;
+      duration_ms?: number | null;
+      clinician_speaker?: string | null;
     };
     RunRequest: { n_runs?: number; preset?: string };
     RunCreated: { run_id: string };
@@ -199,7 +200,7 @@ export interface paths {
   "/sessions/{id}/transcript": {
     get: {
       parameters: Params<{ id: string }>;
-      responses: { 200: Res<S["TranscriptResponse"]>; default: Res<S["ErrorResponse"]> };
+      responses: { 200: Res<S["TranscriptView"]>; default: Res<S["ErrorResponse"]> };
     };
   };
   "/sessions/{id}/runs": {

@@ -402,7 +402,7 @@ export class MockBackend {
     return { session: { id: s.id, status: s.state } };
   }
 
-  getTranscript(uid: string, sid: string): S["TranscriptResponse"] {
+  getTranscript(uid: string, sid: string): S["TranscriptView"] {
     const s = this.own(uid, sid);
     if (!s.flags.transcript_ready) bad(409, "invalid_state", "Transcript is not ready.");
     const turns = this.turns(s).map((t) => ({

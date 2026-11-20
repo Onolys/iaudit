@@ -78,3 +78,15 @@ main { flex: 1; width: 100%; max-width: 64rem; margin: 0 auto; padding: var(--sp
 .counter-over { color: var(--color-score-low); font-weight: 600; }
 .rating-error { color: var(--color-score-low); font-size: var(--font-size-sm); }
 .rating-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+
+/* Transcript (SP05 T8) */
+.transcript-turns { list-style: none; margin: 0; padding: 0; }
+.transcript-turn { margin: 0 0 var(--space-3); }
+.transcript-meta { margin: 0; color: var(--color-gray-600); font-size: var(--font-size-sm); }
+.transcript-role { font-weight: 600; color: var(--color-text); }
+.transcript-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.transcript mark { background: var(--color-score-fair-background); color: inherit; border-radius: 2px; outline: 1px solid var(--color-score-fair); }
+.transcript mark.pulse { animation: transcript-pulse 1.2s ease-in-out 2; }
+.transcript-unplaced { margin-top: var(--space-4); color: var(--color-gray-600); font-size: var(--font-size-sm); }
+@keyframes transcript-pulse { 50% { background: var(--color-accent); color: var(--color-on-accent); } }
+@media (prefers-reduced-motion: reduce) { .transcript mark.pulse { animation: none; outline-width: 3px; } }
