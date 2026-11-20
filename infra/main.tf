@@ -77,3 +77,21 @@ resource "google_firebase_hosting_site" "admin_staging" {
 
   depends_on = [google_project_service.api]
 }
+
+module "staging" {
+  source = "./modules/environment"
+
+  project              = var.project
+  region               = var.region
+  env                  = "staging"
+  database_id          = "staging"
+  delete_protection    = false
+  worker_concurrency   = var.worker_concurrency
+  worker_max_instances = var.worker_max_instances
+  cors_origins = [
+    "https://${var.app_staging_site_id}.web.app",
+    "http://localhost:5173",
+  ]
+
+  depends_on = [google_project_service.api]
+}
