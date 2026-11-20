@@ -3,6 +3,7 @@
 from typing import Annotated, Literal
 
 from onolys_core.llm import LLMConfig
+from onolys_core.llm.routes import Route
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
@@ -121,17 +122,42 @@ class Settings(BaseSettings):
         return v
 
     def llm_config(self) -> LLMConfig:
-        """The slice of settings the shared LLM client reads."""
+        """The slice of settings the shared LLM client reads.
+
+        eaudit keeps its own models and limits: `cheap|mid|strong` are routes built from these
+        settings (so IAUDIT_MODEL_* and the call timeouts behave as before). No `api_key_env`:
+        eaudit checks keys itself and does not fail startup on a missing one.
+        """
+        routes: dict[str, Route] = {}
+        timeout = max(
+            self.llm_timeout_s,
+            self.atomize_call_timeout_s,
+            self.link_call_timeout_s,
+            self.check_call_timeout_s,
+            self.prep_call_timeout_s,
+        )
+        for name, model in (
+            ("cheap", self.model_cheap),
+            ("mid", self.model_mid),
+            ("strong", self.model_strong),
+        ):
+            routes[name] = Route(
+                litellm_id=model,
+                structured_output_mode=self.llm_response_format,
+                caching_mode="anthropic_ephemeral",
+                supports_temperature=True,
+                max_output_tokens=max(16000, self.atomize_max_tokens),
+                timeout_s=timeout,  # per-stage caps clamp below this
+                max_concurrency=self.llm_max_concurrency,
+                max_retries=self.llm_max_retries,
+                backoff_s=0,
+                # Haiku 5.5 thinks by default and can spend all of max_tokens on it.
+                extra_params={"thinking": {"type": "disabled"}},
+            )
         return LLMConfig(
-            model_cheap=self.model_cheap,
-            model_mid=self.model_mid,
-            model_strong=self.model_strong,
-            llm_timeout_s=self.llm_timeout_s,
-            llm_max_retries=self.llm_max_retries,
-            llm_max_concurrency=self.llm_max_concurrency,
             llm_mode=self.llm_mode,
-            llm_response_format=self.llm_response_format,
             fixture_dir=self.fixture_dir,
+            routes=routes,
         )
 
     def safe_summary(self) -> dict:

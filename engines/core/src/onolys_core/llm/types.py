@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal, Protocol
+from typing import Any, Protocol
 
 from pydantic import BaseModel
 
-Tier = Literal["cheap", "mid", "strong"]
+Tier = str  # a route name (eaudit: cheap|mid|strong; task routes such as paudit_code)
 
 
 @dataclass
@@ -20,9 +20,9 @@ class LLMRequest:
         default_factory=list
     )  # up to 2 ordered breakpoints; replaces cache_prefix when set
     unit: str | None = None  # section index or claim id, for metrics
-    max_tokens: int = 1024
+    max_tokens: int | None = None  # None: the route's max_output_tokens; larger is clamped
     temperature: float = 0.0
-    timeout_s: float | None = None
+    timeout_s: float | None = None  # None: the route's timeout_s; larger is clamped
     fixture_key: str | None = None
     deadline: float | None = None  # monotonic; gates the transport retry
     retry: bool = True  # False: one attempt only (warm-up calls)

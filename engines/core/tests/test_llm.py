@@ -22,6 +22,7 @@ from onolys_core.llm.errors import (
     LLMTimeout,
     LLMUnavailable,
 )
+from onolys_core.llm.routes import Route
 
 
 class Out(BaseModel):
@@ -58,8 +59,18 @@ class Fake:
         return r
 
 
-def settings(**kw):
-    return LLMConfig(llm_mode="live", **kw)
+def settings(max_retries=1, max_concurrency=20, structured_output_mode="json_object", **kw):
+    route = Route(
+        litellm_id="anthropic/claude-test",
+        structured_output_mode=structured_output_mode,
+        caching_mode="anthropic_ephemeral",
+        timeout_s=30,
+        max_retries=max_retries,
+        max_concurrency=max_concurrency,
+        backoff_s=0,
+        extra_params={"thinking": {"type": "disabled"}},
+    )
+    return LLMConfig(llm_mode="live", routes={"cheap": route}, **kw)
 
 
 async def test_success_captures_usage_and_latency():
@@ -71,7 +82,7 @@ async def test_success_captures_usage_and_latency():
     assert res.usage.cache_read_tokens == 3
     assert res.attempts == 1 and res.latency_ms >= 0
     kw = fake.calls[0]
-    assert kw["num_retries"] == 0 and kw["model"] == settings().model_cheap
+    assert kw["num_retries"] == 0 and kw["model"] == "anthropic/claude-test"
     assert kw["response_format"] == {"type": "json_object"}
     assert kw["drop_params"] is True
     assert kw["thinking"] == {"type": "disabled"}
@@ -83,7 +94,7 @@ async def test_success_captures_usage_and_latency():
 async def test_json_schema_format_is_opt_in():
     fake = Fake(completion('{"answer": "ok"}'))
     await LiteLLMClient(
-        settings(llm_response_format="json_schema"), acompletion=fake
+        settings(structured_output_mode="json_schema"), acompletion=fake
     ).complete_json(req())
     rf = fake.calls[0]["response_format"]
     assert rf["type"] == "json_schema" and rf["json_schema"]["strict"] is True
@@ -173,7 +184,7 @@ async def test_semaphore_limits_concurrency():
         active -= 1
         return completion('{"answer": "x"}')
 
-    c = LiteLLMClient(settings(llm_max_concurrency=2), acompletion=slow)
+    c = LiteLLMClient(settings(max_concurrency=2), acompletion=slow)
     await asyncio.gather(*(c.complete_json(req()) for _ in range(6)))
     assert peak == 2
 
@@ -201,9 +212,10 @@ async def test_stub_and_failing():
         await FailingClient(LLMTimeout("x")).complete_json(req())
 
 
-def test_make_client_modes(tmp_path):
+def test_make_client_modes(tmp_path, monkeypatch):
     assert isinstance(make_client(LLMConfig(llm_mode="stub")), StubClient)
     assert isinstance(
         make_client(LLMConfig(llm_mode="fixture", fixture_dir=str(tmp_path))), FixtureClient
     )
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
     assert isinstance(make_client(LLMConfig(llm_mode="live")), LiteLLMClient)
