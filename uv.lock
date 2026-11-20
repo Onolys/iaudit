@@ -968,10 +968,12 @@ version = "0.1.0"
 source = { editable = "api" }
 dependencies = [
     { name = "fastapi" },
+    { name = "google-auth" },
     { name = "google-cloud-firestore" },
     { name = "google-cloud-storage" },
     { name = "onolys-core" },
     { name = "pydantic" },
+    { name = "requests" },
     { name = "uvicorn" },
 ]
 
@@ -988,10 +990,12 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115" },
+    { name = "google-auth", specifier = ">=2.30" },
     { name = "google-cloud-firestore", specifier = ">=2.19" },
     { name = "google-cloud-storage", specifier = ">=2.18" },
     { name = "onolys-core", editable = "engines/core" },
     { name = "pydantic", specifier = ">=2.7" },
+    { name = "requests", specifier = ">=2.31" },
     { name = "uvicorn", specifier = ">=0.30" },
 ]
 
