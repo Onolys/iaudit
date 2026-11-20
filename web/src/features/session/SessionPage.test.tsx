@@ -140,8 +140,19 @@ describe("session page: status listener", () => {
   });
 
   it("shows a friendly not-found card when the fallback GET is a 404", async () => {
+    // The heading shows on DOM commit, before the passive effect attaches the listener. Emitting
+    // earlier is silently dropped (no fallback GET, no alert), so wait for the subscription itself.
+    let subscribed = 0;
+    const inner = getStatusListener();
+    setStatusListener({
+      subscribe(id, a, b) {
+        subscribed++;
+        return inner.subscribe(id, a, b);
+      },
+    });
     open("s_nope");
     await screen.findByRole("heading", { level: 1, name: "Session" });
+    await waitFor(() => expect(subscribed).toBeGreaterThanOrEqual(1));
     act(() => mockEmitter.emitError("s_nope", new Error("permission-denied")));
     const card = await screen.findByRole("alert");
     expect(card).toHaveTextContent(/couldn't find that/i);

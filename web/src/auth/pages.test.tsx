@@ -171,8 +171,13 @@ describe("verify email", () => {
   });
 
   it("auto-checks (with a forced refresh) when the tab regains focus", async () => {
+    // The heading shows on DOM commit, before the passive effect adds the window focus listener;
+    // a focus event fired earlier is lost. Wait for the listener itself, not the heading.
+    const add = vi.spyOn(window, "addEventListener");
     const { service } = renderApp("/verify-email", { user: { email: "a@clinic.org", verified: false } });
     await h1("Verify your email");
+    await waitFor(() => expect(add).toHaveBeenCalledWith("focus", expect.any(Function)));
+    add.mockRestore();
     service.markVerified("a@clinic.org");
     act(() => void window.dispatchEvent(new Event("focus")));
     await h1("Sessions");
