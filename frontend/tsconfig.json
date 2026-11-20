@@ -13,7 +13,8 @@
     "types": ["vite/client", "node"],
     "paths": {
       "@contracts/*": ["../docs/contracts/*"],
-      "@eval-api/*": ["../eval/api/*"]
+      "@eval-api/*": ["../eval/api/*"],
+      "@paudit-schema/*": ["../engines/paudit/schemas/*"]
     }
   },
   "include": ["src", "vite.config.ts"]
