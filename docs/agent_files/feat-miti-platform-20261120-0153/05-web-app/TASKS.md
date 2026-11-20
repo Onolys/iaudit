@@ -16,8 +16,8 @@ Source of truth: [PRD.md](PRD.md). Lane C. Built on MSW mocks from day one (D5);
 | 6 | Rating card with autosave and `miti-items` parity | 4 | done |
 | 7 | Speaker gate and "Change who the clinician is" | 4 | done |
 | 8 | Transcript view with code-point segmenter | 2 | done |
-| 9 | Report page | 8 | in-progress |
-| 10 | Dashboard and `/sample-report` | 3, 9 | todo |
+| 9 | Report page | 8 | done |
+| 10 | Dashboard and `/sample-report` | 3, 9 | in-progress |
 | 11 | Settings and API key | 3 | todo |
 | 12 | Hosting config, privacy and CSP checks, ADR 0021 | 1 | todo |
 | 13 | Switch to generated types and `gen:api` staleness check | 2, 9, SP04 T1, SP03 T1 (contracts committed) | todo |
