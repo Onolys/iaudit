@@ -14,8 +14,8 @@ Source of truth: [PRD.md](PRD.md). Lane B (platform). Built and accepted on fake
 | 4 | Sessions: create (idempotent), list, get, `session_status`, state machine core | 2, 3 | done |
 | 5 | Task queue + worker framework (retry, idempotency, OIDC) | 1, 2 | done |
 | 6 | Engine adapters and fakes (`Stt`, `Evaluation`) | 1 | done |
-| 7 | Audio upload, `complete`, `validate` + FLAC transcode | 4, 5, 2 | in-progress |
-| 8 | `transcribe` + `transcribe-poll` | 5, 6, 7 | todo |
+| 7 | Audio upload, `complete`, `validate` + FLAC transcode | 4, 5, 2 | done |
+| 8 | `transcribe` + `transcribe-poll` | 5, 6, 7 | in-progress |
 | 9 | Daily cap, concurrent-run limit, `GET /usage` | 2, 4 | todo |
 | 10 | Rating card: drafts, final revisions | 4 | todo |
 | 11 | Speakers, transcript read, `maybe_start_first_run` transaction | 8, 9, 10 | todo |
