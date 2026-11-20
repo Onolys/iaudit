@@ -9,8 +9,8 @@ Source of truth: 07-admin/PRD.md. **AFTER LAUNCH (r7): none of this is v1 work; 
 | # | Task | Depends on | Status |
 |---|---|---|---|
 | 1 | `admin/auth` ASGI verifier package + workspace wiring | SP01 T1 (workspace) | done |
-| 2 | `admin/backend` gateway: auth + CORS + mounted eaudit app | 1 | in-progress |
-| 3 | `POST /v1/paudit` and `GET /v1/paudit/fixtures` | 2, SP02 T10 | todo |
+| 2 | `admin/backend` gateway: auth + CORS + mounted eaudit app | 1 | done |
+| 3 | `POST /v1/paudit` and `GET /v1/paudit/fixtures` | 2, SP02 T10 | in-progress |
 | 4 | `admin/backend/Dockerfile` image | 3 | todo |
 | 5 | Frontend registry, product-to-view mapping, `VITE_EVAL_ENABLED` | SP01 | todo |
 | 6 | Login gate and bearer transport (`auth/`, `transport/`) | 5 | todo |
