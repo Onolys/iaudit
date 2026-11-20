@@ -74,14 +74,14 @@ export function createHandlers(b: MockBackend): HttpHandler[] {
       return json(b.confirmSpeaker(uid, params.id, clinician_speaker), 202);
     })),
     http.get(`${V1}/sessions/:id/transcript`, guarded(({ uid, params }) => json(b.getTranscript(uid, params.id)))),
-    http.get(`${V1}/sessions/:id/runs`, guarded(({ uid, params }) => json(b.listRuns(uid, params.id)))),
+    http.get(`${V1}/sessions/:id/runs`, guarded(({ uid, params }) => json({ items: b.listRuns(uid, params.id) }))),
     http.post(`${V1}/sessions/:id/runs`, guarded(async ({ uid, params, request }) =>
       json(b.startRun(uid, params.id, await body(request)), 202),
     )),
     http.get(`${V1}/runs/:run_id`, guarded(({ uid, params }) => json(b.getRun(uid, params.run_id)))),
-    http.get(`${V1}/sessions/:id/reports`, guarded(({ uid, params }) => json(b.listReports(uid, params.id)))),
+    http.get(`${V1}/sessions/:id/reports`, guarded(({ uid, params }) => json({ items: b.listReports(uid, params.id) }))),
     http.get(`${V1}/sessions/:id/reports/:version`, guarded(({ uid, params }) =>
-      json(b.getReport(uid, params.id, Number(params.version))),
+      json(b.getReportView(uid, params.id, Number(params.version))),
     )),
     http.get(`${V1}/usage`, guarded(({ uid }) => json(b.getUsage(uid)))),
 

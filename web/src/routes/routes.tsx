@@ -4,6 +4,7 @@ import { Login } from "../auth/pages/Login";
 import { Signup } from "../auth/pages/Signup";
 import { VerifyEmail } from "../auth/pages/VerifyEmail";
 import { PublicOnly, RequireUnverified, RequireVerified } from "../auth/guards";
+import { ReportPage } from "../features/report/ReportPage";
 import { NewSessionPage } from "../features/upload/NewSessionPage";
 import { SessionPage } from "../features/session/SessionPage";
 import { Layout } from "./Layout";
@@ -28,7 +29,7 @@ export const routes: RouteObject[] = [
           { path: "/", element: <P.Dashboard /> },
           { path: "/sessions/new", element: <NewSessionPage /> },
           { path: "/sessions/:id", element: <SessionPage /> },
-          { path: "/sessions/:id/reports/:version", element: <P.ReportPage /> },
+          { path: "/sessions/:id/reports/:version", element: <ReportPage /> },
           { path: "/settings", element: <P.Settings /> },
         ],
       },

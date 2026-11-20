@@ -132,11 +132,26 @@ export interface components {
       stage: RunStage | null;
     };
     ReportVersion: { version: number; report_id: string; run_id: string; created_at: string };
+    /** `GET /reports`: `ReportList` in api/openapi.json. */
+    ReportList: { items: S_ReportVersion[] };
+    /** `GET /reports/{version}`: `ReportView` in api/openapi.json (the report JSON is wrapped). */
+    ReportView: {
+      version: number;
+      report_id: string;
+      run_id: string;
+      created_at: string;
+      report_schema_version: string;
+      report: import("./report").Report;
+    };
+    /** `GET /runs`: `RunList` in api/openapi.json. */
+    RunList: { items: S_Run[] };
     Usage: { runs_today: number; daily_cap: number; resets_at: string };
   };
 }
 
 type S = components["schemas"];
+type S_ReportVersion = S["ReportVersion"];
+type S_Run = S["Run"];
 
 export interface paths {
   "/sessions": {
@@ -206,7 +221,7 @@ export interface paths {
   "/sessions/{id}/runs": {
     get: {
       parameters: Params<{ id: string }>;
-      responses: { 200: Res<S["Run"][]>; default: Res<S["ErrorResponse"]> };
+      responses: { 200: Res<S["RunList"]>; default: Res<S["ErrorResponse"]> };
     };
     post: {
       parameters: Params<{ id: string }>;
@@ -223,13 +238,13 @@ export interface paths {
   "/sessions/{id}/reports": {
     get: {
       parameters: Params<{ id: string }>;
-      responses: { 200: Res<S["ReportVersion"][]>; default: Res<S["ErrorResponse"]> };
+      responses: { 200: Res<S["ReportList"]>; default: Res<S["ErrorResponse"]> };
     };
   };
   "/sessions/{id}/reports/{version}": {
     get: {
       parameters: Params<{ id: string; version: number }>;
-      responses: { 200: Res<import("./report").Report>; default: Res<S["ErrorResponse"]> };
+      responses: { 200: Res<S["ReportView"]>; default: Res<S["ErrorResponse"]> };
     };
   };
   "/usage": {

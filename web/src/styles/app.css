@@ -90,3 +90,42 @@ main { flex: 1; width: 100%; max-width: 64rem; margin: 0 auto; padding: var(--sp
 .transcript-unplaced { margin-top: var(--space-4); color: var(--color-gray-600); font-size: var(--font-size-sm); }
 @keyframes transcript-pulse { 50% { background: var(--color-accent); color: var(--color-on-accent); } }
 @media (prefers-reduced-motion: reduce) { .transcript mark.pulse { animation: none; outline-width: 3px; } }
+
+/* Report page (R4) */
+.report-page { max-width: 80rem; }
+.report-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.report-actions .btn, .report-tabs button { min-height: 44px; }
+.report-tabs { display: none; gap: var(--space-2); margin: var(--space-3) 0; }
+.report-tabs button { flex: 1; border: 1px solid var(--color-accent); background: var(--color-background); color: var(--color-accent); font: inherit; border-radius: 6px; cursor: pointer; }
+.report-tabs button[aria-selected="true"] { background: var(--color-accent); color: var(--color-on-accent); }
+.report-panes { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--space-6); align-items: start; }
+.report-transcript { position: sticky; top: var(--space-3); max-height: calc(100vh - 2 * var(--space-3)); overflow-y: auto; }
+.report-section { margin: var(--space-6) 0; }
+.report-table { width: 100%; border-collapse: collapse; }
+.report-table th, .report-table td { text-align: left; padding: var(--space-2); border-bottom: 1px solid var(--color-gray-300); vertical-align: top; }
+.chip { display: inline-block; padding: 2px var(--space-2); border-radius: 999px; border: 1px solid var(--color-gray-300); background: var(--color-gray-50); font-size: var(--font-size-sm); }
+.chip[data-tone="agree"] { color: var(--color-score-good); background: var(--color-score-good-background); border-color: var(--color-score-good); }
+.chip[data-tone="differs"] { color: var(--color-score-low); background: var(--color-score-low-background); border-color: var(--color-score-low); }
+.chip[data-tone="flagged"] { color: var(--color-score-fair); background: var(--color-score-fair-background); border-color: var(--color-score-fair); }
+.line-chip { display: inline-block; min-height: 44px; margin: 0 var(--space-2) var(--space-2) 0; padding: 0 var(--space-3); border: 1px solid var(--color-gray-300); border-radius: 6px; background: var(--color-background); color: var(--color-text); font: inherit; text-align: left; cursor: pointer; }
+.line-chip:hover { border-color: var(--color-accent); }
+.line-list { list-style: none; margin: 0; padding: 0; }
+.chip-more { color: var(--color-gray-600); font-size: var(--font-size-sm); }
+.disagreement { border: 1px solid var(--color-score-fair); background: var(--color-score-fair-background); border-radius: 6px; padding: var(--space-3); margin-bottom: var(--space-3); }
+.line-heading { margin: var(--space-2) 0 0; font-weight: 600; }
+.quiet-notice { color: var(--color-gray-600); font-size: var(--font-size-sm); margin: var(--space-2) 0; }
+.summary-list { list-style: none; padding: 0; }
+.ref-track { position: relative; height: 12px; background: var(--color-gray-100); border-radius: 6px; margin: var(--space-2) 0; }
+.ref-tick { position: absolute; top: -3px; width: 2px; height: 18px; background: var(--color-gray-600); }
+.ref-dot { position: absolute; top: 0; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--color-accent); }
+.ref-dot[data-kind="you"] { background: var(--color-background); border: 2px solid var(--color-accent); box-sizing: border-box; }
+@media (max-width: 800px) {
+  .report-tabs { display: flex; }
+  .report-panes { display: block; }
+  .report-panes[data-tab="report"] .report-transcript, .report-panes[data-tab="transcript"] .report-main { display: none; }
+  .report-transcript { position: static; max-height: none; }
+  .report-table thead { position: absolute; left: -9999px; }
+  .report-table tr { display: block; border-bottom: 1px solid var(--color-gray-300); padding: var(--space-2) 0; }
+  .report-table th, .report-table td { display: block; border: 0; padding: var(--space-1) 0; }
+  .report-table td[data-label]::before { content: attr(data-label) ": "; font-weight: 600; }
+}

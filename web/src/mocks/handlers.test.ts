@@ -80,18 +80,19 @@ describe("MSW handlers over HTTP (fake auth)", () => {
     expect(detail).toMatchObject({ status: "report_ready", latest_report_version: 1 });
 
     const reports = unwrap(await client.GET("/sessions/{id}/reports", p));
-    expect(reports.map((r) => r.version)).toEqual([1]);
+    expect(reports.items.map((r) => r.version)).toEqual([1]);
     const report = unwrap(
       await client.GET("/sessions/{id}/reports/{version}", { params: { path: { id: sid, version: 1 } } }),
     );
-    expect(report.scorecard).toHaveLength(14);
+    expect(report).toMatchObject({ version: 1, report_schema_version: "0.0.1" });
+    expect(report.report.scorecard).toHaveLength(14);
     const tr = unwrap(await client.GET("/sessions/{id}/transcript", p));
     expect(tr.turns.length).toBeGreaterThan(5);
 
     const run2 = unwrap(await client.POST("/sessions/{id}/runs", p));
     expect(run2.run_id).toBeTruthy();
     mockBackend.settle(sid);
-    expect(unwrap(await client.GET("/sessions/{id}/runs", p))).toHaveLength(2);
+    expect(unwrap(await client.GET("/sessions/{id}/runs", p)).items).toHaveLength(2);
     expect(unwrap(await client.GET("/runs/{run_id}", { params: { path: { run_id: run2.run_id } } })).status).toBe("done");
 
     expect((await client.DELETE("/sessions/{id}", p)).response.status).toBe(204);

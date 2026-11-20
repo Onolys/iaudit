@@ -502,6 +502,20 @@ export class MockBackend {
     return r ? structuredClone(r.report) : notFound();
   }
 
+  /** The API's `ReportView`: the report JSON wrapped with its version metadata. */
+  getReportView(uid: string, sid: string, version: number): S["ReportView"] {
+    const r = this.own(uid, sid).reports.find((x) => x.version === version);
+    if (!r) return notFound();
+    return {
+      version: r.version,
+      report_id: r.report_id,
+      run_id: r.run_id,
+      created_at: r.created_at,
+      report_schema_version: r.report.schema_version,
+      report: structuredClone(r.report),
+    };
+  }
+
   getUsage(uid: string): S["Usage"] {
     const d = this.now();
     const reset = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1));

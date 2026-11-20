@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link, useParams } from "react-router";
+import { Link } from "react-router";
 
 function Page({ title, children }: { title: string; children?: ReactNode }) {
   return (
@@ -11,16 +11,6 @@ function Page({ title, children }: { title: string; children?: ReactNode }) {
 }
 
 export const Dashboard = () => <Page title="Sessions" />;
-export const ReportPage = () => {
-  const { id, version } = useParams();
-  return (
-    <Page title="Report">
-      <p>
-        Session {id}, version {version}
-      </p>
-    </Page>
-  );
-};
 export const SampleReport = () => <Page title="Sample report" />;
 export const Settings = () => <Page title="Settings" />;
 export const NotFound = () => (

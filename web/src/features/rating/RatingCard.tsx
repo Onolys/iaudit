@@ -71,7 +71,16 @@ function Text({ path, label, value, limit, error, rows = 3, hint, onChange }: { 
   );
 }
 
-export function RatingCard({ sessionId, debounceMs = 2000 }: { sessionId: string; debounceMs?: number }) {
+export interface RatingCardProps {
+  sessionId: string;
+  debounceMs?: number;
+  /** Label of the main submit button (the report page uses "Submit and run again"). */
+  submitLabel?: string;
+  /** Called after a final rating is saved (e.g. to start a new run). A throw shows as a form error. */
+  onSubmitted?: () => Promise<void> | void;
+}
+
+export function RatingCard({ sessionId, debounceMs = 2000, submitLabel = "Submit rating", onSubmitted }: RatingCardProps) {
   const client = useApiClient();
   const [load, setLoad] = useState<Load>("loading");
   const [attempt, setAttempt] = useState(0);
@@ -173,6 +182,7 @@ export function RatingCard({ sessionId, debounceMs = 2000 }: { sessionId: string
         }),
       );
       setSubmitted(noRating ? "no_rating" : "submitted");
+      await onSubmitted?.();
     } catch (e) {
       if (e instanceof ApiError && e.code === "rating_invalid") {
         setIssues(issuesFromApi(e));
@@ -300,7 +310,7 @@ export function RatingCard({ sessionId, debounceMs = 2000 }: { sessionId: string
       ) : null}
       <div className="rating-actions">
         <button type="submit" className="btn btn-primary" disabled={busy}>
-          Submit rating
+          {submitLabel}
         </button>
         <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => void submit(true)}>
           No rating — just rate my session
