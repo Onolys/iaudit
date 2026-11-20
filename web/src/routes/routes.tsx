@@ -10,6 +10,7 @@ import { ReportPage } from "../features/report/ReportPage";
 import { NewSessionPage } from "../features/upload/NewSessionPage";
 import { SessionPage } from "../features/session/SessionPage";
 import { Layout } from "./Layout";
+import { Settings } from "../features/settings/Settings";
 import * as P from "./placeholders";
 
 export const routes: RouteObject[] = [
@@ -32,7 +33,7 @@ export const routes: RouteObject[] = [
           { path: "/sessions/new", element: <NewSessionPage /> },
           { path: "/sessions/:id", element: <SessionPage /> },
           { path: "/sessions/:id/reports/:version", element: <ReportPage /> },
-          { path: "/settings", element: <P.Settings /> },
+          { path: "/settings", element: <Settings /> },
         ],
       },
       { path: "/sample-report", element: <SampleReportPage /> },

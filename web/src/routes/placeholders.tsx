@@ -10,7 +10,6 @@ function Page({ title, children }: { title: string; children?: ReactNode }) {
   );
 }
 
-export const Settings = () => <Page title="Settings" />;
 export const NotFound = () => (
   <Page title="Page not found">
     <p>

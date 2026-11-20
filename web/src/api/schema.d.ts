@@ -145,6 +145,10 @@ export interface components {
     };
     /** `GET /runs`: `RunList` in api/openapi.json. */
     RunList: { items: S_Run[] };
+    /** `GET /api-key`: `ApiKeyInfo` in api/openapi.json. `key_id` is the public id in `onolys_<id>_<secret>`. */
+    ApiKeyInfo: { active: boolean; key_id?: string | null; created?: string | null; last_used_at?: string | null };
+    /** `POST /api-key`: `ApiKeyCreated`. `api_key` (the secret) is returned once and never again. */
+    ApiKeyCreated: { key_id: string; api_key: string; created: string };
     Usage: { runs_today: number; daily_cap: number; resets_at: string };
   };
 }
@@ -246,6 +250,11 @@ export interface paths {
       parameters: Params<{ id: string; version: number }>;
       responses: { 200: Res<S["ReportView"]>; default: Res<S["ErrorResponse"]> };
     };
+  };
+  "/api-key": {
+    get: { parameters: NoParams; responses: { 200: Res<S["ApiKeyInfo"]>; default: Res<S["ErrorResponse"]> } };
+    post: { parameters: NoParams; responses: { 201: Res<S["ApiKeyCreated"]>; default: Res<S["ErrorResponse"]> } };
+    delete: { parameters: NoParams; responses: { 204: Record<string, never>; default: Res<S["ErrorResponse"]> } };
   };
   "/usage": {
     get: {

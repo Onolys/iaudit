@@ -117,6 +117,7 @@ export class MockBackend {
   private sessions = new Map<string, SessionRec>();
   private runsByDay = new Map<string, number>();
   private idem = new Map<string, { hash: string; response: S["CreateSessionResponse"] }>();
+  private apiKeys = new Map<string, { key_id: string; created: string }>();
   private n = 0;
 
   constructor(opts: MockOptions) {
@@ -130,6 +131,7 @@ export class MockBackend {
     this.sessions.clear();
     this.runsByDay.clear();
     this.idem.clear();
+    this.apiKeys.clear();
     this.n = 0;
     this.dailyCap = this.initialCap;
     this.emitter.clear();
@@ -514,6 +516,25 @@ export class MockBackend {
       report_schema_version: r.report.schema_version,
       report: structuredClone(r.report),
     };
+  }
+
+  // ---- API key (one active key per user; create revokes the old one) -----
+
+  getApiKey(uid: string): S["ApiKeyInfo"] {
+    const k = this.apiKeys.get(uid);
+    return k ? { active: true, key_id: k.key_id, created: k.created, last_used_at: null } : { active: false };
+  }
+
+  createApiKey(uid: string): S["ApiKeyCreated"] {
+    this.n += 1;
+    const key_id = `k${this.n}abc`;
+    const created = this.now().toISOString();
+    this.apiKeys.set(uid, { key_id, created });
+    return { key_id, api_key: `onolys_${key_id}_mock${this.n}secret`, created };
+  }
+
+  deleteApiKey(uid: string): void {
+    this.apiKeys.delete(uid);
   }
 
   getUsage(uid: string): S["Usage"] {

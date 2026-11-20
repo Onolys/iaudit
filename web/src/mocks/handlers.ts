@@ -83,6 +83,12 @@ export function createHandlers(b: MockBackend): HttpHandler[] {
     http.get(`${V1}/sessions/:id/reports/:version`, guarded(({ uid, params }) =>
       json(b.getReportView(uid, params.id, Number(params.version))),
     )),
+    http.get(`${V1}/api-key`, guarded(({ uid }) => json(b.getApiKey(uid)))),
+    http.post(`${V1}/api-key`, guarded(({ uid }) => json(b.createApiKey(uid), 201))),
+    http.delete(`${V1}/api-key`, guarded(({ uid }) => {
+      b.deleteApiKey(uid);
+      return new HttpResponse(null, { status: 204 });
+    })),
     http.get(`${V1}/usage`, guarded(({ uid }) => json(b.getUsage(uid)))),
 
     // Stand-in for the GCS signed URL: pinned to the canonical Content-Type, like the real one.
