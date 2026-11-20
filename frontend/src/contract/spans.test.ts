@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { codePointLength, sliceCodePoints } from "./codepoints";
+import { codePointLength, sliceCodePoints } from "../utils/codepoints";
 import { isSpanValid, walkSpan, segmentSection } from "./spans";
 import type { AuditRequest, Claim, Span } from "./types";
 
 const request: AuditRequest = {
-  schema_version: "1.2.0",
+  schema_version: "0.0.1",
   transcript: [
     { id: "t0", speaker: "a", text: "hello" },
     { id: "t1", speaker: "b", text: "" },

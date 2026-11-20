@@ -1,6 +1,6 @@
 {
   "status": "ok",
-  "eval_api_version": "1.0.0",
+  "eval_api_version": "0.1.0",
   "backend": {
     "url": "http://backend.invalid",
     "reachable": false,

@@ -35,7 +35,7 @@ COLUMNS = [
 
 
 def references():
-    path = EVAL / "datasets/tofueval/references.json"
+    path = EVAL / "datasets/eaudit/tofueval/references.json"
     assert path.is_file(), "Paper reference rows have not been supplied"
     return json.loads(path.read_text())
 

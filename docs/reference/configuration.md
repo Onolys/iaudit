@@ -1,6 +1,6 @@
 # Configuration
 
-Every `IAUDIT_*` setting, read from `Settings` in `backend/src/iaudit_backend/config.py`. Set one as an environment variable named `IAUDIT_<NAME>` in upper case (for example `IAUDIT_AUDIT_DEADLINE_S=45`). `Settings` also reads a `.env` file in the directory the server starts in, which is normally `backend/`.
+Every `IAUDIT_*` setting, read from `Settings` in `eaudit/src/eaudit/config.py`. Set one as an environment variable named `IAUDIT_<NAME>` in upper case (for example `IAUDIT_AUDIT_DEADLINE_S=45`). `Settings` also reads a `.env` file in the directory the server starts in, which is normally `eaudit/`.
 
 **Audience:** users.
 
@@ -21,7 +21,7 @@ Values here are the defaults. Tuning values (thresholds, caps, windows) are gues
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `IAUDIT_MODEL_CHEAP` | `anthropic/claude-haiku-4-5-20251001` | LiteLLM model id for the cheap tier (prep tagging). |
+| `IAUDIT_MODEL_CHEAP` | `anthropic/claude-haiku-5-5` | LiteLLM model id for the cheap tier (prep tagging). |
 | `IAUDIT_MODEL_MID` | `anthropic/claude-sonnet-5-5` | LiteLLM model id for the mid tier (atomize, link, check). |
 | `IAUDIT_MODEL_STRONG` | `anthropic/claude-opus-5-5` | LiteLLM model id for the strong tier. Offline use only. |
 | `IAUDIT_LLM_TIMEOUT_S` | `30` | Default call timeout for a stage with no `*_CALL_TIMEOUT_S` of its own, and the time a retry needs to fit. A stage cap replaces it, even when longer. |

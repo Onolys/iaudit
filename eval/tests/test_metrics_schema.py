@@ -14,9 +14,9 @@ from iaudit_eval.metrics.report import (
 
 def good_report():
     return {
-        "schema_version": "1.0.0", "run_id": "r1", "dataset": "synthetic",
+        "schema_version": "0.0.1", "run_id": "r1", "dataset": "synthetic",
         "dataset_version": "1", "primary_policy": "failures_count_wrong",
-        "scored": {"at": "2026-10-21T00:00:00Z", "metrics_version": "1.0.0",
+        "scored": {"at": "2026-10-21T00:00:00Z", "metrics_version": "0.0.1",
                    "git_commit": "abc123", "git_dirty": False},
         "bootstrap": {"method": "cluster_percentile", "resamples": 1000, "seed": 0, "level": 0.95},
         "run": {"state": "finished", "complete": True, "mapping_version": None, "tags": {"x": 1}},
@@ -38,7 +38,7 @@ def good_report():
 
 
 def good_rows():
-    return {"schema_version": "1.0.0", "run_id": "r1", "rows": [
+    return {"schema_version": "0.0.1", "run_id": "r1", "rows": [
         {"item_id": "a", "status": "ok", "gold": "True", "pred": "True", "match": True},
         {"item_id": "b", "label": "B", "status": "failed", "gold": "True", "pred": None,
          "match": None, "outcome": "timeout", "detail": {"s": [1]}},
@@ -49,7 +49,7 @@ def good_rows():
 def test_valid_report_and_rows():
     validate_metrics(good_report())
     validate_item_rows(good_rows())
-    assert METRICS_SCHEMA_VERSION == "1.0.0"
+    assert METRICS_SCHEMA_VERSION == "0.0.1"
 
 
 def test_state_values():
@@ -122,3 +122,11 @@ def test_error_lists_paths_not_values():
         validate_metrics(r)
     assert "entries/0/ci_status" in str(ei.value)
     assert "SECRET-VALUE" not in str(ei.value)
+
+
+@pytest.mark.parametrize("validate,good", [(validate_metrics, good_report), (validate_item_rows, good_rows)])
+def test_nonmatching_saved_report_is_schema_error(validate, good):
+    body = good()
+    body["schema_version"] = "9.8.7"
+    with pytest.raises(ReportSchemaError, match="schema_version"):
+        validate(body)

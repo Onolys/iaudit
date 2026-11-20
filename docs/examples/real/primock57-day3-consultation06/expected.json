@@ -35,6 +35,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "The duration is longer than the patient reported.",
           "evidence_ids": [
             "e1"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check mock audit fixtures against contract 1.2.0.
+"""Check mock audit fixtures against contract 0.0.1.
 
 Each sample is a folder holding request.json and response.json. The script
 checks the JSON schemas (when the jsonschema package is installed) and the
@@ -25,7 +25,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 CONTRACTS = HERE.parent.parent / "contracts"
-VERSION = "1.2.0"
+VERSION = "0.0.1"
 # A run of this many words copied from a turn into written text breaks rule 9.
 COPY_WORDS = 6
 

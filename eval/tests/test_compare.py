@@ -49,7 +49,7 @@ def test_counts_and_validation(pair_of_runs):
     root, a, b = pair_of_runs
     rep = compare(a, b, runs_root=root)
     validate_compare(rep)
-    assert rep["schema_version"] == "1.0.0"
+    assert rep["schema_version"] == "0.0.1"
     assert (rep["run_a"], rep["run_b"], rep["dataset"]) == (a, b, "synthetic")
     assert rep["n_shared"] == 6 and rep["n_a_only"] == 1 and rep["n_b_only"] == 1
     assert rep["n_clusters_shared"] == 3
@@ -149,4 +149,12 @@ def test_compare_does_not_write(pair_of_runs):
 
 def test_validate_compare_rejects_bad():
     with pytest.raises(ReportSchemaError):
-        validate_compare({"schema_version": "1.0.0"})
+        validate_compare({"schema_version": "0.0.1"})
+
+
+def test_nonmatching_saved_comparison_is_schema_error(pair_of_runs):
+    root, a, b = pair_of_runs
+    report = compare(a, b, runs_root=root)
+    report["schema_version"] = "9.8.7"
+    with pytest.raises(ReportSchemaError, match="schema_version"):
+        validate_compare(report)

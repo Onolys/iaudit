@@ -7,6 +7,6 @@ describe("@contracts alias", () => {
   it("imports both schemas and the response example in place", () => {
     expect(requestSchema).toBeTypeOf("object");
     expect(responseSchema).toBeTypeOf("object");
-    expect(example.schema_version).toBe("1.2.0");
+    expect(example.schema_version).toBe("0.0.1");
   });
 });

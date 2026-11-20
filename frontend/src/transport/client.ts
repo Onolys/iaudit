@@ -1,5 +1,6 @@
 import type { AuditRequest, Result } from "../contract";
-import { readErrorMessage } from "./errorBody";
+import { retry } from "../utils/retry";
+import { readErrorBody } from "./errorBody";
 import type { LoadError } from "./errors";
 
 export const TIMEOUT_MS = 120_000;
@@ -28,18 +29,22 @@ export async function postAudit(
   const timer = setTimeout(() => abort("timeout"), TIMEOUT_MS);
 
   try {
-    const res = await doFetch(url, {
+    const res = await retry(() => doFetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       credentials: "omit",
       body: JSON.stringify(request),
       signal: controller.signal,
+    }), {
+      attempts: 2, delayMs: 300, signal: controller.signal,
+      shouldRetry: outcome => outcome.ok && outcome.value.status === 429,
     });
     const text = await res.text();
     if (res.ok) return { ok: true, value: text };
-    const message = readErrorMessage(text);
+    const body = readErrorBody(text);
+    const validBody = body?.status === res.status ? body : undefined;
     const kind = res.status >= 400 && res.status < 500 ? "http_4xx" : "http_5xx";
-    return { ok: false, error: { kind, status: res.status, message } };
+    return { ok: false, error: { kind, status: res.status, message: validBody?.message, details: validBody?.details } };
   } catch {
     if (reason === "timeout") return { ok: false, error: { kind: "timeout", seconds: TIMEOUT_MS / 1000 } };
     if (reason === "cancelled") return { ok: false, error: { kind: "cancelled" } };

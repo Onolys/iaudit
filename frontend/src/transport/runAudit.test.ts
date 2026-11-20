@@ -53,7 +53,7 @@ describe("readRequestFile", () => {
 });
 
 describe("invalid files never reach fetch", () => {
-  it.each(["", "{nope", "{}", '{"schema_version":"1.2.0"}'])("%j", async (t) => {
+  it.each(["", "{nope", "{}", '{"schema_version":"0.0.1"}'])("%j", async (t) => {
     const { run, fetchSpy } = setup(real);
     expect((await errorOf(run(t))).kind).toBe("invalid_request_file");
     expect(fetchSpy).not.toHaveBeenCalled();
@@ -105,7 +105,7 @@ describe("real service", () => {
     ["empty body", "", { kind: "invalid_response", reason: "empty" }],
     ["non-JSON body", "<html>", { kind: "invalid_response", reason: "not_json" }],
     ["array body", "[]", { kind: "invalid_response", reason: "not_object" }],
-    ["version 2.0.0", mutate((r) => (r.schema_version = "2.0.0")), { kind: "invalid_response", reason: "wrong_version" }],
+    ["version 2.0.0", mutate((r) => (r.schema_version = "2.0.0")), { kind: "invalid_response", reason: "schema" }],
     ["extra field", mutate((r) => (r.extra = 1)), { kind: "invalid_response", reason: "schema" }],
     ["id mismatch", mutate((r) => (r.request_id = "other")), { kind: "request_id_mismatch", expected: "example-001", received: "other" }],
     [

@@ -2,7 +2,7 @@
   "item_id": "fictional-item-0",
   "status": "ok",
   "request": {
-    "schema_version": "1.2.0",
+    "schema_version": "0.0.1",
     "request_id": "example-001",
     "transcript": [
       {
@@ -53,7 +53,7 @@
     ]
   },
   "response": {
-    "schema_version": "1.2.0",
+    "schema_version": "0.0.1",
     "request_id": "example-001",
     "status": "complete",
     "warnings": [],
@@ -137,6 +137,7 @@
         "concerns": [
           {
             "type": "negation_reversal",
+            "group": "opposite_of_interview",
             "explanation": "A denial is written as a positive habit.",
             "evidence_ids": [
               "e-denial"
@@ -144,6 +145,7 @@
           },
           {
             "type": "frequency_severity_inflation",
+            "group": "changed_detail",
             "explanation": "A denied behavior is described as frequent.",
             "evidence_ids": [
               "e-denial"
@@ -186,6 +188,7 @@
         "concerns": [
           {
             "type": "frequency_severity_inflation",
+            "group": "changed_detail",
             "explanation": "One missed appointment is written as a pattern across the year.",
             "evidence_ids": [
               "e-appointments"
@@ -193,6 +196,7 @@
           },
           {
             "type": "context_stripping",
+            "group": "missing_context",
             "explanation": "The travel limit on that appointment is omitted.",
             "evidence_ids": [
               "e-appointments"
@@ -235,6 +239,7 @@
         "concerns": [
           {
             "type": "unsupported_claim",
+            "group": "not_in_interview",
             "explanation": "Nothing in the supplied interview establishes a work problem.",
             "evidence_ids": []
           }

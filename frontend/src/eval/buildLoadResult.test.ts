@@ -19,9 +19,9 @@ it("replays a parsed contract example with service source and analyzed claims", 
   expect(result.value.analysis.checks["c-supported"].claimSpanOk).toBe(true);
 });
 
-it("rejects stale 1.0.0 data with the Audit wrong-version error", () => {
-  expect(buildLoadResult(request, { ...response, schema_version: "1.0.0" })).toEqual({
-    ok: false, error: { kind: "invalid_response", reason: "wrong_version" },
+it("rejects nonmatching saved data with schema issues", () => {
+  expect(buildLoadResult(request, { ...response, schema_version: "9.8.7" })).toMatchObject({
+    ok: false, error: { kind: "invalid_response", reason: "schema", issues: [{ path: "/schema_version" }] },
   });
 });
 
@@ -33,7 +33,7 @@ it("rejects malformed saved responses with validation issues", () => {
 });
 
 it("validates a bad request before checking even a stale response", () => {
-  const result = buildLoadResult({}, { schema_version: "1.0.0" });
+  const result = buildLoadResult({}, { schema_version: "9.8.7" });
   expect(result).toMatchObject({ ok: false, error: { kind: "invalid_request_file", reason: "schema" } });
   if (result.ok || result.error.kind !== "invalid_request_file") throw new Error("expected request error");
   expect(result.error.issues?.length).toBeGreaterThan(0);

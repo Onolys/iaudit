@@ -1,6 +1,6 @@
 # LLM client
 
-Every model call goes through one interface. Code: `backend/src/iaudit_backend/llm/`.
+Every model call goes through one interface. Code: `eaudit/src/eaudit/llm/`.
 
 **Audience:** maintainers and coding agents.
 

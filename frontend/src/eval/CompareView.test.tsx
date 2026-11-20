@@ -73,7 +73,7 @@ it.each([409, 422])("shows cross-dataset HTTP %s inline", async status => {
 });
 
 it("retries an unreachable server with the shared banner", async () => {
-  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockResolvedValueOnce(json(comparison));
+  const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValueOnce(Error("offline")).mockRejectedValueOnce(Error("offline")).mockResolvedValueOnce(json(comparison));
   render(<CompareView api={createEvalApi({ fetch })} aRunId="a" bRunId="b" onOpenItem={() => {}} onBack={() => {}} />);
   await screen.findByText("Eval server not reachable");
   fireEvent.click(screen.getByRole("button", { name: "Retry" }));

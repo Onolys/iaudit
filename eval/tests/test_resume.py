@@ -4,10 +4,10 @@ import json
 
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import engine, store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import (
     FingerprintChanged,
     ResumeError,
@@ -22,7 +22,7 @@ URL = "http://fake"
 
 @pytest.fixture(scope="module")
 def synth():
-    return load("synthetic")
+    return engine_dataset()
 
 
 async def _nosleep(_s):
@@ -145,11 +145,11 @@ async def test_allow_mixed_records_change(synth, tmp_path):
 
 async def test_schema_version_change_always_refused(synth, tmp_path):
     h = await _partial_run(synth, tmp_path)
-    store.update_run(tmp_path, h.run_id, schema_version="0.0.1")
+    store.update_run(tmp_path, h.run_id, schema_version="9.8.7")
     r = resume(h.run_id, allow_mixed=True, client=_client(FakeBackend("ok")), runs_root=tmp_path)
     with pytest.raises(SchemaVersionChanged):
         await r.wait()
-    assert store.load_run(tmp_path, h.run_id)["schema_version"] == "0.0.1"
+    assert store.load_run(tmp_path, h.run_id)["schema_version"] == "9.8.7"
 
 
 async def test_git_change_adds_entry_and_warning_only(synth, tmp_path, monkeypatch):

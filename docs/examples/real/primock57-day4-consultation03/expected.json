@@ -35,6 +35,7 @@
       "concerns": [
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "The patient's four weeks is recorded as two to three weeks.",
           "evidence_ids": [
             "e1"
@@ -42,6 +43,7 @@
         },
         {
           "type": "question_as_answer",
+          "group": "not_in_interview",
           "explanation": "The shorter figure comes from the clinician's restatement, not the patient's answer.",
           "evidence_ids": [
             "e2"
@@ -123,6 +125,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "No question or answer covers fever, chills or position.",
           "evidence_ids": []
         }
@@ -166,6 +169,7 @@
       "concerns": [
         {
           "type": "negation_reversal",
+          "group": "opposite_of_interview",
           "explanation": "Soreness on breathing in is recorded as no pain on inspiration.",
           "evidence_ids": [
             "e1"
@@ -173,6 +177,7 @@
         },
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "The patient's answer conflicts with the stated absence.",
           "evidence_ids": [
             "e1"
@@ -234,6 +239,7 @@
       "concerns": [
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "The patient's four weeks is recorded as two to three weeks.",
           "evidence_ids": [
             "e1"
@@ -310,6 +316,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "No turn covers complications of the operation.",
           "evidence_ids": []
         }
@@ -342,6 +349,7 @@
       "concerns": [
         {
           "type": "unsupported_claim",
+          "group": "not_in_interview",
           "explanation": "The heart rhythm is not established by a beat count over the phone.",
           "evidence_ids": [
             "e1"

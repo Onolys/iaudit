@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 FIXTURES = Path(__file__).with_name("fixtures")
-MODULE = Path(__file__).resolve().parents[3] / "datasets/tofueval/items.py"
+MODULE = Path(__file__).resolve().parents[3] / "datasets/eaudit/tofueval/items.py"
 
 
 def loader():

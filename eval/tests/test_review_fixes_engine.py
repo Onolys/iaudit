@@ -9,10 +9,10 @@ import threading
 
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import paths, store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import Selection, resume, start_run
 
 URL = "http://fake"
@@ -28,7 +28,7 @@ def _client(fb):
 
 @pytest.fixture(scope="module")
 def synth():
-    return load("synthetic")
+    return engine_dataset()
 
 
 async def test_drain_lets_inflight_finish_and_stores_no_terminal_state(synth, tmp_path):
@@ -125,10 +125,10 @@ async def test_lock_failure_on_start_leaves_no_run_dir(synth, tmp_path, monkeypa
 
 async def test_auto_score_uses_the_runs_datasets_root(tmp_path):
     root = tmp_path / "datasets"
-    shutil.copytree(paths.datasets_dir() / "synthetic", root / "synth2")
-    meta = json.loads((root / "synth2" / "metadata.json").read_text())
+    shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", root / "eaudit/synth2")
+    meta = json.loads((root / "eaudit/synth2" / "metadata.json").read_text())
     meta["name"] = "synth2"
-    (root / "synth2" / "metadata.json").write_text(json.dumps(meta))
+    (root / "eaudit/synth2" / "metadata.json").write_text(json.dumps(meta))
     runs = tmp_path / "runs"
     h = start_run("synth2", Selection(split="all"), base_url=URL, runs_root=runs,
                   datasets_root=root, client=_client(FakeBackend("ok")))  # fmt: skip

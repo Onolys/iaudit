@@ -4,8 +4,8 @@ A metric is `stat(pairs, spec, **params) -> Stats` (Counter or list) plus
 `finalize(stats, spec, **params) -> Result`. Stats from disjoint pair sets are combined with
 `combine` (sum for Counter, concat for list), so bootstrap resamples summed statistics.
 
-Resolution: `datasets/<name>/metrics.py` `METRICS` first, then the core registry. No plugin
-discovery.
+Resolution: `datasets/<product>/<name>/metrics.py` `METRICS` first, then the core registry.
+No plugin discovery.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .. import paths
+from ..datasets.registry import dataset_folders
 from .pair import Result
 
 POLICIES = ("primary_secondary", "none")
@@ -109,8 +109,10 @@ def _add(a: Counter, b: Counter) -> Counter:
 def _dataset_metrics(name: str, root: Path | None) -> dict[str, Metric] | None:
     if not _NAME_RE.fullmatch(name):
         raise ValueError(f"invalid dataset name {name!r}")
-    root = Path(root) if root is not None else paths.datasets_dir()
-    path = root / name / "metrics.py"
+    folder = dataset_folders(root).get(name)
+    if folder is None:
+        return None
+    path = folder / "metrics.py"
     if not path.is_file():
         return None
     modname = f"iaudit_eval_dataset_{name.replace('-', '_')}.metrics"

@@ -4,7 +4,7 @@ Runnable public-API usage examples.
 
 **Audience:** users.
 
-- [mock/](mock/): fictional request/response pairs for audit contract 1.2.0, plus a validator, for UI work. Responses carry an optional `run_info` block; one omits it.
+- [mock/](mock/): fictional request/response pairs for audit contract 0.0.1, plus a validator, for UI work. Responses carry an optional `run_info` block; one omits it.
 - [real/](real/): 10 real (role-played) PriMock57 consultations with evaluator-derived answer keys, for testing the auditor.
 - [../contracts/examples/](../contracts/examples/): the single worked example that belongs to the contract itself.
 

@@ -26,7 +26,7 @@ const claimOf = (evidence: Claim["evidence"], over: Partial<Claim> = {}): Claim 
 });
 const LONG = "0123456789".repeat(6); // 60 code points
 const req: AuditRequest = {
-  schema_version: "1.2.0",
+  schema_version: "0.0.1",
   transcript: [
     { id: "a", speaker: "A", role: "interviewer", text: "first", timestamp: "00:00:01" },
     { id: "b", speaker: "B", text: LONG },
@@ -90,6 +90,15 @@ describe("excerpts", () => {
     expect(r1.textContent).not.toContain(" · ");
   });
 
+  it("labels missing speaker identity without changing transcript data", () => {
+    const transcript = [{ id: "unknown", text: "Some evidence." }];
+    const request = { ...req, transcript };
+    const e = { id: "e1", role: "supporting" as const, span: span(0, 0, 0, 14) };
+    render(<ClaimDetail {...inlineProps(request, claimOf([e]))} />);
+    expect(screen.getByText("Unknown speaker")).toBeTruthy();
+    expect(transcript[0]).not.toHaveProperty("speaker");
+  });
+
   it("shows (empty turn) for an empty turn inside an excerpt", () => {
     const e = { id: "e1", role: "qualifying" as const, span: span(1, 50, 3, 4) };
     render(<ClaimDetail {...inlineProps(req, claimOf([e]))} />);
@@ -111,7 +120,7 @@ describe("excerpts", () => {
     const e1 = { id: "e1", role: "supporting" as const, span: span(0, 0, 0, 5) };
     const e2 = { id: "e2", role: "contradicting" as const, span: span(3, 0, 3, 9) };
     const claim = claimOf([e1, e2], {
-      concerns: [{ type: "negation_reversal", explanation: "why", evidence_ids: ["e2"] }],
+      concerns: [{ type: "negation_reversal", group: "opposite_of_interview" as const, explanation: "why", evidence_ids: ["e2"] }],
     });
     const { container } = render(<ClaimDetail {...inlineProps(req, claim)} />);
     const btn = screen.getByRole("button", { name: /Negation reversal/ });

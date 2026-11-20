@@ -2,7 +2,7 @@
 
 **Audience:** contributors.
 
-From `backend/`:
+From `eaudit/`:
 
 ```bash
 uv sync

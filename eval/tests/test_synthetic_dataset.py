@@ -2,10 +2,13 @@ import json
 import re
 
 import pytest
+from fakes.fake_backend import FakeBackend
 
-from iaudit_eval import paths
+from iaudit_eval import paths, store
+from iaudit_eval.client import AuditClient
 from iaudit_eval.contracts import validate_request
 from iaudit_eval.datasets import Unmapped, list_datasets, load
+from iaudit_eval.engine import Selection, start_run
 
 FORBIDDEN_SPEAKERS = {"alex1", "sam1", "clinician1"}
 WINDOW = 8
@@ -34,8 +37,8 @@ def test_metadata():
 
 def test_shape(ds):
     items = ds.items("all")
-    assert 6 <= len(items) <= 10
-    assert len({i.doc_id for i in items}) == 3
+    assert len(items) >= 20
+    assert len({i.doc_id for i in items}) >= 7
     assert {i.split for i in items} == {"dev", "test"}
     assert sum(ds.split_sizes()[s] for s in ("dev", "test")) == len(items)
     for it in items:
@@ -87,7 +90,7 @@ def _strings(o):
 
 
 def test_no_fewshot_overlap_or_speaker_ids(ds):
-    pdir = paths.repo_root() / "backend" / "src" / "iaudit_backend" / "prompts"
+    pdir = paths.repo_root() / "eaudit" / "src" / "eaudit" / "prompts"
     files = sorted(pdir.glob("*_fewshot.json"))
     if not files:
         pytest.skip("backend few-shot files absent")
@@ -106,3 +109,45 @@ def test_no_fewshot_overlap_or_speaker_ids(ds):
         speakers = {t["speaker"] for t in req["transcript"]}
         assert not speakers & FORBIDDEN_SPEAKERS
         assert not FORBIDDEN_SPEAKERS & set(_words(" ".join(texts)))
+
+
+@pytest.mark.parametrize("concern", [
+    "opinion_as_fact", "calculation_error", "meaning_shift", "unsupported_inference",
+])
+def test_taxonomy_cases_include_two_flags_and_a_faithful_near_miss(ds, concern):
+    """Dropping or mislabelling a boundary case must leave a gap in offline coverage."""
+    cases = {it.id: it for it in ds.items("all") if it.doc_id == f"doc-{concern}"}
+    expected = {
+        f"{concern}-flagged-a": "flagged",
+        f"{concern}-flagged-b": "flagged",
+        f"{concern}-clean": "clean",
+    }
+    assert {iid: ds.adapter.gold(it) for iid, it in cases.items()} == expected
+    assert len({it.payload["summary"] for it in cases.values()}) == 3
+    # Matched variants share the same source conversation, making the faithful
+    # control useful for detecting false positives as well as missed flags.
+    requests = [ds.adapter.to_request(it) for it in cases.values()]
+    assert all(req["transcript"] == requests[0]["transcript"] for req in requests)
+    assert len({it.split for it in cases.values()}) == 1
+
+
+async def test_full_dataset_runs_offline_including_taxonomy_cases(ds, tmp_path):
+    """Every public case passes through request conversion, persistence and projection."""
+    backend = FakeBackend()
+    async with AuditClient("http://fake", transport=backend.transport()) as client:
+        run = start_run(
+            ds, Selection(split="all"), base_url="http://fake", client=client,
+            runs_root=tmp_path, on_finish=None,
+        )
+        assert await run.wait() == "finished"
+    saved = {item["item_id"]: item for item in store.iter_items(tmp_path, run.run_id)}
+    cases = {item.id: item for item in ds.items("all")}
+    assert set(saved) == set(cases)
+    assert len(saved) >= 20 and backend.audit_work == len(saved)
+    for item_id, record in saved.items():
+        assert record["status"] == "ok", item_id
+        prediction = ds.adapter.project(record["response"], cases[item_id])
+        pairs = ds.adapter.pairs(cases[item_id], ds.adapter.gold(cases[item_id]), prediction, None)
+        assert [(pair.level, pair.pred) for pair in pairs] == [
+            ("item", "flagged"), ("section", True),
+        ]

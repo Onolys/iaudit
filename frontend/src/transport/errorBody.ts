@@ -3,10 +3,21 @@ import errorSchema from "@contracts/error-response.schema.json";
 
 // Same options as ../contract/validate.ts; kept local so the contract core is untouched.
 const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true, strictTypes: false });
-const checkError = ajv.compile(errorSchema);
+const checkError = ajv.compile<ErrorBody>(errorSchema);
 
-/** `error.message` of a non-2xx body, only when the body validates against the error schema. */
-export function readErrorMessage(text: string): string | undefined {
+export interface ErrorDetail {
+  code: string;
+  message: string;
+}
+
+export interface ErrorBody {
+  status: number;
+  message: string;
+  details: ErrorDetail[];
+}
+
+/** Display fields of a non-2xx body, only when the complete error body validates. */
+export function readErrorBody(text: string): ErrorBody | undefined {
   let raw: unknown;
   try {
     raw = JSON.parse(text);
@@ -14,5 +25,6 @@ export function readErrorMessage(text: string): string | undefined {
     return undefined;
   }
   if (!checkError(raw)) return undefined;
-  return (raw as { error: { message: string } }).error.message;
+  const { status, message, details } = raw;
+  return { status, message, details };
 }

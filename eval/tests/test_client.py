@@ -55,7 +55,7 @@ async def test_defaults():
     await c.aclose()
 
 
-@pytest.mark.parametrize("mode,code", [("429", "rate_limited"), ("503", "unavailable")])
+@pytest.mark.parametrize("mode,code", [("429", "rate_limited"), ("503", "upstream_unavailable")])
 async def test_retry_once_then_fail(mode, code):
     fb = FakeBackend(mode)
     out, c = await _audit(fb)
@@ -169,10 +169,10 @@ async def test_error_body_non_json_400():
 
 
 async def test_backend_400_valid_error_is_http_error():
-    fb = FakeBackend("unsupported_version")
+    fb = FakeBackend("invalid_request")
     out, _ = await _audit(fb)
     assert out.kind == "http_error" and out.http_status == 400
-    assert out.error_code == "unsupported_version"
+    assert out.error_code == "schema_violation"
 
 
 async def test_invalid_request_zero_posts():
@@ -192,7 +192,7 @@ async def test_invalid_response_bad_body():
 
 async def test_invalid_response_schema():
     def handler(request):
-        return httpx.Response(200, json={"schema_version": "1.2.0", "oops": 1})
+        return httpx.Response(200, json={"schema_version": "0.0.1", "oops": 1})
 
     c = AuditClient("http://fake", transport=httpx.MockTransport(handler))
     async with c:
@@ -233,3 +233,28 @@ async def test_healthz():
     fb = FakeBackend()
     async with _client(fb) as c:
         assert await c.healthz() is True
+
+
+@pytest.mark.parametrize("body", [
+    {"schema_version": "0.0.1", "error": {"code": "internal_error", "message": "old"}},
+    {"schema_version": "0.0.1", "status": 400, "message": "mismatch",
+     "details": [{"code": "internal_error", "message": "fixed"}]},
+])
+async def test_old_or_mismatched_error_body_is_invalid(body):
+    async with AuditClient("http://fake", transport=httpx.MockTransport(
+        lambda request: httpx.Response(500, json=body)
+    )) as client:
+        outcome = await client.audit(_req())
+    assert outcome.kind == "error_body"
+    assert outcome.error_message is None and outcome.error_code is None
+
+
+async def test_multi_error_uses_first_detail_code_and_top_message():
+    body = json.loads((EX / "multi-error.json").read_text())
+    async with AuditClient("http://fake", transport=httpx.MockTransport(
+        lambda request: httpx.Response(400, json=body)
+    )) as client:
+        outcome = await client.audit(_req())
+    assert outcome.kind == "http_error"
+    assert outcome.error_code == body["details"][0]["code"]
+    assert outcome.error_message == body["message"]

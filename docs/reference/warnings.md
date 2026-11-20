@@ -9,7 +9,7 @@ When the backend emits each contract warning code. The code list and the warning
 | Code | Carries | Emitted when |
 |---|---|---|
 | `section_not_processed` | `section_index` | A section produced no claims: the audit ran out of time for it, an internal error occurred, or no claim could be located in its text. |
-| `ambiguous_speaker` | `claim_id` | A claim relies on a turn with no `role`. No speaker or role is assumed. The message names turn indexes only. See [missing role](../concepts/missing-role.md). |
+| `ambiguous_speaker` | `claim_id` | A claim relies on a turn with no `speaker` or no `role`. No speaker or role is assumed. Message: "Speaker or role was missing for turn(s) {turns}; none was assumed." It names turn indexes only. See [missing role](../concepts/missing-role.md). |
 | `input_truncated` | none | More claims were found than `IAUDIT_PIPELINE_MAX_CLAIMS`. The extra claims were not audited. |
 | `span_out_of_range` | `claim_id` | A claim or evidence span did not fit the input and was omitted. A safety net; not expected in normal runs. |
 | `other` | `claim_id` or `section_index` | See below. |

@@ -4,7 +4,7 @@ How to test, and what to verify before a release.
 
 **Audience:** contributors.
 
-- [frontend.md](frontend.md): Audit/Eval commands, offline test coverage and owner release checks.
+- [frontend.md](frontend.md): eaudit/Eval commands, offline test coverage and owner release checks.
 - [running-tests.md](running-tests.md): backend commands and test layout.
 - [evaluation.md](evaluation.md): the evaluation harness, the POC gate, replay and live.
 - [local-setup.md](local-setup.md): setup of every component, offline checks, owner live checks after taxonomy v1.

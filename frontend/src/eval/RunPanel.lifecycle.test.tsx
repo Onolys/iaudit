@@ -66,7 +66,7 @@ it("attaches to run_active 409", async () => {
 });
 it("reattaches on reload, shows lost contact after three misses, then recovers", async () => {
   const s=setup({reload:true}); await tick(); expect(screen.getByRole("progressbar")).toBeTruthy();
-  s.failPolls(true); await tick(3000); expect(screen.getByText("Lost contact with eval server — retrying")).toBeTruthy();
+  s.failPolls(true); await tick(4000); expect(screen.getByText("Lost contact with eval server — retrying")).toBeTruthy();
   s.failPolls(false); await tick(1000); expect(screen.queryByText("Lost contact with eval server — retrying")).toBeNull();
   s.unmount(); const count=s.fetch.mock.calls.length; await tick(10000); expect(s.fetch).toHaveBeenCalledTimes(count);
 });
@@ -75,7 +75,7 @@ it("shows failed state and the server's actual cost error", async () => {
   expect(screen.getByText("failed")).toBeTruthy(); expect(screen.getByText("No cost was returned")).toBeTruthy();
 });
 it.each(["schema_mismatch","backend_unreachable"])("preserves %s message and detail", async code => {
-  const s=setup(); await tick(); await tick(400); s.setStartError({code,message:"Exact server message",detail:{expected:"1.2.0",actual:"0.0.0"}}); start(); await tick();
+  const s=setup(); await tick(); await tick(400); s.setStartError({code,message:"Exact server message",detail:{expected:"0.0.1",actual:"0.0.0"}}); start(); await tick();
   expect(screen.getByText("Exact server message")).toBeTruthy(); expect(screen.getByText(/"actual": "0.0.0"/)).toBeTruthy();
 });
 it("retry after a failed download shows downloading, not the old failure", async () => {

@@ -20,7 +20,7 @@ from iaudit_eval.server.guards import Settings
 @pytest.fixture
 def roots(tmp_path):
     datasets = tmp_path / "datasets"
-    shutil.copytree(paths.datasets_dir() / "synthetic", datasets / "synthetic")
+    shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", datasets / "eaudit/synthetic")
     return datasets, tmp_path / "data", tmp_path / "runs"
 
 
@@ -86,12 +86,14 @@ async def test_dataset_list_and_metadata_use_injected_roots(roots, monkeypatch, 
         datasets = checked(await http.get("/datasets"), "DatasetSummary[]")
         assert len(datasets) == 1
         assert datasets[0]["name"] == "synthetic"
+        assert datasets[0]["product"] == "eaudit"
         assert datasets[0]["data_present"] is True
-        assert datasets[0]["splits"] == [{"name": "dev", "size": 6}, {"name": "test", "size": 2}]
+        assert datasets[0]["splits"] == [{"name": "dev", "size": 15}, {"name": "test", "size": 5}]
         meta = checked(await http.get("/datasets/synthetic"), "DatasetMeta")
+        assert meta["product"] == "eaudit"
         assert meta["default_split"] == "dev"
         assert meta["license"]["name"] == "CC0-1.0"
-        assert meta["splits"][0]["size"] == 6
+        assert meta["splits"][0]["size"] == 15
         assert meta["splits"][0]["description"]
 
 
@@ -107,10 +109,10 @@ async def test_unknown_dataset_is_schema_valid_404(roots, method, path):
 
 def downloadable(roots):
     datasets, data, _ = roots
-    folder = datasets / "local"
+    folder = datasets / "eaudit/local"
     folder.mkdir()
     (folder / "metadata.json").write_text(json.dumps({
-        "name": "local", "title": "Offline download", "data_required": True,
+        "name": "local", "product": "eaudit", "title": "Offline download", "data_required": True,
         "splits": [{"name": "test", "description": "Local fixture"}], "default_split": "test",
     }))
     (folder / "adapter.py").write_text('''
@@ -231,7 +233,7 @@ async def test_download_outlives_request_client(roots):
 @pytest.mark.parametrize("filename", ["metadata.json", "adapter.py"])
 async def test_dataset_file_symlink_cannot_escape_root(roots, tmp_path, filename):
     datasets, _, _ = roots
-    source = datasets / "synthetic" / filename
+    source = datasets / "eaudit/synthetic" / filename
     outside = tmp_path / ("outside-" + filename)
     source.replace(outside)
     source.symlink_to(outside)

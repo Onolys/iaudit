@@ -1,3 +1,4 @@
+import json
 from collections import Counter
 
 import pytest
@@ -22,8 +23,9 @@ def clean_registry():
 
 
 def _make(tmp_path, name, body):
-    d = tmp_path / name
-    d.mkdir()
+    d = tmp_path / "eaudit" / name
+    d.mkdir(parents=True)
+    (d / "metadata.json").write_text(json.dumps({"name": name}))
     (d / "metrics.py").write_text(body)
     return tmp_path
 

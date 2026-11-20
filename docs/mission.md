@@ -59,7 +59,7 @@ The idea is also independent of the original source format. The interview might 
 
 ## What the tool checks
 
-The following thirteen checks define the scope of this build. The examples are illustrative.
+The following seventeen checks define the scope of this build. The examples are illustrative.
 
 | Check | What it checks | Example potential discrepancy |
 |---|---|---|
@@ -68,14 +68,29 @@ The following thirteen checks define the scope of this build. The examples are i
 | **3. Wrong person, source, or entity attribution** | Who or what experienced something, who reported it, and which person, source, or entity a fact belongs to. | A parent describes their own forgetfulness, but the assessment attributes it to the participant. Side effects the patient attributed to a previous medication are recorded against the current one. |
 | **4. Timeframe mismatch** | Whether past, current, future, and hypothetical statements retain their original timing. | Childhood difficulty is presented as a current problem. |
 | **5. Negation reversal** | Whether a denial, absence, or exception becomes an affirmative statement, or the reverse. | “I don’t lose my keys” becomes a claim that the person frequently loses their keys. |
-| **6. Certainty inflation** | Whether tentative statements, estimates, or secondhand information become definite facts. | “I think this happened twice” becomes a confirmed, consistent pattern. |
+| **6. Certainty inflation** | Whether the assessment drops a speaker's hedge or expression of uncertainty and presents the same statement as definite. | The person tentatively estimates that something happened twice; the assessment states that it happened twice as a definite fact. |
 | **7. Frequency or severity inflation** | Whether the assessment exaggerates or understates frequency, duration, intensity, or impact. | Occasional difficulty becomes daily difficulty, or inconvenience becomes inability. |
-| **8. Context stripping** | Whether an omitted qualification, or a broadened scope, materially changes the meaning of a claim. | Difficulty occurring only after several nights without sleep becomes an unrestricted claim about everyday functioning. “Some members of the panel raised concerns” becomes “the panel raised concerns.” |
+| **8. Context stripping** | Whether an omitted qualification or condition materially changes the meaning of a claim. | Difficulty occurring only after several nights without sleep becomes an unrestricted claim about everyday functioning. |
 | **9. Question mistaken for an answer** | Whether the interviewer’s question, suggestion, or hypothetical is treated as respondent evidence. | “Do you often forget things?” is used as proof without an affirmative response. |
 | **10. Correction ignored** | Whether later clarification or retraction changes an earlier statement used in the assessment. | The person corrects “every week” to “twice last year,” but the original frequency remains in the assessment. |
 | **11. Conflicting accounts flattened** | Whether unresolved disagreement between sources is presented as agreement. | Participant and caregiver disagree, but the assessment says both describe the same experience. |
 | **12. Unsupported causal links** | Whether the assessment presents a cause-and-effect relationship as established by the interview when the source does not substantiate it. | Two events occurred around the same time; the assessment says the interview establishes that one caused the other. |
-| **13. Quantity mismatch** | Whether an amount, count, value, or total the assessment states about the interview matches the interview: money, doses, ages, counts, tallies, and sums of figures the interview itself gives. | The patient reports taking 20 mg; the assessment records 10 mg. |
+| **13. Quantity mismatch** | Whether a stated amount, count or value in the assessment differs from the figure supplied by the interview. Totals or arithmetic derived from interview figures are checked under check 15. | The person reports taking 20 mg; the assessment records 10 mg. |
+| **14. Opinion as fact** | Whether a belief, opinion or reported view is presented as an established fact rather than attributed to the person who holds it. | A parent believes the medication causes headaches; the assessment states that the medication causes headaches. |
+| **15. Calculation error** | Whether a total or arithmetic result stated in the assessment matches the figures the supplied interview gives. | The interview reports two missed appointments in March and one in April; the assessment gives a total of five. |
+| **16. Meaning shift** | Whether the assessment substitutes a word or action whose meaning differs from what the interview describes. | The interview describes a recommendation for physiotherapy; the assessment says physiotherapy was ordered. |
+| **17. Unsupported inference** | Whether the assessment asserts a relation between individually supported facts, or generalizes beyond those facts, without support in the supplied interview. | The interview says some panel members raised concerns; the assessment attributes those concerns to the panel as a whole. |
+
+### How the checks are grouped
+
+The seventeen checks are organized into four groups to help reviewers understand the kind of potential discrepancy. The groups organize concern types; they do not replace the claim's result or determine its severity.
+
+| Group | Checks |
+|---|---|
+| **Not in interview** | 1. Claim support (`unsupported_claim`); 12. Unsupported causal links (`unsupported_causal_link`); 9. Question mistaken for an answer (`question_as_answer`); 17. Unsupported inference (`unsupported_inference`). |
+| **Opposite of interview** | 2. Contradictory evidence (`contradictory_evidence`); 5. Negation reversal (`negation_reversal`). |
+| **Changed detail** | 3. Wrong person, source, or entity attribution (`wrong_attribution`); 4. Timeframe mismatch (`timeframe_mismatch`); 13. Quantity mismatch (`quantity_mismatch`); 7. Frequency or severity inflation (`frequency_severity_inflation`); 6. Certainty inflation (`certainty_inflation`); 14. Opinion as fact (`opinion_as_fact`); 15. Calculation error (`calculation_error`); 16. Meaning shift (`meaning_shift`). |
+| **Missing context** | 8. Context stripping (`context_stripping`); 10. Correction ignored (`correction_ignored`); 11. Conflicting accounts flattened (`conflicting_accounts_flattened`). |
 
 ### How these checks should be interpreted
 
@@ -89,9 +104,9 @@ The following thirteen checks define the scope of this build. The examples are i
 
 **Not every omission is a concern.** An assessment can summarize selectively. An omission matters here when it changes the meaning of a claim that the assessment does make.
 
-**Reported explanations and assessor inferences are different.** “The participant believes X caused Y” is different from “X caused Y.” The tool should preserve that distinction.
+**Reported explanations and assessor inferences are different.** Reporting that a participant believes one event caused another is different from stating that the causal relationship is established. The tool should preserve that distinction. Presenting the participant's belief as fact is checked under check 14, Opinion as fact. A causal relationship asserted without interview support is checked under check 12, Unsupported causal links.
 
-**A stated figure is a claim like any other.** The tool compares figures with what the interview gives. It does not judge whether a figure is clinically right, and ordinary rounding is not a discrepancy. A total is checked only against figures the interview supplies.
+**A stated figure is a claim like any other.** The tool compares figures with what the interview gives. It does not judge whether a figure is clinically right, and ordinary rounding is not a discrepancy. A differing stated value is checked under check 13, Quantity mismatch. A total or arithmetic result is checked under check 15, Calculation error, only against figures the supplied interview provides.
 
 ## What the reviewer receives
 
@@ -147,7 +162,7 @@ This build does not check:
 - Consent procedures.
 - Administrative fields.
 - Protocol compliance.
-- Numerical score calculations: scoring rules, rubric totals, and rating arithmetic. Figures the assessment states about what the interview contained (counts, totals, doses, amounts) are checked under check 13.
+- Numerical score calculations: scoring rules, rubric totals, and rating arithmetic. Stated interview figures (counts, doses, amounts and other values) are checked under check 13; totals or arithmetic derived from figures the supplied interview gives are checked under check 15. This does not include calculating or validating clinical scores.
 - Specialty-specific diagnostic or rating criteria.
 
 Those are separate builds and should not expand today’s scope.

@@ -1,4 +1,4 @@
-# iaudit review UI
+# eaudit review UI
 
 Vite + React + strict TypeScript + Vitest. Upload a request JSON, see the audit.
 

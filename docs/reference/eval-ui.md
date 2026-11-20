@@ -6,12 +6,12 @@ The **Eval** tab runs local dataset evaluations against the audit backend. It sh
 run setup, progress, run results, saved items and comparisons. API endpoints and server configuration are in
 [eval-api.md](eval-api.md); the audit upload flow is in [review-ui.md](review-ui.md).
 
-## Audit and Eval
+## eaudit and Eval
 
-The app opens in **Audit**. Use the **Audit** and **Eval** buttons above the current
-screen to switch modes. Switching unmounts the current screen: leaving Audit discards
+The app opens in **eaudit**. Use the **eaudit** and **Eval** buttons above the current
+screen to switch modes. Switching unmounts the current screen: leaving eaudit discards
 the loaded audit and selection, and cancels an in-flight audit request. Returning to
-Audit shows the upload prompt.
+eaudit shows the upload prompt.
 
 Leaving Eval stops its browser requests and polling. A server-side run continues;
 returning to Eval or reloading scans the server's runs and attaches to a running run.
@@ -99,7 +99,7 @@ Set frontend values in `frontend/.env.local`, starting from
 | `VITE_EVAL_API_BASE` | `/eval-api` | Browser API base, fixed at frontend build time. |
 | `IAUDIT_EVAL_PORT` | `8100` | Local target port read by Vite configuration; also used by the Python server entrypoint. |
 | `VITE_AUDIT_URL` | See `.env.example` | Audit endpoint; independent of Eval. |
-| `VITE_MOCK` | Off unless exactly `true` | Bundled Audit fixtures only; Eval has no mock mode. |
+| `VITE_MOCK` | Off unless exactly `true` | Bundled eaudit fixtures only; Eval has no mock mode. |
 
 Both Vite dev and preview proxy `/eval-api` to
 `http://127.0.0.1:${IAUDIT_EVAL_PORT}`, preserving the original Host. The proxy strips
@@ -117,7 +117,7 @@ Ids that are empty, `.` or `..` are refused client-side with an `invalid_request
 
 | Situation | Display or action |
 |---|---|
-| Eval health request fails | `Eval server not reachable` banner with **Retry**; Audit remains usable. |
+| Eval health request fails | `Eval server not reachable` banner with **Retry**; eaudit remains usable. |
 | No registered datasets | `No datasets in eval/datasets/` |
 | Dataset metadata/list load fails | Error and **Retry run form** |
 | Missing data | **Download data** |
@@ -172,7 +172,7 @@ show `No items match this filter.` When fewer rows are returned than exist, `Sho
 filter loads. Click a row or its item button to open it.
 
 A saved item shows a back action, gold annotations and the same assessment/evidence
-review as Audit. This is read-only replay: selecting claims changes the view, and
+review as eaudit. This is read-only replay: selecting claims changes the view, and
 neither starts an audit nor edits saved data. There is no upload control. **Back to
 run** returns to the originating run; **Back to comparison** returns to the same
 comparison pair.
@@ -183,9 +183,9 @@ They do not open the review panes. An unmapped item states its scoring limitatio
 it can still replay a valid saved response. If none exists, it says
 `No saved audit response is available.`
 
-Saved requests and responses pass the same validators as Audit. The current audit
-contract pin is **1.2.0**: saved 1.0.0 and 1.1.0 responses show the unsupported-version error.
-This is an accepted limitation; there is no replay compatibility layer. Run lists, saved
+Saved requests and responses pass the same validators as eaudit. The current audit
+contract pin is **0.0.1**: bodies that fail the current schema show a validation error.
+The owner deletes non-conforming files. Run lists, saved
 metrics and comparisons remain available independently of item replay validation.
 
 ### Gold kinds
@@ -220,7 +220,7 @@ the proxy against a stub. The following live checks remain for the owner:
 - After downloading the real dataset and completing a paid pilot, open one real
   TofuEval item and compare its gold with the source CSV; inspect run detail and compare.
 - Open the largest saved item and check its load time in a real browser.
-- Verify that older (1.1.0 and earlier) items show the unsupported-version screen while
+- Verify that non-conforming saved items show a validation error while
   run lists, metrics and comparisons still work.
 
 Full-stack launches, live provider calls and real dataset downloads are owner checks;

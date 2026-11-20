@@ -64,9 +64,9 @@ describe("suggestion", () => {
 });
 
 describe("concerns", () => {
-  it("labels all 13 mission checks and falls back to the raw value", () => {
+  it("labels all 17 concern types and falls back to the raw value", () => {
     expect(Object.keys(CONCERN_LABELS)).toEqual([...CONCERN_TYPES]);
-    expect(new Set(Object.values(CONCERN_LABELS)).size).toBe(13);
+    expect(new Set(Object.values(CONCERN_LABELS)).size).toBe(17);
     expect(concernLabel("something_new")).toBe("something_new");
   });
 
@@ -99,7 +99,7 @@ describe("concerns", () => {
     const props = exampleProps("c-contradicted");
     const claim = {
       ...props.claim,
-      concerns: [{ type: "negation_reversal" as const, explanation: "x", evidence_ids: ["nope", "e-denial"] }],
+      concerns: [{ type: "negation_reversal" as const, group: "opposite_of_interview" as const, explanation: "x", evidence_ids: ["nope", "e-denial"] }],
     };
     render(<ClaimDetail {...props} claim={claim} check={{ ...props.check, evidence: { "e-denial": false } }} />);
     expect(screen.queryAllByRole("button")).toHaveLength(0);

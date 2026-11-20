@@ -70,10 +70,9 @@ def _load_references(dataset: Dataset, datasets_root: Path | None) -> tuple[list
     ref = dataset.meta.references
     if not ref:
         return [], []
-    from . import paths
+    from .datasets.registry import dataset_folder
 
-    base = Path(datasets_root) if datasets_root is not None else paths.datasets_dir()
-    path = base / dataset.meta.name / ref
+    path = dataset_folder(dataset.meta.name, datasets_root) / ref
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:

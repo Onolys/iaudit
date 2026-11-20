@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "0.0.1",
   "run_info": {
     "models": {
       "cheap": "claude-haiku-5-5",
@@ -68,6 +68,7 @@
       "concerns": [
         {
           "type": "frequency_severity_inflation",
+          "group": "changed_detail",
           "explanation": "Mild, occasional tiredness becomes daily exhaustion.",
           "evidence_ids": [
             "e1"
@@ -75,6 +76,7 @@
         },
         {
           "type": "unsupported_causal_link",
+          "group": "not_in_interview",
           "explanation": "A sleep disruption is given as the cause, though sleep is reported as fine.",
           "evidence_ids": [
             "e2",
@@ -148,6 +150,7 @@
       "concerns": [
         {
           "type": "conflicting_accounts_flattened",
+          "group": "missing_context",
           "explanation": "Two different accounts are written as agreement.",
           "evidence_ids": [
             "e1",

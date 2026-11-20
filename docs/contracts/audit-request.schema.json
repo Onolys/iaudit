@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "audit-request.schema.json",
   "title": "AuditRequest",
-  "description": "Body of one evidence-consistency audit request, schema 1.2.0. This is the JSON body only. HTTP path, method, and auth are out of scope. label and score are display-only and must not be audited.",
+  "description": "Body of one evidence-consistency audit request, schema 0.0.1. This is the JSON body only. HTTP path, method, and auth are out of scope. label and score are display-only and must not be audited.",
   "type": "object",
   "required": ["schema_version", "transcript", "assessment"],
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.2.0",
+      "const": "0.0.1",
       "description": "Contract version. Producers must send exactly this value until the contract is bumped."
     },
     "request_id": {
@@ -32,7 +32,7 @@
   "$defs": {
     "Turn": {
       "type": "object",
-      "required": ["id", "speaker", "text"],
+      "required": ["id", "text"],
       "additionalProperties": false,
       "properties": {
         "id": {
@@ -43,7 +43,7 @@
         "speaker": {
           "type": "string",
           "minLength": 1,
-          "description": "Free text, for example clinician1, patient1, caretaker1, or any custom name. Each distinct string is a distinct speaker. There is no limit on how many."
+          "description": "Optional speaker identity. Missing means unknown; never infer it. Free text, for example clinician1, patient1, caretaker1, or any custom name. Each distinct string is a distinct speaker. There is no limit on how many."
         },
         "role": {
           "enum": ["interviewer", "respondent", "informant", "other"],

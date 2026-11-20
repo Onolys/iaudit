@@ -7,6 +7,7 @@ import threading
 
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import restrict_engine_fixture
 from test_dataset_routes import checked, session
 from test_run_control import start, terminal
 
@@ -16,7 +17,8 @@ from iaudit_eval import paths, scoring, store
 @pytest.fixture
 def roots(tmp_path):
     datasets = tmp_path / "datasets"
-    shutil.copytree(paths.datasets_dir() / "synthetic", datasets / "synthetic")
+    shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", datasets / "eaudit/synthetic")
+    restrict_engine_fixture(datasets)
     return datasets, tmp_path / "data", tmp_path / "runs"
 
 
@@ -155,8 +157,8 @@ async def test_compare_uses_current_items_and_validates_nested_bundle(roots):
 
 async def test_compare_refuses_different_datasets(roots):
     datasets, _, _ = roots
-    shutil.copytree(datasets / "synthetic", datasets / "other")
-    path = datasets / "other" / "metadata.json"
+    shutil.copytree(datasets / "eaudit/synthetic", datasets / "eaudit/other")
+    path = datasets / "eaudit/other" / "metadata.json"
     metadata = json.loads(path.read_text())
     metadata["name"] = "other"
     path.write_text(json.dumps(metadata))
@@ -266,7 +268,7 @@ async def test_detail_preserves_run_error_extra_fields(roots):
         path = roots[2] / run_id / "run.json"
         run = json.loads(path.read_text())
         run["error"] = {"kind": "fixture_failure", "message": "Exact fixture message",
-                        "versions": {"expected": "1.2.0", "actual": "0.0.0"}}
+                        "versions": {"expected": "0.0.1", "actual": "0.0.0"}}
         path.write_text(json.dumps(run))
         detail = checked(await http.get(f"/runs/{run_id}"), "RunDetail")
         assert detail["error"] == run["error"]

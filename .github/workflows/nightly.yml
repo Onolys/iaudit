@@ -15,12 +15,12 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: backend
+        working-directory: eaudit
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: backend/uv.lock
+          cache-dependency-glob: eaudit/uv.lock
       - run: uv sync --frozen
       - run: uv run --no-sync python -m eval.run --mode oracle --gate poc

@@ -27,7 +27,7 @@ const titles: [LoadError, string, boolean][] = [
   [{ kind: "invalid_response", reason: "empty" }, "Invalid audit response", false],
   [{ kind: "invalid_response", reason: "not_json", message: "oops" }, "Invalid audit response", false],
   [{ kind: "invalid_response", reason: "not_object" }, "Invalid audit response", false],
-  [{ kind: "invalid_response", reason: "wrong_version" }, "Invalid audit response", false],
+  [{ kind: "invalid_response", reason: "schema" }, "Invalid audit response", false],
   [{ kind: "invalid_response", reason: "schema", issues }, "Invalid audit response", false],
   [{ kind: "invalid_response", reason: "duplicate_claim_id", claimId: "c1" }, "Invalid audit response", false],
   [{ kind: "request_id_mismatch", expected: "a", received: "b" }, "Response doesn't match this request.", false],
@@ -35,8 +35,8 @@ const titles: [LoadError, string, boolean][] = [
 
 describe("ErrorScreen", () => {
   it("shows saved-response errors without a choose-file action", () => {
-    render(<ErrorScreen error={{ kind: "invalid_response", reason: "wrong_version" }} />);
-    expect(screen.getByRole("alert").textContent).toContain("unsupported schema version");
+    render(<ErrorScreen error={{ kind: "invalid_response", reason: "schema" }} />);
+    expect(screen.getByRole("alert").textContent).toContain("does not match the audit response schema");
     expect(screen.queryByRole("button", { name: "Choose another file" })).toBeNull();
   });
 
@@ -94,10 +94,23 @@ describe("ErrorScreen", () => {
 
   it("renders server text literally, never as HTML", () => {
     const evil = "<b>bold</b><img src=x onerror=alert(1)>";
-    const { container } = render(<ErrorScreen error={{ kind: "http_4xx", status: 400, message: evil }} onChooseFile={() => {}} />);
+    const { container } = render(<ErrorScreen error={{ kind: "http_4xx", status: 400, message: evil, details: [{ code: "schema_violation", message: evil }] }} onChooseFile={() => {}} />);
     expect(container.querySelector("b")).toBeNull();
     expect(container.querySelector("img")).toBeNull();
     expect(container.textContent).toContain(evil);
+  });
+
+  it.each(["http_4xx", "http_5xx"] as const)("shows message and each detail in order for %s", kind => {
+    render(<ErrorScreen error={{ kind, status: kind === "http_4xx" ? 400 : 500,
+      message: "Request rejected.", details: [
+        { code: "schema_violation", message: "transcript/0/text: must be of type string" },
+        { code: "schema_violation", message: "assessment/0: required property missing" },
+      ],
+    }} />);
+    expect(screen.getByText("Request rejected.").tagName).toBe("P");
+    expect(screen.getAllByRole("listitem").map(item => item.textContent)).toEqual([
+      "transcript/0/text: must be of type string", "assessment/0: required property missing",
+    ]);
   });
 
   it("shows no body text when the 5xx body was not a valid error", () => {
@@ -120,7 +133,7 @@ describe("LoadingView", () => {
 });
 
 describe("WarningsBanner", () => {
-  const base: AuditResponse = { schema_version: "1.2.0", status: "complete", warnings: [], claims: [] };
+  const base: AuditResponse = { schema_version: "0.0.1", status: "complete", warnings: [], claims: [] };
 
   it("is absent for a clean complete response", () => {
     const { container } = render(<WarningsBanner response={base} />);

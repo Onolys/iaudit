@@ -6,6 +6,7 @@ import json
 
 from iaudit_eval import compare as comparison
 from iaudit_eval import store
+from iaudit_eval.datasets.registry import dataset_folder
 from iaudit_eval.metrics.report import validate_compare, validate_item_rows, validate_metrics
 from iaudit_eval.server.guards import (
     ApiError,
@@ -123,8 +124,9 @@ class RunReader:
         for run_id, run in ((run_a, a), (run_b, b)):
             self.manager._item_paths(run_id, run)
             name = validate_dataset_id(run["dataset"])
+            folder = dataset_folder(name, self.manager.datasets_root)
             for filename in ("metadata.json", "adapter.py", "metrics.py"):
-                resolve_under(self.manager.datasets_root, name, filename)
+                resolve_under(self.manager.datasets_root, folder.parent.name, name, filename)
             resolve_under(self.manager.data_root, name)
         try:
             result = comparison.compare(

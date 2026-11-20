@@ -7,7 +7,7 @@
   "required": ["schema_version", "run_a", "run_b", "dataset", "warnings", "n_shared", "n_a_only",
                "n_b_only", "n_clusters_shared", "deltas", "disagreements"],
   "properties": {
-    "schema_version": {"const": "1.0.0"},
+    "schema_version": {"const": "0.0.1"},
     "run_a": {"type": "string", "minLength": 1},
     "run_b": {"type": "string", "minLength": 1},
     "dataset": {"type": "string", "minLength": 1},

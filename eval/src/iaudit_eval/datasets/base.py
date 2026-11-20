@@ -42,7 +42,7 @@ class Adapter(Protocol):
 
 
 _KNOWN = (
-    "name", "title", "description", "dataset_version", "kind", "splits", "default_split",
+    "name", "product", "title", "description", "dataset_version", "kind", "splits", "default_split",
     "cluster_key", "license", "data_required", "sources", "test_split_note", "slices",
     "mapping", "references", "levels", "metrics", "pool_all", "gold_kind",
 )  # fmt: skip
@@ -51,6 +51,7 @@ _KNOWN = (
 @dataclass(frozen=True)
 class DatasetMeta:
     name: str
+    product: str
     title: str = ""
     description: str = ""
     dataset_version: str = ""
@@ -75,6 +76,8 @@ class DatasetMeta:
     def from_dict(cls, raw: Mapping) -> DatasetMeta:
         if not isinstance(raw, Mapping) or not isinstance(raw.get("name"), str):
             raise DatasetError("metadata.json must be an object with a string 'name'")
+        if not isinstance(raw.get("product"), str):
+            raise DatasetError("metadata.json must have a string 'product'")
         known = {k: raw[k] for k in _KNOWN if k in raw}
         for k in ("splits", "sources", "slices"):
             if k in known:

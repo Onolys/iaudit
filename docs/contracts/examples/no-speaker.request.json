@@ -1,0 +1,10 @@
+{
+  "schema_version": "0.0.1",
+  "request_id": "no-speaker-001",
+  "transcript": [
+    {"id": "t0", "role": "respondent", "text": "I forget appointments."}
+  ],
+  "assessment": [
+    {"id": "s0", "text": "The participant forgets appointments."}
+  ]
+}

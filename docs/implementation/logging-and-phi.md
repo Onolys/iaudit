@@ -1,6 +1,6 @@
 # Logging and PHI
 
-The backend handles interview text that may be sensitive. Code: `backend/src/iaudit_backend/safe_log.py`.
+The backend handles interview text that may be sensitive. Code: `eaudit/src/eaudit/safe_log.py`.
 
 **Audience:** maintainers and coding agents.
 
@@ -9,4 +9,4 @@ The backend handles interview text that may be sensitive. Code: `backend/src/iau
 - **Exceptions.** Log the class name and a few frame locations, never the message, because a message can hold user data.
 - **Errors in replies.** Error bodies carry fixed messages and a request id, never instance values.
 - **Metrics.** The per-request collector holds no prompt or output text.
-- **Test.** A sentinel word placed in a transcript must never appear in logs, metrics or the `Server-Timing` header (`backend/tests/latency/test_latency.py`, scenario S9).
+- **Test.** A sentinel word placed in a transcript must never appear in logs, metrics or the `Server-Timing` header (`eaudit/tests/latency/test_latency.py`, scenario S9).

@@ -255,7 +255,7 @@
           "type": "string"
         },
         "schema_version": {
-          "const": "1.0.0"
+          "const": "0.0.1"
         },
         "warnings": {
           "items": {
@@ -372,6 +372,10 @@
           "title": "Pool All",
           "type": "boolean"
         },
+        "product": {
+          "title": "Product",
+          "type": "string"
+        },
         "references": {
           "anyOf": [
             {
@@ -426,6 +430,7 @@
       },
       "required": [
         "name",
+        "product",
         "splits"
       ],
       "title": "DatasetMeta",
@@ -442,6 +447,10 @@
           "title": "Name",
           "type": "string"
         },
+        "product": {
+          "title": "Product",
+          "type": "string"
+        },
         "splits": {
           "items": {
             "$ref": "#/$defs/SplitSummary"
@@ -456,6 +465,7 @@
       },
       "required": [
         "name",
+        "product",
         "title",
         "data_present",
         "splits"
@@ -1195,7 +1205,7 @@
           "type": "string"
         },
         "schema_version": {
-          "const": "1.0.0"
+          "const": "0.0.1"
         },
         "scored": {
           "additionalProperties": false,

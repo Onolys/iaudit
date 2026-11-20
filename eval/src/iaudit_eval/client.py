@@ -141,15 +141,17 @@ class AuditClient:
 
         if status >= 300 or status < 200:
             retryable = status in RETRY_STATUSES
-            if parsed and not (err_issues := contracts.validate_error(body)):
-                err = body["error"]
+            err_issues = contracts.validate_error(body) if parsed else []
+            if parsed and not err_issues and body["status"] != status:
+                err_issues = [Issue("status", "must equal HTTP status")]
+            if parsed and not err_issues:
                 return (
                     _failed(
                         "http_error",
                         attempt,
                         http_status=status,
-                        error_code=err.get("code"),
-                        error_message=err.get("message"),
+                        error_code=body["details"][0]["code"],
+                        error_message=body["message"],
                     ),
                     retryable,
                 )
