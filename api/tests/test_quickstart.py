@@ -80,3 +80,12 @@ def test_quickstart_runs_end_to_end(tmp_path):
     finally:
         proc.terminate()
         proc.wait(10)
+
+
+def test_quickstart_put_sends_every_required_header():
+    """Staging: the signed URL also signs `x-goog-content-length-range`; sending only
+    Content-Type gives 400 MalformedSecurityHeader. The PUT must send all required_headers."""
+    script = quickstart_script()
+    put = script.split("# 2.")[1].split("# 3.")[0]
+    assert "required_headers | to_entries" in put
+    assert 'required_headers["Content-Type"]' not in put

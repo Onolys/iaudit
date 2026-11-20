@@ -59,8 +59,39 @@ SP01 p95 gate for 25 min of audio: no p95 value is recorded anywhere to compare 
 
 Test data: the test session was deleted through `DELETE /sessions/{id}` (204, then 404), the staging bucket prefix for the user is empty, and the test user was deleted (lookup returns no account).
 
+## Task 9: API-key front door and no-rating run
+
+Same sample, staging, deployed sha `698d622`, preset `default`, N=1, language `auto`. Test user created and deleted via Identity Toolkit. Key created with `POST /v1/api-key` (the call the `/api-key` page makes; 201, fields `key_id`, `api_key`, `created`). Every later call used only `X-API-Key`.
+
+Curl steps (the `/v1/docs` quickstart script, key redacted as `<KEY>`; `$AUTH` is `X-API-Key: <KEY>`):
+
+1. `POST /sessions` (Idempotency-Key, `{"language":"auto","n_runs":1,"title":...}`) -> session id
+2. `POST /sessions/$SID/audio` -> signed `upload_url` + `required_headers`; `PUT` the file to it
+3. `POST /sessions/$SID/audio/complete`
+4. `PUT /sessions/$SID/rating` (`final=true`)
+5. poll `GET /sessions/$SID` until `awaiting_input`; `GET /speakers`; `POST /speakers/confirm`
+6. poll until `report_ready`; `GET /sessions/$SID/reports/1`
+
+| Run | Card | upload-complete -> `awaiting_input` | confirm -> `report_ready` | run doc (started -> ended) | `reasons_audit` | Tips | eaudit artifact |
+|---|---|---|---|---|---|---|---|
+| A: quickstart as written | change goal + notes (no scores) | not timed | not timed (script has no clock) | 53.5 s, 1 attempt | `partial` (1 item) | 5 | `eaudit.json` 294 B; `run_info.eaudit` present |
+| B: no rating | change goal only, `no_rating=true` | 80.1 s | 54.3 s | 53.1 s, 1 attempt | `skipped` (0 items) | 5 | none; `run_info.eaudit` null |
+
+Run B timings: signed PUT 2.5 s, `validating` +1.0 s, `transcribing` +3.6 s after upload-complete. Both runs are well inside the Task 8 target (<= 5 min; 67.9 s at N=1).
+
+Run B report: 4 globals, 10 behaviours, 14 scorecard rows, 5 tips, warnings `short_session`, `reflection_before_client_speech` (no `reasons_audit_*` warning), header `has_clinician_rating=false`, rating coverage 0/14. Run B artifacts under `{uid}/{sid}/runs/{run_id}/`: `paudit.json` (27.5 KB), `tips.json` (7.2 KB), no `eaudit.json`: Task 4's no-eaudit rule holds on staging. Run A (rated card) wrote all three, eaudit included.
+
+Findings:
+
+- **Quickstart PUT failed on staging (fixed in repo, not deployed).** `required_headers` is `Content-Type`, `x-goog-content-length-range`, `Host`; the quickstart sent only Content-Type, so storage answered 400 `MalformedSecurityHeader` (`x-goog-content-length-range` signed but not sent; the script exits 22). The runs above used the same script with the PUT sending all `required_headers` except `Host`. The fix (`api/src/onolys_api/docs.py`, regenerated `api/openapi.json`, test `test_quickstart_put_sends_every_required_header`) lands with this commit; `/v1/docs` on staging shows the fix only after the next deploy. The quickstart also hard-codes `audio/mp4`; for the mp3 sample the request used `audio/mpeg`.
+- The quickstart card (`notes` set) counts as a rating (`has_rating=true`), so it gives `reasons_audit=partial`, not `skipped`. `skipped` needs no scores, counts or notes (or `no_rating=true`).
+- API-key `DELETE /api-key` with the key itself returns 403 (an ID token is needed). Deleting the Identity Platform user does not revoke the key: it kept authenticating (200) until its `api_keys` doc was removed (then 401).
+
+Cleanup: 3 sessions deleted (204, then 404; includes the session of the failed first PUT), bucket prefix for the user empty, `api_keys`, `users` and `usage` docs for the test user removed (key now 401), test user deleted (lookup returns no account).
+
 ## Open
 
 - The task's 10-25 min recording size is not met: the only real sample is 6.7 min. Run time scales with audio length, so a 10-25 min recording should be re-measured when one is available (the 85 s transcribe step is the part that grows).
 - No SP01 p95 figure to compare against (see above).
 - `run_info.preset`/`code_version` appear in the run doc and report header; `cost_usd` in evaluation usage is `null`.
+- Quickstart on staging still shows the old PUT until the next deploy (see Task 9). A deleted user's API key stays valid until its doc is removed (consider revoking keys on account deletion).
