@@ -8,7 +8,7 @@ Source of truth: 07-admin/PRD.md. **AFTER LAUNCH (r7): none of this is v1 work; 
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | `admin/auth` ASGI verifier package + workspace wiring | SP01 T1 (workspace) | in-progress |
+| 1 | `admin/auth` ASGI verifier package + workspace wiring | SP01 T1 (workspace) | todo |
 | 2 | `admin/backend` gateway: auth + CORS + mounted eaudit app | 1 | todo |
 | 3 | `POST /v1/paudit` and `GET /v1/paudit/fixtures` | 2, SP02 T10 | todo |
 | 4 | `admin/backend/Dockerfile` image | 3 | todo |
