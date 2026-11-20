@@ -2,7 +2,7 @@
 
 **Audience:** contributors.
 
-**Status:** accepted. Gate results below are pending.
+**Status:** accepted. Gate run 2026-11-20; one open finding (STT 20-minute file cap), see below.
 
 **Context.** The platform (protocol audit, evaluation, API) needs the LLM client, speech-to-text and transcript types that lived inside `eaudit`, and `eval/` may not import `eaudit`. Model choice was three env vars with Anthropic-only quirks in the client, and no STT code existed. The owner widened the mission to the platform scope on 2026-11-20 (see [mission](../mission.md)).
 
@@ -21,14 +21,19 @@
 
 ## Gate result
 
-Pending: filled in when the live checks run with credentials and a 2-speaker sample of at least 10 minutes.
+Run 2026-11-20 with live credentials, preset `default`, by the Task 13 agent. **Caveat: the audio is synthetic.** The owner has not supplied a real sample, so the STT check used a short fictional two-speaker dialogue (25 turns, about 2.5 min) synthesized with Google Cloud Text-to-Speech (`en-US-Neural2-F` and `en-US-Neural2-D`, 16 kHz mono) and looped to the target length. Diarization and word-offset quality on clean synthetic voices is not evidence for real sessions. Re-running the STT check on a real 2-speaker sample of at least 10 minutes is an owner follow-up. The audio was uploaded temporarily to `gs://onolys-audio-staging/gate-t13/` and deleted afterwards; no audio is in the repo.
 
 | Item | Result |
 |---|---|
-| LLM smoke (`onolys_core.llm.smoke`) | pending |
-| STT check (`onolys_core.stt.check`) | pending |
-| (a) Are word time offsets present? | pending |
-| (b) Does diarization work with `language: auto`? | pending |
-| (c) p95 latency for 25 minutes of audio | pending |
+| LLM smoke (`onolys_core.llm.smoke`) | PASS, 6/6 routes (`cheap`, `mid`, `strong`, `paudit_code`, `paudit_globals`, `tips`), `json_object` through LiteLLM on `anthropic/claude-sonnet-5-5`. 54 input and 9 output tokens per call; latency 8.0 s on the first call (cold), 0.7-0.8 s on the rest. No route moved to `json_schema`. |
+| STT check (`onolys_core.stt.check --language auto --min-minutes 10`), 17.4 min file | PASS twice: 167 turns, 2 speakers, `language=en` detected, offsets present and monotonic. Wall time 165.4 s and 251.5 s. |
+| STT check, 24.9 min file | FAIL (provider limit, not a quality failure): `File ... is too long. Only audio files up to 20 minutes long are supported for BatchRecognize.` The rejection came back after 273 s. |
+| (a) Are word time offsets present? | Yes. Every turn had `start_ms`/`end_ms`, monotonic. No fallback. |
+| (b) Does diarization work with `language: auto`? | Yes on synthetic audio: 2 speakers found, language detected as `en`. `auto` stays in the SP05 list. Real-audio confirmation pending (caveat above). |
+| (c) p95 latency for 25 minutes of audio | Cannot be measured as a single call: `BatchRecognize` rejects files over 20 minutes. For files under the cap, 2 runs of 17.4 min took 165 s and 252 s (about 0.16-0.24 s of wall time per audio second; two samples cannot give a real p95, so treat it as an estimate). Extrapolated to the 20 minute cap: about 3-5 min, and a 25 min recording split into two chunks run in parallel: about the same. Both are well inside the SP04 poll window (about 20 min). |
+
+**Open finding (action needed before SP04 relies on 25-minute sessions).** The default STT path cannot take a recording longer than 20 minutes. The documented fallbacks in the table below (another model or provider) do not obviously fix it, so this was not changed here: it needs a design choice, either the adapter or SP04 splits audio into chunks under 20 minutes (with speaker labels and offsets stitched across the join), or another recognition mode or provider is used for long files. Owner/SP04 decision.
+
+**Environment note.** The ADC quota project is another project (`juno-medical-clarity`), which has Speech-to-Text disabled. The first STT call failed with `SERVICE_DISABLED` until `GOOGLE_CLOUD_QUOTA_PROJECT=onolys` was set. Set it wherever the adapter runs with user credentials. APIs used (`speech`, `texttospeech`, `storage`) were already enabled on `onolys`; nothing was enabled by this run.
 
 If (a) is no: use another STT model or provider through the adapter. If (b) is no: default language becomes `en-US` and `auto` leaves the web language list. If (c) exceeds the transcribe poll window (about 20 minutes): another model or provider as in (a).
