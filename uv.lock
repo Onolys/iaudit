@@ -1101,6 +1101,7 @@ dependencies = [
     { name = "onolys-core" },
     { name = "onolys-paudit" },
     { name = "pydantic" },
+    { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
@@ -1119,6 +1120,7 @@ requires-dist = [
     { name = "onolys-core", editable = "engines/core" },
     { name = "onolys-paudit", editable = "engines/paudit" },
     { name = "pydantic", specifier = ">=2.7" },
+    { name = "pyyaml", specifier = ">=6" },
 ]
 
 [package.metadata.requires-dev]

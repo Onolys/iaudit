@@ -77,6 +77,21 @@
         "total_mia",
         "total_mina"
       ]
+    },
+    {
+      "section": "reasons_audit",
+      "title": "Your written reasons, checked against the session",
+      "items": []
+    },
+    {
+      "section": "tips",
+      "title": "Ideas to try next time",
+      "items": []
+    },
+    {
+      "section": "method",
+      "title": "How Onolys reads this",
+      "items": []
     }
   ],
   "scorecard": [

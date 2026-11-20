@@ -9,6 +9,7 @@ dependencies = [
   "onolys-paudit",
   "pydantic>=2.7",
   "jsonschema>=4.22",
+  "pyyaml>=6",
 ]
 
 [tool.uv.sources]

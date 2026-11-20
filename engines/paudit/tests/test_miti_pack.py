@@ -129,7 +129,7 @@ def test_compare_covers_every_item_with_a_kind(pack):
         assert cmp[g] == {"kind": "score_diff", "differs_at": 1, "within": 1}
     for c in CODES:
         assert cmp[c] == {"kind": "count_diff", "flag_abs": 2, "flag_rel": 0.25}
-    assert pack.data["evaluation"] == {}
+    assert set(pack.data["evaluation"]) == {"tone"}  # SP03 fills the evaluation block
 
 
 def test_report_stub_lists_known_ids(pack):

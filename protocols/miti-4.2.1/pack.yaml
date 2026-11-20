@@ -330,4 +330,31 @@ compare:
   confront: *count_compare
 
 # Owned and filled by SP03.
-evaluation: {}
+evaluation:
+  # Tone rules (SP03 R6). Phrases match whole words, case-insensitive; patterns are regexes
+  # (case-insensitive) aimed at second-person verdicts. Applied in code to every
+  # model-authored string and, by a unit test, to every static string in report.yaml.
+  tone:
+    banned:
+      phrases:
+        - you are wrong
+        - you were wrong
+        - you got it wrong
+        - incorrect
+        - incorrectly
+        - mistake
+        - mistakes
+        - failed to
+        - failure
+        - you should have
+        - you shouldn't have
+        - bad
+        - poor
+        - poorly
+        - terrible
+        - sloppy
+      patterns:
+        - '\byou(?:\s+(?:clearly|obviously|simply|just))?\s+(?:missed|failed|forgot|ignored|blew|botched|neglected)\b'
+        - '\byou(?:\s+(?:are|were|did|do)(?:n.t|\s+not)?)\s+(?:wrong|incorrect|bad|poor|careless|lazy)\b'
+        - '\byour\s+(?:mistake|error|failure|fault)\b'
+        - '\byou\s+(?:didn.t|did\s+not|never)\s+(?:even\s+)?(?:ask|reflect|listen|try|explore)\b'
