@@ -9,8 +9,8 @@ Source of truth: [PRD.md](PRD.md). Lane C. Code goes to `Onolys/onolys-landing` 
 | # | Task | Depends on | Status |
 |---|---|---|---|
 | 1 | `appUrl()` helper and `PUBLIC_APP_URL` env plumbing (types, build check, CI, `.env.example`) | none | done |
-| 2 | Top bar: Log in + Sign up, desktop and mobile | 1 | in-progress |
-| 3 | `TryItButton` replaces early-access CTAs in Hero, Section, TeamSection | 1 | todo |
+| 2 | Top bar: Log in + Sign up, desktop and mobile | 1 | done |
+| 3 | `TryItButton` replaces early-access CTAs in Hero, Section, TeamSection | 1 | in-progress |
 | 4 | Fix existing e2e specs and CI-config test for the new CTAs | 2, 3 | todo |
 | 5 | PR preview verification at 320/375/768 px and kept-code check | 4 | todo |
 
