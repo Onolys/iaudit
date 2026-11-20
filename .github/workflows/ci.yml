@@ -85,6 +85,49 @@ jobs:
             uv run --no-sync --package onolys-core coverage report --format=markdown
           } >> "$GITHUB_STEP_SUMMARY"
 
+  api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FIREBASE_TOOLS_VERSION: 15.37.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cache firebase-tools and emulator jars
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.cache/firebase/emulators
+          key: firebase-${{ runner.os }}-${{ env.FIREBASE_TOOLS_VERSION }}
+      - run: npm install -g firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }}
+      - run: uv sync --frozen --package onolys-api
+      - run: uv run --no-sync --package onolys-api ruff check api
+      - name: pytest with coverage (Firestore emulator)
+        run: |
+          firebase emulators:exec --config api/firebase.json --only firestore --project demo-onolys \
+            'uv run --no-sync --package onolys-api pytest api -m "not live" --cov=api/src --cov-report='
+          {
+            echo "### Coverage: onolys-api"
+            uv run --no-sync --package onolys-api coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: OpenAPI is up to date
+        run: |
+          uv run --no-sync --package onolys-api python -m onolys_api.openapi
+          git diff --exit-code api/openapi.json
+
   paudit:
     needs: changes
     if: needs.changes.outputs.paudit == 'true'
