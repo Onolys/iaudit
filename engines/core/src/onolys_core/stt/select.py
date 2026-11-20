@@ -17,14 +17,18 @@ STT_FILE_NAME = "stt_providers.yaml"
 DEFAULT_RESOURCE = "stt_providers.default.yaml"
 
 
-def locate_config_file(name: str = STT_FILE_NAME, default_resource: str = DEFAULT_RESOURCE) -> Path:
+def locate_config_file(
+    name: str = STT_FILE_NAME,
+    default_resource: str = DEFAULT_RESOURCE,
+    package: str = "onolys_core.stt",
+) -> Path:
     """`name` next to the file named by env ROUTES_FILE if present, else the packaged default."""
     routes = os.environ.get("ROUTES_FILE")
     if routes:
         candidate = Path(routes).parent / name
         if candidate.is_file():
             return candidate
-    return Path(str(resources.files("onolys_core.stt").joinpath(default_resource)))
+    return Path(str(resources.files(package).joinpath(default_resource)))
 
 
 def load_stt_config(path: Path | None = None) -> dict:

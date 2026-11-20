@@ -1,0 +1,26 @@
+# Packaged default model routes (PRD R3, D6, D11, D12). Used when env ROUTES_FILE is unset.
+# Every shipped route is Claude Sonnet; swapping a model is an edit to this file.
+# `thinking` is deliberately not set: claude-sonnet-5-5 rejects {type: disabled}.
+cheap: &sonnet
+  litellm_id: anthropic/claude-sonnet-5-5
+  api_key_env: ANTHROPIC_API_KEY
+  structured_output_mode: json_object
+  caching_mode: anthropic_ephemeral
+  supports_temperature: false
+  max_output_tokens: 16000
+  context_tokens: 1000000
+  timeout_s: 180
+  max_concurrency: 8
+  max_retries: 3
+  backoff_s: 2
+  extra_params: {}
+mid: *sonnet
+strong: *sonnet
+paudit_code: {alias: mid}
+paudit_globals: {alias: mid}
+tips: {alias: mid}
+
+# Named bundles of route overrides (+ an STT key from stt_providers.yaml). DEFAULT_PRESET picks one.
+presets:
+  default:
+    routes: {}
