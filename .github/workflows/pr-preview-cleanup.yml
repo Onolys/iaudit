@@ -1,0 +1,44 @@
+name: pr-preview-cleanup
+
+# Delete the PR preview (SP00 R3): Cloud Run service onolys-pr-<N> and Hosting channel pr-<N>. Not-found is ignored,
+# so re-running on a clean PR succeeds. Same WIF identity as pr-preview.yml; same-repo PRs only (fork PRs have none).
+# Shares the concurrency group with pr-preview.yml and cancels an in-flight deploy for the same PR.
+on:
+  pull_request:
+    types: [closed]
+
+concurrency:
+  group: pr-preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  GCP_PROJECT: ${{ vars.GCP_PROJECT || 'onolys' }}
+  GCP_REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+  FIREBASE_TOOLS_VERSION: 15.37.0
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Delete service onolys-pr-<N> and channel pr-<N> (ignore not-found)
+        env:
+          PR: ${{ github.event.number }}
+        run: bash scripts/ci/pr_preview.sh cleanup "$PR"

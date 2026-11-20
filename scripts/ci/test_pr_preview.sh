@@ -3,6 +3,7 @@
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 WF="$ROOT/.github/workflows/pr-preview.yml"
+CL="$ROOT/.github/workflows/pr-preview-cleanup.yml"
 PP="$ROOT/scripts/ci/pr_preview.sh"
 fail=0
 ok()  { echo "ok   $1"; }
@@ -10,8 +11,8 @@ bad() { echo "FAIL $1"; fail=1; }
 has()   { grep -Eq -- "$3" "$2" 2>/dev/null && ok "$1" || bad "$1"; }
 hasnt() { grep -Eq -- "$3" "$2" 2>/dev/null && bad "$1" || ok "$1"; }
 
-for f in "$WF" "$PP"; do [[ -f "$f" ]] && ok "exists: ${f#"$ROOT"/}" || { bad "exists: ${f#"$ROOT"/}"; }; done
-[[ -f "$WF" && -f "$PP" ]] || exit 1
+for f in "$WF" "$CL" "$PP"; do [[ -f "$f" ]] && ok "exists: ${f#"$ROOT"/}" || { bad "exists: ${f#"$ROOT"/}"; }; done
+[[ -f "$WF" && -f "$CL" && -f "$PP" ]] || exit 1
 
 # --- pr-preview.yml
 has   "triggers: opened, synchronize, reopened" "$WF" 'types: \[opened, synchronize, reopened\]'
@@ -41,6 +42,15 @@ has   "preview-real label wired"                "$WF" 'preview-real'
 hasnt "no LLM/STT secret names"                 "$WF" '(ANTHROPIC|GEMINI|OPENAI|DEEPGRAM|ASSEMBLYAI|STT|LLM)_[A-Z0-9_]*(KEY|TOKEN|SECRET)'
 hasnt "no pull_request_target"                  "$WF" 'pull_request_target'
 (cd "$ROOT" && python3 scripts/ci/check_no_llm_keys_in_pr_workflows.py >/dev/null) && ok "key guard passes" || bad "key guard passes"
+
+# --- pr-preview-cleanup.yml
+has   "cleanup on pull_request closed"          "$CL" 'types: \[closed\]'
+has   "cleanup same-repo guard"                 "$CL" 'github\.event\.pull_request\.head\.repo\.full_name == github\.repository'
+has   "cleanup WIF auth"                        "$CL" 'google-github-actions/auth@v2'
+has   "cleanup deployer-staging SA var"         "$CL" 'vars\.DEPLOYER_STAGING_SA'
+has   "cleanup concurrency shares preview group" "$CL" 'group: pr-preview-\$\{\{ github\.event\.number \}\}'
+has   "cleanup uses helper"                     "$CL" 'pr_preview\.sh cleanup'
+hasnt "cleanup no JSON key auth"                "$CL" 'credentials_json|GOOGLE_CREDENTIALS|service_account_key'
 
 # --- helper: firebase-config
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
@@ -92,5 +102,20 @@ bash "$PP" is-not-found "Error: Channel pr-9 does not exist on site x" && ok "no
 bash "$PP" is-not-found "HTTP Error: 404, Requested entity was not found." && ok "not-found: 404" || bad "not-found: 404"
 bash "$PP" is-not-found "ERROR: PERMISSION_DENIED: forbidden" && bad "permission denied is not not-found" || ok "permission denied is not not-found"
 
-command -v actionlint >/dev/null 2>&1 && { (cd "$ROOT" && actionlint "$WF") && ok "actionlint" || bad "actionlint"; }
+# --- helper: cleanup with stubbed gcloud/npx (not-found ignored, other errors fail, both deletes attempted)
+mkdir -p "$T/bin"
+mk() { printf '#!/usr/bin/env bash\necho "$(basename "$0") $*" >> "%s/calls"\n%s\n' "$T" "$1" > "$T/bin/$2"; chmod +x "$T/bin/$2"; }
+mk 'echo "ERROR: (gcloud.run.services.delete) Cannot find service [onolys-pr-9]" >&2; exit 1' gcloud
+mk 'echo "Error: Channel pr-9 does not exist" >&2; exit 1' npx
+: > "$T/calls"
+PATH="$T/bin:$PATH" bash "$PP" cleanup 9 >/dev/null 2>&1 && ok "cleanup ignores not-found on both" || bad "cleanup ignores not-found on both"
+grep -q 'gcloud run services delete onolys-pr-9' "$T/calls" && grep -q 'hosting:channel:delete pr-9 --site onolys-app-staging' "$T/calls" && ok "cleanup deletes service and channel" || bad "cleanup deletes service and channel"
+mk 'echo "ERROR: PERMISSION_DENIED" >&2; exit 1' gcloud
+: > "$T/calls"
+PATH="$T/bin:$PATH" bash "$PP" cleanup 9 >/dev/null 2>&1 && bad "cleanup fails on a real error" || ok "cleanup fails on a real error"
+mk 'echo deleted' gcloud; mk 'echo deleted' npx
+PATH="$T/bin:$PATH" bash "$PP" cleanup 9 >/dev/null 2>&1 && ok "cleanup succeeds when both exist" || bad "cleanup succeeds when both exist"
+bash "$PP" cleanup abc >/dev/null 2>&1 && bad "cleanup rejects bad PR number" || ok "cleanup rejects bad PR number"
+
+command -v actionlint >/dev/null 2>&1 && { (cd "$ROOT" && actionlint "$WF" "$CL") && ok "actionlint" || bad "actionlint"; }
 exit $fail
