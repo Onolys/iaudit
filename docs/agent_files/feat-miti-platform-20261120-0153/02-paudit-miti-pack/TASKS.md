@@ -20,7 +20,7 @@ Source of truth: [PRD.md](PRD.md). Lane A. Tests follow SP00 conventions: marker
 | 10 | `paudit.run`: N runs, aggregate, `run_info` | 8, 9, SP01 T10 | done |
 | 11 | Synthetic fixtures, `expected.yaml`, thresholds, offline CLI `run`, golden | 10 | done |
 | 12 | Live `paudit.cli check` | 11 | done |
-| 13 | ADR 0018, contracts pointer, CI finish | 10 | in-progress |
+| 13 | ADR 0018, contracts pointer, CI finish | 10 | done |
 | 14 | Live measurement after the SP01 gate; tune pack `params` | 12, SP01 T13 | todo |
 
 Parallel lanes: all of Lane A, but split among people. Tasks 1 to 7 are pure code and need only SP01 Task 1 (workspace + types) plus, where noted, SP01 Task 3 helpers (`hash_files`, `locate`, stub/fixture clients), which land before the gate; they start before SP01 Task 13. Tasks 8 to 13 use the core client and routes (SP01 Tasks 3, 5, 6, 10) but run on stub clients only. Only Task 14 (live) needs the gate. After Task 1: Tasks 2, 3, 4 run concurrently; after Task 6, Tasks 8 and 9 run concurrently; Task 13 can run beside 11 to 12. Cross-lane sync points: Task 2 (`rating.schema.json`: SP05 builds the rating card, SP03 `validate_rating`) and Task 3 (result schema: SP03, SP04 stub engine) — push each as soon as green. Task 4 (`paudit.formula.evaluate`) is reused by SP03.
