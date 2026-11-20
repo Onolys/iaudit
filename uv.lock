@@ -309,6 +309,7 @@ dependencies = [
     { name = "httpx" },
     { name = "jsonschema" },
     { name = "litellm" },
+    { name = "onolys-core" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "rank-bm25" },
@@ -331,6 +332,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.27" },
     { name = "jsonschema", specifier = ">=4.22" },
     { name = "litellm", specifier = ">=1.50" },
+    { name = "onolys-core", editable = "engines/core" },
     { name = "pydantic", specifier = ">=2.7" },
     { name = "pydantic-settings", specifier = ">=2.3" },
     { name = "rank-bm25", specifier = ">=0.2.2" },
@@ -892,8 +894,10 @@ name = "onolys-core"
 version = "0.1.0"
 source = { editable = "engines/core" }
 dependencies = [
+    { name = "litellm" },
     { name = "pydantic" },
     { name = "pyyaml" },
+    { name = "rapidfuzz" },
 ]
 
 [package.optional-dependencies]
@@ -912,8 +916,10 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "google-cloud-speech", marker = "extra == 'stt-google'", specifier = ">=2.26" },
+    { name = "litellm", specifier = ">=1.50" },
     { name = "pydantic", specifier = ">=2.7" },
     { name = "pyyaml", specifier = ">=6" },
+    { name = "rapidfuzz", specifier = ">=3.14.6" },
 ]
 provides-extras = ["stt-google"]
 

@@ -1,7 +1,7 @@
 from check_helpers import adhd_prep, claim, ev, link
+from onolys_core.llm import FailingClient, LLMUnavailable
 
 from eaudit.check import check_claims, check_one, passthrough_oos, stalled_draft
-from eaudit.llm import FailingClient, LLMUnavailable
 from eaudit.models import ConcernType, Verdict
 
 

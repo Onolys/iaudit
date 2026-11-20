@@ -10,9 +10,9 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline"))
 from injector import LatencyInjector  # noqa: E402
+from onolys_core.llm import LLMTimeout, LLMUnavailable  # noqa: E402
 from pl_scripted import Scripted  # noqa: E402
 
-from eaudit.llm import LLMTimeout, LLMUnavailable  # noqa: E402
 from eaudit.models import AuditRequest  # noqa: E402
 from eaudit.pipeline.full import FullPipeline  # noqa: E402
 

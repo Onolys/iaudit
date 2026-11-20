@@ -8,7 +8,7 @@ import asyncio
 import random
 import time
 
-from eaudit.llm import LLMResult
+from onolys_core.llm import LLMResult
 
 # per call_tag (p50, p95) seconds at factor 1
 DEFAULTS = {"prep_acts": (1.5, 3), "atomize": (5, 9), "link": (4, 8), "check": (4, 8)}

@@ -1,9 +1,9 @@
 from atomize_helpers import FIXTURES, ROSTER, adhd_section, raw
+from onolys_core.llm import FailingClient, FixtureClient, LLMResult, LLMUnavailable
 
 from eaudit.atomize import atomize_section
 from eaudit.atomize.models import AtomizerOutput
 from eaudit.atomize.prompt import Speaker
-from eaudit.llm import FailingClient, FixtureClient, LLMResult, LLMUnavailable
 from eaudit.models import Section
 
 TEXT = "Jordan misplaces receipts. Jordan double-books clients and skips lunch every day."
@@ -370,7 +370,7 @@ def test_atomize_has_no_matcher_of_its_own():
 
     import eaudit.atomize.validate as val
 
-    asm = importlib.import_module("eaudit.assembler.locate")
+    asm = importlib.import_module("onolys_core.locate")
     assert val.locate is asm.locate
     pkg = Path(val.__file__).parent
     src = "\n".join(p.read_text() for p in pkg.glob("*.py"))

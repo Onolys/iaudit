@@ -8,11 +8,11 @@ import json
 import re
 
 from atomize_helpers import FIXTURES, raw
+from onolys_core.llm import LLMResult
 
 from eaudit.atomize.models import AtomizerOutput
 from eaudit.check.models import VerifierOutput
 from eaudit.link.models import LinkerOutput
-from eaudit.llm import LLMResult
 from eval.adhd import faithful_request, load_spec, make_request
 
 UNSPEC = [{"source": "unspecified", "speaker": None}]

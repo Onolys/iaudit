@@ -2,13 +2,14 @@
 
 import asyncio
 
+from onolys_core.safe_log import log_event
+
 from eaudit.assembler.models import ClaimDraft, ConcernDraft, Outcome
 from eaudit.atomize.models import AtomicClaim, CausalLink
 from eaudit.config import Settings
 from eaudit.link.models import LinkResult
 from eaudit.models import ConcernType, EvidenceRole, Verdict
 from eaudit.prep import IndexedTurn, PrepResult
-from eaudit.safe_log import log_event
 
 from .group_a import GroupA, run_group_a
 from .models import Concern, Decision, JudgedEvidence

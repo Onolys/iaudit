@@ -2,18 +2,18 @@ import logging
 
 import pytest
 from check_helpers import adhd_prep, claim, ev, link
-
-from eaudit.assembler import InternalAudit, assemble
-from eaudit.check import check_claims
-from eaudit.check.models import VerifierOutput
-from eaudit.config import Settings
-from eaudit.llm import (
+from onolys_core.llm import (
     FailingClient,
     LLMBadOutput,
     LLMTimeout,
     LLMUnavailable,
     StubClient,
 )
+
+from eaudit.assembler import InternalAudit, assemble
+from eaudit.check import check_claims
+from eaudit.check.models import VerifierOutput
+from eaudit.config import Settings
 from eaudit.models import AuditRequest
 
 PREP = adhd_prep(roles=True)
@@ -32,7 +32,7 @@ class Scripted:
         self.calls = []
 
     async def complete_json(self, req, metrics=None):
-        from eaudit.llm import LLMResult
+        from onolys_core.llm import LLMResult
 
         cid = req.fixture_key.split(".check.")[1].removesuffix(".retry")
         self.calls.append(req.fixture_key)
@@ -130,7 +130,7 @@ def test_check_settings_defaults():
 async def test_check_concurrency_bounds_in_flight_calls(make_ctx):
     import asyncio
 
-    from eaudit.llm import LLMResult
+    from onolys_core.llm import LLMResult
 
     live = peak = 0
 
@@ -180,6 +180,6 @@ async def test_drafts_pass_the_assembler_without_repair(make_ctx):
 
 
 def test_floor_count_fields_are_loggable():
-    from eaudit.safe_log import ALLOWED_FIELDS
+    from onolys_core.safe_log import ALLOWED_FIELDS
 
     assert {"items_below_floor", "inferences_below_floor", "flags_below_floor"} <= ALLOWED_FIELDS

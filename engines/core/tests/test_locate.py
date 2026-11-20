@@ -1,9 +1,10 @@
+from types import SimpleNamespace
+
 import pytest
 
-from eaudit.assembler.locate import locate
-from eaudit.config import Settings
+from onolys_core.locate import locate
 
-CFG = Settings()
+CFG = SimpleNamespace(fuzzy_threshold=90, fuzzy_min_len=12)  # eaudit Settings defaults
 
 
 def sl(text, m):

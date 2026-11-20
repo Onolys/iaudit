@@ -4,12 +4,12 @@ import json
 
 import pytest
 from fastapi.testclient import TestClient
+from llm_helpers import Fake, completion
+from onolys_core.llm import LiteLLMClient, LLMRequest, MetricsCollector
 from pydantic import BaseModel
-from test_llm import Fake, completion
 
 from eaudit.app import create_app
 from eaudit.config import Settings
-from eaudit.llm import LiteLLMClient, LLMRequest, MetricsCollector
 
 # -- streaming body cap ----------------------------------------------------------------------
 
@@ -117,7 +117,7 @@ def _req(**kw):
 async def test_metrics_record_carries_unit():
     fake = Fake(completion('{"answer": "a"}'))
     m = MetricsCollector()
-    await LiteLLMClient(Settings(llm_mode="live"), acompletion=fake).complete_json(
+    await LiteLLMClient(Settings(llm_mode="live").llm_config(), acompletion=fake).complete_json(
         _req(unit="c3"), m
     )
     assert m.snapshot()["records"][0]["unit"] == "c3"
@@ -126,7 +126,7 @@ async def test_metrics_record_carries_unit():
 async def test_unit_defaults_to_none():
     fake = Fake(completion('{"answer": "a"}'))
     m = MetricsCollector()
-    await LiteLLMClient(Settings(llm_mode="live"), acompletion=fake).complete_json(_req(), m)
+    await LiteLLMClient(Settings(llm_mode="live").llm_config(), acompletion=fake).complete_json(_req(), m)
     assert m.snapshot()["records"][0]["unit"] is None
 
 
@@ -135,7 +135,7 @@ async def test_unit_defaults_to_none():
 
 async def test_two_cache_prefixes_give_two_breakpoints():
     fake = Fake(completion('{"answer": "a"}'))
-    await LiteLLMClient(Settings(llm_mode="live"), acompletion=fake).complete_json(
+    await LiteLLMClient(Settings(llm_mode="live").llm_config(), acompletion=fake).complete_json(
         _req(cache_prefixes=["ONE", "TWO"])
     )
     system = fake.calls[0]["messages"][0]["content"]
@@ -146,14 +146,14 @@ async def test_two_cache_prefixes_give_two_breakpoints():
 async def test_more_than_two_prefixes_rejected():
     fake = Fake(completion('{"answer": "a"}'))
     with pytest.raises(ValueError):
-        await LiteLLMClient(Settings(llm_mode="live"), acompletion=fake).complete_json(
+        await LiteLLMClient(Settings(llm_mode="live").llm_config(), acompletion=fake).complete_json(
             _req(cache_prefixes=["a", "b", "c"])
         )
 
 
 async def test_single_cache_prefix_still_works():
     fake = Fake(completion('{"answer": "a"}'))
-    await LiteLLMClient(Settings(llm_mode="live"), acompletion=fake).complete_json(
+    await LiteLLMClient(Settings(llm_mode="live").llm_config(), acompletion=fake).complete_json(
         _req(cache_prefix="P")
     )
     system = fake.calls[0]["messages"][0]["content"]
@@ -164,7 +164,7 @@ FIXED_KEY = "df61adfd490005e69c880a0033174adc6dd29b8b66c6da6f1496ee57290deb76"
 
 
 def test_fixture_key_depends_on_cache_prefixes():
-    from eaudit.llm import FixtureClient
+    from onolys_core.llm import FixtureClient
 
     a = FixtureClient.key_for(_req(cache_prefixes=["RULES v1", "TRANSCRIPT A"]))
     b = FixtureClient.key_for(_req(cache_prefixes=["RULES v2", "TRANSCRIPT B"]))
@@ -172,7 +172,7 @@ def test_fixture_key_depends_on_cache_prefixes():
 
 
 def test_fixture_key_unchanged_when_cache_prefixes_empty():
-    from eaudit.llm import FixtureClient
+    from onolys_core.llm import FixtureClient
 
     assert FixtureClient.key_for(_req(cache_prefix="P")) == FixtureClient.key_for(
         _req(cache_prefix="P", cache_prefixes=[])

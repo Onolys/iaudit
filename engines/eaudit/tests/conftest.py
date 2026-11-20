@@ -21,8 +21,9 @@ def make_ctx():
     """Factory for a RequestContext with a StubClient (offline)."""
     import time
 
+    from onolys_core.llm import MetricsCollector, StubClient
+
     from eaudit.config import Settings
-    from eaudit.llm import MetricsCollector, StubClient
     from eaudit.pipeline import RequestContext
 
     def factory(llm=None, deadline_in=60.0, request_id="r1", **settings):

@@ -4,6 +4,7 @@ from dataclasses import replace
 
 import pytest
 from check_helpers import adhd_prep, claim, ev, link
+from onolys_core.llm import StubClient
 
 from eaudit.atomize.models import CausalLink
 from eaudit.check import check_one
@@ -12,7 +13,6 @@ from eaudit.check.models import VerifierOutput
 from eaudit.check.synth import decide, judge
 from eaudit.check.verifier import apply_floors
 from eaudit.config import Settings
-from eaudit.llm import StubClient
 
 E1, E2 = "c0.1:e1", "c0.1:e2"
 NEW_TYPES = ("opinion_as_fact", "calculation_error", "meaning_shift", "unsupported_inference")

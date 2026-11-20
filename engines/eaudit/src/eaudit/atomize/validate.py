@@ -6,7 +6,8 @@
 import re
 from dataclasses import dataclass, field
 
-from eaudit.assembler.locate import locate
+from onolys_core.locate import locate
+
 from eaudit.config import Settings
 
 from .models import AtomizerOutput, CausalLink, RawClaim

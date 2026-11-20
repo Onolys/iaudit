@@ -4,7 +4,7 @@ import asyncio
 
 import pytest
 
-from eaudit.utils import retry
+from onolys_core.retry import retry
 
 
 async def test_first_success_runs_once_without_budget_check():

@@ -3,9 +3,10 @@
 import re
 from dataclasses import dataclass
 
+from onolys_core.normalize import normalize
+
 from eaudit.models import AuditRequest, Verdict
 
-from .normalize import normalize
 from .repair import EXPLANATIONS, GENERIC_OUT_OF_SCOPE
 
 _QUOTED = re.compile(r""""([^"]+)"|“([^”]+)”|‘([^’]+)’|(?<!\w)'(.+?)'(?!\w)""")

@@ -4,9 +4,9 @@ import json
 import re
 
 import pytest
+from onolys_core.llm import LLMResult
 
 from eaudit.check.models import VerifierOutput
-from eaudit.llm import LLMResult
 from eval import run as run_mod
 from eval.baselines import BaselineNotInstalled, get_baseline, run_baseline
 from eval.compare import deltas, render

@@ -1,6 +1,7 @@
 import json
 
 from check_helpers import adhd_prep, claim, ev, link
+from onolys_core.llm import FailingClient, LLMBadOutput, LLMTimeout, LLMUnavailable, StubClient
 
 from eaudit.check.models import VerifierOutput
 from eaudit.check.verifier import (
@@ -12,7 +13,6 @@ from eaudit.check.verifier import (
     verify,
 )
 from eaudit.config import Settings
-from eaudit.llm import FailingClient, LLMBadOutput, LLMTimeout, LLMUnavailable, StubClient
 
 PREP = adhd_prep(roles=True)
 

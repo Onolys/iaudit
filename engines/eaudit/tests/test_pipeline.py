@@ -2,11 +2,11 @@ import asyncio
 import time
 
 import pytest
+from onolys_core.llm import MetricsCollector, StubClient
 
 from eaudit import contract
 from eaudit.api.errors import DeadlineExceeded
 from eaudit.config import Settings
-from eaudit.llm import MetricsCollector, StubClient
 from eaudit.models import AuditRequest
 from eaudit.pipeline import (
     MIN_CALL_S,

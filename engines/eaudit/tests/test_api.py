@@ -3,11 +3,11 @@ import json
 
 import pytest
 from fastapi.testclient import TestClient
+from onolys_core.llm.errors import LLMUnavailable
 
 from eaudit import contract
 from eaudit.app import create_app
 from eaudit.config import Settings
-from eaudit.llm.errors import LLMUnavailable
 
 
 def settings(**kw) -> Settings:

@@ -2,10 +2,11 @@
 
 from dataclasses import dataclass, field
 
+from onolys_core.locate import locate
+
 from eaudit.config import Settings
 from eaudit.models import Turn
 
-from .locate import locate
 from .models import AssembleReport, EvidenceDraft
 
 

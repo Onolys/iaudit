@@ -8,6 +8,8 @@ import hashlib
 from functools import cache
 from pathlib import Path
 
+from onolys_core.run_info import hash_files
+
 from eaudit.config import Settings
 
 PROMPTS = Path(__file__).resolve().parent / "prompts"
@@ -21,10 +23,7 @@ STAGE_FILES = {
 def compute_hashes(prompts_dir: Path) -> dict[str, str]:
     out = {}
     for stage, files in STAGE_FILES.items():
-        h = hashlib.sha256()
-        for f in files:
-            h.update((prompts_dir / f).read_bytes())
-        out[stage] = h.hexdigest()[:16]
+        out[stage] = hash_files([prompts_dir / f for f in files])
     from eaudit.prep.prompt import SYSTEM
 
     out["prep"] = hashlib.sha256(SYSTEM.encode()).hexdigest()[:16]

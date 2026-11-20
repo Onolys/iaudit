@@ -2,12 +2,13 @@
 
 from dataclasses import dataclass, field
 
+from onolys_core.locate import locate
+from onolys_core.normalize import normalize
+
 from eaudit.config import Settings
 from eaudit.models import Section, Verdict
 
-from .locate import locate
 from .models import AssembleReport, ClaimDraft, SectionFailure
-from .normalize import normalize
 
 _SEVERITY = {
     Verdict.contradicted: 4,

@@ -1,6 +1,6 @@
 # LLM client
 
-Every model call goes through one interface. Code: `engines/eaudit/src/eaudit/llm/`.
+Every model call goes through one interface. Code: `engines/core/src/onolys_core/llm/`.
 
 **Audience:** maintainers and coding agents.
 
@@ -20,7 +20,7 @@ Every model call goes through one interface. Code: `engines/eaudit/src/eaudit/ll
 | `StubClient` | Canned answers per call tag, for tests. |
 | `FailingClient` | Always raises, for failure tests. |
 
-`make_client(settings)` picks one from `llm_mode`.
+`make_client(settings.llm_config())` picks one from `llm_mode`.
 
 ## Errors
 

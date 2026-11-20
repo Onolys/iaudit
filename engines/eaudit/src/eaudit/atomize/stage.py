@@ -3,11 +3,12 @@
 import asyncio
 import re
 
-from eaudit.llm import LLMBadOutput, LLMError, LLMRequest, LLMTimeout
+from onolys_core.llm import LLMBadOutput, LLMError, LLMRequest, LLMTimeout
+from onolys_core.retry import retry
+from onolys_core.safe_log import log_event
+
 from eaudit.models import Section, Turn
-from eaudit.safe_log import log_event
 from eaudit.scales import FrequencyBucket, SeverityBucket, resolve_quantity
-from eaudit.utils.retry import retry
 
 from .models import AtomicClaim, AtomizerOutput, Quantity, SectionAtoms
 from .prompt import Speaker, build_cache_prefix, render_user, roster_from_turns

@@ -1,5 +1,7 @@
 import json
 
+from onolys_core.locate import Match
+
 from eaudit.assembler import (
     AssemblyError,
     ClaimDraft,
@@ -10,7 +12,6 @@ from eaudit.assembler import (
     SectionFailure,
     assemble,
 )
-from eaudit.assembler.locate import Match
 from eaudit.config import Settings
 from eaudit.contract import validate_response
 from eaudit.models import AuditRequest

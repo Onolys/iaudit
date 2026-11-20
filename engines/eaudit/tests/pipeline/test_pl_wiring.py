@@ -37,7 +37,7 @@ def test_live_mode_without_key_warns_by_presence_only(monkeypatch, caplog):
 
 
 def test_unavailable_provider_is_503_through_the_real_pipeline(example_request):
-    from eaudit.llm import FailingClient, LLMUnavailable
+    from onolys_core.llm import FailingClient, LLMUnavailable
 
     app = create_app(Settings(llm_mode="stub"), llm=FailingClient(LLMUnavailable("down")))
     with TestClient(app) as c:

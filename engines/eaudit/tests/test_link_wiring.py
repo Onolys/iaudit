@@ -3,6 +3,7 @@ import logging
 
 from atomize_helpers import FIXTURES, ROSTER, adhd_section
 from link_helpers import adhd_prep, adhd_turns, claim
+from onolys_core.llm import FailingClient, FixtureClient, LLMResult, LLMUnavailable
 
 from eaudit.assembler import ClaimDraft, InternalAudit, assemble
 from eaudit.atomize import atomize_section
@@ -10,7 +11,6 @@ from eaudit.atomize.prompt import Speaker
 from eaudit.contract import validate_response
 from eaudit.link import link_claims, to_evidence_drafts
 from eaudit.link.models import LinkerOutput
-from eaudit.llm import FailingClient, FixtureClient, LLMResult, LLMUnavailable
 from eaudit.models import AuditRequest
 from eaudit.prep import prep as run_prep
 

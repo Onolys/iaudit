@@ -178,10 +178,10 @@ def test_shortlist_only_needs_no_client_and_matches_the_index():
 async def _requests(make_ctx, mode, **kw):
     from atomize_helpers import raw  # noqa: F401
     from link_helpers import adhd_turns
+    from onolys_core.llm import LLMResult, StubClient
 
     from eaudit.link import build_link_context, link_one
     from eaudit.link.models import LinkerOutput
-    from eaudit.llm import LLMResult, StubClient
 
     seen = []
 

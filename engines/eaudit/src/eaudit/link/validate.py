@@ -3,7 +3,8 @@
 from collections import Counter
 from dataclasses import dataclass, field
 
-from eaudit.assembler.locate import locate
+from onolys_core.locate import locate
+
 from eaudit.assembler.models import EvidenceDraft, ExcerptSegment
 from eaudit.config import Settings
 from eaudit.models import EvidenceRole, Turn

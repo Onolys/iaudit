@@ -3,13 +3,7 @@ import asyncio
 import pytest
 from atomize_helpers import FIXTURES, ROSTER, adhd_section
 from link_helpers import adhd_prep, adhd_turns, claim
-
-from eaudit.atomize import atomize_section
-from eaudit.atomize.prompt import Speaker
-from eaudit.link.context import build_link_context
-from eaudit.link.linker import link_one
-from eaudit.link.models import LinkerOutput
-from eaudit.llm import (
+from onolys_core.llm import (
     FailingClient,
     FixtureClient,
     LLMBadOutput,
@@ -18,6 +12,12 @@ from eaudit.llm import (
     LLMUnavailable,
     StubClient,
 )
+
+from eaudit.atomize import atomize_section
+from eaudit.atomize.prompt import Speaker
+from eaudit.link.context import build_link_context
+from eaudit.link.linker import link_one
+from eaudit.link.models import LinkerOutput
 
 
 def out(*items):

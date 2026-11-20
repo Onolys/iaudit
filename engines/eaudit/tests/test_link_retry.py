@@ -1,11 +1,11 @@
 import asyncio
 
 from link_helpers import adhd_prep, adhd_turns, claim
+from onolys_core.llm import LLMBadOutput, LLMResult, LLMTimeout, LLMUnavailable
 
 from eaudit.link.context import build_link_context
 from eaudit.link.linker import link_one
 from eaudit.link.models import LinkerOutput
-from eaudit.llm import LLMBadOutput, LLMResult, LLMTimeout, LLMUnavailable
 
 GOOD = {
     "items": [

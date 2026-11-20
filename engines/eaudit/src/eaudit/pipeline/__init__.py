@@ -5,9 +5,10 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
+from onolys_core.llm import LLMClient, MetricsCollector
+
 from eaudit.api.errors import DeadlineExceeded
 from eaudit.config import Settings
-from eaudit.llm import LLMClient, MetricsCollector
 from eaudit.models import AuditRequest, AuditResponse, Status
 
 MIN_CALL_S = 4.0  # default of Settings.min_call_s: below this remaining budget no call starts

@@ -106,12 +106,12 @@ def test_speaker_free_request_audits_through_api_and_warns():
 
     from atomize_helpers import raw
     from fastapi.testclient import TestClient
+    from onolys_core.llm import StubClient
 
     from eaudit.app import create_app
     from eaudit.atomize.models import AtomizerOutput
     from eaudit.check.models import VerifierOutput
     from eaudit.link.models import LinkerOutput
-    from eaudit.llm import StubClient
 
     examples = Path(__file__).resolve().parents[3] / "docs/contracts/examples"
     request = json.loads((examples / "no-speaker.request.json").read_text())

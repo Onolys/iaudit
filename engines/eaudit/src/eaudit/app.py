@@ -10,6 +10,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from onolys_core.llm import LLMClient, LLMUnavailable, MetricsCollector, make_client
+from onolys_core.safe_log import log_event, setup_logging
 from starlette.concurrency import run_in_threadpool
 
 from eaudit import contract, run_info
@@ -21,7 +23,6 @@ from eaudit.api.errors import (
     register_error_handlers,
 )
 from eaudit.config import Settings
-from eaudit.llm import LLMClient, LLMUnavailable, MetricsCollector, make_client
 from eaudit.models import AuditRequest
 from eaudit.pipeline import (
     BACKSTOP_GRACE_S,
@@ -30,7 +31,6 @@ from eaudit.pipeline import (
     make_pipeline,
     run_with_backstop,
 )
-from eaudit.safe_log import log_event, setup_logging
 
 log = logging.getLogger("iaudit")
 MAX_SAFE_DEADLINE_S = 100
@@ -81,7 +81,7 @@ def create_app(
     async def lifespan(app: FastAPI):
         contract.get_contracts()  # fail fast on a missing or invalid schema
         setup_logging(settings.log_level)
-        app.state.llm = llm or make_client(settings)
+        app.state.llm = llm or make_client(settings.llm_config())
         app.state.pipeline = pipeline or make_pipeline(settings)
         log.info("startup config=%s", json.dumps(settings.safe_summary(), sort_keys=True))
         if settings.audit_deadline_s > MAX_SAFE_DEADLINE_S:

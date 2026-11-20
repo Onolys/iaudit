@@ -1,9 +1,9 @@
 import time
 
 import pytest
+from onolys_core.llm import MetricsCollector, StubClient
 
 from eaudit.config import Settings
-from eaudit.llm import MetricsCollector, StubClient
 from eaudit.pipeline import MIN_CALL_S, RequestContext
 
 

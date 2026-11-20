@@ -11,10 +11,10 @@ interview. They exercise the checker, gates, deduplication, verdict and evidence
 
 import pytest
 from check_helpers import claim, ev, link
+from onolys_core.llm import StubClient
 
 from eaudit.check import check_claims
 from eaudit.check.models import VerifierOutput
-from eaudit.llm import StubClient
 from eaudit.models import Turn
 from eaudit.prep import PrepResult, index_turns, pair_turns
 

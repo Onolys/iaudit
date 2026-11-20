@@ -1,10 +1,10 @@
 import pytest
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.testclient import TestClient
+from onolys_core.llm.errors import LLMUnavailable
 
 from eaudit import contract
 from eaudit.api.errors import ApiError, register_error_handlers
-from eaudit.llm.errors import LLMUnavailable
 
 
 def make_app() -> FastAPI:

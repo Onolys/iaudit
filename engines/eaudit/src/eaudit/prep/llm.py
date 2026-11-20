@@ -8,10 +8,9 @@ import asyncio
 import re
 from dataclasses import replace
 
+from onolys_core.llm import LLMError, LLMRequest
+from onolys_core.safe_log import log_event
 from pydantic import BaseModel, ConfigDict
-
-from eaudit.llm import LLMError, LLMRequest
-from eaudit.safe_log import log_event
 
 from .models import Act, IndexedTurn
 from .prompt import SYSTEM, render_user

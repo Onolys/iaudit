@@ -6,17 +6,17 @@ from types import SimpleNamespace
 import pytest
 from pydantic import BaseModel
 
-from eaudit.config import Settings
-from eaudit.llm import (
+from onolys_core.llm import (
     FailingClient,
     FixtureClient,
     LiteLLMClient,
+    LLMConfig,
     LLMRequest,
     MetricsCollector,
     StubClient,
     make_client,
 )
-from eaudit.llm.errors import (
+from onolys_core.llm.errors import (
     FixtureMiss,
     LLMBadOutput,
     LLMTimeout,
@@ -59,7 +59,7 @@ class Fake:
 
 
 def settings(**kw):
-    return Settings(llm_mode="live", **kw)
+    return LLMConfig(llm_mode="live", **kw)
 
 
 async def test_success_captures_usage_and_latency():
@@ -202,8 +202,8 @@ async def test_stub_and_failing():
 
 
 def test_make_client_modes(tmp_path):
-    assert isinstance(make_client(Settings(llm_mode="stub")), StubClient)
+    assert isinstance(make_client(LLMConfig(llm_mode="stub")), StubClient)
     assert isinstance(
-        make_client(Settings(llm_mode="fixture", fixture_dir=str(tmp_path))), FixtureClient
+        make_client(LLMConfig(llm_mode="fixture", fixture_dir=str(tmp_path))), FixtureClient
     )
-    assert isinstance(make_client(Settings(llm_mode="live")), LiteLLMClient)
+    assert isinstance(make_client(LLMConfig(llm_mode="live")), LiteLLMClient)

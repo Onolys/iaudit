@@ -1,7 +1,8 @@
 """Basic per-request metrics: stage spans, counters, deadline_hit. Counts and durations only."""
 
+from onolys_core.safe_log import log_event
+
 from eaudit.assembler import InternalAudit
-from eaudit.safe_log import log_event
 
 from .state import RunState
 

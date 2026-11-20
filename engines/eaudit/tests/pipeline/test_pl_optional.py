@@ -3,9 +3,9 @@
 import asyncio
 
 import pytest
+from onolys_core.llm import LLMRequest, LLMResult, LLMUnavailable, MetricsCollector, Usage
 from pl_scripted import Scripted
 
-from eaudit.llm import LLMRequest, LLMResult, LLMUnavailable, MetricsCollector, Usage
 from eaudit.models import AuditRequest
 from eaudit.pipeline.full import FullPipeline
 from eaudit.pipeline.layout import COMMON_SYSTEM, transcript_prefix

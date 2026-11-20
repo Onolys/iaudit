@@ -18,12 +18,13 @@ import time
 from datetime import date
 from pathlib import Path
 
-from eaudit.config import Settings
-from eaudit.llm import (
+from onolys_core.llm import (
     FixtureClient,
     RecordingClient,
     make_client,
 )
+
+from eaudit.config import Settings
 from eval.adapters import MODES, RUNNERS, MissCounter, load_fixture
 from eval.adhd import DATA
 from eval.baselines import BaselineNotInstalled, get_baseline, run_baseline
@@ -274,7 +275,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.max_cost is not None and estimate > args.max_cost:
                 print(f"estimate exceeds --max-cost ${args.max_cost:.2f}; nothing was called")
                 return 2
-            llm = make_client(settings)
+            llm = make_client(settings.llm_config())
             if args.record and not isinstance(llm, RecordingClient):
                 llm = RecordingClient(llm, args.fixture_dir)
         else:

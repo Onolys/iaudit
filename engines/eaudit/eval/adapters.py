@@ -8,6 +8,8 @@ import asyncio
 import json
 import time
 
+from onolys_core.llm import FixtureMiss, MetricsCollector
+
 from eaudit.assembler import InternalAudit, assemble
 from eaudit.assembler.models import (
     ClaimDraft,
@@ -20,7 +22,6 @@ from eaudit.config import Settings
 from eaudit.link import build_link_context, link_one
 from eaudit.link.models import LinkedEvidence, LinkResult
 from eaudit.link.validate import answer_status
-from eaudit.llm import FixtureMiss, MetricsCollector
 from eaudit.models import AuditRequest, EvidenceRole, Verdict
 from eaudit.pipeline import RequestContext
 from eaudit.pipeline.full import FullPipeline

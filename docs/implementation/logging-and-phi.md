@@ -1,6 +1,6 @@
 # Logging and PHI
 
-The backend handles interview text that may be sensitive. Code: `engines/eaudit/src/eaudit/safe_log.py`.
+The backend handles interview text that may be sensitive. Code: `engines/core/src/onolys_core/safe_log.py`.
 
 **Audience:** maintainers and coding agents.
 

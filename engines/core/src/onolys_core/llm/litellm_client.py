@@ -12,9 +12,9 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from eaudit.config import Settings
-from eaudit.utils.retry import retry
+from onolys_core.retry import retry
 
+from .config import LLMConfig
 from .errors import LLMBadOutput, LLMTimeout, LLMUnavailable
 from .types import LLMRequest, LLMResult, MetricsCollector, Usage
 
@@ -66,7 +66,7 @@ def _kind(exc: BaseException | None) -> str:
 class LiteLLMClient:
     def __init__(
         self,
-        settings: Settings,
+        settings: LLMConfig,
         acompletion: Callable[..., Awaitable[Any]] | None = None,
     ) -> None:
         self._s = settings

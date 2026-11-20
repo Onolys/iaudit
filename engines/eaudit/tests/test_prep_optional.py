@@ -2,7 +2,8 @@
 
 import asyncio
 
-from eaudit.llm import FailingClient, LLMResult, LLMUnavailable
+from onolys_core.llm import FailingClient, LLMResult, LLMUnavailable
+
 from eaudit.models import Turn
 from eaudit.pipeline.state import RunState
 from eaudit.prep import Act, index_turns, prep, prep_rules_only

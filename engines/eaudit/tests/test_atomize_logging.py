@@ -1,10 +1,10 @@
 import logging
 
 from atomize_helpers import ROSTER, raw
+from onolys_core.llm import FailingClient, LLMResult, LLMUnavailable
 
 from eaudit.atomize import atomize_section
 from eaudit.atomize.models import AtomizerOutput
-from eaudit.llm import FailingClient, LLMResult, LLMUnavailable
 from eaudit.models import Section, Turn
 from eaudit.prep import prep
 

@@ -4,8 +4,9 @@ Rules decide every act they can. With `prep_llm` on, a cheap-tier call tags the 
 rules were unsure about; otherwise unsure acts resolve to none and no LLM call is made.
 """
 
+from onolys_core.safe_log import log_event
+
 from eaudit.models import Turn
-from eaudit.safe_log import log_event
 
 from .llm import tag_unsure
 from .models import Act, IndexedTurn, PrepResult, QAPair

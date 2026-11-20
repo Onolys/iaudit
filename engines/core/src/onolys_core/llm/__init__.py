@@ -2,15 +2,14 @@
 
 import os
 
-from eaudit.config import Settings
-
+from .config import LLMConfig
 from .errors import FixtureMiss, LLMBadOutput, LLMError, LLMTimeout, LLMUnavailable
 from .fixture_client import FailingClient, FixtureClient, RecordingClient, StubClient
 from .litellm_client import LiteLLMClient
 from .types import LLMClient, LLMRequest, LLMResult, MetricsCollector, Usage
 
 
-def make_client(settings: Settings) -> LLMClient:
+def make_client(settings: LLMConfig) -> LLMClient:
     if settings.llm_mode == "stub":
         return StubClient()
     if settings.llm_mode == "fixture":
@@ -22,6 +21,7 @@ def make_client(settings: Settings) -> LLMClient:
 
 
 __all__ = [
+    "LLMConfig",
     "FailingClient",
     "FixtureClient",
     "FixtureMiss",

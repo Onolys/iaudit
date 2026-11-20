@@ -1,8 +1,8 @@
 import pytest
+from onolys_core.llm import LLMBadOutput, LLMTimeout, LLMUnavailable
 from pl_scripted import Scripted
 
 from eaudit.api.errors import DeadlineExceeded
-from eaudit.llm import LLMBadOutput, LLMTimeout, LLMUnavailable
 from eaudit.models import AuditRequest
 from eaudit.pipeline.full import FullPipeline
 from eaudit.pipeline.guards import assess

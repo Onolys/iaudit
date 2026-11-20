@@ -2,10 +2,10 @@ import json
 import logging
 
 from fastapi.testclient import TestClient
+from onolys_core.safe_log import log_event
 
 from eaudit.app import create_app
 from eaudit.config import Settings
-from eaudit.safe_log import log_event
 
 SENTINEL = "ZZ-SENTINEL-PHI-ZZ"
 
@@ -101,7 +101,7 @@ def test_lines_print_to_stderr_without_caplog(capsys, example_request):
 
 
 def test_setup_logging_is_idempotent():
-    from eaudit.safe_log import setup_logging
+    from onolys_core.safe_log import setup_logging
 
     setup_logging("INFO")
     setup_logging("INFO")

@@ -6,8 +6,9 @@ one in-scope claim finished ok. A run of out-of-scope claims only is valid.
 
 from collections.abc import Collection
 
+from onolys_core.llm import LLMUnavailable
+
 from eaudit.api.errors import DeadlineExceeded
-from eaudit.llm import LLMUnavailable
 
 
 def assess(

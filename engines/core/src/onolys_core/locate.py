@@ -3,10 +3,9 @@
 import re
 from collections import Counter
 from dataclasses import dataclass
+from typing import Protocol
 
 from rapidfuzz import fuzz
-
-from eaudit.config import Settings
 
 from .normalize import normalize
 
@@ -20,6 +19,13 @@ _NUMBER_WORDS = frozenset(
 _NEGATORS = frozenset("no not never none nobody nothing neither nor without cannot".split())
 _WINDOW_MIN, _WINDOW_MAX = 0.8, 1.25
 _HULL_MAX = 2.5
+
+
+class LocateConfig(Protocol):
+    """The two fuzzy-match knobs `locate` reads (eaudit's Settings satisfies this)."""
+
+    fuzzy_threshold: float
+    fuzzy_min_len: int
 
 
 @dataclass(frozen=True)
@@ -66,7 +72,7 @@ def _guard_tokens(s: str) -> Counter:
     return c
 
 
-def _locate_one(text: str, needle: str, hint: int | None, cfg: Settings) -> Match | None:
+def _locate_one(text: str, needle: str, hint: int | None, cfg: LocateConfig) -> Match | None:
     stripped = needle.strip()
     if not stripped:
         return None
@@ -118,7 +124,7 @@ def _locate_one(text: str, needle: str, hint: int | None, cfg: Settings) -> Matc
     return Match(t[0], t[1], "fuzzy", float(al.score))
 
 
-def locate(text: str, needle: str, hint: int | None, cfg: Settings) -> Match | None:
+def locate(text: str, needle: str, hint: int | None, cfg: LocateConfig) -> Match | None:
     """Find `needle` in `text`. Offsets are code points in `text` exactly as received."""
     whole = _locate_one(text, needle, hint, cfg)
     if whole is not None and whole.tier != "fuzzy":

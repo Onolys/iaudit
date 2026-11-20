@@ -2,6 +2,7 @@
 
 from typing import Annotated, Literal
 
+from onolys_core.llm import LLMConfig
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
@@ -118,6 +119,20 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
+
+    def llm_config(self) -> LLMConfig:
+        """The slice of settings the shared LLM client reads."""
+        return LLMConfig(
+            model_cheap=self.model_cheap,
+            model_mid=self.model_mid,
+            model_strong=self.model_strong,
+            llm_timeout_s=self.llm_timeout_s,
+            llm_max_retries=self.llm_max_retries,
+            llm_max_concurrency=self.llm_max_concurrency,
+            llm_mode=self.llm_mode,
+            llm_response_format=self.llm_response_format,
+            fixture_dir=self.fixture_dir,
+        )
 
     def safe_summary(self) -> dict:
         """Non-secret effective config for the startup log."""

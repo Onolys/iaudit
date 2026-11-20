@@ -2,11 +2,7 @@ import asyncio
 
 import pytest
 from atomize_helpers import FIXTURES, ROSTER, adhd_section, raw
-
-from eaudit.atomize import atomize_section, atomize_sections
-from eaudit.atomize.models import AtomizerOutput
-from eaudit.atomize.prompt import Speaker, build_cache_prefix
-from eaudit.llm import (
+from onolys_core.llm import (
     FailingClient,
     FixtureClient,
     LLMBadOutput,
@@ -14,6 +10,10 @@ from eaudit.llm import (
     LLMUnavailable,
     StubClient,
 )
+
+from eaudit.atomize import atomize_section, atomize_sections
+from eaudit.atomize.models import AtomizerOutput
+from eaudit.atomize.prompt import Speaker, build_cache_prefix
 from eaudit.models import Section, Turn
 
 
@@ -133,7 +133,7 @@ async def test_atomize_sections_is_concurrent_ordered_and_isolated(make_ctx):
             if started == 2:
                 both.set()
             await asyncio.wait_for(both.wait(), 2)  # only passes if calls overlap
-            from eaudit.llm import LLMResult
+            from onolys_core.llm import LLMResult
 
             return LLMResult(parsed=AtomizerOutput.model_validate({"claims": [raw()]}))
 

@@ -4,11 +4,11 @@ import json
 
 from atomize_helpers import FIXTURES
 from check_helpers import adhd_prep, claim, ev, link
+from onolys_core.llm import StubClient
 
 from eaudit.atomize.models import AtomicClaim, AtomizerOutput
 from eaudit.check import check_claims
 from eaudit.check.models import VerifierOutput
-from eaudit.llm import StubClient
 
 PREP = adhd_prep(roles=True)
 TURNS = PREP.turns

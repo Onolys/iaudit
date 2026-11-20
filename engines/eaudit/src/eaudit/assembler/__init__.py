@@ -1,5 +1,7 @@
 """Stage 4: resolve verbatim text to spans, enforce contract rules, validate the response."""
 
+from onolys_core.locate import Match, locate
+
 from eaudit.config import Settings
 from eaudit.contract import SCHEMA_VERSION
 from eaudit.models import AuditRequest
@@ -9,7 +11,6 @@ from .bounds import span_in_bounds
 from .claims import resolve_claims
 from .copycheck import CopyContext, scrub_claim
 from .evidence import resolve_evidence
-from .locate import Match, locate
 from .models import (
     AssembleOutcome,
     AssembleReport,

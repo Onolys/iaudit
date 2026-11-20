@@ -33,7 +33,7 @@ Where the code lives, under `engines/eaudit/`:
 | Path | Holds |
 |---|---|
 | `src/eaudit/app.py`, `api/`, `config.py`, `contract.py` | The endpoint, error mapping, settings, schema loading |
-| `src/eaudit/llm/` | The one interface to every model call |
+| `engines/core/src/onolys_core/llm/` | The one interface to every model call |
 | `src/eaudit/prep/`, `atomize/`, `link/`, `check/`, `assembler/` | Stages 0 to 4 |
 | `src/eaudit/pipeline/` | Orchestration, deadline, metrics |
 | `eval/`, `tests/` | The evaluation harness and the test suite |

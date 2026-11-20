@@ -1,4 +1,5 @@
-from eaudit.llm import FailingClient, LLMUnavailable
+from onolys_core.llm import FailingClient, LLMUnavailable
+
 from eaudit.models import Turn
 from eaudit.prep import Act, QAPair, prep
 from eval.adhd import load_spec

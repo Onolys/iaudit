@@ -6,10 +6,10 @@ from typing import TypedDict
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from onolys_core.llm.errors import LLMUnavailable
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from eaudit.contract import SCHEMA_VERSION
-from eaudit.llm.errors import LLMUnavailable
 
 log = logging.getLogger("iaudit")
 
