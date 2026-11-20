@@ -10,3 +10,4 @@ What exactly is supported? Precise, lookup-oriented facts.
 - [warnings.md](warnings.md): when the backend emits each warning code.
 - [eval-ui.md](eval-ui.md): eaudit/Eval switch, run lifecycle, results/metrics, saved items/gold, comparisons and local proxy.
 - [eval-api.md](eval-api.md): local evaluation endpoints, states, errors and configuration.
+- [testing.md](testing.md): test markers (`unit`/`integration`/`live`), fixtures, local commands, emulator, coverage, adding a package to CI.
