@@ -49,3 +49,12 @@ output "worker_service_name" {
 output "firestore_db_resource" {
   value = local.firestore_db_resource
 }
+
+# Admin backend (SP07): null while admin_enabled is false.
+output "admin_backend_service_name" {
+  value = one(google_cloud_run_v2_service.admin_backend[*].name)
+}
+
+output "admin_backend_sa_email" {
+  value = one(google_service_account.admin_backend[*].email)
+}
