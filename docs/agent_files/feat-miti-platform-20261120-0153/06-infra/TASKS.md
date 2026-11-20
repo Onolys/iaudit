@@ -18,8 +18,8 @@ Source of truth: 06-infra/PRD.md. Tasks 1-9 are the STAGING MINIMAL slice (SP00 
 | 8 | First staging apply, seeding, IAM and egress checks | 4, 5, 6, 7 (owner step: Anthropic key) | done |
 | 9 | `_deploy-cloudrun.yml` + `deploy-staging.yml` | 8, SP04 T1, SP04 T16, SP05 T1 | todo |
 | 10 | Budget, failure alerts, alert email channel | 8 (owner step: alert email) | done |
-| 11 | Prod environment + `deployer-prod` | 8, 10 | in-progress |
-| 12 | Custom domain `app.onolys.com` + DNS output | 11 (owner step: DNS) | todo |
+| 11 | Prod environment + `deployer-prod` | 8, 10 | done |
+| 12 | Custom domain `app.onolys.com` + DNS output | 11 (owner step: DNS) | in-progress |
 | 13 | `deploy-prod.yml`: gated promotion + rollback drill | 9, 11 (owner step: GitHub env) | todo |
 | 14 | `docs/reference/infra.md` runbook + ADR 0022 | 10, 12, 13 | todo |
 | 15 | Acceptance sweep + recorded measurements | 12, 13, 14, SP09 T8 | todo |
