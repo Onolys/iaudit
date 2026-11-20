@@ -124,6 +124,8 @@ _GLOBALS = (
 )
 _BEHAVIOURS = (("reflection_simple", "Simple Reflection"), ("question", "Question"))
 _PROTOCOL = {"id": "fake-pack", "version": "0.0.0", "pack_hash": "0" * 16, "label": "Fake pack"}
+# Mirrors paudit.pack.PACK_FORMAT (string); api does not depend on the paudit package.
+_PACK_FORMAT = "0.0.1"
 
 
 def _run_info(engine: str, params: dict[str, Any]) -> dict[str, Any]:
@@ -185,7 +187,7 @@ def _paudit_result(
     stat = lambda v: {"mean": float(v), "min": v, "max": v, "values": [v] * n_runs}  # noqa: E731
     return {
         "schema_version": "0.0.1",
-        "protocol": {**{k: _PROTOCOL[k] for k in ("id", "version", "pack_hash")}, "pack_format": 1},
+        "protocol": {**{k: _PROTOCOL[k] for k in ("id", "version", "pack_hash")}, "pack_format": _PACK_FORMAT},
         "language": str(params.get("language") or "en"),
         "change_goal": str(params.get("change_goal") or ""),
         "coded_span": params.get("coded_span"),
