@@ -13,6 +13,7 @@ Logs carry codes and ids only, never transcript text.
 """
 
 import asyncio
+import json
 import threading
 from collections import Counter
 from collections.abc import Callable
@@ -21,6 +22,7 @@ from typing import Any
 from onolys_core.stt import SttParams
 from onolys_core.transcript import Transcript
 
+from onolys_api import logs
 from onolys_api.adapters.base import AdapterError, Stt
 from onolys_api.audio import canonical_audio_ref
 from onolys_api.config import Settings
@@ -100,6 +102,24 @@ def check_transcript(transcript: Transcript) -> str | None:
     return None
 
 
+def operation_name(handle: Any) -> str | None:
+    """The provider operation name inside a stored STT handle (ids only, never text).
+
+    The real router stores `{"provider", "handle"}` JSON, where `handle` is the Chirp operation
+    name; fakes store a bare string.
+    """
+    if handle is None:
+        return None
+    if isinstance(handle, str):
+        try:
+            inner = json.loads(handle)
+        except ValueError:
+            return handle
+        if isinstance(inner, dict) and isinstance(inner.get("handle"), str):
+            return inner["handle"]
+    return str(handle)
+
+
 def _poll_payload(ctx: TaskContext, n: int) -> TaskPayload:
     return TaskPayload(kind="transcribe-poll", uid=ctx.uid, sid=ctx.sid, n=n)
 
@@ -129,9 +149,14 @@ def make_transcribe_handler(blobs: BlobStore, stt: Stt) -> Handler:
                 handle = _run(stt.start(audio, params))
             except AdapterError as e:
                 raise _provider_error(e, ctx) from None
+            started = ctx.clock()
             ctx.repo.update_session(
                 uid, sid,
-                {f"steps.{STEP}.stt_operation": handle, f"steps.{STEP}.stt_started": ctx.clock()},
+                {f"steps.{STEP}.stt_operation": handle, f"steps.{STEP}.stt_started": started},
+            )  # fmt: skip
+            logs.emit(
+                "stt_started", session_id=sid, step=STEP, request_id=ctx.request_id,
+                stt_operation=operation_name(handle), stt_started=started.isoformat(),
             )  # fmt: skip
         # release the claim: a redelivery resumes polling instead of waiting out the lease
         ctx.repo.update_session(uid, sid, {f"steps.{STEP}.status": "pending"})
@@ -185,9 +210,15 @@ def make_poll_handler(
         except AdapterError as e:
             raise _provider_error(e, ctx) from None
 
+        started = rec.stt_started or ctx.clock()
+        elapsed = (ctx.clock() - started).total_seconds()
+        logs.emit(
+            "stt_poll", session_id=sid, step=STEP, request_id=ctx.request_id,
+            stt_operation=operation_name(rec.stt_operation), poll_n=ctx.payload.n or 1,
+            elapsed_s=round(elapsed), outcome="pending" if transcript is None else "ready",
+        )  # fmt: skip
         if transcript is None:
-            started = rec.stt_started or ctx.clock()
-            if (ctx.clock() - started).total_seconds() >= STT_TIME_LIMIT_S:
+            if elapsed >= STT_TIME_LIMIT_S:
                 raise PermanentError("transcription_failed")
             ctx.enqueue(_poll_payload(ctx, (ctx.payload.n or 1) + 1), POLL_INTERVAL_S)
             return

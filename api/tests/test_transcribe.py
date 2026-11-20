@@ -361,3 +361,60 @@ def test_app_registers_both_handlers(settings, blobs):
 
     app = create_app(settings, repo=FakeRepo(blobs), blobs=blobs)
     assert app.state.runner.has("transcribe") and app.state.runner.has("transcribe-poll")
+
+
+# ---- observability: Chirp operation name + poll progress in the logs ----
+
+
+def _events(caplog, event):
+    import json
+
+    out = []
+    for r in caplog.records:
+        if r.name.startswith("onolys_api"):
+            try:
+                d = json.loads(r.getMessage())
+            except ValueError:
+                continue
+            if d.get("event") == event:
+                out.append(d)
+    return out
+
+
+def test_start_logs_operation_name_and_stt_started(make_env, caplog):
+    import logging
+
+    env = make_env()
+    with caplog.at_level(logging.INFO):
+        env.start()
+    (d,) = _events(caplog, "stt_started")
+    op = env.session.steps["transcribe"].stt_operation
+    assert d["stt_operation"] == op  # bare handle (no wrapper) is logged as is
+    assert d["stt_started"] == T0.isoformat()
+    assert (d["session_id"], d["step"]) == (SID, "transcribe")
+    assert not any(k in d for k in ("text", "transcript", "uid"))
+
+
+def test_operation_name_unwraps_the_provider_router_handle():
+    import json
+
+    wrapped = json.dumps({"provider": "google-chirp", "handle": "projects/p/operations/123"})
+    assert tr.operation_name(wrapped) == "projects/p/operations/123"
+    assert tr.operation_name("fake:abc") == "fake:abc"
+    assert tr.operation_name(None) is None
+
+
+def test_every_poll_logs_number_elapsed_and_operation(blobs, caplog):
+    import logging
+
+    env = Env(blobs, fixture_stt(blobs, {"A": 60, "B": 60}, polls_before_ready=2))
+    with caplog.at_level(logging.INFO):
+        env.start()
+        env.run_polls()
+    op = env.session.steps["transcribe"].stt_operation
+    polls = _events(caplog, "stt_poll")
+    assert [(d["poll_n"], d["elapsed_s"], d["outcome"]) for d in polls] == [
+        (1, 15, "pending"), (2, 30, "pending"), (3, 45, "ready"),
+    ]  # fmt: skip
+    assert all(d["stt_operation"] == op and d["session_id"] == SID for d in polls)
+    assert all("transcript" not in d and "text" not in d for d in polls)

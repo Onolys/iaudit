@@ -20,7 +20,7 @@ from onolys_api.config import Settings
 API_FIELDS = frozenset({
     "uid_hash", "session_id", "run_id", "step", "status", "attempt", "duration_ms",
     "auth_kind", "error_code", "exc_class", "request_id", "code_version",
-    "method", "route",
+    "method", "route", "stt_operation", "stt_started", "poll_n", "elapsed_s", "outcome",
 })  # fmt: skip
 register_fields(API_FIELDS)
 
