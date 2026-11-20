@@ -116,7 +116,7 @@ def test_evaluate_passes():
         ([("S1", 0, 1000), ("S2", 500, 900)], 11 * 60_000, "not monotonic"),
         ([("S1", 0, 1000), ("S2", 900, 2000), ("S1", 800, 3000)], 11 * 60_000, "not monotonic"),
         ([("S1", 500, 100), ("S2", 600, 700)], 11 * 60_000, "start_ms > end_ms"),
-        (GOOD, 5 * 60_000, "need 10+"),
+        (GOOD, 4 * 60_000, "need 5+"),
         ([], 11 * 60_000, "no turns"),
     ],
 )
@@ -131,6 +131,14 @@ def test_evaluate_missing_offsets():
     ts = [Turn(id="t1", speaker="S1", text="x"), Turn(id="t2", speaker="S2", text="y")]
     r = check.evaluate(tr(ts), 1.0)
     assert not r.passed and any("no start_ms" in p for p in r.problems)
+
+
+def test_evaluate_default_min_is_5_minutes():
+    # owner decision 2026-11-20: real sample is 6.7 min, so the default minimum is 5
+    assert check.DEFAULT_MIN_MINUTES == 5
+    assert check.evaluate(tr(turns(*GOOD), int(6.7 * 60_000)), 1.0).passed
+    r = check.evaluate(tr(turns(*GOOD), 4 * 60_000), 1.0)
+    assert not r.passed and any("need 5+" in p for p in r.problems)
 
 
 def test_evaluate_min_minutes_override():

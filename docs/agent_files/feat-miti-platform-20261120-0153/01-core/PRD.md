@@ -123,7 +123,7 @@ class PackRef(BaseModel): id: str; version: str; path: str   # SP02 defines pack
 **R10 Run record (r7).** `RunInfo{engine, code_version (env `GIT_SHA`), preset, routes{name: {litellm_id, provider, structured_output_mode, temperature_effective, params_hash}}, stt: SttRun | None, pack{id, version, hash} | None, prompt_hashes, n_runs, usage}`. `provider` is derived from the `litellm_id` prefix; `temperature_effective` is `null` when the route omits temperature; `params_hash` hashes the resolved route entry (never the key). `prompt_hashes` covers pack prompts AND engine-owned prompt templates (the engine passes both file lists to `hash_files()`). No text in `RunInfo`.
 
 **R11 Live checks and gate (r7; none depends on `eval/`).**
-- `python -m onolys_core.stt.check --audio <ref> --preset default`: transcribes a 2-speaker sample of at least 10 min through the selected adapter; passes when it finds ≥2 speakers and `start_ms/end_ms` are present and monotonic; prints wall time.
+- `python -m onolys_core.stt.check --audio <ref> --preset default`: transcribes a 2-speaker sample of at least 5 min (lowered from 10, owner decision 2026-11-20) through the selected adapter; passes when it finds ≥2 speakers and `start_ms/end_ms` are present and monotonic; prints wall time.
 - `python -m onolys_core.llm.smoke --preset default`: one real `complete_json` per default route (and its task aliases); passes when each returns schema-valid JSON; prints model id, latency, tokens. This is what proves the shipped route config.
 - **Gate.** Both run before SP02 starts; the result is recorded in ADR 0017 with this decision table:
 
@@ -166,7 +166,7 @@ Data flow for the platform: `AudioRef → SttAdapter.start/poll → words_to_tur
 - Branch protection: none today [verified: `gh api …/branches/main/protection` → 404 "Branch not protected"]. If Tejit adds required checks, job names `eaudit` and `frontend` must be kept (this PRD keeps them).
 - Tejit: confirm Speech-to-Text v2 API enabled on project `onolys` and Chirp 3 usable in the `us` multi-region (SP06 R3); ADC quota project must be `onolys` (brief: currently `juno-medical-clarity`).
 - Tejit adds the Anthropic API key (`ANTHROPIC_API_KEY`) to Secret Manager (SP06 R10); every default LLM route names it in `api_key_env`.
-- Tejit supplies a 2-speaker audio sample of at least 10 min for the STT check (R11).
+- Tejit supplies a 2-speaker audio sample of at least 5 min (lowered from 10, owner decision 2026-11-20) for the STT check (R11).
 - Implementer runs the gate (R11) with live credentials and records the result in ADR 0017 before SP02 starts.
 
 ## Risks / Open Questions
@@ -191,6 +191,6 @@ Data flow for the platform: `AudioRef → SttAdapter.start/poll → words_to_tur
 8. `docs/mission.md` and `AGENTS.md` state the widened scope, keep the 17 checks; `docs/decisions/0017-*` exists; no broken relative links (`grep` link check).
 9. Rate limits and caching (offline): a 429 or 529 raises/handles as `LLMRateLimited`, waits at least `retry-after`, retries beyond `max_retries` while the deadline allows and stops at the deadline; concurrent calls on one route never exceed its `max_concurrency` while another route is unaffected; a response cut off at the token limit raises `LLMBadOutput`; `warm_then_fanout` starts no second call before the first has returned.
 10. Live LLM smoke: `python -m onolys_core.llm.smoke --preset default` makes one real `complete_json` per default route and exits 0 with schema-valid JSON from each. This run, not the sample YAML, is the proof that the route config is valid.
-11. Live STT check: `python -m onolys_core.stt.check --audio <ref> --preset default` on a 2-speaker sample of at least 10 min exits 0 with ≥2 speakers and monotonic `start_ms/end_ms`, and prints wall time.
+11. Live STT check: `python -m onolys_core.stt.check --audio <ref> --preset default` on a 2-speaker sample of at least 5 min (lowered from 10, owner decision 2026-11-20) exits 0 with ≥2 speakers and monotonic `start_ms/end_ms`, and prints wall time.
 12. Gate: AC10 and AC11 have run before SP02 starts and ADR 0017 records the result and the answers to the R11 decision table (a)–(c).
 13. `RunInfo` (R10) validates for an eaudit run: `code_version` from `GIT_SHA`, `preset`, per-route `{litellm_id, provider, structured_output_mode, temperature_effective, params_hash}`, typed `stt`, `prompt_hashes`; no text and no key value in it.

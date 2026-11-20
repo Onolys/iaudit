@@ -15,7 +15,7 @@ Numbers only. Staging env, project `onolys`, 2026-11-20. Task 8 first run; **the
 | `onolys_core.llm.smoke` | PASS 6/6 routes; 1.1-1.2 s per route (8.5 s cold first call); 54 in / 9 out tokens |
 | `paudit.cli check --pack miti@4.2.1` | PASS; count_mae 0.30 (<=1.5), globals_within_1 1.00, bad_output_rate 0.00, p95 latency 20.3 s (<=90), 21,513 tokens/run (<=120,000); 3 runs, 46 s wall |
 | `onolys_evaluation.check` | PASS; tips 5 valid (83% quote-valid of 6), `reasons_audit.status=ran`; 30.0 s wall (paudit 13.2, eaudit 26.4, tips 16.7); 24 LLM calls, est. cost $0.96 |
-| `onolys_core.stt.check` (real owner sample, 6.8 min, 2 speakers) | FAIL on two counts: audio covers 6.7 min vs the 10 min minimum (sample is shorter than assumed; `--min-minutes 9` also fails), and one turn has `start_ms > end_ms` (turn `t24`: start 105,960 ms, end 0). Chirp returned a word with `end_offset` 0; `extract_words` does not clamp it. 74 turns, 2 speakers, language `en`, offsets otherwise monotonic. Wall time 89.3 s for 6.8 min of audio (0.22 s per audio second); second run 89 s total |
+| `onolys_core.stt.check` (real owner sample, 6.8 min, 2 speakers) | FAIL on two counts: audio covers 6.7 min vs the 10 min minimum (since lowered to 5 min, owner decision 2026-11-20) (sample is shorter than assumed; `--min-minutes 9` also fails), and one turn has `start_ms > end_ms` (turn `t24`: start 105,960 ms, end 0). Chirp returned a word with `end_offset` 0; `extract_words` does not clamp it. 74 turns, 2 speakers, language `en`, offsets otherwise monotonic. Wall time 89.3 s for 6.8 min of audio (0.22 s per audio second); second run 89 s total |
 
 Needs the `stt-google` extra to run locally (`uv run --extra stt-google --package onolys-core ...`).
 

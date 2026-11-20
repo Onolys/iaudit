@@ -21,7 +21,7 @@
 
 ## Gate result
 
-Run 2026-11-20 with live credentials, preset `default`, by the Task 13 agent. **Caveat: the audio is synthetic.** The owner has not supplied a real sample, so the STT check used a short fictional two-speaker dialogue (25 turns, about 2.5 min) synthesized with Google Cloud Text-to-Speech (`en-US-Neural2-F` and `en-US-Neural2-D`, 16 kHz mono) and looped to the target length. Diarization and word-offset quality on clean synthetic voices is not evidence for real sessions. Re-running the STT check on a real 2-speaker sample of at least 10 minutes is an owner follow-up. The audio was uploaded temporarily to `gs://onolys-audio-staging/gate-t13/` and deleted afterwards; no audio is in the repo.
+Run 2026-11-20 with live credentials, preset `default`, by the Task 13 agent. **Caveat: the audio is synthetic.** The owner has not supplied a real sample, so the STT check used a short fictional two-speaker dialogue (25 turns, about 2.5 min) synthesized with Google Cloud Text-to-Speech (`en-US-Neural2-F` and `en-US-Neural2-D`, 16 kHz mono) and looped to the target length. Diarization and word-offset quality on clean synthetic voices is not evidence for real sessions. Re-running the STT check on a real 2-speaker sample (minimum lowered to 5 minutes, owner decision 2026-11-20; originally 10) is an owner follow-up. The audio was uploaded temporarily to `gs://onolys-audio-staging/gate-t13/` and deleted afterwards; no audio is in the repo.
 
 | Item | Result |
 |---|---|
@@ -38,7 +38,7 @@ Run 2026-11-20 with live credentials, preset `default`, by the Task 13 agent. **
 
 ### Real-sample re-run (2026-11-20)
 
-Owner-supplied real mock MI session: 2 speakers, MP3 128 kbps 44.1 kHz stereo, 6.7 min of audio (shorter than the 10 min target, so `--min-minutes 6` was used). Uploaded temporarily to `gs://onolys-audio-staging/gate-t13-real/` (MP3 sent as is; Chirp 3 auto-decodes it, no transcode) and deleted afterwards; no audio or transcript text is in the repo, logs or this ADR. Preset `default`, `--language auto`, 2 speakers requested. Counts and metrics only.
+Owner-supplied real mock MI session: 2 speakers, MP3 128 kbps 44.1 kHz stereo, 6.7 min of audio (shorter than the 10 min target, so `--min-minutes 6` was used). **Owner decision (2026-11-20): the STT gate minimum audio length is lowered from 10 min to 5 min** (`DEFAULT_MIN_MINUTES = 5` in `onolys_core.stt.check`), because the real sample is 6.7 min; the 20 min maximum is unchanged. Uploaded temporarily to `gs://onolys-audio-staging/gate-t13-real/` (MP3 sent as is; Chirp 3 auto-decodes it, no transcode) and deleted afterwards; no audio or transcript text is in the repo, logs or this ADR. Preset `default`, `--language auto`, 2 speakers requested. Counts and metrics only.
 
 | Item | Result |
 |---|---|

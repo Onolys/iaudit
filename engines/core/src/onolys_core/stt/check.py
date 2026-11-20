@@ -6,7 +6,7 @@
 project is set explicitly (`--project`, else env GOOGLE_CLOUD_PROJECT, else `onolys`) because the
 ADC quota project may be another project. Passes when the transcript has at least 2 speakers,
 every turn has `start_ms`/`end_ms`, they are monotonic, and the audio is long enough
-(`--min-minutes`, default 10). Prints wall time. Exit code 0 only on pass.
+(`--min-minutes`, default 5; owner decision 2026-11-20). Prints wall time. Exit code 0 only on pass.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from onolys_core.stt.select import select_stt
 from onolys_core.transcript import Transcript
 
 DEFAULT_PROJECT = "onolys"
-DEFAULT_MIN_MINUTES = 10.0
+DEFAULT_MIN_MINUTES = 5.0
 _MIMES = {".wav": "audio/wav", ".mp3": "audio/mpeg", ".flac": "audio/flac", ".m4a": "audio/mp4"}
 
 
