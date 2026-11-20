@@ -1,0 +1,6 @@
+# Virtual workspace root (no [project]). Members land over time:
+# engines/core now; engines/eaudit (moves from ./eaudit), paudit, evaluation, api, admin/* later.
+# ./eaudit is excluded until it moves to engines/eaudit; it keeps its own lock (cd eaudit && uv sync).
+[tool.uv.workspace]
+members = ["engines/*", "api", "admin/*"]
+exclude = ["eval", "eaudit"]

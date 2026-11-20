@@ -1,2 +1,6 @@
 .worktrees/
 **/_next-context_.md
+__pycache__/
+.venv/
+.pytest_cache/
+.ruff_cache/
