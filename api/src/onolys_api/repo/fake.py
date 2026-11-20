@@ -375,3 +375,8 @@ class FakeRepo:
             return False
         self._put(path, {**doc.to_store(), "uid": uid})
         return True
+
+    def delete_idempotency(self, uid: str, key: str) -> None:
+        path = f"idempotency/{_idem_id(uid, key)}"
+        if self._owned(path, uid, missing_ok=True) is not None:
+            del self._docs[path]

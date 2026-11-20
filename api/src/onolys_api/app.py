@@ -17,9 +17,11 @@ from onolys_api.auth.idtoken import TokenVerifier
 from onolys_api.config import Settings
 from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse, error_body
 from onolys_api.factory import build_blobs, build_repo
+from onolys_api.presets import PresetResolver
 from onolys_api.queue import InMemoryQueue
 from onolys_api.repo.base import Repo
 from onolys_api.routes import api_key as api_key_routes
+from onolys_api.routes import sessions as session_routes
 from onolys_api.storage.base import BlobStore
 from onolys_api.storage.fake import FakeBlobStore
 from onolys_api.storage.fake_routes import make_fake_blob_router
@@ -155,6 +157,7 @@ def create_app(
     app.state.settings = settings
     app.state.blobs = blobs or build_blobs(settings)
     app.state.repo = repo or build_repo(settings, app.state.blobs)
+    app.state.presets = PresetResolver(settings)
     app.state.auth = Authenticator(settings, app.state.repo, token_verifier)
     if settings.service_mode == "combined":
         app.state.queue = InMemoryQueue()  # handlers registered in Task 5
@@ -183,6 +186,7 @@ def create_app(
         return Healthz(service_mode=settings.service_mode, code_version=settings.git_sha)
 
     router.include_router(api_key_routes.router)
+    router.include_router(session_routes.router)
     app.include_router(router)
     if isinstance(app.state.blobs, FakeBlobStore):  # dev/tests: serve the fake signed URLs
         app.include_router(make_fake_blob_router(app.state.blobs))

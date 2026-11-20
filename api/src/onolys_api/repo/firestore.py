@@ -380,3 +380,8 @@ class FirestoreRepo:
         except AlreadyExists:
             return False
         return True
+
+    def delete_idempotency(self, uid: str, key: str) -> None:
+        ref = self._top("idempotency", _idem_id(uid, key))
+        if _owned(ref, uid, missing_ok=True) is not None:
+            ref.delete()

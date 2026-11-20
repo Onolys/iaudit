@@ -73,6 +73,62 @@
         "title": "ApiKeyInfo",
         "type": "object"
       },
+      "CreateSessionRequest": {
+        "properties": {
+          "language": {
+            "default": "auto",
+            "description": "BCP-47 tag or `auto`",
+            "title": "Language",
+            "type": "string"
+          },
+          "n_runs": {
+            "default": 1,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "N Runs",
+            "type": "integer"
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Allowlisted preset name",
+            "title": "Preset"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "CreateSessionRequest",
+        "type": "object"
+      },
+      "CreateSessionResponse": {
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/SessionRef"
+          }
+        },
+        "required": [
+          "session"
+        ],
+        "title": "CreateSessionResponse",
+        "type": "object"
+      },
       "ErrorDetailModel": {
         "properties": {
           "code": {
@@ -168,6 +224,34 @@
         "title": "ErrorResponse",
         "type": "object"
       },
+      "Flags": {
+        "properties": {
+          "has_rating": {
+            "title": "Has Rating",
+            "type": "boolean"
+          },
+          "rating_submitted": {
+            "title": "Rating Submitted",
+            "type": "boolean"
+          },
+          "speaker_confirmed": {
+            "title": "Speaker Confirmed",
+            "type": "boolean"
+          },
+          "transcript_ready": {
+            "title": "Transcript Ready",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "transcript_ready",
+          "speaker_confirmed",
+          "rating_submitted",
+          "has_rating"
+        ],
+        "title": "Flags",
+        "type": "object"
+      },
       "Healthz": {
         "properties": {
           "code_version": {
@@ -189,6 +273,273 @@
           "code_version"
         ],
         "title": "Healthz",
+        "type": "object"
+      },
+      "SessionDetail": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "flags": {
+            "$ref": "#/components/schemas/Flags"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "latest_report_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Report Version"
+          },
+          "links": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "object"
+          },
+          "n_runs": {
+            "title": "N Runs",
+            "type": "integer"
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preset"
+          },
+          "progress": {
+            "title": "Progress",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "uploading",
+              "validating",
+              "transcribing",
+              "awaiting_input",
+              "running",
+              "report_ready",
+              "failed",
+              "deleting"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "progress",
+          "flags",
+          "warnings",
+          "language",
+          "n_runs",
+          "created_at",
+          "updated_at",
+          "links"
+        ],
+        "title": "SessionDetail",
+        "type": "object"
+      },
+      "SessionErrorInfo": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "SessionErrorInfo",
+        "type": "object"
+      },
+      "SessionList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SessionListItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "SessionList",
+        "type": "object"
+      },
+      "SessionListItem": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "latest_report_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Report Version"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "uploading",
+              "validating",
+              "transcribing",
+              "awaiting_input",
+              "running",
+              "report_ready",
+              "failed",
+              "deleting"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "created_at"
+        ],
+        "title": "SessionListItem",
+        "type": "object"
+      },
+      "SessionRef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "uploading",
+              "validating",
+              "transcribing",
+              "awaiting_input",
+              "running",
+              "report_ready",
+              "failed",
+              "deleting"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "SessionRef",
         "type": "object"
       }
     },
@@ -346,6 +697,196 @@
         "summary": "Liveness (no auth)",
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/v1/sessions": {
+      "get": {
+        "operationId": "listSessions",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "The caller's sessions, newest first (in-flight and failed included)",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "post": {
+        "description": "Writes the session and its PHI-free `session_status` document before returning. `Idempotency-Key` replays the original response for 24 h; the same key with a different body is 409 `conflict`.",
+        "operationId": "createSession",
+        "parameters": [
+          {
+            "description": "Client-chosen key; replays for 24 h",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Client-chosen key; replays for 24 h",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSessionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Create a session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}": {
+      "get": {
+        "operationId": "getSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Session status snapshot (the web app uses the session_status listener instead)",
+        "tags": [
+          "sessions"
         ]
       }
     }

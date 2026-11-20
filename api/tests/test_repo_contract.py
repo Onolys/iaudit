@@ -451,3 +451,16 @@ def test_fake_repo_records_session_status_writes(tmp_path):
         ("uploading", 5),
     ]
     assert all(w[0] == uid and w[1] == sid for w in repo.status_writes)
+
+
+def test_idempotency_delete_is_scoped_and_repeatable(repo):
+    uid, _ = new_ids()
+    other, _ = new_ids()
+    doc = IdempotencyDoc(body_hash="b", response={"id": "s1"}, created_at=datetime.now(UTC))
+    repo.put_idempotency(uid, "k1", doc)
+    repo.delete_idempotency(other, "k1")  # another uid's key: untouched
+    assert repo.get_idempotency(uid, "k1") is not None
+    repo.delete_idempotency(uid, "k1")
+    repo.delete_idempotency(uid, "k1")  # repeatable
+    assert repo.get_idempotency(uid, "k1") is None
+    assert repo.put_idempotency(uid, "k1", doc) is True
