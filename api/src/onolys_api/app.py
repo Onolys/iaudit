@@ -22,6 +22,7 @@ from onolys_api.config import LOCAL_ENVS, Settings
 from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse, error_body
 from onolys_api.factory import build_blobs, build_repo
 from onolys_api.jobs.queue import build_queue
+from onolys_api.jobs.run import make_run_handler
 from onolys_api.jobs.transcribe import make_poll_handler, make_transcribe_handler
 from onolys_api.jobs.validate import make_validate_handler
 from onolys_api.jobs.worker import HandlerSpec, TaskRunner
@@ -30,6 +31,7 @@ from onolys_api.repo.base import Repo
 from onolys_api.routes import api_key as api_key_routes
 from onolys_api.routes import audio as audio_routes
 from onolys_api.routes import rating as rating_routes
+from onolys_api.routes import runs as run_routes
 from onolys_api.routes import sessions as session_routes
 from onolys_api.routes import speakers as speaker_routes
 from onolys_api.routes import tasks as task_routes
@@ -211,6 +213,13 @@ def create_app(
                 claim=False,  # the step record belongs to `transcribe`
             ),
         )
+        app.state.runner.register(
+            "run",
+            HandlerSpec(
+                make_run_handler(app.state.blobs, lambda: app.state.adapters.evaluation, settings),
+                scope="run",
+            ),
+        )
         if settings.env not in LOCAL_ENVS:
             if not settings.worker_url or not settings.tasks_sa:
                 raise ConfigError("WORKER_URL and TASKS_SA are required for the worker")
@@ -244,6 +253,8 @@ def create_app(
     router.include_router(audio_routes.router)
     router.include_router(rating_routes.router)
     router.include_router(speaker_routes.router)
+    router.include_router(run_routes.router)
+    router.include_router(run_routes.runs_router)
     router.include_router(usage_routes.router)
     app.include_router(router)
     if runs_tasks:

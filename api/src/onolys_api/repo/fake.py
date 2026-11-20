@@ -458,7 +458,7 @@ class FakeRepo:
             run = RunDoc(
                 uid=uid, session_id=sid, run_id=run_id, n_runs=sess.get("n_runs", 1),
                 preset=sess.get("preset"), rating_id=rating_id,
-                stt=sess.get("stt"), code_version=code_version,
+                stt=sess.get("stt"), code_version=code_version, cap_date=date,
             )  # fmt: skip
             self._create(f"sessions/{sid}/runs/{run_id}", run.to_store())
             self._put(f"usage/{uid}_{date}", {**usage, "runs": usage.get("runs", 0) + 1})

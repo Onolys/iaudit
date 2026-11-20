@@ -500,7 +500,7 @@ class FirestoreRepo:
             run = RunDoc(
                 uid=uid, session_id=sid, run_id=run_id, n_runs=sess.get("n_runs", 1),
                 preset=sess.get("preset"), rating_id=latest[0].id if latest else None,
-                stt=sess.get("stt"), code_version=code_version,
+                stt=sess.get("stt"), code_version=code_version, cap_date=date,
             )  # fmt: skip
             txn.create(run_ref, run.to_store())
             txn.set(

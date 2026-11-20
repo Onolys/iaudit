@@ -1,0 +1,142 @@
+{
+ "type": "object",
+ "required": [
+  "schema_version",
+  "created_at",
+  "header",
+  "layout",
+  "scorecard",
+  "globals",
+  "behaviours",
+  "summaries",
+  "reasons_audit",
+  "tips",
+  "method",
+  "aggregates",
+  "warnings",
+  "run_info"
+ ],
+ "properties": {
+  "schema_version": {
+   "const": "0.0.1"
+  },
+  "header": {
+   "type": "object",
+   "required": [
+    "change_goal",
+    "protocol",
+    "language",
+    "coded_span",
+    "subject_speaker",
+    "n_runs",
+    "models",
+    "stt",
+    "preset",
+    "code_version",
+    "params",
+    "has_clinician_rating",
+    "rating_coverage"
+   ],
+   "properties": {}
+  },
+  "scorecard": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "item_id",
+     "kind",
+     "label",
+     "clinician",
+     "onolys"
+    ],
+    "properties": {}
+   }
+  },
+  "reasons_audit": {
+   "type": "object",
+   "required": [
+    "status",
+    "items"
+   ],
+   "properties": {
+    "status": {
+     "enum": [
+      "ran",
+      "partial",
+      "skipped",
+      "failed"
+     ]
+    },
+    "items": {
+     "type": "array"
+    }
+   }
+  },
+  "tips": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "rank",
+     "item_id",
+     "observation",
+     "quote",
+     "alternative",
+     "why_it_matters"
+    ],
+    "properties": {
+     "quote": {
+      "type": "object",
+      "required": [
+       "turn_id",
+       "start",
+       "end",
+       "text"
+      ]
+     }
+    }
+   }
+  },
+  "method": {
+   "type": "object",
+   "required": [
+    "statement",
+    "limits",
+    "not_official_miti_coding",
+    "citation"
+   ],
+   "properties": {}
+  },
+  "aggregates": {
+   "type": "object",
+   "required": [
+    "globals_compared",
+    "avg_abs_global_difference",
+    "within_one_share",
+    "counts_flagged"
+   ],
+   "properties": {}
+  },
+  "warnings": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "code"
+    ],
+    "properties": {}
+   }
+  },
+  "run_info": {
+   "type": "object",
+   "required": [
+    "evaluation",
+    "paudit",
+    "eaudit"
+   ],
+   "properties": {}
+  }
+ },
+ "$comment": "LOCAL STAND-IN from the SP03 R7 / SP02 R3 PRD shapes; used only until engines/*/schemas exist (tests prefer the real file)."
+}

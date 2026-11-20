@@ -177,6 +177,8 @@ class RunDoc(Doc):
     error: str | None = None
     run_info: dict[str, Any] | None = None
     artifacts_prefix: str | None = None
+    cap_date: str | None = None  # UTC day the cap slot was reserved on (R8)
+    released: bool = False  # the cap slot was handed back: guards double release
 
 
 class ReportDoc(Doc):
