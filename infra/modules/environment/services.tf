@@ -168,7 +168,7 @@ resource "google_cloud_run_v2_service" "worker" {
           name = env.key
           value_source {
             secret_key_ref {
-              secret  = env.value
+              secret  = google_secret_manager_secret.provider[env.key].secret_id
               version = "latest"
             }
           }
@@ -264,7 +264,7 @@ resource "google_cloud_run_v2_service" "admin_backend" {
           name = env.key
           value_source {
             secret_key_ref {
-              secret  = env.value
+              secret  = google_secret_manager_secret.provider[env.key].secret_id
               version = "latest"
             }
           }

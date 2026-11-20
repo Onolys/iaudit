@@ -19,7 +19,7 @@
 - **D9 Secret values** are seeded by a script, never in Terraform state.
 - **D10 Staging domain**: `*.web.app` only.
 - **D11 Firestore rules**: owner read of `session_status/{sid}` only; every write and every other collection denied (Admin SDK bypasses rules).
-- **D12 Provider keys**: `llm_secrets` / `stt_secrets` maps looped into secret shells, accessor bindings and Cloud Run env refs; adding a provider is one tfvars line, a seeded value and a route.
+- **D12 Provider keys**: `llm_secrets` / `stt_secrets` maps looped into secret shells, accessor bindings and Cloud Run env refs; adding a provider is one tfvars line, a seeded value and a route. **Amended 2026-11-20: per-environment keys.** The maps hold base ids; the environment module creates `<base>-{env}` (e.g. `anthropic-api-key-staging`, `anthropic-api-key-prod`), and each env's service accounts get accessor only on their own env's secrets. Staging and prod use separate provider keys (no shared project-level key). The old shared `anthropic-api-key` is dropped from state and removed by hand after cutover.
 - **D13 STT settings** live in `config/{env}/stt_providers.yaml` in the image; no STT env vars.
 - **D14 Worker sizing**: concurrency 2, max 3 instances in prod until measured; queue dispatches = concurrency x max instances.
 - **D15 Version stamp**: CI sets `GIT_SHA` on api and worker; the rollback target is a sha.

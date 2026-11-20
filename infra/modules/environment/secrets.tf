@@ -1,5 +1,5 @@
 # Secret shells only; values are written by infra/scripts/seed-secrets.py (PRD D9) so they never enter state.
-# Provider-key shells (llm_secrets/stt_secrets) are project-wide and created by the root module.
+# Provider-key shells (llm_secrets/stt_secrets) are per environment: `<base>-<env>` (owner decision 2026-11-20).
 
 resource "google_secret_manager_secret" "uid_hmac" {
   project   = var.project
@@ -21,8 +21,18 @@ resource "google_secret_manager_secret" "admin_allowed_emails" {
 }
 
 locals {
-  # Keys are the env-var names (known at plan time); values the secret ids.
+  # Keys are the env-var names (known at plan time); values the BASE secret ids (env suffix added below).
   worker_provider_secrets = merge(var.llm_secrets, var.stt_secrets)
+}
+
+resource "google_secret_manager_secret" "provider" {
+  for_each  = local.worker_provider_secrets
+  project   = var.project
+  secret_id = "${each.value}-${var.env}"
+
+  replication {
+    auto {}
+  }
 }
 
 resource "google_secret_manager_secret_iam_member" "hmac" {
@@ -36,7 +46,7 @@ resource "google_secret_manager_secret_iam_member" "hmac" {
 resource "google_secret_manager_secret_iam_member" "worker_provider" {
   for_each  = local.worker_provider_secrets
   project   = var.project
-  secret_id = each.value
+  secret_id = google_secret_manager_secret.provider[each.key].secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.worker.email}"
 }
@@ -52,7 +62,7 @@ resource "google_service_account" "admin_backend" {
 resource "google_secret_manager_secret_iam_member" "admin_llm" {
   for_each  = var.admin_enabled ? var.llm_secrets : {}
   project   = var.project
-  secret_id = each.value
+  secret_id = google_secret_manager_secret.provider[each.key].secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.admin_backend[0].email}"
 }

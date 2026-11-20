@@ -41,12 +41,12 @@ variable "worker_max_instances" {
 }
 
 variable "llm_secrets" {
-  description = "Env-var name to secret id (shell created by the caller) for LLM provider keys."
+  description = "Env-var name to BASE secret id for LLM provider keys; the module creates `<base>-<env>`."
   type        = map(string)
 }
 
 variable "stt_secrets" {
-  description = "Env-var name to secret id for STT provider keys (worker only)."
+  description = "Env-var name to BASE secret id for STT provider keys (worker only); the module creates `<base>-<env>`."
   type        = map(string)
   default     = {}
 }

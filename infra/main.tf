@@ -79,23 +79,15 @@ resource "google_firebase_hosting_site" "admin_staging" {
   depends_on = [google_project_service.api]
 }
 
-# Provider-key secret shells (PRD D12): one per llm_secrets/stt_secrets entry, shared by both envs.
-# Values are seeded outside state by scripts/seed-secrets.py (PRD D9).
-resource "google_secret_manager_secret" "provider" {
-  for_each  = merge(var.llm_secrets, var.stt_secrets)
-  project   = var.project
-  secret_id = each.value
+# Provider-key secrets are per environment (`<base>-<env>`, created inside the module; owner decision 2026-11-20).
+# The old shared project-level shell (`anthropic-api-key`) is dropped from state WITHOUT deleting it, so live
+# revisions keep working until the owner deletes it by hand after the cutover (docs/reference/infra.md).
+removed {
+  from = google_secret_manager_secret.provider
 
-  replication {
-    auto {}
+  lifecycle {
+    destroy = false
   }
-
-  depends_on = [google_project_service.api]
-}
-
-locals {
-  llm_secret_ids = { for k in keys(var.llm_secrets) : k => google_secret_manager_secret.provider[k].secret_id }
-  stt_secret_ids = { for k in keys(var.stt_secrets) : k => google_secret_manager_secret.provider[k].secret_id }
 }
 
 module "staging" {
@@ -109,8 +101,8 @@ module "staging" {
   worker_concurrency       = var.worker_concurrency
   worker_max_instances     = var.worker_max_instances
   api_max_instances        = 3
-  llm_secrets              = local.llm_secret_ids
-  stt_secrets              = local.stt_secret_ids
+  llm_secrets              = var.llm_secrets
+  stt_secrets              = var.stt_secrets
   admin_enabled            = var.admin_enabled
   alerts_enabled           = var.staging_alerts
   notification_channel_ids = [google_monitoring_notification_channel.owner_email.id]
@@ -138,8 +130,8 @@ module "prod" {
   worker_concurrency       = var.worker_concurrency
   worker_max_instances     = var.worker_max_instances
   api_max_instances        = 10
-  llm_secrets              = local.llm_secret_ids
-  stt_secrets              = local.stt_secret_ids
+  llm_secrets              = var.llm_secrets
+  stt_secrets              = var.stt_secrets
   admin_enabled            = var.admin_enabled
   alerts_enabled           = true
   notification_channel_ids = [google_monitoring_notification_channel.owner_email.id]

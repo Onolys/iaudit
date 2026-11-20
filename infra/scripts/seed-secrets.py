@@ -4,9 +4,10 @@
 Usage (staging; keys from the environment, never from argv or files in the repo):
   set -a; . ~/.config/onolys/keys.env; set +a
   python3 infra/scripts/seed-secrets.py --env staging
-  # extra provider keys: --map GEMINI_API_KEY=gemini-api-key   (map name = env var holding the value)
+  # extra provider keys: --map GEMINI_API_KEY=gemini-api-key   (env var name = BASE secret id; written to <base>-{env})
   # admin allowlist:     ADMIN_ALLOWED_EMAILS="a@x.com,b@y.com" ... --admin
 
+Provider keys are per environment: base id `anthropic-api-key` is written to `anthropic-api-key-{env}`.
 Idempotent: a new secret version is added only when (a) the secret has no version yet, or
 (b) the supplied value differs from the latest version. Otherwise nothing is written.
 Special case: `uid-hmac-key-{env}` is random and generated only when it has no version
@@ -52,7 +53,7 @@ def seed(client, *, env, provider_maps, environ, admin=False):
         rep.add(hmac_id, "created (random)")
     else:
         rep.add(hmac_id, "unchanged")
-    wanted = dict(provider_maps)
+    wanted = {name: f"{base}-{env}" for name, base in provider_maps.items()}  # per-env secret ids
     for name, sid in sorted(wanted.items()):
         val = environ.get(name)
         if val:
@@ -111,7 +112,7 @@ def main(argv=None):
     ap.add_argument("--env", required=True, choices=["staging", "prod"])
     ap.add_argument("--project", default="onolys")
     ap.add_argument("--map", action="append", default=[], metavar="ENVVAR=secret-id",
-                    help="provider key (repeatable); default ANTHROPIC_API_KEY=anthropic-api-key")
+                    help="provider key (repeatable); default ANTHROPIC_API_KEY=anthropic-api-key (base id; --env suffix is added)")
     ap.add_argument("--admin", action="store_true", help="also seed admin-allowed-emails-{env} from ADMIN_ALLOWED_EMAILS")
     a = ap.parse_args(argv)
     maps = dict(m.split("=", 1) for m in a.map) if a.map else dict(DEFAULT_MAP)

@@ -26,11 +26,12 @@ staging: same shape, site onolys-app-staging, Firestore DB `staging`, *-staging 
 | Cloud Tasks queue | `steps-staging` | `steps-prod` |
 | Service accounts (`@onolys.iam.gserviceaccount.com`) | `api-staging`, `worker-staging`, `tasks-invoker-staging`, `deployer-staging` | `api-prod`, `worker-prod`, `tasks-invoker-prod`, `deployer-prod` |
 | Secret `uid-hmac-key-{env}` | `uid-hmac-key-staging` | `uid-hmac-key-prod` |
+| Secret `<base>-{env}` per `llm_secrets` / `stt_secrets` entry (default base `anthropic-api-key`) | `anthropic-api-key-staging` | `anthropic-api-key-prod` |
 | Log-based metric (5xx) | `onolys-api-5xx-staging` | `onolys-api-5xx-prod` |
 | Alert policies | none while `staging_alerts=false` | `Onolys failed step/run (prod)`, `Onolys api 5xx rate (prod)` |
 | Hosting site | `onolys-app-staging` (`https://onolys-app-staging.web.app`) | `onolys-app` (`https://onolys-app.web.app`, custom domain `app.onolys.com`) |
 
-Shared (project level): Artifact Registry repo `onolys` (`us-central1-docker.pkg.dev/onolys/onolys`, no cleanup policy, so any earlier sha stays deployable), secret `anthropic-api-key` (default `llm_secrets` entry), budget `onolys monthly`, Monitoring channel `Onolys owner email`, Workload Identity pool `github` with provider `github` (condition `assertion.repository=='Onolys/onolys'`), Speech-to-Text service agent `service-1054076260967@gcp-sa-speech.iam.gserviceaccount.com` (`objectViewer` on both buckets), Identity Platform config (email+password, min length 8, open sign-up, no MFA).
+Shared (project level): Artifact Registry repo `onolys` (`us-central1-docker.pkg.dev/onolys/onolys`, no cleanup policy, so any earlier sha stays deployable), budget `onolys monthly`, Monitoring channel `Onolys owner email`, Workload Identity pool `github` with provider `github` (condition `assertion.repository=='Onolys/onolys'`), Speech-to-Text service agent `service-1054076260967@gcp-sa-speech.iam.gserviceaccount.com` (`objectViewer` on both buckets), Identity Platform config (email+password, min length 8, open sign-up, no MFA).
 
 Admin (SP07) resources (`onolys-admin`, `onolys-admin-staging` sites, `admin.onolys.com`, `onolys-admin-backend-{env}`, `admin-allowed-emails-{env}`) exist only when `admin_enabled=true` (default `false`, after launch).
 
@@ -68,7 +69,7 @@ Set by Terraform (`infra/modules/environment/services.tf`). Values below are the
 | `DEFAULT_PRESET` | yes | yes | `default` |
 | `CORS_ORIGINS` | yes | no | staging `https://onolys-app-staging.web.app,http://localhost:5173`; prod `https://app.onolys.com` |
 | `UID_HMAC_KEY` | yes | yes | secret ref `uid-hmac-key-{env}` (keys the `uid_hash` log field) |
-| `ANTHROPIC_API_KEY` | no | yes | secret ref `anthropic-api-key` (one ref per `llm_secrets` / `stt_secrets` entry) |
+| `ANTHROPIC_API_KEY` | no | yes | secret ref `anthropic-api-key-{env}` (one ref per `llm_secrets` / `stt_secrets` entry, always the env's own secret; staging and prod use separate provider keys) |
 | `GIT_SHA` | yes | yes | set by CI at deploy. `unset` until the first CI deploy (the services still run the placeholder image `us-docker.pkg.dev/cloudrun/container/hello`) |
 
 There are no STT env vars. No model id appears in infra.
@@ -126,7 +127,7 @@ Environments: create `production` with Tejit as required reviewer (all prod jobs
 
 `VITE_FIREBASE_PROJECT_ID` is taken from `GCP_PROJECT`/`onolys` in the workflow; `VITE_FIRESTORE_DATABASE` is hard-coded per workflow (see Terraform outputs).
 
-Secrets: the only one is `ANTHROPIC_API_KEY`, read by `nightly.yml` (job `api-real-mode`, a live Claude run). Deploys use WIF, so no JSON key and no deploy secret exists. Do not add a GCP key.
+Secrets: the only one is `ANTHROPIC_API_KEY`, read by `nightly.yml` (job `api-real-mode`, a live Claude run); it should hold the staging/test key, never the prod key (prod's key lives only in Secret Manager as `anthropic-api-key-prod`). Deploys use WIF, so no JSON key and no deploy secret exists. Do not add a GCP key.
 
 Workflows: `deploy-staging.yml` runs after the `CI` workflow succeeds on `main` (also manual). `deploy-prod.yml` is manual (`workflow_dispatch`, input `sha`) or on a `v*` tag. `deploy-admin.yml` is for SP07 and needs `admin_enabled=true` first. `nightly.yml` runs 06:17 UTC daily.
 
@@ -149,7 +150,24 @@ set -a; . ~/.config/onolys/keys.env; set +a
 python3 infra/scripts/seed-secrets.py --env staging     # also: --env prod
 ```
 
-It creates `uid-hmac-key-{env}` (random, only if missing) and writes the key for each `--map ENVVAR=secret-id` (default `ANTHROPIC_API_KEY=anthropic-api-key`). Re-running is a no-op unless a value changed.
+It creates `uid-hmac-key-{env}` (random, only if missing) and writes the key for each `--map ENVVAR=base-id` (default `ANTHROPIC_API_KEY=anthropic-api-key`) into `<base-id>-{env}`, so `--env staging` and `--env prod` fill different secrets from the key in your shell. Re-running is a no-op unless a value changed.
+
+### Cutover: shared `anthropic-api-key` to per-env secrets (one-time, owner decision 2026-11-20)
+
+A Cloud Run revision that references a secret with no version fails to deploy, so the new secrets must have values before services switch. Terraform drops the old shared secret from state without deleting it (`removed` block, `destroy = false`), so live revisions keep working until you delete it. Order:
+
+```bash
+cd infra && terraform init
+# (a) create only the empty per-env secrets; services still use the old secret
+terraform apply -target='module.staging.google_secret_manager_secret.provider' -target='module.prod.google_secret_manager_secret.provider'
+# (b) seed values: staging key, then a DIFFERENT prod key
+cd .. && ANTHROPIC_API_KEY=<staging key> python3 infra/scripts/seed-secrets.py --env staging
+ANTHROPIC_API_KEY=<prod key> python3 infra/scripts/seed-secrets.py --env prod
+# (c) full apply: moves accessor grants and the worker env refs to the per-env secrets, forgets the old secret
+cd infra && terraform plan && terraform apply
+```
+
+Then dispatch `deploy-staging` / `deploy-prod` (or just confirm the new worker revisions are healthy) and, once both envs work on the new keys, delete the orphaned shared secret `anthropic-api-key` in the console (or `gcloud secrets delete`). Rotate the old key since it was shared.
 
 ## Adding an LLM or STT provider
 
@@ -160,8 +178,8 @@ It creates `uid-hmac-key-{env}` (random, only if missing) and writes the key for
      GEMINI_API_KEY    = "gemini-api-key"
    }
    ```
-   STT keys go in `stt_secrets` (empty by default; Google STT uses the worker service account, not a key). `terraform plan` must show exactly one new secret shell, its accessor bindings (worker) and one env ref per service; existing resources unchanged. Apply.
-2. **Seed the value.** `GEMINI_API_KEY=... python3 infra/scripts/seed-secrets.py --env staging --map ANTHROPIC_API_KEY=anthropic-api-key --map GEMINI_API_KEY=gemini-api-key` (repeat for `--env prod`). Pass every `--map` you want checked; unset variables keep their existing version.
+   STT keys go in `stt_secrets` (empty by default; Google STT uses the worker service account, not a key). The tfvars value is the BASE id; the module creates `<base>-staging` and `<base>-prod`. `terraform plan` must show exactly two new secret shells (one per env), their accessor bindings (that env's worker only) and one env ref per worker; existing resources unchanged. As in the cutover above, create the shells first with a `-target` apply, seed, then do the full apply, otherwise the new revision references a secret with no version.
+2. **Seed the value** per env, with that env's own key: `GEMINI_API_KEY=<staging key> python3 infra/scripts/seed-secrets.py --env staging --map ANTHROPIC_API_KEY=anthropic-api-key --map GEMINI_API_KEY=gemini-api-key`, then the same with the prod key and `--env prod`. Pass every `--map` you want checked; unset variables keep their existing version.
 3. **Route.** Add a route (or preset) in `config/{staging,prod}/routes.yaml` with `litellm_id: <provider>/<model>` and `api_key_env: GEMINI_API_KEY` (the map key). For STT, add a provider under `providers:` in `config/{env}/stt_providers.yaml`, then point `default`, `by_language` or a preset's `stt` at it.
 4. **Ship.** PR, merge to `main` (deploys staging), then dispatch `deploy-prod`. The new secret is only mounted on a new revision, which the deploy creates. CI fails if a config file is missing for an env.
 

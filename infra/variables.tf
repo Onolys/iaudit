@@ -39,13 +39,13 @@ variable "billing_account_id" {
 }
 
 variable "llm_secrets" {
-  description = "Map of env-var name to secret id for LLM provider keys."
+  description = "Map of env-var name to base secret id for LLM provider keys; each environment gets `<base>-<env>`."
   type        = map(string)
   default     = { ANTHROPIC_API_KEY = "anthropic-api-key" }
 }
 
 variable "stt_secrets" {
-  description = "Map of env-var name to secret id for STT provider keys (empty: Google STT uses ADC)."
+  description = "Map of env-var name to base secret id for STT provider keys, per environment `<base>-<env>` (empty: Google STT uses ADC)."
   type        = map(string)
   default     = {}
 }
