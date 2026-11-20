@@ -3,7 +3,7 @@ name = "onolys-core"
 version = "0.1.0"
 description = "Shared interface types and services for Onolys engines"
 requires-python = ">=3.12,<3.13"
-dependencies = ["pydantic>=2.7"]
+dependencies = ["pydantic>=2.7", "pyyaml>=6"]
 
 [project.optional-dependencies]
 stt-google = ["google-cloud-speech>=2.26"]
