@@ -11,10 +11,10 @@ Source of truth: [PRD.md](PRD.md). Tests follow SP00 conventions: pytest markers
 | 1 | Package skeleton, report types, `report.schema.json` and fixtures | SP01 T1; SP02 T2, SP02 T3 (`rating.schema.json`, `PauditResult` shape) | done |
 | 2 | `validate_rating` (draft vs final) | 1 | done |
 | 3 | eaudit: optional `profile`, suppress filter, contract `0.0.2` | SP01 T3 (core extraction) | done |
-| 4 | Reasons-audit mapping, evidence mapping, pack `evaluation:` block | 1, 3, SP01 T10 | todo |
+| 4 | Reasons-audit mapping, evidence mapping, pack `evaluation:` block | 1, 3, SP01 T10 | in-progress |
 | 5 | Tone lint and `report.yaml` static strings | 1 | done |
 | 6 | Compare and template explanations | 1, 5, SP02 T4 (`paudit.formula.evaluate`) | done |
-| 7 | Tips: prompt, quote validation, retry | 1, 5, SP01 T4 (route `tips`) | in-progress |
+| 7 | Tips: prompt, quote validation, retry | 1, 5, SP01 T4 (route `tips`) | done |
 | 8 | `build_report` assembly | 4, 6, 7 | todo |
 | 9 | `run_evaluation` orchestration, progress, partial failure | 8, SP02 T10 (paudit entry point) | todo |
 | 10 | Live check, measurements, ADR 0019, boundary tests | 9, SP02 working paudit | todo |
