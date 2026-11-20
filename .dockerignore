@@ -19,3 +19,7 @@ eval
 firestore-rules-test
 .github
 .claude
+**/datasets
+**/.env
+**/.env.*
+!docs/contracts

@@ -183,6 +183,8 @@ jobs:
       - run: uv sync --frozen --package onolys-admin-backend
       - run: uv run --no-sync --package onolys-admin-backend ruff check admin/backend
       - run: uv run --no-sync --package onolys-admin-backend pytest admin/backend
+      - name: Image builds, rejects anonymous calls, refuses an empty allowlist, ships no eval data
+        run: bash scripts/ci/test_admin_image.sh onolys-admin-backend:ci
 
   paudit:
     needs: changes

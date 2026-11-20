@@ -32,8 +32,9 @@ API_EXTRA_RE='^(firestore\.rules|firebase\.json|firestore-rules-test/)'
 # The web job also runs on the contracts its generated types come from (gen:api staleness check).
 WEB_EXTRA_RE='^(api/openapi\.json|engines/evaluation/schemas/report\.schema\.json)$'
 
-# The admin gateway mounts eaudit and uses admin/auth, so it re-runs when either changes.
-ADMIN_BACKEND_EXTRA_RE='^(admin/auth/|engines/eaudit/)'
+# The admin gateway mounts eaudit, uses admin/auth and paudit, and its image ships protocols/ and
+# docs/contracts/, so it re-runs when any of them (or .dockerignore) changes.
+ADMIN_BACKEND_EXTRA_RE='^(admin/auth/|engines/eaudit/|engines/paudit/|protocols/|docs/contracts/|\.dockerignore)'
 
 mapfile -t FILES
 
