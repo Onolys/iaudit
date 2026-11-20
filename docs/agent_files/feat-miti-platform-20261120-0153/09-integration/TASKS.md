@@ -16,7 +16,7 @@ Code-only vs staging-only: Tasks 1-7 need no GCP and no network in CI. They can 
 | 4 | Run artifacts + `run_info` persistence | 3, SP04 T12 | todo |
 | 5 | Wire `ADAPTERS=real` + error mapping into the worker; offline real-mode flow test | 1, 2, 3, 4, SP04 T12 | todo |
 | 6 | Local real mode `live` test (fixture STT, real LLM) | 5, SP01 T11 | todo |
-| 7 | Staging-only presets `test-broken-llm`, `test-broken-eaudit` | SP01 T4 | in-progress |
+| 7 | Staging-only presets `test-broken-llm`, `test-broken-eaudit` | SP01 T4 | done |
 | 8 | Staging deploy on real adapters; four live checks; web end-to-end + timing | 5, 7, SP05 T14, SP06 T9, SP06 T10 | todo |
 | 9 | Staging API-key flow + no-rating run | 8, SP04 T15 | todo |
 | 10 | Forced failures by preset + failure alert | 7, 8, SP06 T10 | todo |
