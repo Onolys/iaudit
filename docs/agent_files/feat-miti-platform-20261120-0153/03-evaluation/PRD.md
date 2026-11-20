@@ -33,7 +33,7 @@ build_report(...)  # pure assembly from already-computed parts (used by tests, a
 `run_evaluation` starts the reasons audit (R3) at t0 concurrently with paudit (unless a `paudit_result` is passed in), runs tips (R5) when paudit finishes, joins, then compare + assemble in code. Worker (SP04) may call parts separately. There is no parse step: the run starts once transcript + speaker confirm + card (or "no rating") are in (SP04 R4).
 
 **R2. Rating card (no parsing).** [RESOLVED: in-app rating card only; no `extract_text`, `parse_rating`, spreadsheet/docx/pdf parsing or parser model step (Tejit 2026-11-20 r6)]
-- Input is the pack's `rating.schema.json` object (SP02 R1): `change_goal`, `coded_span{from_s,to_s}`, per global `{score 1-5, reason ≤1,000 chars, example?{at_s, text}}`, per behaviour code `{count, note ≤1,000 chars}`, and `notes` (≤3,000 chars, "Additional notes / evaluation reasoning"). `notes` is free text and is **not** parsed into the card.
+- Input is the pack's `rating.schema.json` object (SP02 R1): `change_goal`, `coded_span{from_s,to_s}`, per global `{score 1-5, reason ≤1,000 chars, example?{at_s, text ≤1,000 chars}}` [RESOLVED: 1,000 chars (Tejit r6)], per behaviour code `{count, note ≤1,000 chars}`, and `notes` (≤3,000 chars, "Additional notes / evaluation reasoning"). `notes` is free text and is **not** parsed into the card.
 - `validate_rating(pack, obj)` (code only): jsonschema; keys ⊆ pack item ids; scores int within `scale`; counts int ≥ 0; `coded_span` ordered, ≥ 0; `change_goal` non-empty when a run starts; length limits above (hard limits: SP04 rejects over-limit input; the UI only warns). Partial ratings are valid (missing item = null, never defaulted). Returns `Issue{path, code}` (paths, never text). A card with no scores/counts and no notes is a "no rating" run.
 - Text is never logged; no flags such as `reason_not_in_source` exist any more (the user typed the card).
 
@@ -136,7 +136,7 @@ Engine owns: mechanics (mapping, filter hook, validation, locate, compare arithm
 - [DEFERRED: Claude Sonnet quality, measured on Tejit's transcripts] Quality of atomize/check on first-person self-ratings; run once real self-ratings exist. Build and test on synthetic fixtures now.
 - [RESOLVED: card caps: reason/note ≤1,000 chars per item, additional notes ≤3,000; API rejects over-limit input, UI only warns (Tejit 2026-11-20 r6)] Cost of the reasons audit on a verbose rating is bounded by these caps; measure at staging.
 - [RESOLVED: tips retry once, on Claude (Tejit 2026-11-20 r6)] Tune on real transcripts.
-- [OPEN] Tejit r6 asked for paudit, eaudit and tips in parallel, but tips are built only from paudit's counted instances (D7), so they cannot start before paudit finishes. Default: tips start when paudit finishes and run alongside eaudit/compare; a tips pass from the transcript alone (fully parallel) is possible but loses the tie to Onolys's scores. Tejit to confirm or accept the default.
+- [RESOLVED: tips start when paudit finishes and run alongside eaudit (Tejit 2026-11-20 r6)] Tips need paudit's counted instances (D7), so they cannot run fully parallel to paudit.
 - [RESOLVED: no parsing, so no xlsx/docx/pdf parser risk (Tejit 2026-11-20 r6)]
 - [RESOLVED: count-flag denominator = max(clinician, Onolys)]
 - [DEFERRED] Tips about strengths; localised report text; multi-run per-instance voting display.

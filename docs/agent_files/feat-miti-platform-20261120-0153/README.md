@@ -45,13 +45,13 @@ See the Decision log in [brainstorm.md](brainstorm.md). Headlines:
 Report JSON = SP03 `report.schema.json` (SP04 stores, SP05 renders); `GET /v1/sessions/{id}/transcript` + `GET /v1/presets` added to SP04; `n_runs` (1-5) + allowlisted `preset` under "Advanced" in web; Hosting site `onolys-app` same-origin rewrite; `FIRESTORE_DATABASE`, `ROUTES_FILE`, `STT_PROVIDERS_FILE`, `DEFAULT_PRESET`, `uploads/` staging prefix, extra SA roles; `coded_span{from_s,to_s}` everywhere; eaudit `profile` passthrough; `evaluation:` pack block; public `paudit.formula.evaluate`; admin-only `POST /v1/paudit`; admin service `onolys-admin-backend-{env}`, reusable `_deploy-cloudrun.yml`; ADR numbers made unique (0017 SP01, 0018 SP02, 0019 SP03, 0020 SP04, 0021 SP05, 0022 SP06, 0023 SP07); `locate` + typed errors added to core.
 
 ## Cross-cutting risks / open questions
-After round 6 one `[OPEN]` remains across the PRDs (it came out of applying r6, not from earlier rounds); round-5 and round-6 items are listed below. "Tejit" = only he can answer; "build" = resolved by a spike or measurement during implementation.
+After round 6 no `[OPEN]` items remain across the PRDs; round-5 and round-6 items are listed below. "Tejit" = only he can answer; "build" = resolved by a spike or measurement during implementation.
 
 | PRD | Open item | Default / cheapest test | Who |
 |---|---|---|---|
-| 03 | r6 asks for paudit, eaudit and tips in parallel, but tips are built from paudit's counted instances (SP03 D7), so they cannot start before paudit ends | Default: tips start when paudit finishes and run alongside eaudit/compare; a transcript-only tips pass (fully parallel) loses the tie to Onolys's scores | Tejit |
 
 **Resolved/deferred by Tejit 2026-11-20 (round 6):**
+- Tips timing (SP03): tips start when paudit finishes (they need its counted instances) and run alongside eaudit; paudit and eaudit run in parallel. Rating-card example text capped at 1,000 chars. [RESOLVED]
 - Models (A): Google = speech-to-text only; all LLM work (paudit coding/globals, eaudit stages, tips) on Claude Sonnet `anthropic/claude-sonnet-5-5` via the Anthropic API through the LiteLLM client, key `ANTHROPIC_API_KEY` in Secret Manager; routes still swappable by config; Gemini/Vertex only an optional future route; Vertex AI API/IAM removed from SP06. Resolves SP01 Gemini `json_schema`, SP06 Gemini-location. SP02/SP03 "Gemini quality" items become "Claude Sonnet quality, measured on Tejit's transcripts". [RESOLVED] [DEFERRED: Claude Sonnet quality on Tejit's transcripts]
 - STT (B): Chirp 3 standard recognition (not dynamic batch), cost not a concern, from `us`; STT service agent gets bucket read; residency claims dropped. Resolves SP01 dynamic-batch, SP06 diarization/service-agent and residency items. [RESOLVED]
 - Rating input (C): in-app rating card only (change goal, coded span, per-global score + reason ≤1,000 + optional timestamped example, per-code count + note ≤1,000) plus ONE separate "Additional notes / evaluation reasoning" box (≤3,000) audited by eaudit as extra claims, not parsed; soft caps in UI, hard limits at API; no upload, paste-to-parse, parser step, `extract_text`/`parse_rating`, xlsx risk or `awaiting_rating_confirm`; `validate_rating` kept. Resolves SP03 xlsx and reason-length items. [RESOLVED]
@@ -87,4 +87,4 @@ Owner-only tasks, consolidated from the PRDs (agents supply exact values where n
 10. **Branch protection:** none today; if added, required job names are `eaudit` and `frontend` (SP01).
 
 ## Status
-Design phase done: 8 PRDs written, reconciled, Tejit's round-5 and round-6 answers applied (1 `[OPEN]` left, see above). Next: `dev-tasks` per approved PRD.
+Design phase done: 8 PRDs written, reconciled, Tejit's round-5 and round-6 answers applied (0 `[OPEN]` left). Next: `dev-tasks` per approved PRD.
