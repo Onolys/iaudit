@@ -1,0 +1,333 @@
+pack_format: "0.0.1"
+id: miti
+version: 4.2.1
+source:
+  citation: >-
+    Moyers, T.B., Manuel, J.K., & Ernst, D. Motivational Interviewing Treatment Integrity
+    Coding Manual 4.2.1 (revised June 2015). University of New Mexico, Center on Alcoholism,
+    Substance Abuse, and Addictions (CASAA). Page numbers cited in this pack ("manual p. N")
+    are the manual's own page numbers.
+  url: "PLACEHOLDER: Tejit to supply the official manual URL"
+  permission_note: >-
+    PLACEHOLDER: Tejit to confirm the permission wording shown to users. The manual footer
+    reads "Draft: Do not cite without permission"; the owner has confirmed permission to use
+    the manual text here. Onolys output is not an official MITI coding.
+speaker_roles:
+  subject: clinician
+  other: client
+
+items:
+  # ---- global ratings (manual pp. 4-12) ----
+  - id: cct
+    kind: global
+    label: Cultivating Change Talk
+    definition: >-
+      Manual p. 5: the extent to which the clinician actively encourages the client's own
+      language in favor of the change goal, and confidence for making that change. For higher
+      ratings the change goal must be obvious in the session and the conversation largely
+      focused on change, with the clinician actively cultivating change talk when possible.
+      Low scores occur when the clinician is inattentive to the client's language about change
+      (fails to recognize and follow up on it, or prioritizes history-taking, assessment or
+      non-directive listening). Manual p. 5: do not penalize the clinician if the client does
+      not offer change talk or does not respond to efforts to evoke it. Anchors (manual
+      pp. 5-6): 1 no explicit attention to or preference for the client's language in favor of
+      changing; 2 sporadic attention, frequently misses opportunities; 3 often attends but
+      misses some opportunities; 4 consistently attends and makes efforts to encourage it;
+      5 marked and consistent effort to increase the depth, strength, or momentum of the
+      client's language in favor of change.
+    scale: {min: 1, max: 5, default: 3}
+    evidence_min: 2
+    caps: &poor_practice_cap
+      - max: 4
+        when: poor_practice_cited
+        source: >-
+          MITI 4.2.1 manual p. 4: "A '5' is generally not given when there are prominent
+          examples of poor practice in the segment."
+  - id: sst
+    kind: global
+    label: Softening Sustain Talk
+    definition: >-
+      Manual p. 7: the extent that the clinician avoids a focus on the reasons against
+      changing or for maintaining the status quo. To achieve high scores the clinician should
+      avoid lingering in discussions of the difficulty or undesirability of change, spending
+      only as much time on sustain talk as needed to bring the discussion into more favorable
+      territory. High scores may also be achieved when no sustain talk occurs, if the
+      clinician does not engage in behaviors to evoke it (manual p. 7; FAQ 6, p. 38). Lower
+      the rating when sustain talk is infrequent but the clinician responds inappropriately
+      to it (manual p. 38). Anchors (manual pp. 7-8): 1 consistently facilitates the frequency
+      or depth of arguments for the status quo; 2 usually explores or responds to the
+      status quo; 3 gives preference to status-quo language but shows some shifting away;
+      4 typically avoids an emphasis on status-quo language; 5 marked and consistent effort
+      to decrease the depth, strength, or momentum of status-quo language.
+    scale: {min: 1, max: 5, default: 3}
+    evidence_min: 2
+    caps: *poor_practice_cap
+  - id: partnership
+    kind: global
+    label: Partnership
+    definition: >-
+      Manual p. 9: the extent to which the clinician conveys an understanding that expertise
+      and wisdom about change reside mostly within the client. Clinicians high on the scale
+      behave as if the interview is between two equal partners; clinicians low on the scale
+      assume the expert role for a majority of the interaction and have a high degree of
+      influence on its nature. Anchors (manual pp. 9-10): 1 actively assumes the expert role,
+      partnership absent; 2 superficially responds to opportunities to collaborate;
+      3 incorporates the client's contributions in a lukewarm or erratic fashion; 4 fosters
+      collaboration and power sharing so the client's contributions impact the session;
+      5 actively fosters and encourages power sharing so the client's contributions
+      substantially influence the session. Manual pp. 37-38 (FAQ 5): the rating may be lowered
+      even when Persuade with Permission is counted, e.g. permission asked for virtually every
+      comment, perfunctory or insincere permission, no time for the client to respond, or
+      overstretched or "dumped" information.
+    scale: {min: 1, max: 5, default: 3}
+    evidence_min: 2
+    caps: *poor_practice_cap
+  - id: empathy
+    kind: global
+    label: Empathy
+    definition: >-
+      Manual p. 11: the extent to which the clinician understands or makes an effort to grasp
+      the client's perspective and experience (tries to "try on" what the client feels or
+      thinks). Empathy is not sympathy, warmth, acceptance, genuineness, support, or client
+      advocacy. Reflective listening is an important part, but the rating captures all efforts
+      to understand the client's perspective and convey that understanding. Anchors (manual
+      pp. 11-12): 1 little or no attention to the client's perspective; 2 sporadic efforts,
+      understanding may be inaccurate; 3 actively trying to understand, with modest success;
+      4 active and repeated efforts, accurate understanding mostly limited to explicit
+      content; 5 deep understanding of the client's point of view, not just what has been
+      stated but what the client means and has not yet said.
+    scale: {min: 1, max: 5, default: 3}
+    evidence_min: 2
+    caps: *poor_practice_cap
+
+  # ---- behavior counts (manual pp. 13-32) ----
+  - id: gi
+    kind: count
+    label: Giving Information
+    definition: >-
+      Manual p. 16: the clinician gives information, educates, provides feedback, or expresses
+      a professional opinion without persuading, advising, or warning. Typically the tone is
+      neutral and the language does not imply the information is specifically relevant to the
+      client or that the client must act on it. Structuring statements (what will happen in the
+      session, exercise instructions, scheduling) are not coded as Giving Information
+      (manual p. 16). If the coder cannot decide between Persuade and Giving Information, use
+      Giving Information (manual p. 17).
+    examples:
+      - "The guidelines state that women should not drink more than seven drinks per week. (manual p. 16)"
+      - "Well, we know that sons of alcoholics carry an increased risk of problem drinking. (manual p. 18)"
+  - id: persuade
+    kind: count
+    label: Persuade
+    definition: >-
+      Manual p. 17: the clinician makes overt attempts to change the client's opinions,
+      attitudes, or behavior using logic, compelling arguments, self-disclosure, or facts (with
+      an explicit link to an overt message to change). Also coded when the clinician gives
+      biased information, advice, suggestions, tips, opinions, or solutions without an explicit
+      statement or strong contextual cue emphasizing the client's autonomy in receiving the
+      recommendation. Neutral information without an explicit focus on influencing is Giving
+      Information. Persuade sets a relatively high bar: if undecided between Persuade and
+      Giving Information, use Giving Information (manual p. 17). Persuade is a MI Non-Adherent
+      code (manual p. 29); Confront trumps Persuade (manual p. 31).
+    examples:
+      - "You just don't know how good your life can be if you quit drinking altogether. (manual p. 17)"
+      - "Continuing to drink at these levels can really harm your liver. (manual p. 17)"
+  - id: persuade_permission
+    kind: count
+    label: Persuade with Permission
+    definition: >-
+      Manual p. 18: assigned when the interviewer includes an emphasis on collaboration or
+      autonomy support while persuading. Permission may be present when (1) the client asks
+      directly for the clinician's opinion, (2) the clinician asks the client directly for
+      permission to advise, suggest, give opinion, offer feedback, express concerns, make
+      recommendations, or discuss a topic, or (3) the clinician uses autonomy-supportive
+      language to preface or qualify the advice so the client may discount, ignore, or
+      evaluate it. Permission may come before, during, or after persuasion but must be close
+      in time; a general permission may last several minutes, but a topic change, a more
+      directive stance, significant added content, or prescribing a plan without asking again
+      may earn Persuade instead (manual pp. 18-19). When Persuade and Persuade with Permission
+      both occur in the same utterance, assign only Persuade with Permission (manual p. 20).
+      If accompanied by an explicit Seeking Collaboration or Emphasizing Autonomy, assign both
+      (manual p. 18). If the coder is uncertain, prefer Giving Information (manual p. 19).
+    examples:
+      - "I've had good luck with clients using the nicotine gum. (after the client has agreed to hear information; manual p. 20)"
+  - id: question
+    kind: count
+    label: Question
+    definition: >-
+      Manual p. 20: all questions from clinicians (open, closed, evocative, fact-finding, etc.)
+      receive the Question code, but only one question per volley is coded. Open and closed
+      questions are not differentiated. Asking about the client's knowledge or understanding of
+      a topic is a Question, not Seeking Collaboration (manual p. 27). Confront trumps Question
+      (manual p. 30). A statement that only sets up a following question is a structuring
+      statement and is not coded as a separate reflection (manual p. 23).
+    examples:
+      - "What have you already been told about drinking during pregnancy? (manual p. 27)"
+  - id: sr
+    kind: count
+    label: Simple Reflection
+    definition: >-
+      Manual pp. 20-21: reflective listening statements made in response to client statements
+      that essentially capture and return something the client has just said. Simple
+      reflections typically convey understanding or facilitate exchanges and add little or no
+      meaning or emphasis; they may mark important or intense emotions but do not go far beyond
+      the client's original statement. Summaries of several client statements may be simple
+      reflections if the clinician does not use the summary to add a point or direction. If
+      the coder cannot distinguish simple from complex (including summaries), code Simple
+      Reflection (manual p. 22). Only one reflection code is given per volley (manual p. 13).
+    examples:
+      - "You're furious about this. (manual p. 21)"
+  - id: cr
+    kind: count
+    label: Complex Reflection
+    definition: >-
+      Manual p. 21: reflections that typically add substantial meaning or emphasis to what the
+      client has said, conveying a deeper or more complex picture. The clinician may emphasize
+      a particular part of what the client said to make a point or take the conversation in a
+      different direction, may add subtle or obvious content to the client's words, or may
+      combine client statements into summaries that are directional. Only one reflection code
+      is given per volley; if any reflection in the volley is complex, code Complex Reflection
+      (manual pp. 13, 22). A reflection followed by a question to check it: code both
+      (manual p. 23).
+    examples:
+      - "This is the last straw for you. (manual p. 21)"
+      - "You're having a hard time figuring out what your mother really wants. (manual p. 21)"
+  - id: affirm
+    kind: count
+    label: Affirm
+    definition: >-
+      Manual p. 25: a clinician utterance that accentuates something positive about the
+      client: the client's strengths, efforts, intentions, or worth. It must be given in a
+      genuine manner, reflect something genuine about the client, and be explicitly linked to
+      client behaviors or specific characteristics; it need not focus on the change goal.
+      Agreement, approval, cheerleading, non-specific praise ("You did great!") and statements
+      of support are not coded (manual pp. 25-26). Affirms are often complex reflections; then
+      prefer Affirm. If unsure whether it is specific or strong enough, do not assign it
+      (manual p. 26). Three strikes rule: after the first two or three, repeated affirmations
+      are typically not coded (manual p. 26). Trumping order for the MI-Adherent codes:
+      Emphasize over Seek over Affirm; when unsure use the lower code (manual pp. 24-25).
+    examples:
+      - "You came up with a lot of great ideas on how to reduce your drinking. Great job brainstorming today. (manual p. 26)"
+  - id: seek_collab
+    kind: count
+    label: Seeking Collaboration
+    definition: >-
+      Manual p. 26: assigned when the clinician explicitly attempts to share power or
+      acknowledge the expertise of the client, or genuinely seeks consensus with the client on
+      tasks, goals, or directions of the session. It may be assigned when the clinician asks
+      what the client thinks about information provided; when permission to give information or
+      advice is sought, Seeking Collaboration is typically assigned (manual pp. 26-27). Asking
+      about the client's knowledge of a topic is a Question instead (manual p. 27). Withhold
+      the code for rhetorical, rote, or superficial questions or if no genuine effort to share
+      power is perceived; defer the code when undecided (manual p. 39).
+    examples:
+      - "How can I help you with this? (manual p. 27)"
+  - id: emphasize_autonomy
+    kind: count
+    label: Emphasizing Autonomy
+    definition: >-
+      Manual p. 28: utterances that clearly focus the responsibility with the client for
+      decisions about and actions pertaining to change. They highlight the client's sense of
+      control, freedom of choice, personal autonomy, or ability or obligation to decide about
+      attitudes and actions. They are not statements that specifically emphasize the client's
+      self-efficacy, confidence, or ability to perform a specific action. It is the highest in
+      the MI-Adherent trumping order; the bar is intentionally set higher (manual pp. 24-25).
+    examples:
+      - "The number of fruits and vegetables you choose to eat is really up to you. (manual p. 28)"
+  - id: confront
+    kind: count
+    label: Confront
+    definition: >-
+      Manual p. 30: the clinician directly and unambiguously disagrees, argues, corrects,
+      shames, blames, criticizes, labels, warns, moralizes, ridicules, or questions the
+      client's honesty, with the quality of uneven power sharing accompanied by disapproval or
+      negativity. Includes questions or reflections whose voice tone clearly indicates
+      confrontation; most Confronts can be identified from tone and context. If the coder is
+      not certain whether an utterance is Confront or Reflection, assign no code. Confront
+      trumps Persuade (manual p. 31) and Question (manual p. 30). When confrontation is used
+      to emphasize a client strength, consider Affirm (manual p. 31). Confront is a MI
+      Non-Adherent code (manual p. 29).
+    examples:
+      - "You have no concerns whatsoever about your drinking? (manual p. 30)"
+
+rules:
+  # Manual p. 13: each utterance may receive only one behavior code.
+  - kind: one_code_per_utterance
+  # Manual p. 13: each volley earns each code only once (max 8 codes per volley).
+  - kind: max_per_unit
+    unit: volley
+    code: any
+    n: 1
+  # Manual pp. 13, 22: one reflection code per volley; any complex reflection makes it CR.
+  - kind: exclusive_group
+    unit: volley
+    codes: [sr, cr]
+    precedence: [cr, sr]
+
+# Manual p. 13: a volley is uninterrupted clinician speech, ended by client speech other than
+# facilitative comments ("yeah, right, good"). Default: any client turn breaks a volley
+# (Tejit, accepted default); raise min_other_words to let short acknowledgements through.
+volley:
+  breaks_on: other_speaker
+  min_other_words: 0
+
+# Manual section H (pp. 32-33) formulas; reference levels from section I (p. 33).
+summaries:
+  - id: technical
+    label: Technical Global
+    expr: "(cct+sst)/2"
+    format: "0.0"
+    reference: {fair: 3, good: 4, direction: higher_better}
+  - id: relational
+    label: Relational Global
+    expr: "(partnership+empathy)/2"
+    format: "0.0"
+    reference: {fair: 3.5, good: 4, direction: higher_better}
+  - id: pct_cr
+    label: "% Complex Reflections"
+    expr: "cr/(sr+cr)"
+    format: percent
+    reference: {fair: 0.4, good: 0.5, direction: higher_better}
+  - id: reflection_question_ratio
+    label: Reflection-to-Question Ratio
+    expr: "(sr+cr)/question"
+    format: "0.0"
+    reference: {fair: 1, good: 2, direction: higher_better}
+  # No reference levels: manual p. 33 leaves MIA and MINA thresholds unspecified ("-").
+  - id: total_mia
+    label: Total MI-Adherent
+    expr: "seek_collab+affirm+emphasize_autonomy"
+    format: "0"
+  - id: total_mina
+    label: Total MI Non-Adherent
+    expr: "confront+persuade"
+    format: "0"
+
+input_checks:
+  # Manual p. 3: 20-minute segment recommended; p. 37: globals harder under 10 minutes.
+  - {id: duration_max, kind: duration_max, value: 25, severity: error}
+  - {id: duration_min, kind: duration_min, value: 10, severity: warn}
+  # Manual pp. 3-4: the coder must be told the change goal before coding.
+  - {id: change_goal, kind: param_required, value: change_goal, severity: error}
+  - {id: min_subject_turns, kind: min_subject_turns, value: 5, severity: error}
+  - {id: min_other_turns, kind: min_other_turns, value: 3, severity: error}
+
+# Difference rule (brainstorm): globals differ if abs diff >= 1, "within one point" is abs diff
+# <= 1; counts: any diff shown, flagged if abs diff >= 2 or >= 25%.
+compare:
+  cct: &global_compare {kind: score_diff, differs_at: 1, within: 1}
+  sst: *global_compare
+  partnership: *global_compare
+  empathy: *global_compare
+  gi: &count_compare {kind: count_diff, flag_abs: 2, flag_rel: 0.25}
+  persuade: *count_compare
+  persuade_permission: *count_compare
+  question: *count_compare
+  sr: *count_compare
+  cr: *count_compare
+  affirm: *count_compare
+  seek_collab: *count_compare
+  emphasize_autonomy: *count_compare
+  confront: *count_compare
+
+# Owned and filled by SP03.
+evaluation: {}

@@ -1,0 +1,11 @@
+# Stub layout; the content of this file is owned by SP03.
+sections:
+  - id: globals
+    label: Global ratings
+    items: [cct, sst, partnership, empathy]
+  - id: counts
+    label: Behavior counts
+    items: [gi, persuade, persuade_permission, question, sr, cr, affirm, seek_collab, emphasize_autonomy, confront]
+  - id: summaries
+    label: Summary scores
+    items: [technical, relational, pct_cr, reflection_question_ratio, total_mia, total_mina]
