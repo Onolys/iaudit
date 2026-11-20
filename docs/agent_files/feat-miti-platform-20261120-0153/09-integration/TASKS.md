@@ -12,7 +12,7 @@ Code-only vs staging-only: Tasks 1-7 need no GCP and no network in CI. They can 
 |---|---|---|---|
 | 1 | Error map `to_public` + table-driven tests | SP01 T3, SP02 T1, SP04 T5, SP04 T14 | done |
 | 2 | Real `Stt` adapter + provider registry | SP01 T7, SP01 T8, SP04 T6, SP04 T8 | done |
-| 3 | Real `Evaluation` adapter | SP03 T9, SP02 T6, SP01 T4, SP04 T6 | in-progress |
+| 3 | Real `Evaluation` adapter | SP03 T9, SP02 T6, SP01 T4, SP04 T6 | done |
 | 4 | Run artifacts + `run_info` persistence | 3, SP04 T12 | todo |
 | 5 | Wire `ADAPTERS=real` + error mapping into the worker; offline real-mode flow test | 1, 2, 3, 4, SP04 T12 | todo |
 | 6 | Local real mode `live` test (fixture STT, real LLM) | 5, SP01 T11 | todo |
