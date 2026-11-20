@@ -27,3 +27,4 @@ Why is it like this? Architecture decision records.
 | [0019](0019-evaluation-engine-and-concern-suppression.md) | Evaluation engine: one in-process run, concern suppression before the decision table |
 | [0020](0020-public-api-contract.md) | Public `/v1` API contract: generated OpenAPI, stable names, vendored Redoc |
 | [0021](0021-web-app-hosting-and-sharing.md) | Web app hosting: same-origin `/v1` rewrite, strict CSP, privacy checks as tests |
+| [0022](0022-infra-gcp-terraform-two-environments.md) | Infrastructure: one GCP project, Terraform, staging and prod, STT in `us`, no residency claims |
