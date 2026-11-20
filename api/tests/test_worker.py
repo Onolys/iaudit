@@ -425,3 +425,67 @@ def test_combined_queue_calls_runner_directly(repo, blobs):
     app.state.queue.enqueue(payload())
     app.state.queue.drain()
     assert calls == [1]
+
+
+# --- combined mode on a non-local env (PR previews): in-process tasks, no worker/tasks config ---
+
+
+@pytest.fixture
+def preview_settings():
+    return Settings(env="staging", service_mode="combined", auth_mode="idp", adapters="stub",
+                    gcp_project="onolys", auth_project="onolys")  # fmt: skip
+
+
+def test_combined_staging_needs_no_worker_url_or_sa(preview_settings, repo, blobs):
+    assert not preview_settings.worker_url and not preview_settings.tasks_sa
+    app = create_app(preview_settings, repo=repo, blobs=blobs)
+    assert app.state.queue.auto is True
+
+
+def test_build_queue_auto_everywhere_but_test():
+    from onolys_api.jobs.queue import build_queue
+
+    for env, auto in (("local", True), ("staging", True), ("test", False)):
+        q = build_queue(
+            Settings(
+                env=env,
+                service_mode="combined",
+                auth_mode="fake" if auto and env == "local" else "idp",
+            )
+        )
+        assert q.auto is auto, env
+
+
+async def test_combined_staging_tasks_reject_without_oidc(preview_settings, repo, blobs):
+    app = create_app(preview_settings, repo=repo, blobs=blobs)
+    app.state.runner.register("validate", HandlerSpec(lambda ctx: None, step="validate"))
+    assert (await _post(app)).status_code == 401
+    assert (await _post(app, headers={"Authorization": f"Bearer {mint()}"})).status_code == 401
+    assert (await _post(app, headers={"Authorization": "Bearer x"})).status_code == 401
+
+
+async def test_combined_staging_with_sa_configured_uses_real_oidc(preview_settings, repo, blobs):
+    s = replace(preview_settings, worker_url=WORKER_URL, tasks_sa=SA)
+    app = create_app(s, repo=repo, blobs=blobs, oidc_verifier=verifier())
+    app.state.runner.register("validate", HandlerSpec(lambda ctx: None, step="validate"))
+    assert (await _post(app)).status_code == 401
+    assert (await _post(app, headers={"Authorization": f"Bearer {mint()}"})).status_code == 200
+
+
+def test_combined_queue_auto_delivers_in_background_with_runner_mapping(repo, blobs):
+    import threading
+
+    s = Settings(env="staging", service_mode="combined", auth_mode="idp", auth_project="p")
+    app = create_app(s, repo=repo, blobs=blobs)
+    done = threading.Event()
+    gate = threading.Event()
+
+    def handler(ctx):
+        gate.wait(5)
+        done.set()
+
+    app.state.runner.register("validate", HandlerSpec(handler, step="validate"))
+    app.state.queue.enqueue(payload())  # returns at once: the handler is still blocked
+    assert not done.is_set()
+    gate.set()
+    assert done.wait(5)

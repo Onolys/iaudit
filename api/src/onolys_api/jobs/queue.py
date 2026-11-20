@@ -104,8 +104,8 @@ class InMemoryQueue:
     """Combined/local/test queue: calls the handler wrapper directly, no HTTP. It emulates the
     Cloud Tasks queue (name dedup, one retry on 5xx), which is the queue's job, not the app's.
 
-    `auto=True` (local dev) delivers each task on a background timer; otherwise tasks wait in
-    `pending` until `drain()` (tests)."""
+    `auto=True` (every env but test: local dev, PR previews) delivers each task on a background
+    timer; otherwise tasks wait in `pending` until `drain()` (tests)."""
 
     def __init__(self, dispatcher: Dispatcher | None = None, auto: bool = False) -> None:
         self.dispatcher = dispatcher
@@ -153,7 +153,7 @@ class InMemoryQueue:
 
 def build_queue(settings: Settings) -> TaskQueue | None:
     if settings.service_mode == "combined":
-        return InMemoryQueue(auto=settings.env == "local")
+        return InMemoryQueue(auto=settings.env != "test")
     if settings.tasks_queue:
         return CloudTasksQueue(settings)
     return None

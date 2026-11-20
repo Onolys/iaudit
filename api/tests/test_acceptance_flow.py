@@ -159,3 +159,45 @@ async def test_list_shows_done_failed_and_inflight(flow):
     assert (by_id[failed]["status"], by_id[failed]["error_code"]) == ("failed", "no_speech")
     assert by_id[inflight]["status"] == "validating"
     assert by_id[inflight]["error_code"] is None
+
+
+async def test_combined_staging_auto_runs_stub_flow_to_report(blobs, tmp_path, monkeypatch):
+    """PR preview config: ENV=staging, combined, stub adapters, no WORKER_URL/TASKS_SA. Nothing calls
+    drain(): the auto queue must carry a session to report_ready."""
+    import asyncio
+
+    from onolys_api.config import Settings
+    from onolys_api.jobs import transcribe
+
+    monkeypatch.setattr(transcribe, "POLL_INTERVAL_S", 0.05)  # the real delayed poll is 15 s
+
+    routes = tmp_path / "routes.yaml"
+    routes.write_text(ROUTES)
+    (tmp_path / "stt_providers.yaml").write_text(
+        "providers:\n  base: {provider: p1, model: m1}\ndefault: base\nby_language: {}\n"
+    )
+
+    class Verifier:
+        def verify(self, token: str) -> str:
+            return token.removeprefix("test:")
+
+    s = Settings(env="staging", service_mode="combined", auth_mode="idp", adapters="stub",
+                 auth_project="onolys", gcp_project="onolys", routes_file=str(routes))  # fmt: skip
+    app = create_app(s, repo=FakeRepo(blobs), blobs=blobs, audio_tools=StubTools(),
+                     token_verifier=Verifier())  # fmt: skip
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as c:
+        f = Flow(app, c)
+
+        async def until(sid, status):
+            for _ in range(200):
+                if (await f.get(f"/sessions/{sid}"))["status"] == status:
+                    return
+                await asyncio.sleep(0.05)
+            raise AssertionError((await f.get(f"/sessions/{sid}"))["status"])
+
+        sid = await f.create("preview")
+        await f.upload(sid)
+        await until(sid, "awaiting_input")
+        await f.rate(sid)
+        await f.confirm(sid)
+        await until(sid, "report_ready")

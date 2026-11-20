@@ -19,7 +19,7 @@ from onolys_api import logs
 from onolys_api.adapters import Adapters, build_adapters
 from onolys_api.audio import AudioTools, FfmpegTools
 from onolys_api.auth.deps import Authenticator
-from onolys_api.auth.idtoken import TokenVerifier
+from onolys_api.auth.idtoken import InvalidToken, TokenVerifier
 from onolys_api.auth.oidc import OidcVerifier
 from onolys_api.config import LOCAL_ENVS, Settings
 from onolys_api.docs import DESCRIPTION, add_error_responses, make_docs_router
@@ -202,6 +202,11 @@ def register_error_handlers(app: FastAPI) -> None:
         return _response(request, 500, message, [{"code": "internal_error", "message": message}])
 
 
+class _RejectAllOidc:
+    def verify(self, token: str) -> str:
+        raise InvalidToken
+
+
 class _NoQueue:
     def enqueue(self, payload, delay_s: float = 0.0) -> None:
         raise RuntimeError("TASKS_QUEUE is not configured")
@@ -278,9 +283,15 @@ def create_app(
             "delete", HandlerSpec(make_delete_handler(app.state.blobs), claim=False)
         )
         if settings.env not in LOCAL_ENVS:
-            if not settings.worker_url or not settings.tasks_sa:
+            if settings.worker_url and settings.tasks_sa:
+                app.state.oidc = oidc_verifier or OidcVerifier(
+                    settings.worker_url, settings.tasks_sa
+                )
+            elif settings.service_mode == "combined":
+                # tasks run in process (no Cloud Tasks): /tasks/* stays mounted but trusts nobody
+                app.state.oidc = _RejectAllOidc()
+            else:
                 raise ConfigError("WORKER_URL and TASKS_SA are required for the worker")
-            app.state.oidc = oidc_verifier or OidcVerifier(settings.worker_url, settings.tasks_sa)
 
     app.add_middleware(
         ContractCORSMiddleware,
