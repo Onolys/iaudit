@@ -16,7 +16,7 @@ Source of truth: [PRD.md](PRD.md). Tests follow SP00 conventions: pytest markers
 | 6 | Compare and template explanations | 1, 5, SP02 T4 (`paudit.formula.evaluate`) | done |
 | 7 | Tips: prompt, quote validation, retry | 1, 5, SP01 T4 (route `tips`) | done |
 | 8 | `build_report` assembly | 4, 6, 7 | done |
-| 9 | `run_evaluation` orchestration, progress, partial failure | 8, SP02 T10 (paudit entry point) | in-progress |
+| 9 | `run_evaluation` orchestration, progress, partial failure | 8, SP02 T10 (paudit entry point) | done |
 | 10 | Live check, measurements, ADR 0019, boundary tests | 9, SP02 working paudit | todo |
 
 Parallel lanes: all of Lane A after SP02. Task 1 goes first and is a sync point: push it as soon as green, because SP05 generates its TS types from `report.schema.json` and SP04 stores/validates the report verbatim against it. Tasks 1, 2, 5, 6, 7 need only SP02's published types and schemas plus fixture paudit results, so they can start before paudit works end to end. Task 3 (eaudit, different package) runs in parallel with 1 and 2. After 1: 4 (needs 3), 6 and 7 (both need 5) can run side by side. Task 8 joins 4, 6, 7; Tasks 9 and 10 are serial and need a working paudit.
