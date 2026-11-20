@@ -31,6 +31,7 @@ from onolys_api.routes import api_key as api_key_routes
 from onolys_api.routes import audio as audio_routes
 from onolys_api.routes import sessions as session_routes
 from onolys_api.routes import tasks as task_routes
+from onolys_api.routes import usage as usage_routes
 from onolys_api.storage.base import BlobStore
 from onolys_api.storage.fake import FakeBlobStore
 from onolys_api.storage.fake_routes import make_fake_blob_router
@@ -239,6 +240,7 @@ def create_app(
     router.include_router(api_key_routes.router)
     router.include_router(session_routes.router)
     router.include_router(audio_routes.router)
+    router.include_router(usage_routes.router)
     app.include_router(router)
     if runs_tasks:
         app.include_router(task_routes.router)  # /tasks/{kind}: Cloud Tasks only, not in schema

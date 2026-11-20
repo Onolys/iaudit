@@ -10,6 +10,8 @@ import base64
 import binascii
 import hashlib
 import os
+import random
+import time
 from datetime import datetime
 from typing import Any
 
@@ -20,7 +22,14 @@ from onolys_core.transcript import Transcript
 
 from onolys_api.config import Settings
 from onolys_api.repo import large
-from onolys_api.repo.base import Claim, ConflictError, NotFoundError, Page, decide_claim
+from onolys_api.repo.base import (
+    Claim,
+    ConflictError,
+    NotFoundError,
+    Page,
+    ReserveOutcome,
+    decide_claim,
+)
 from onolys_api.repo.models import (
     ApiKeyDoc,
     Doc,
@@ -41,6 +50,8 @@ from onolys_api.storage.base import BlobStore
 
 DRAFT_ID = "draft"
 MAX_LIMIT = 50
+_TXN_ATTEMPTS = 5
+_TXN_ROUNDS = 12  # cap/limit counters are hot docs: re-run exhausted transactions with jitter
 
 
 def make_firestore_client(settings: Settings) -> firestore.Client:
@@ -419,6 +430,50 @@ class FirestoreRepo:
             merge=True,
         )
         return _load(UsageDoc, ref.get())
+
+    def reserve_run(self, uid: str, date: str, cap: int, max_active: int) -> ReserveOutcome:
+        usage_ref = self._top("usage", f"{uid}_{date}")
+        user_ref = self._top("users", uid)
+
+        @firestore.transactional
+        def txn_fn(txn) -> ReserveOutcome:
+            user = user_ref.get(transaction=txn).to_dict() or {}
+            usage = usage_ref.get(transaction=txn).to_dict() or {}
+            runs, active = usage.get("runs", 0), user.get("active_runs", 0)
+            eff_cap, eff_active = user.get("daily_cap"), user.get("max_active_runs")
+            if runs >= (cap if eff_cap is None else eff_cap):
+                return "daily_cap"
+            if active >= (max_active if eff_active is None else eff_active):
+                return "concurrent"
+            txn.set(usage_ref, {"uid": uid, "date": date, "runs": runs + 1}, merge=True)
+            txn.set(user_ref, {"active_runs": active + 1}, merge=True)
+            return "ok"
+
+        return self._contended(txn_fn)
+
+    def release_run(self, uid: str, date: str, refund: bool) -> None:
+        usage_ref = self._top("usage", f"{uid}_{date}")
+        user_ref = self._top("users", uid)
+
+        @firestore.transactional
+        def txn_fn(txn) -> None:
+            user = user_ref.get(transaction=txn).to_dict() or {}
+            usage = usage_ref.get(transaction=txn).to_dict() or {}
+            if user.get("active_runs", 0) > 0:
+                txn.set(user_ref, {"active_runs": user["active_runs"] - 1}, merge=True)
+            if refund and usage.get("runs", 0) > 0:
+                txn.set(usage_ref, {"runs": usage["runs"] - 1}, merge=True)
+
+        self._contended(txn_fn)
+
+    def _contended(self, txn_fn):
+        for round_ in range(_TXN_ROUNDS):
+            try:
+                return txn_fn(self._client.transaction(max_attempts=_TXN_ATTEMPTS))
+            except ValueError:  # "Failed to commit transaction in N attempts": contention
+                if round_ == _TXN_ROUNDS - 1:
+                    raise
+                time.sleep(random.uniform(0.01, 0.15))
 
     def get_idempotency(self, uid: str, key: str) -> IdempotencyDoc | None:
         ref = self._top("idempotency", _idem_id(uid, key))

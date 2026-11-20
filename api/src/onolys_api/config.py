@@ -26,6 +26,7 @@ class Settings:
     audio_bucket: str = ""
     cors_origins: tuple[str, ...] = ()
     daily_run_cap: int = 20
+    max_active_runs: int = 2
     tasks_queue: str = ""
     tasks_sa: str = ""
     worker_url: str = ""
@@ -43,6 +44,11 @@ class Settings:
             cap = int(cap_raw)
         except ValueError:
             raise ConfigError("DAILY_RUN_CAP must be an integer") from None
+        active_raw = e.get("MAX_ACTIVE_RUNS", "2")
+        try:
+            max_active = int(active_raw)
+        except ValueError:
+            raise ConfigError("MAX_ACTIVE_RUNS must be an integer") from None
         s = cls(
             env=env,
             service_mode=e.get("SERVICE_MODE", "combined" if local else "api"),
@@ -57,6 +63,7 @@ class Settings:
                 o.strip() for o in e.get("CORS_ORIGINS", "").split(",") if o.strip()
             ),
             daily_run_cap=cap,
+            max_active_runs=max_active,
             tasks_queue=e.get("TASKS_QUEUE", ""),
             tasks_sa=e.get("TASKS_SA", ""),
             worker_url=e.get("WORKER_URL", ""),
@@ -80,3 +87,5 @@ class Settings:
             raise ConfigError("AUTH_MODE=fake is only allowed when ENV is local or test")
         if self.daily_run_cap < 0:
             raise ConfigError("DAILY_RUN_CAP must be >= 0")
+        if self.max_active_runs < 0:
+            raise ConfigError("MAX_ACTIVE_RUNS must be >= 0")

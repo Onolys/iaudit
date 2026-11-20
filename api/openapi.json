@@ -616,6 +616,30 @@
         ],
         "title": "SessionRef",
         "type": "object"
+      },
+      "Usage": {
+        "properties": {
+          "daily_cap": {
+            "title": "Daily Cap",
+            "type": "integer"
+          },
+          "resets_at": {
+            "format": "date-time",
+            "title": "Resets At",
+            "type": "string"
+          },
+          "runs_today": {
+            "title": "Runs Today",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "runs_today",
+          "daily_cap",
+          "resets_at"
+        ],
+        "title": "Usage",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -1126,6 +1150,45 @@
         "summary": "Tell the server the PUT finished",
         "tags": [
           "audio"
+        ]
+      }
+    },
+    "/v1/usage": {
+      "get": {
+        "operationId": "getUsage",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Runs used today (UTC day)",
+        "tags": [
+          "usage"
         ]
       }
     }

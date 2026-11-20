@@ -48,6 +48,8 @@ class UserDoc(Doc):
     prefs: dict[str, Any] = Field(default_factory=dict)
     expiry_days: int | None = None
     daily_cap: int | None = None  # per-user override of DAILY_RUN_CAP (R8)
+    max_active_runs: int | None = None  # per-user override of MAX_ACTIVE_RUNS (R8)
+    active_runs: int = 0  # runs reserved and not yet released (R8 concurrent limit)
 
 
 class SttInfo(BaseModel):

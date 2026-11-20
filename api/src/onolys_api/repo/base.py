@@ -46,6 +46,7 @@ class Page[T]:
     next_cursor: str | None = None
 
 
+ReserveOutcome = Literal["ok", "daily_cap", "concurrent"]
 ClaimOutcome = Literal["claimed", "done", "failed", "busy"]
 
 
@@ -128,6 +129,12 @@ class Repo(Protocol):
     # usage + idempotency
     def get_usage(self, uid: str, date: str) -> UsageDoc: ...
     def add_usage(self, uid: str, date: str, runs: int = 0, tokens: int = 0) -> UsageDoc: ...
+    # R8: one transaction reads the user + usage docs, checks the daily cap (users/{uid}.daily_cap
+    # overrides `cap`) and the active-run limit (`max_active_runs` overrides `max_active`), and
+    # on "ok" does runs+1, active_runs+1. Nothing is written on a refusal.
+    def reserve_run(self, uid: str, date: str, cap: int, max_active: int) -> ReserveOutcome: ...
+    # active_runs-1 (floor 0); with refund also runs-1 (floor 0) on that day's usage doc.
+    def release_run(self, uid: str, date: str, refund: bool) -> None: ...
     def get_idempotency(self, uid: str, key: str) -> IdempotencyDoc | None: ...
     def put_idempotency(self, uid: str, key: str, doc: IdempotencyDoc) -> bool: ...
     def delete_idempotency(self, uid: str, key: str) -> None: ...  # no-op if absent/foreign

@@ -8,7 +8,14 @@ from typing import Any
 from onolys_core.transcript import Transcript
 
 from onolys_api.repo import large
-from onolys_api.repo.base import Claim, ConflictError, NotFoundError, Page, decide_claim
+from onolys_api.repo.base import (
+    Claim,
+    ConflictError,
+    NotFoundError,
+    Page,
+    ReserveOutcome,
+    decide_claim,
+)
 from onolys_api.repo.firestore import (
     DRAFT_ID,
     MAX_LIMIT,
@@ -397,6 +404,30 @@ class FakeRepo:
         d["tokens"] += tokens
         self._put(path, d)
         return self._load(UsageDoc, f"{uid}_{date}", d)
+
+    def reserve_run(self, uid: str, date: str, cap: int, max_active: int) -> ReserveOutcome:
+        with self._claim_lock:
+            user = self._get(f"users/{uid}") or {}
+            usage = self._get(f"usage/{uid}_{date}") or {"uid": uid, "date": date, "runs": 0}
+            active = user.get("active_runs", 0)
+            eff_cap = user.get("daily_cap")
+            eff_active = user.get("max_active_runs")
+            if usage.get("runs", 0) >= (cap if eff_cap is None else eff_cap):
+                return "daily_cap"
+            if active >= (max_active if eff_active is None else eff_active):
+                return "concurrent"
+            self._put(f"usage/{uid}_{date}", {**usage, "runs": usage.get("runs", 0) + 1})
+            self._put(f"users/{uid}", {**user, "active_runs": active + 1})
+            return "ok"
+
+    def release_run(self, uid: str, date: str, refund: bool) -> None:
+        with self._claim_lock:
+            user = self._get(f"users/{uid}") or {}
+            if user.get("active_runs", 0) > 0:
+                self._put(f"users/{uid}", {**user, "active_runs": user["active_runs"] - 1})
+            usage = self._get(f"usage/{uid}_{date}")
+            if refund and usage and usage.get("runs", 0) > 0:
+                self._put(f"usage/{uid}_{date}", {**usage, "runs": usage["runs"] - 1})
 
     def get_idempotency(self, uid: str, key: str) -> IdempotencyDoc | None:
         path = f"idempotency/{_idem_id(uid, key)}"
