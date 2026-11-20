@@ -92,6 +92,7 @@ jobs:
           case "$IMAGE" in *@sha256:*) ;; *) echo "image must be pinned by digest" >&2; exit 1 ;; esac
           # Runs as the staging api SA (deployer-staging has actAs on it; infra/deployer.tf). Combined mode runs tasks
           # in process (no Cloud Tasks, no OIDC): no WORKER_URL/TASKS_SA, so /tasks/* rejects every request.
+          bash scripts/ci/pr_preview.sh env-file "$ADAPTERS" "$SHA" "$RUNNER_TEMP/preview-env.yaml"
           gcloud run deploy "$SERVICE" \
             --project "$PROJECT" --region "$REGION" --image "$IMAGE" \
             --service-account "api-staging@${PROJECT}.iam.gserviceaccount.com" \
@@ -99,7 +100,7 @@ jobs:
             --min-instances 0 --max-instances 1 --no-cpu-throttling \
             --cpu 1 --memory 1Gi --timeout 60 \
             --labels "onolys-preview=pr-${PR}" \
-            --set-env-vars "^@^ENV=staging@SERVICE_MODE=combined@ADAPTERS=${ADAPTERS}@FIRESTORE_DATABASE=staging@GCP_PROJECT=${PROJECT}@AUTH_PROJECT=${PROJECT}@REGION=${REGION}@AUDIO_BUCKET=onolys-audio-staging@BLOB_SIGNER_EMAIL=api-staging@${PROJECT}.iam.gserviceaccount.com@ROUTES_FILE=config/staging/routes.yaml@DAILY_RUN_CAP=20@CORS_ORIGINS=http://localhost:5173@GIT_SHA=${SHA}" \
+            --env-vars-file "$RUNNER_TEMP/preview-env.yaml" \
             --set-secrets "UID_HMAC_KEY=uid-hmac-key-staging:latest" \
             --quiet
       - uses: actions/setup-node@v4

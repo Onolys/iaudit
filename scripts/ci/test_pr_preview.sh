@@ -24,10 +24,10 @@ has   "deployer-staging SA var"                 "$WF" 'vars\.DEPLOYER_STAGING_SA
 hasnt "no JSON key auth"                        "$WF" 'credentials_json|GOOGLE_CREDENTIALS|service_account_key'
 has   "image tag pr-<N>-<sha>"                  "$WF" 'pr-\$\{\{ github\.event\.number \}\}-'
 has   "service onolys-pr-<N>"                   "$WF" 'onolys-pr-'
-has   "combined mode"                           "$WF" 'SERVICE_MODE=combined'
+has   "combined mode via env-file helper"      "$WF" 'pr_preview\.sh env-file'
 has   "fake adapters by default (adapters=stub)" "$WF" 'adapters=stub; mode=fake'
-has   "staging database"                        "$WF" 'FIRESTORE_DATABASE=staging'
-has   "GIT_SHA set"                             "$WF" 'GIT_SHA='
+hasnt "no inline --set-env-vars (values with @ or , break gcloud dict parsing)" "$WF" '--set-env-vars'
+has   "env passed via --env-vars-file"          "$WF" '--env-vars-file'
 has   "max 1 instance"                          "$WF" '--max-instances[ =]1'
 has   "min 0 instances"                         "$WF" '--min-instances[ =]0'
 has   "CPU always allocated"                    "$WF" '--no-cpu-throttling'
@@ -75,6 +75,19 @@ echo '{"hosting":[{"target":"other","rewrites":[]}]}' > "$T/nofb.json"
 bash "$PP" firebase-config 7 "$T/nofb.json" "$T/x.json" >/dev/null 2>&1 && bad "fails without app-staging target" || ok "fails without app-staging target"
 echo '{"hosting":[{"target":"app-staging","rewrites":[{"source":"**","destination":"/index.html"}]}]}' > "$T/norw.json"
 bash "$PP" firebase-config 7 "$T/norw.json" "$T/x.json" >/dev/null 2>&1 && bad "fails without /v1/** rewrite" || ok "fails without /v1/** rewrite"
+
+# --- helper: env-file (YAML for gcloud --env-vars-file; values contain '@' and ',' and must stay intact)
+PROJECT=onolys GCP_REGION=us-central1 bash "$PP" env-file stub abcdef1234567890abcdef1234567890abcdef12 "$T/env.yaml" >/dev/null 2>&1 && ok "env-file runs" || bad "env-file runs"
+python3 - "$T/env.yaml" <<'PY' && ok "env-file: flat str->str map, SA email intact, combined/staging/GIT_SHA, no stale WORKER_URL/TASKS_SA" || bad "env-file: flat str->str map, SA email intact, combined/staging/GIT_SHA, no stale WORKER_URL/TASKS_SA"
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1]))
+assert isinstance(d, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in d.items()), d
+assert d["BLOB_SIGNER_EMAIL"] == "api-staging@onolys.iam.gserviceaccount.com", d
+assert d["SERVICE_MODE"] == "combined" and d["FIRESTORE_DATABASE"] == "staging" and d["ADAPTERS"] == "stub", d
+assert d["GIT_SHA"].startswith("abcdef12") and d["DAILY_RUN_CAP"] == "20", d
+assert not {"WORKER_URL", "TASKS_SA", "TASKS_QUEUE"} & set(d), d
+PY
+bash "$PP" env-file stub "bad sha" "$T/x.yaml" >/dev/null 2>&1 && bad "env-file rejects bad sha" || ok "env-file rejects bad sha"
 
 # --- helper: comment marker
 body="$(bash "$PP" comment-body 42 https://onolys-app-staging--pr-42-abc.web.app abcdef1234567890 fake)"

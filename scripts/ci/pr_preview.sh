@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Helpers for pr-preview.yml / pr-preview-cleanup.yml (SP00 R3). Pure functions, no cloud calls except `cleanup`.
 #   pr_preview.sh firebase-config <pr> <src firebase.json> <out>   Hosting config: /v1/** -> onolys-pr-<pr>, target app-staging only
+#   pr_preview.sh env-file <adapters> <sha> <out>                  YAML for `gcloud run deploy --env-vars-file` (values may hold @ and ,)
 #   pr_preview.sh comment-body <pr> <url> <sha> <fake|real>        marker PR comment body
 #   pr_preview.sh comment-id                                        stdin: JSON list of PR comments -> id of the first marker comment (or empty)
 #   pr_preview.sh comment <pr> <url> <sha> <mode>                   create-or-update the ONE marker comment (needs gh, GITHUB_REPOSITORY, GH_TOKEN)
@@ -33,6 +34,27 @@ rewrites[idx]["run"] = {"serviceId": f"onolys-pr-{pr}", "region": region}
 if idx != 0 and any(r.get("source") == "**" for r in rewrites[:idx]):
     sys.exit("SPA fallback precedes /v1/**")
 json.dump({"hosting": [site]}, open(out, "w"), indent=2)
+PY
+}
+
+env_file() {
+  local adapters="${1:-}" sha="${2:-}" out="${3:-}"
+  [[ "$adapters" =~ ^[a-z]+$ ]] || die "bad adapters: '$adapters'"
+  [[ "$sha" =~ ^[0-9a-f]{7,40}$ ]] || die "bad sha: '$sha'"
+  [[ -n "$out" ]] || die "output path required"
+  # JSON is valid YAML; json.dumps quotes every value, so '@', ',' and ':' stay literal.
+  python3 - "$adapters" "$sha" "$out" "$PROJECT" "$REGION" <<'PY'
+import json, sys
+adapters, sha, out, project, region = sys.argv[1:6]
+env = {
+    "ENV": "staging", "SERVICE_MODE": "combined", "ADAPTERS": adapters, "FIRESTORE_DATABASE": "staging",
+    "GCP_PROJECT": project, "AUTH_PROJECT": project, "REGION": region,
+    "AUDIO_BUCKET": "onolys-audio-staging",
+    "BLOB_SIGNER_EMAIL": f"api-staging@{project}.iam.gserviceaccount.com",
+    "ROUTES_FILE": "config/staging/routes.yaml", "DAILY_RUN_CAP": "20",
+    "CORS_ORIGINS": "http://localhost:5173", "GIT_SHA": sha,
+}
+json.dump(env, open(out, "w"), indent=2)
 PY
 }
 
@@ -97,10 +119,11 @@ cleanup() {
 cmd="${1:-}"; [[ $# -gt 0 ]] && shift
 case "$cmd" in
   firebase-config) firebase_config "$@" ;;
+  env-file)        env_file "$@" ;;
   comment-body)    comment_body "$@" ;;
   comment-id)      comment_id ;;
   comment)         post_comment "$@" ;;
   is-not-found)    is_not_found "$@" ;;
   cleanup)         cleanup "$@" ;;
-  *) die "usage: pr_preview.sh firebase-config|comment-body|comment-id|comment|is-not-found|cleanup ..." ;;
+  *) die "usage: pr_preview.sh firebase-config|env-file|comment-body|comment-id|comment|is-not-found|cleanup ..." ;;
 esac
