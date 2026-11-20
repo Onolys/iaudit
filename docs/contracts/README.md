@@ -22,6 +22,8 @@ The verdict list and the concern-type list mirror [../mission.md](../mission.md)
 
 Version: `0.0.1`; no compatibility promise.
 
+Protocol-audit (`paudit`) packs and results are separate from this contract; see [ADR 0018](../decisions/0018-protocol-pack-data-vs-code.md) and [engines/paudit](../../engines/paudit/README.md).
+
 **Contract-versioning rule (whole initiative): all schemas are `"0.0.1"`; the project is not deployed; no legacy/back-compat code, version history or migration; a non-conforming file just shows a validation error and the owner deletes it.**
 
 A consumer must not render a partial audit from an invalid body.
