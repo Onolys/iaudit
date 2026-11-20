@@ -538,3 +538,29 @@ def test_two_concurrent_claims_one_wins(repo):
             ex.map(lambda _: repo.claim_step(uid, sid, "validate", now, LEASE).outcome, range(4))
         )
     assert outs.count("claimed") == 1 and outs.count("busy") == 3
+
+
+@pytest.mark.parametrize("kind", ["step", "run"])
+def test_claim_survives_exhausted_txn_retries(repo, monkeypatch, kind):
+    """Exhausted-retry contention ("Failed to commit transaction in N attempts", a ValueError from
+    the client) must be re-run, not surfaced: the claim still resolves to a clean outcome."""
+    if isinstance(repo, FakeRepo):
+        pytest.skip("Firestore transaction contention only")
+    uid, sid = seed(repo)
+    now = datetime.now(UTC)
+    run_id = f"run-{uuid.uuid4().hex[:8]}"
+    repo.create_run(uid, sid, run_id, RunDoc(uid=uid, session_id=sid, run_id=run_id))
+    real, calls = repo._client.transaction, []
+
+    def flaky(*a, **kw):
+        calls.append(1)
+        if len(calls) <= 2:
+            raise ValueError("Failed to commit transaction in 5 attempts.")
+        return real(*a, **kw)
+
+    monkeypatch.setattr(repo._client, "transaction", flaky)
+    if kind == "step":
+        assert repo.claim_step(uid, sid, "validate", now, LEASE).outcome == "claimed"
+    else:
+        assert repo.claim_run(uid, sid, run_id, now, LEASE).outcome == "claimed"
+    assert len(calls) == 3

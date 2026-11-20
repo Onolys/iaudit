@@ -313,7 +313,7 @@ class FirestoreRepo:
                 )
             return claim
 
-        return txn_fn(self._client.transaction())
+        return self._contended(txn_fn)
 
     def claim_run(self, uid: str, sid: str, run_id: str, now: datetime, lease_s: float) -> Claim:
         ref = self._run_ref(uid, sid, run_id)
@@ -339,7 +339,7 @@ class FirestoreRepo:
                 )
             return claim
 
-        return txn_fn(self._client.transaction())
+        return self._contended(txn_fn)
 
     def list_runs(self, uid: str, sid: str) -> list[RunDoc]:
         coll = self._session_ref(uid, sid).collection("runs")
