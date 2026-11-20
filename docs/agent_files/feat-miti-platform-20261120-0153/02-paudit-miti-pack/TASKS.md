@@ -12,8 +12,8 @@ Source of truth: [PRD.md](PRD.md). Lane A. Tests follow SP00 conventions: marker
 | 2 | `rating.schema.json` (rating card) + parity test | 1 | done |
 | 3 | Result models and `paudit-result.schema.json` | 1 | done |
 | 4 | Safe formula evaluator `paudit.formula.evaluate` | 1 | done |
-| 5 | Select, volley builder, input checks, hook interface | 1, 3 | in-progress |
-| 6 | MITI 4.2.1 pack data, `rules.py` hook, prompt drafts | 2, 4, 5 | todo |
+| 5 | Select, volley builder, input checks, hook interface | 1, 3 | done |
+| 6 | MITI 4.2.1 pack data, `rules.py` hook, prompt drafts | 2, 4, 5 | in-progress |
 | 7 | Rules, counts, summaries (code side) | 3, 4, 6 | todo |
 | 8 | Code pass: batching, warm-first, halving, locate/validate | 5, 6, 7, SP01 T3, T5, T6 | todo |
 | 9 | Globals pass: evidence, default, caps | 3, 6, SP01 T3, T5 | todo |
