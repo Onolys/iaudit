@@ -148,6 +148,67 @@
         "title": "AudioUploadResponse",
         "type": "object"
       },
+      "ConfirmRequest": {
+        "properties": {
+          "clinician_speaker": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Clinician Speaker",
+            "type": "string"
+          }
+        },
+        "required": [
+          "clinician_speaker"
+        ],
+        "title": "ConfirmRequest",
+        "type": "object"
+      },
+      "ConfirmResponse": {
+        "properties": {
+          "clinician_speaker": {
+            "title": "Clinician Speaker",
+            "type": "string"
+          },
+          "session": {
+            "$ref": "#/components/schemas/ConfirmSessionRef"
+          }
+        },
+        "required": [
+          "session",
+          "clinician_speaker"
+        ],
+        "title": "ConfirmResponse",
+        "type": "object"
+      },
+      "ConfirmSessionRef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "uploading",
+              "validating",
+              "transcribing",
+              "awaiting_input",
+              "running",
+              "report_ready",
+              "failed",
+              "deleting"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "ConfirmSessionRef",
+        "type": "object"
+      },
       "CreateSessionRequest": {
         "properties": {
           "language": {
@@ -765,6 +826,172 @@
           "status"
         ],
         "title": "SessionRef",
+        "type": "object"
+      },
+      "SpeakerInfo": {
+        "properties": {
+          "samples": {
+            "description": "Up to 3 of the speaker's first lines",
+            "items": {
+              "type": "string"
+            },
+            "title": "Samples",
+            "type": "array"
+          },
+          "speaker": {
+            "title": "Speaker",
+            "type": "string"
+          },
+          "turn_count": {
+            "title": "Turn Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "speaker",
+          "turn_count",
+          "samples"
+        ],
+        "title": "SpeakerInfo",
+        "type": "object"
+      },
+      "SpeakersView": {
+        "properties": {
+          "clinician_speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinician Speaker"
+          },
+          "speakers": {
+            "items": {
+              "$ref": "#/components/schemas/SpeakerInfo"
+            },
+            "title": "Speakers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "speakers"
+        ],
+        "title": "SpeakersView",
+        "type": "object"
+      },
+      "TranscriptTurn": {
+        "properties": {
+          "end_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Ms"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`clinician`/`client`; null until confirmed",
+            "title": "Role"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "start_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Ms"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "TranscriptTurn",
+        "type": "object"
+      },
+      "TranscriptView": {
+        "properties": {
+          "clinician_speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinician Speaker"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptTurn"
+            },
+            "title": "Turns",
+            "type": "array"
+          }
+        },
+        "required": [
+          "turns"
+        ],
+        "title": "TranscriptView",
         "type": "object"
       },
       "Usage": {
@@ -1409,6 +1636,169 @@
         "summary": "Save the rating card (draft autosave or final revision)",
         "tags": [
           "rating"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/speakers": {
+      "get": {
+        "description": "Every speaker in first-appearance order, each with up to 3 sample lines. 409 `invalid_state` until the transcript is ready.",
+        "operationId": "getSpeakers",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpeakersView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Speakers with sample lines, for picking the clinician",
+        "tags": [
+          "speakers"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/speakers/confirm": {
+      "post": {
+        "description": "Allowed once the transcript is ready and not while a run is in progress. In `report_ready|failed` it applies to the next run only. May start the first run (R4).",
+        "operationId": "confirmSpeakers",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Pick the clinician speaker (every other speaker is the client)",
+        "tags": [
+          "speakers"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/transcript": {
+      "get": {
+        "description": "Owner-scoped; `Cache-Control: private, no-store`. Report offsets are code points into `turn.text`. 409 `invalid_state` before transcription finishes.",
+        "operationId": "getTranscript",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "The transcript, with roles once the clinician is confirmed",
+        "tags": [
+          "speakers"
         ]
       }
     },

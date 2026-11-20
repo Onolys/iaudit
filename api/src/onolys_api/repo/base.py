@@ -47,6 +47,7 @@ class Page[T]:
 
 
 ReserveOutcome = Literal["ok", "daily_cap", "concurrent"]
+StartOutcome = Literal["started", "not_ready", "already", "daily_cap", "concurrent"]
 ClaimOutcome = Literal["claimed", "done", "failed", "busy"]
 
 
@@ -135,6 +136,16 @@ class Repo(Protocol):
     def reserve_run(self, uid: str, date: str, cap: int, max_active: int) -> ReserveOutcome: ...
     # active_runs-1 (floor 0); with refund also runs-1 (floor 0) on that day's usage doc.
     def release_run(self, uid: str, date: str, refund: bool) -> None: ...
+    # R4 first run, ONE transaction: reads session + status + user + usage + latest rating; if
+    # `state=awaiting_input`, the three flags are set and `first_run_id` is absent, checks the cap
+    # like `reserve_run`, then creates run `run_id` (snapshot: rating_id, n_runs, preset, stt,
+    # code_version), counts it (runs+1, active_runs+1), sets `first_run_id`, `state=running`, the
+    # status mirror and clears the error. Cap/concurrent hit: writes `error=daily_cap_reached`
+    # (state unchanged) and nothing else. Anything not ready: nothing written.
+    def start_first_run(
+        self, uid: str, sid: str, run_id: str, date: str, cap: int, max_active: int,
+        code_version: str, start_progress: int,
+    ) -> StartOutcome: ...  # fmt: skip
     def get_idempotency(self, uid: str, key: str) -> IdempotencyDoc | None: ...
     def put_idempotency(self, uid: str, key: str, doc: IdempotencyDoc) -> bool: ...
     def delete_idempotency(self, uid: str, key: str) -> None: ...  # no-op if absent/foreign

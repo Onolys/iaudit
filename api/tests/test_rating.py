@@ -170,7 +170,7 @@ async def test_final_creates_revision_and_updates_session(env, hook_calls):
     assert s.change_goal == "cut back on drinking" and s.coded_span.to_s == 600
     st = repo.get_status(uid, sid)
     assert st.rating_submitted and st.has_rating
-    assert len(hook_calls) == 1 and hook_calls[0][2:] == (uid, sid)
+    assert len(hook_calls) == 1 and hook_calls[0][2:4] == (uid, sid)
 
 
 async def test_each_final_is_new_revision_latest_wins(env):

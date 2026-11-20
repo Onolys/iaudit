@@ -28,6 +28,7 @@ from onolys_api.repo.base import (
     NotFoundError,
     Page,
     ReserveOutcome,
+    StartOutcome,
     decide_claim,
 )
 from onolys_api.repo.models import (
@@ -448,6 +449,76 @@ class FirestoreRepo:
             txn.set(usage_ref, {"uid": uid, "date": date, "runs": runs + 1}, merge=True)
             txn.set(user_ref, {"active_runs": active + 1}, merge=True)
             return "ok"
+
+        return self._contended(txn_fn)
+
+    def start_first_run(
+        self, uid: str, sid: str, run_id: str, date: str, cap: int, max_active: int,
+        code_version: str, start_progress: int,
+    ) -> StartOutcome:  # fmt: skip
+        sref = self._session_ref(uid, sid)
+        stref = self._top("session_status", sid)
+        usage_ref = self._top("usage", f"{uid}_{date}")
+        user_ref = self._top("users", uid)
+        run_ref = sref.collection("runs").document(run_id)
+        ratings = sref.collection("ratings")
+        newest = ratings.order_by("created_at", direction=firestore.Query.DESCENDING).limit(1)
+
+        @firestore.transactional
+        def txn_fn(txn) -> StartOutcome:
+            snap = sref.get(transaction=txn)
+            sess = snap.to_dict() or {}
+            if not snap.exists or sess.get("uid") != uid:
+                raise NotFoundError()
+            if sess.get("first_run_id"):
+                return "already"
+            if sess.get("state") != "awaiting_input" or not all(
+                sess.get(f) for f in ("transcript_ready", "speaker_confirmed", "rating_submitted")
+            ):
+                return "not_ready"
+            status = stref.get(transaction=txn).to_dict() or {}
+            user = user_ref.get(transaction=txn).to_dict() or {}
+            usage = usage_ref.get(transaction=txn).to_dict() or {}
+            latest = [s for s in newest.get(transaction=txn) if s.id != DRAFT_ID]
+            now = utcnow()
+            eff_cap, eff_active = user.get("daily_cap"), user.get("max_active_runs")
+            outcome: StartOutcome | None = None
+            if usage.get("runs", 0) >= (cap if eff_cap is None else eff_cap):
+                outcome = "daily_cap"
+            elif user.get("active_runs", 0) >= (max_active if eff_active is None else eff_active):
+                outcome = "concurrent"
+            if outcome is not None:
+                txn.update(
+                    sref, {"error": {"code": "daily_cap_reached", "step": None}, "updated_at": now}
+                )
+                txn.set(
+                    stref,
+                    {"error_code": "daily_cap_reached", "uid": uid, "updated_at": now},
+                    merge=True,
+                )
+                return outcome
+            run = RunDoc(
+                uid=uid, session_id=sid, run_id=run_id, n_runs=sess.get("n_runs", 1),
+                preset=sess.get("preset"), rating_id=latest[0].id if latest else None,
+                stt=sess.get("stt"), code_version=code_version,
+            )  # fmt: skip
+            txn.create(run_ref, run.to_store())
+            txn.set(
+                usage_ref, {"uid": uid, "date": date, "runs": usage.get("runs", 0) + 1}, merge=True
+            )
+            txn.set(user_ref, {"active_runs": user.get("active_runs", 0) + 1}, merge=True)
+            txn.update(
+                sref,
+                {"first_run_id": run_id, "state": "running", "step": None, "error": None,
+                 "updated_at": now},
+            )  # fmt: skip
+            txn.set(
+                stref,
+                {"state": "running", "step": None, "error_code": None, "uid": uid,
+                 "progress": max(status.get("progress", 0), start_progress), "updated_at": now},
+                merge=True,
+            )  # fmt: skip
+            return "started"
 
         return self._contended(txn_fn)
 

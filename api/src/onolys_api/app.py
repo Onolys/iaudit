@@ -31,6 +31,7 @@ from onolys_api.routes import api_key as api_key_routes
 from onolys_api.routes import audio as audio_routes
 from onolys_api.routes import rating as rating_routes
 from onolys_api.routes import sessions as session_routes
+from onolys_api.routes import speakers as speaker_routes
 from onolys_api.routes import tasks as task_routes
 from onolys_api.routes import usage as usage_routes
 from onolys_api.storage.base import BlobStore
@@ -205,7 +206,7 @@ def create_app(
         app.state.runner.register(
             "transcribe-poll",
             HandlerSpec(
-                make_poll_handler(app.state.blobs, app.state.adapters.stt),
+                make_poll_handler(app.state.blobs, app.state.adapters.stt, settings=settings),
                 step="transcribe",
                 claim=False,  # the step record belongs to `transcribe`
             ),
@@ -242,6 +243,7 @@ def create_app(
     router.include_router(session_routes.router)
     router.include_router(audio_routes.router)
     router.include_router(rating_routes.router)
+    router.include_router(speaker_routes.router)
     router.include_router(usage_routes.router)
     app.include_router(router)
     if runs_tasks:

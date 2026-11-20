@@ -23,6 +23,7 @@ from onolys_core.transcript import Transcript
 
 from onolys_api.adapters.base import AdapterError, Stt
 from onolys_api.audio import canonical_audio_ref
+from onolys_api.config import Settings
 from onolys_api.jobs.first_run import maybe_start_first_run
 from onolys_api.jobs.machine import advance
 from onolys_api.jobs.queue import MAX_ATTEMPTS, TaskPayload, TaskQueue
@@ -140,10 +141,22 @@ def make_transcribe_handler(blobs: BlobStore, stt: Stt) -> Handler:
 
 
 def make_poll_handler(
-    blobs: BlobStore, stt: Stt, first_run_hook: FirstRunHook = maybe_start_first_run
+    blobs: BlobStore,
+    stt: Stt,
+    first_run_hook: FirstRunHook | None = None,
+    *,
+    settings: Settings | None = None,
 ) -> Handler:
     """Register with `HandlerSpec(fn, step="transcribe", claim=False)`: the step record belongs
-    to `transcribe`; a failure here is recorded on it."""
+    to `transcribe`; a failure here is recorded on it. `first_run_hook` defaults to the real
+    first-run gate bound to `settings` (cap, code version)."""
+    if first_run_hook is None:
+        if settings is None:
+            raise ValueError("settings or first_run_hook is required")
+        gate_settings = settings
+
+        def first_run_hook(repo, queue, uid, sid):  # noqa: F811
+            maybe_start_first_run(repo, queue, uid, sid, gate_settings)
 
     def finish(ctx: TaskContext) -> None:
         ctx.repo.update_session(

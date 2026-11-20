@@ -119,7 +119,14 @@ def put_rating(id: str, body: RatingRequest, request: Request, user: User) -> Ra
         fields,
         status={"rating_submitted": True, "has_rating": not no_rating},
     )
-    maybe_start_first_run(repo, getattr(request.app.state, "queue", None), uid, id)
+    maybe_start_first_run(
+        repo,
+        getattr(request.app.state, "queue", None),
+        uid,
+        id,
+        request.app.state.settings,
+        getattr(request.state, "request_id", None),
+    )
     return RatingSaved(
         final=True, rating_id=rating_id, no_rating=no_rating, has_rating=not no_rating,
         updated_at=now,
