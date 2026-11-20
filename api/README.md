@@ -21,3 +21,10 @@ Reproduce: `uv run --package onolys-api python api/scripts/measure_validate_memo
 
 ## Rating card
 `PUT/GET /v1/sessions/{id}/rating` (`routes/rating.py`): `final=false` overwrites one draft doc (size limits only); `final=true` validates and writes a new `ratings/{rating_id}` revision, copies `change_goal`/`coded_span` to the session, sets `rating_submitted`/`has_rating` and calls `maybe_start_first_run`. Firestore only; nothing is written to GCS. Validation is the single function `rating.validate_rating(card, final)`: jsonschema against `engines/paudit/schemas/rating.schema.json` when it exists, else the bundled stand-in `schemas/rating.local.schema.json`. Swap its body for SP03 `validate_rating` when SP03 lands.
+
+## Local run and image
+One command, combined mode with fakes (no GCP): `api/scripts/dev.sh` (serves on `$PORT`, default 8000; `--quickstart` runs the OpenAPI quickstart against it and exits; `--check` preflights only).
+
+Image (build from the repo root): `docker build -f api/Dockerfile --build-arg GIT_SHA=$(git rev-parse HEAD) -t onolys-api .` then `docker run --rm -p 8080:8080 -e ENV=local -e SERVICE_MODE=combined onolys-api`. The entrypoint (`api/docker-entrypoint.sh`) accepts `SERVICE_MODE=api|worker|combined` and serves on `$PORT` (Cloud Run injects it). Contains ffmpeg and the vendored Redoc; runs as non-root.
+
+Acceptance: `uv run --package onolys-api pytest api -q -m "not live"` (add `FIRESTORE_EMULATOR_HOST` for the emulator params). `tests/test_acceptance_checklist.py` maps AC1-AC18 to their tests.

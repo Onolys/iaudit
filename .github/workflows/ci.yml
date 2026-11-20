@@ -137,6 +137,16 @@ jobs:
           uv run --no-sync --package onolys-api python -m onolys_api.openapi
           uv run --no-sync --package onolys-api python -m onolys_api.contracts
           git diff --exit-code api/openapi.json docs/contracts/public
+      - name: Image builds and answers /v1/healthz (SERVICE_MODE=combined)
+        run: |
+          docker build -f api/Dockerfile --build-arg GIT_SHA="$GITHUB_SHA" -t onolys-api:ci .
+          docker run -d --name onolys-api -p 8080:8080 -e ENV=local -e SERVICE_MODE=combined \
+            onolys-api:ci
+          for _ in $(seq 1 30); do curl -sf localhost:8080/v1/healthz && break; sleep 1; done
+          curl -sf localhost:8080/v1/healthz \
+            | jq -e --arg sha "$GITHUB_SHA" '.service_mode == "combined" and .code_version == $sha'
+          docker logs onolys-api
+          docker rm -f onolys-api
 
   paudit:
     needs: changes
