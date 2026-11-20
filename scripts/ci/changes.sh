@@ -32,6 +32,9 @@ API_EXTRA_RE='^(firestore\.rules|firebase\.json|firestore-rules-test/)'
 # The web job also runs on the contracts its generated types come from (gen:api staleness check).
 WEB_EXTRA_RE='^(api/openapi\.json|engines/evaluation/schemas/report\.schema\.json)$'
 
+# The frontend's pauditSchema.test.ts imports the paudit result schema through the @paudit-schema alias.
+FRONTEND_EXTRA_RE='^engines/paudit/schemas/'
+
 # The admin gateway mounts eaudit, uses admin/auth and paudit, and its image ships protocols/ and
 # docs/contracts/, so it re-runs when any of them (or .dockerignore) changes.
 ADMIN_BACKEND_EXTRA_RE='^(admin/auth/|engines/eaudit/|engines/paudit/|protocols/|docs/contracts/|\.dockerignore)'
@@ -53,6 +56,7 @@ for entry in "${PACKAGES[@]}"; do
               ( "$kind" == python && "$f" =~ $PY_SHARED_RE ) ||
               ( "$name" == api && "$f" =~ $API_EXTRA_RE ) ||
               ( "$name" == admin-backend && "$f" =~ $ADMIN_BACKEND_EXTRA_RE ) ||
+              ( "$name" == frontend && "$f" =~ $FRONTEND_EXTRA_RE ) ||
               ( "$name" == web && "$f" =~ $WEB_EXTRA_RE ) ]]; then
           run=true
           break

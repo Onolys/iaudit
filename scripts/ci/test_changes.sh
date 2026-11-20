@@ -22,6 +22,7 @@ run false "eaudit=true core=true paudit=false evaluation=false api=true admin-au
 run false "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=true web=false infra=false" .github/workflows/ci.yml
 run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=false infra=false" docs/readme.md
 run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=false infra=false" infra/main.tf web/a.ts engines/paudit/a.py
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=true web=false infra=false" engines/paudit/schemas/result.schema.json
 run true  "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=true web=false infra=false" docs/readme.md
 run false "eaudit=false core=false paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=false web=false infra=false" firestore.rules
 run false "eaudit=false core=false paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=false web=false infra=false" firestore-rules-test/rules.test.mjs
@@ -35,6 +36,7 @@ run true  "eaudit=true core=true paudit=false evaluation=false api=true admin-au
 rm "$T/web/package.json" "$T/infra" -r
 touch "$T/engines/paudit/pyproject.toml"   # now paudit exists
 run false "eaudit=false core=false paudit=true evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=false infra=false" engines/paudit/a.py
+run false "eaudit=false core=false paudit=true evaluation=false api=false admin-auth=false admin-backend=false frontend=true web=false infra=false" engines/paudit/schemas/result.schema.json
 mkdir -p "$T/admin/auth"; touch "$T/admin/auth/pyproject.toml"   # admin/auth now exists
 run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=true admin-backend=false frontend=false web=false infra=false" admin/auth/a.py
 mkdir -p "$T/admin/backend"; touch "$T/admin/backend/pyproject.toml"   # admin/backend now exists
