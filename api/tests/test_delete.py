@@ -267,3 +267,20 @@ async def test_delete_mid_run_releases_once_and_usage_counters_stay(env):
     assert sid
     assert calls == [False]  # released by the delete (run was running: spent), not again
     assert env.counters() == (0, 1)  # usage count kept: it is per user, not per session
+
+
+async def test_delete_mid_run_leaves_no_blobs_or_docs_behind(env):
+    """The run finishes after the DELETE: its artifacts/report must not reappear (privacy)."""
+    holder: dict = {}
+
+    class DeletesItself(FakeEvaluation):
+        async def run(self, *a, **kw):
+            out = await super().run(*a, **kw)  # all progress callbacks are done
+            delete_session_data(env.repo, env.blobs, env.uid, holder["sid"])  # DELETE lands now
+            return out
+
+    swap_eval(env, DeletesItself())
+    sid = holder["sid"] = await env.start()
+    env.drain()
+    assert session_blob_keys(env, sid) == []
+    assert remaining_docs(env, sid) == []

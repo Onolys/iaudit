@@ -27,11 +27,12 @@ from onolys_api.audio import (
     sniff,
     staging_key,
 )
+from onolys_api.jobs.alive import ensure_alive as _ensure_alive
 from onolys_api.jobs.machine import advance
 from onolys_api.jobs.queue import TaskPayload
 from onolys_api.jobs.worker import Handler, PermanentError, TaskContext
 from onolys_api.repo.models import RecordingDoc
-from onolys_api.storage.base import MAX_UPLOAD_BYTES, BlobStore
+from onolys_api.storage.base import MAX_UPLOAD_BYTES, BlobNotFoundError, BlobStore
 
 SHORT_WARNING = "short_recording"
 
@@ -54,6 +55,9 @@ def make_validate_handler(
     def purge(uid: str, sid: str) -> None:
         blobs.delete_prefix(f"uploads/{uid}/{sid}/")
         blobs.delete_prefix(f"{uid}/{sid}/audio/")
+
+    def ensure_alive(ctx: TaskContext) -> None:
+        _ensure_alive(ctx.repo, blobs, ctx.uid, ctx.sid)
 
     def fail(ctx: TaskContext, code: str) -> PermanentError:
         purge(ctx.uid, ctx.sid)
@@ -132,12 +136,18 @@ def make_validate_handler(
 
             orig = original_key(uid, sid, fmt)
             digest, nbytes = _sha256(local), local.stat().st_size
-            blobs.upload_from(canonical_key(uid, sid), flac, "audio/flac")
-            if moved:
-                if src_key != orig:  # sniffed format differs from the earlier attempt's
-                    blobs.move(src_key, orig)
-            else:
-                blobs.move(src_key, orig)  # also deletes the staged object
+            ensure_alive(ctx)
+            try:
+                blobs.upload_from(canonical_key(uid, sid), flac, "audio/flac")
+                if moved:
+                    if src_key != orig:  # sniffed format differs from the earlier attempt's
+                        blobs.move(src_key, orig)
+                else:
+                    blobs.move(src_key, orig)  # also deletes the staged object
+            except BlobNotFoundError:
+                ensure_alive(ctx)  # the DELETE swept the staged object under us
+                raise
+            ensure_alive(ctx)  # a DELETE during the writes above must not leave audio behind
 
         ctx.repo.add_recording(
             uid,

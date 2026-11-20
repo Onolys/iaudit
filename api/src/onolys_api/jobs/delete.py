@@ -14,7 +14,8 @@
 5. one content-free `session_deleted` log line, only by the call that removed the document, so
    retries and duplicate tasks never add a second line. No tombstone is kept.
 
-Not handled in v1 (deferred in the PRD): an in-flight run may still write after the delete.
+An in-flight validate or run task that writes blobs after the delete is covered by
+`jobs.alive.ensure_alive` (it removes what it wrote and answers `gone`).
 """
 
 import logging

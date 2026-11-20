@@ -221,3 +221,41 @@ def settings_routes(settings):
     from importlib import resources
 
     return resources.files("onolys_core.llm").joinpath("routes.default.yaml")
+
+
+class DeletingTools(StubTools):
+    """Runs `on_transcode` while ffmpeg 'runs': a DELETE landing mid-validate (privacy race)."""
+
+    def __init__(self, on_transcode, **kw) -> None:
+        super().__init__(**kw)
+        self.on_transcode = on_transcode
+
+    def to_flac(self, src, dst, max_seconds=None) -> None:
+        super().to_flac(src, dst, max_seconds)
+        self.on_transcode()
+
+
+@pytest.mark.parametrize("gone", ["deleting", "removed"])
+async def test_delete_during_validate_leaves_no_audio_blobs(settings, repo, blobs, gone):
+    """DELETE lands while validate transcodes: the task must not leave canonical/original."""
+    from onolys_api.jobs.delete import delete_session_data, session_prefixes
+    from onolys_api.jobs.machine import advance
+
+    def sid_of_only_session() -> str:
+        (path,) = [p for p in repo._docs if p.count("/") == 1 and p.startswith("sessions/")]
+        return path.split("/")[1]
+
+    def delete_now() -> None:
+        sid = sid_of_only_session()
+        if gone == "removed":
+            delete_session_data(repo, blobs, "alice", sid)
+        else:  # marked deleting and blobs swept, but the session doc is still there
+            advance(repo, "alice", sid, to="deleting")
+            for prefix in session_prefixes("alice", sid):
+                blobs.delete_prefix(prefix)
+
+    tools = DeletingTools(delete_now, probe=OK)
+    _, sid = await run_validate(settings, repo, blobs, tiny_wav(), tools)
+    if gone == "deleting":  # the delete finishes afterwards (doc removal)
+        delete_session_data(repo, blobs, "alice", sid)
+    assert [k for k in blobs.list_keys("") if f"{sid}/" in k] == []

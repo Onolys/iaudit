@@ -33,6 +33,7 @@ from onolys_api import logs
 from onolys_api.adapters.base import Evaluation
 from onolys_api.adapters.error_map import to_public
 from onolys_api.jobs import caps
+from onolys_api.jobs.alive import ensure_alive
 from onolys_api.jobs.machine import RUN_START_PROGRESS, STAGE_WEIGHTS, advance
 from onolys_api.jobs.queue import MAX_ATTEMPTS
 from onolys_api.jobs.transcribe import TRANSCRIPT_ID
@@ -204,6 +205,7 @@ def _evaluate(ctx, blobs, evaluation, run_doc, session, started) -> ReportDoc:
         if out.artifacts.get(name) is not None:
             blobs.put_bytes(artifact_key(uid, sid, run_id, name), _dumps(out.artifacts[name]),
                             "application/json")  # fmt: skip
+    ensure_alive(repo, blobs, uid, sid)  # a DELETE during the run must not leave artifacts
     versions = [r.version for r in repo.list_reports(uid, sid)]
     doc = ReportDoc(
         version=max(versions, default=0) + 1,
