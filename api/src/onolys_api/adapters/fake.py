@@ -187,7 +187,10 @@ def _paudit_result(
     stat = lambda v: {"mean": float(v), "min": v, "max": v, "values": [v] * n_runs}  # noqa: E731
     return {
         "schema_version": "0.0.1",
-        "protocol": {**{k: _PROTOCOL[k] for k in ("id", "version", "pack_hash")}, "pack_format": _PACK_FORMAT},
+        "protocol": {
+            **{k: _PROTOCOL[k] for k in ("id", "version", "pack_hash")},
+            "pack_format": _PACK_FORMAT,
+        },
         "language": str(params.get("language") or "en"),
         "change_goal": str(params.get("change_goal") or ""),
         "coded_span": params.get("coded_span"),
@@ -206,7 +209,7 @@ def _paudit_result(
 
 
 def _global_diff(clinician: float | None, onolys: float) -> dict[str, Any]:
-    """Minimal score_diff `Diff` (mirrors onolys_evaluation.compare.compare_item; differs at >=1)."""
+    """Minimal score_diff `Diff` (mirrors onolys_evaluation.compare.compare_item; >=1 differs)."""
     if clinician is None:
         return {"signed": None, "abs": None, "direction": None, "status": "not_rated"}
     signed = onolys - clinician

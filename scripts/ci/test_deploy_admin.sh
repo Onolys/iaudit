@@ -22,7 +22,7 @@ has   "image built from admin/backend/Dockerfile" 'file: admin/backend/Dockerfil
 has   "image passed by digest"               'steps\.push\.outputs\.digest'
 has   "git_sha passed to the revision"       'git_sha:'
 has   "hosting target admin-staging"         'hosting_target=admin-staging'
-has   "hosting target admin"                 'hosting_target=admin ;;'
+has   "hosting target admin"                 'hosting_target="admin" ;;'
 has   "VITE_AUTH_REQUIRED true"              'VITE_AUTH_REQUIRED: "true"'
 has   "VITE_AUDIT_URL set"                   'VITE_AUDIT_URL:'
 has   "origin substituted into firebase.json" 'set_admin_origin\.sh'

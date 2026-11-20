@@ -57,7 +57,7 @@ jobs:
         run: |
           case "$TARGET" in
             staging) site=onolys-admin-staging; hosting_target=admin-staging ;;
-            prod) site=onolys-admin; hosting_target=admin ;;
+            prod) site=onolys-admin; hosting_target="admin" ;;
             *) echo "env must be staging or prod" >&2; exit 1 ;;
           esac
           {
