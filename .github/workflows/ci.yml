@@ -26,6 +26,7 @@ jobs:
       evaluation: ${{ steps.flags.outputs.evaluation }}
       api: ${{ steps.flags.outputs.api }}
       admin-auth: ${{ steps.flags.outputs.admin-auth }}
+      admin-backend: ${{ steps.flags.outputs.admin-backend }}
       frontend: ${{ steps.flags.outputs.frontend }}
       web: ${{ steps.flags.outputs.web }}
       infra: ${{ steps.flags.outputs.infra }}
@@ -167,6 +168,21 @@ jobs:
       - run: uv sync --frozen --package onolys-admin-auth
       - run: uv run --no-sync --package onolys-admin-auth ruff check admin/auth
       - run: uv run --no-sync --package onolys-admin-auth pytest admin/auth
+
+  admin-backend:
+    needs: changes
+    if: needs.changes.outputs.admin-backend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-admin-backend
+      - run: uv run --no-sync --package onolys-admin-backend ruff check admin/backend
+      - run: uv run --no-sync --package onolys-admin-backend pytest admin/backend
 
   paudit:
     needs: changes

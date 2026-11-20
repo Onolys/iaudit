@@ -179,7 +179,24 @@ def test_off_refused_outside_local_test():
 def test_off_allowed_local_test_and_default():
     for env in ("local", "test"):
         assert not AdminAuthConfig.from_env({"ENV": env, "ADMIN_AUTH": "off"}).enabled
-    assert not AdminAuthConfig.from_env({}).enabled
+    assert not AdminAuthConfig.from_env({"ENV": "local"}).enabled
+    assert not AdminAuthConfig.from_env({"ENV": "test"}).enabled
+
+
+def test_unset_or_empty_env_is_non_local_auth_on():
+    for env in ({}, {"ENV": ""}, {"ENV": "  "}):
+        with pytest.raises(ConfigError, match="ALLOWED_EMAILS"):
+            AdminAuthConfig.from_env(env)
+        c = AdminAuthConfig.from_env(
+            {**env, "GCP_PROJECT": PROJECT, "ADMIN_ALLOWED_EMAILS": "a@x.com"}
+        )
+        assert c.enabled
+
+
+def test_unset_env_with_auth_off_refused():
+    for env in ({}, {"ENV": ""}):
+        with pytest.raises(ConfigError, match="local or test"):
+            AdminAuthConfig.from_env({**env, "ADMIN_AUTH": "off"})
 
 
 def test_default_on_outside_local():

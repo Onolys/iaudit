@@ -18,6 +18,7 @@ PACKAGES=(
   "evaluation:engines/evaluation:python"
   "api:api:python"
   "admin-auth:admin/auth:python"
+  "admin-backend:admin/backend:python"
   "frontend:frontend:other"
   "web:web:node"
   "infra:infra:other"
@@ -30,6 +31,9 @@ CI_SHARED_RE='^(\.github/workflows/|scripts/ci/)'
 API_EXTRA_RE='^(firestore\.rules|firebase\.json|firestore-rules-test/)'
 # The web job also runs on the contracts its generated types come from (gen:api staleness check).
 WEB_EXTRA_RE='^(api/openapi\.json|engines/evaluation/schemas/report\.schema\.json)$'
+
+# The admin gateway mounts eaudit and uses admin/auth, so it re-runs when either changes.
+ADMIN_BACKEND_EXTRA_RE='^(admin/auth/|engines/eaudit/)'
 
 mapfile -t FILES
 
@@ -47,6 +51,7 @@ for entry in "${PACKAGES[@]}"; do
         if [[ "$f" == "$dir/"* || "$f" =~ $CI_SHARED_RE ||
               ( "$kind" == python && "$f" =~ $PY_SHARED_RE ) ||
               ( "$name" == api && "$f" =~ $API_EXTRA_RE ) ||
+              ( "$name" == admin-backend && "$f" =~ $ADMIN_BACKEND_EXTRA_RE ) ||
               ( "$name" == web && "$f" =~ $WEB_EXTRA_RE ) ]]; then
           run=true
           break

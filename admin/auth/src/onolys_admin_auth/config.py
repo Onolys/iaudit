@@ -18,9 +18,10 @@ class AdminAuthConfig:
 
     @classmethod
     def from_env(cls, env: Mapping[str, str]) -> "AdminAuthConfig":
-        """ADMIN_AUTH on|off (default: off when ENV is local/test, else on), ENV,
+        """ADMIN_AUTH on|off (default: off only when ENV is explicitly local/test;
+        unset or empty ENV counts as non-local, so auth is on and ADMIN_AUTH=off is refused), ENV,
         ADMIN_AUTH_PROJECT (or GCP_PROJECT), ADMIN_ALLOWED_EMAILS (comma list)."""
-        env_name = env.get("ENV", "local")
+        env_name = (env.get("ENV") or "").strip().lower()
         mode = env.get("ADMIN_AUTH", "off" if env_name in LOCAL_ENVS else "on").strip().lower()
         if mode not in ("on", "off"):
             raise ConfigError("ADMIN_AUTH must be 'on' or 'off'")

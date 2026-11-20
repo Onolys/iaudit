@@ -15,26 +15,30 @@ run() {
   got="$(printf '%s\n' "$@" | ROOT="$T" FORCE_ALL="$force" GITHUB_OUTPUT=/dev/stdout bash "$HERE/changes.sh" | tr '\n' ' ' | sed 's/ $//')"
   if [[ "$got" == "$want" ]]; then echo "ok   $*"; else echo "FAIL $*"; echo "  got:  $got"; echo "  want: $want"; fail=1; fi
 }
-run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false frontend=true web=false infra=false" frontend/src/a.ts
-run false "eaudit=true core=false paudit=false evaluation=false api=false admin-auth=false frontend=false web=false infra=false" engines/eaudit/src/x.py
-run false "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false frontend=false web=false infra=false" engines/core/x.py
-run false "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false frontend=false web=false infra=false" uv.lock
-run false "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false frontend=true web=false infra=false" .github/workflows/ci.yml
-run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false frontend=false web=false infra=false" docs/readme.md
-run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false frontend=false web=false infra=false" infra/main.tf web/a.ts engines/paudit/a.py
-run true  "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false frontend=true web=false infra=false" docs/readme.md
-run false "eaudit=false core=false paudit=false evaluation=false api=true admin-auth=false frontend=false web=false infra=false" firestore.rules
-run false "eaudit=false core=false paudit=false evaluation=false api=true admin-auth=false frontend=false web=false infra=false" firestore-rules-test/rules.test.mjs
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=true web=false infra=false" frontend/src/a.ts
+run false "eaudit=true core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=false infra=false" engines/eaudit/src/x.py
+run false "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=false web=false infra=false" engines/core/x.py
+run false "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=false web=false infra=false" uv.lock
+run false "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=true web=false infra=false" .github/workflows/ci.yml
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=false infra=false" docs/readme.md
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=false infra=false" infra/main.tf web/a.ts engines/paudit/a.py
+run true  "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=true web=false infra=false" docs/readme.md
+run false "eaudit=false core=false paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=false web=false infra=false" firestore.rules
+run false "eaudit=false core=false paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=false web=false infra=false" firestore-rules-test/rules.test.mjs
 touch "$T/web/package.json"; mkdir -p "$T/infra"   # web (package.json) and infra (dir) now exist
-run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false frontend=false web=true infra=false" web/src/a.ts
-run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false frontend=false web=false infra=true" infra/main.tf
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=true infra=false" web/src/a.ts
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=false infra=true" infra/main.tf
 # generated-type inputs (api/openapi.json, report.schema.json) must trigger the web gen:api staleness check
-run false "eaudit=false core=false paudit=false evaluation=false api=true admin-auth=false frontend=false web=true infra=false" api/openapi.json
-run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false frontend=false web=true infra=false" engines/evaluation/schemas/report.schema.json
-run true  "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false frontend=true web=true infra=true" docs/readme.md
+run false "eaudit=false core=false paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=false web=true infra=false" api/openapi.json
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=true infra=false" engines/evaluation/schemas/report.schema.json
+run true  "eaudit=true core=true paudit=false evaluation=false api=true admin-auth=false admin-backend=false frontend=true web=true infra=true" docs/readme.md
 rm "$T/web/package.json" "$T/infra" -r
 touch "$T/engines/paudit/pyproject.toml"   # now paudit exists
-run false "eaudit=false core=false paudit=true evaluation=false api=false admin-auth=false frontend=false web=false infra=false" engines/paudit/a.py
+run false "eaudit=false core=false paudit=true evaluation=false api=false admin-auth=false admin-backend=false frontend=false web=false infra=false" engines/paudit/a.py
 mkdir -p "$T/admin/auth"; touch "$T/admin/auth/pyproject.toml"   # admin/auth now exists
-run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=true frontend=false web=false infra=false" admin/auth/a.py
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=true admin-backend=false frontend=false web=false infra=false" admin/auth/a.py
+mkdir -p "$T/admin/backend"; touch "$T/admin/backend/pyproject.toml"   # admin/backend now exists
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=true frontend=false web=false infra=false" admin/backend/a.py
+run false "eaudit=false core=false paudit=false evaluation=false api=false admin-auth=true admin-backend=true frontend=false web=false infra=false" admin/auth/a.py
+run false "eaudit=true core=false paudit=false evaluation=false api=false admin-auth=false admin-backend=true frontend=false web=false infra=false" engines/eaudit/src/x.py
 exit $fail
