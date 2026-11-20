@@ -5,6 +5,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from google.api_core.exceptions import Aborted
 from onolys_core.transcript import Transcript, Turn
 
 from onolys_api.repo.base import ConflictError, NotFoundError
@@ -689,3 +690,32 @@ def test_fail_stale_session_skips_fresh_moved_on_and_foreign(repo):
     with pytest.raises(NotFoundError):
         repo.fail_stale_session("someone-else", sid, "transcribing", cutoff, err)
     assert repo.get_session(uid, sid).state == "transcribing"
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        ValueError("Failed to commit transaction in 5 attempts."),
+        Aborted("409 Transaction lock timeout."),
+    ],
+)
+def test_cap_txns_survive_contention(repo, monkeypatch, exc):
+    """reserve_run/release_run (the active-run limit) re-run on exhausted retries and on a raw
+    Aborted, instead of surfacing the error to the caller."""
+    if isinstance(repo, FakeRepo):
+        pytest.skip("Firestore transaction contention only")
+    u, day = f"u-{uuid.uuid4().hex[:8]}", "2026-11-20"
+    real, calls = repo._client.transaction, []
+
+    def flaky(*a, **kw):
+        calls.append(1)
+        if len(calls) <= 2:
+            raise exc
+        return real(*a, **kw)
+
+    monkeypatch.setattr(repo._client, "transaction", flaky)
+    assert repo.reserve_run(u, day, 5, 2) == "ok"
+    assert len(calls) == 3
+    calls.clear()
+    repo.release_run(u, day, refund=True)
+    assert len(calls) == 3

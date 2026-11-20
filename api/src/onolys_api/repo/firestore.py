@@ -15,7 +15,7 @@ import time
 from datetime import datetime
 from typing import Any
 
-from google.api_core.exceptions import AlreadyExists
+from google.api_core.exceptions import Aborted, AlreadyExists
 from google.api_core.exceptions import NotFound as GoogleNotFound
 from google.cloud import firestore
 from google.cloud.firestore_v1 import FieldFilter, Increment
@@ -605,7 +605,7 @@ class FirestoreRepo:
         for round_ in range(_TXN_ROUNDS):
             try:
                 return txn_fn(self._client.transaction(max_attempts=_TXN_ATTEMPTS))
-            except ValueError:  # "Failed to commit transaction in N attempts": contention
+            except (ValueError, Aborted):  # exhausted retries or a raw 409 lock timeout: contention
                 if round_ == _TXN_ROUNDS - 1:
                     raise
                 time.sleep(random.uniform(0.01, 0.15))
