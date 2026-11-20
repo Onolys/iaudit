@@ -4,7 +4,9 @@ from these models (`python -m paudit.result --write`); a test keeps the two in s
 Protocol-agnostic: item ids, codes and summary ids are free strings defined by the pack."""
 
 import json
+import math
 import sys
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
@@ -54,6 +56,18 @@ class ProtocolBlock(_Model):
 class CodedSpan(_Model):
     from_s: int | None = None
     to_s: int | None = None
+
+
+def whole_second_span(span: Mapping[str, Any] | None) -> dict[str, int | None] | None:
+    """Callers may hold fractional seconds; `CodedSpan` wants whole ones. Widen outward
+    (floor `from_s`, ceil `to_s`) so the converted span still covers the one given."""
+    if not span:
+        return None
+    lo, hi = span.get("from_s"), span.get("to_s")
+    return {
+        "from_s": None if lo is None else math.floor(lo),
+        "to_s": None if hi is None else math.ceil(hi),
+    }
 
 
 class Instance(_Model):

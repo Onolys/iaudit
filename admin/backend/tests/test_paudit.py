@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import math
 from pathlib import Path
 
 import jsonschema
@@ -10,10 +11,13 @@ from eaudit.app import create_app as create_eaudit
 from eaudit.config import Settings
 from fastapi.testclient import TestClient
 from onolys_admin_auth import IdTokenVerifier
+from onolys_core import InputError, OnolysError
+from onolys_core.llm import LLMUnavailable
+from paudit.engine import AllRunsFailed
 from paudit.result import schema_text
 from paudit.stub import ExpectedStubClient
 
-from onolys_admin_backend import create_app
+from onolys_admin_backend import create_app, paudit_routes
 
 ROOT = Path(__file__).resolve().parents[3]
 FIX = ROOT / "protocols" / "miti-4.2.1" / "fixtures"
@@ -261,3 +265,93 @@ def test_live_miti_synthetic_fixture(capsys):
     assert r.status_code == 200, r.text[:300]
     jsonschema.validate(r.json(), json.loads(schema_text()))
     print(f"LIVE_OK duration_s={dt:.1f} calls={r.json()['run_info']['usage']['calls']}")
+
+
+ERROR_SCHEMA = json.loads((ROOT / "docs" / "contracts" / "error-response.schema.json").read_text())
+
+
+def _assert_contract_error(r, status, code):
+    assert r.status_code == status, r.text
+    body = r.json()
+    jsonschema.validate(body, ERROR_SCHEMA)  # every code must be in the shared contract enum
+    assert body["details"][0]["code"] == code
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("over", "status", "code"),
+    [
+        ({"pack": "miti@9.9.9"}, 400, "unknown_pack"),
+        ({"params": {"change_goal": "g"}}, 400, "missing_parameter"),
+        ({"params": "nope"}, 400, "missing_parameter"),
+        ({"transcript": {"nope": 1}}, 400, "schema_violation"),
+        ({"transcript": {"turns": []}}, 400, "empty_transcript"),
+        (
+            {"params": {"speaker_map": {"subject": "A"}, "change_goal": "g", "n_runs": 99}},
+            400,
+            "invalid_parameters",
+        ),
+    ],
+)
+def test_validation_errors_match_error_contract(local, over, status, code):
+    _assert_contract_error(post(local, body_for(**over)), status, code)
+
+
+@pytest.mark.unit
+def test_transport_errors_match_error_contract(local):
+    _assert_contract_error(post(local, None, raw=b"{nope"), 400, "invalid_json")
+    _assert_contract_error(post(local, None, raw=b"[]"), 400, "invalid_json")
+    r = local.post("/v1/paudit", content=b"{}", headers={"content-type": "text/plain"})
+    _assert_contract_error(r, 415, "unsupported_media_type")
+    _assert_contract_error(local.get("/v1/paudit/fixtures/nope"), 404, "not_found")
+    with make_client(eaudit=eaudit_app(max_body_bytes=1000)) as c:
+        _assert_contract_error(post(c, body_for()), 413, "body_too_large")
+
+
+@pytest.mark.unit
+def test_deadline_error_matches_error_contract():
+    env = {**ENV_LOCAL, "ADMIN_PAUDIT_DEADLINE_S": "0.2"}
+    with make_client(env, llm=SlowClient()) as c:
+        _assert_contract_error(post(c, body_for()), 504, "deadline_exceeded")
+
+
+def _raising_run(exc):
+    async def run(*args, **kwargs):
+        raise exc
+
+    return run
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    ("exc", "status", "code"),
+    [
+        (InputError("bad input"), 400, "input_rejected"),
+        (LLMUnavailable("down"), 503, "upstream_unavailable"),
+        (AllRunsFailed("all failed"), 502, "run_failed"),
+        (OnolysError("boom"), 500, "internal_error"),
+        (RuntimeError("boom"), 500, "internal_error"),
+    ],
+)
+def test_engine_errors_match_error_contract(local, monkeypatch, exc, status, code):
+    monkeypatch.setattr(paudit_routes, "run", _raising_run(exc))
+    _assert_contract_error(post(local, body_for()), status, code)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("span", [{"from_s": 0.5, "to_s": 1300.2}, {"from_s": 3, "to_s": 1300.9}])
+def test_float_coded_span_is_whole_seconds(local, monkeypatch, span):
+    seen = {}
+    real_run = paudit_routes.run
+
+    async def spy(transcript, pack, params, *args, **kwargs):
+        seen.update(params["coded_span"])
+        return await real_run(transcript, pack, params, *args, **kwargs)
+
+    monkeypatch.setattr(paudit_routes, "run", spy)
+    body = body_for()
+    body["params"]["coded_span"] = span
+    r = post(local, body)
+    assert r.status_code == 200, r.text
+    assert seen == {"from_s": math.floor(span["from_s"]), "to_s": math.ceil(span["to_s"])}
+    assert all(isinstance(v, int) for v in seen.values())

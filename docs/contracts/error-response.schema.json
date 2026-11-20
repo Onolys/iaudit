@@ -59,7 +59,11 @@
               "request_rejected",
               "upstream_unavailable",
               "deadline_exceeded",
-              "internal_error"
+              "internal_error",
+              "missing_parameter",
+              "unknown_pack",
+              "input_rejected",
+              "run_failed"
             ]
           },
           "message": {

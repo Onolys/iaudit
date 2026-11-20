@@ -266,6 +266,10 @@ The body has no top-level code or nested `error` object. A wrong `schema_version
 | `upstream_unavailable` | 503 | `LLMUnavailable` | Model provider unreachable or failing after retries | Audit service temporarily unavailable. | Retry later (retryable). |
 | `deadline_exceeded` | 504 | `DeadlineExceeded`/`TimeoutError` | Audit deadline passed with no usable result | The audit ran out of time. | Retry or use a shorter input (retryable). |
 | `internal_error` | 500 | catch-all; response self-validation failure | Backend bug | Internal server error. | Report; retry once (retryable). |
+| `missing_parameter` | 400 | admin `POST /v1/paudit` | A required `params` field is absent (paths only) | Request rejected: params.… is required. | Add the field. |
+| `unknown_pack` | 400 | admin `POST /v1/paudit` | `pack` is not the supported pack ref | Request rejected: unknown pack. | Use the supported pack. |
+| `input_rejected` | 400 | admin `POST /v1/paudit` | The engine refused the input (e.g. too few subject turns) | Request rejected. | Fix the input. |
+| `run_failed` | 502 | admin `POST /v1/paudit` | Every protocol-audit run failed | The protocol audit failed. | Retry later (retryable). |
 
 Consumer rule: if the body validates against the error schema and its `status` equals the HTTP response status, show `message`, followed by each `details[].message` as a list. Otherwise (including empty, HTML, or other JSON), use generic text for the HTTP status. Never render an audit from an error body. Retry decisions use HTTP status only; detail codes are for display and diagnostics. Automatic audit POST retry is limited to 429.
 

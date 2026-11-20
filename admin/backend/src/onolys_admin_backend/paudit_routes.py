@@ -30,6 +30,7 @@ from onolys_core.safe_log import log_event, register_fields
 from onolys_core.transcript import Transcript
 from paudit.engine import AllRunsFailed, run
 from paudit.pack import Pack, load_pack
+from paudit.result import whole_second_span
 from pydantic import ValidationError
 
 PACK_REF = "miti@4.2.1"
@@ -87,6 +88,7 @@ def _validate_params(raw: Any) -> dict[str, Any]:
                 "Request rejected: invalid parameters.",
                 detail="params.coded_span: must be {from_s, to_s} with from_s <= to_s",
             )
+        out["coded_span"] = whole_second_span(span)  # the engine wants whole seconds
     if "language" in out and not isinstance(out["language"], str):
         raise _bad("Request rejected: invalid parameters.", detail="params.language: not a string")
     if "n_runs" in out:

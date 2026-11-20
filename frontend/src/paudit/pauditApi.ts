@@ -1,7 +1,7 @@
 import Ajv2020 from "ajv/dist/2020";
 import resultSchema from "@paudit-schema/paudit-result.schema.json";
 import type { AppConfig } from "../config";
-import type { ErrorDetail } from "../transport/errorBody";
+import { readErrorBody, type ErrorDetail } from "../transport/errorBody";
 import sampleResult from "./fixtures/sample-result.json";
 import mockTranscript from "./fixtures/good_practice.transcript.json";
 import mockParams from "./fixtures/good_practice.params.json";
@@ -19,21 +19,6 @@ export interface PauditDeps {
 export type ApiResult<T> =
   | { ok: true; value: T }
   | { ok: false; message: string; details?: ErrorDetail[] };
-
-/** Lenient error-body reader: paudit adds codes (missing_parameter, unknown_pack, run_failed) that the
- * shared eaudit error enum does not list, so the strict contract check would drop them. */
-function readPauditError(text: string): { status: number; message: string; details: ErrorDetail[] } | undefined {
-  try {
-    const b = JSON.parse(text) as { status?: unknown; message?: unknown; details?: unknown };
-    if (typeof b?.status !== "number" || typeof b.message !== "string" || !b.message) return undefined;
-    const details = Array.isArray(b.details)
-      ? b.details.filter((d): d is ErrorDetail => typeof d?.code === "string" && typeof d?.message === "string")
-      : [];
-    return { status: b.status, message: b.message, details };
-  } catch {
-    return undefined;
-  }
-}
 
 const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true, strict: false });
 const checkResult = ajv.compile(resultSchema);
@@ -72,7 +57,7 @@ async function send(
         return { ok: false, message: "The service reply was not valid JSON." };
       }
     }
-    const body = readPauditError(text);
+    const body = readErrorBody(text);
     return {
       ok: false,
       message: body?.status === res.status ? body.message : `The service returned HTTP ${res.status}.`,

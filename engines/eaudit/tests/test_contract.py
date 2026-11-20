@@ -85,6 +85,10 @@ ERROR_CODES = {
     "upstream_unavailable",
     "deadline_exceeded",
     "internal_error",
+    "missing_parameter",
+    "unknown_pack",
+    "input_rejected",
+    "run_failed",
 }
 
 

@@ -26,6 +26,11 @@ ERROR_CODES = (
     "upstream_unavailable",
     "deadline_exceeded",
     "internal_error",
+    # added to the eaudit contract for the admin paudit routes
+    "missing_parameter",
+    "unknown_pack",
+    "input_rejected",
+    "run_failed",
     # new in the public API
     "unauthenticated",
     "forbidden",
