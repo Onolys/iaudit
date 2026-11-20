@@ -18,8 +18,8 @@ Source of truth: [PRD.md](PRD.md). Lane C. Built on MSW mocks from day one (D5);
 | 8 | Transcript view with code-point segmenter | 2 | done |
 | 9 | Report page | 8 | done |
 | 10 | Dashboard and `/sample-report` | 3, 9 | done |
-| 11 | Settings and API key | 3 | in-progress |
-| 12 | Hosting config, privacy and CSP checks, ADR 0021 | 1 | todo |
+| 11 | Settings and API key | 3 | done |
+| 12 | Hosting config, privacy and CSP checks, ADR 0021 | 1 | in-progress |
 | 13 | Switch to generated types and `gen:api` staleness check | 2, 9, SP04 T1, SP03 T1 (contracts committed) | todo |
 | 14 | Flow tests, staging deploy check, manual preview click-through | 5, 6, 7, 9, 10, 11, 12, 13 | todo |
 
