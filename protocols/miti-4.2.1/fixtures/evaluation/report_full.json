@@ -31,7 +31,9 @@
     "preset": "fixture",
     "code_version": "fixture",
     "params": {
-      "n_runs": 1
+      "n_runs": 1,
+      "preset": "fixture",
+      "code_version": "fixture"
     },
     "has_clinician_rating": true,
     "rating_coverage": {
@@ -100,16 +102,16 @@
       "kind": "global",
       "label": "Cultivating Change Talk",
       "clinician": {
-        "value": 3
+        "value": 3.0
       },
       "onolys": {
-        "value": 4,
         "mean": 4.0,
         "min": 4.0,
         "max": 4.0,
         "values": [
           4.0
-        ]
+        ],
+        "value": 4.0
       },
       "diff": {
         "signed": 1.0,
@@ -124,16 +126,16 @@
       "kind": "global",
       "label": "Softening Sustain Talk",
       "clinician": {
-        "value": 4
+        "value": 4.0
       },
       "onolys": {
-        "value": 4,
         "mean": 4.0,
         "min": 4.0,
         "max": 4.0,
         "values": [
           4.0
-        ]
+        ],
+        "value": 4.0
       },
       "diff": {
         "signed": 0.0,
@@ -148,16 +150,16 @@
       "kind": "global",
       "label": "Partnership",
       "clinician": {
-        "value": 5
+        "value": 5.0
       },
       "onolys": {
-        "value": 5,
         "mean": 5.0,
         "min": 5.0,
         "max": 5.0,
         "values": [
           5.0
-        ]
+        ],
+        "value": 5.0
       },
       "diff": {
         "signed": 0.0,
@@ -172,16 +174,16 @@
       "kind": "global",
       "label": "Empathy",
       "clinician": {
-        "value": 3
+        "value": 3.0
       },
       "onolys": {
-        "value": 4,
         "mean": 4.0,
         "min": 4.0,
         "max": 4.0,
         "values": [
           4.0
-        ]
+        ],
+        "value": 4.0
       },
       "diff": {
         "signed": 1.0,
@@ -196,22 +198,23 @@
       "kind": "count",
       "label": "Giving Information",
       "clinician": {
-        "value": 2
+        "value": 2.0
       },
       "onolys": {
-        "value": 1.0,
         "mean": 1.0,
         "min": 1.0,
         "max": 1.0,
         "values": [
           1.0
-        ]
+        ],
+        "value": 1.0
       },
       "diff": {
         "signed": -1.0,
         "abs": 1.0,
         "direction": "onolys_lower",
-        "status": "flagged"
+        "status": "flagged",
+        "within_one": null
       }
     },
     {
@@ -219,22 +222,23 @@
       "kind": "count",
       "label": "Persuade",
       "clinician": {
-        "value": 0
+        "value": 0.0
       },
       "onolys": {
-        "value": 0.0,
         "mean": 0.0,
         "min": 0.0,
         "max": 0.0,
         "values": [
           0.0
-        ]
+        ],
+        "value": 0.0
       },
       "diff": {
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       }
     },
     {
@@ -242,22 +246,23 @@
       "kind": "count",
       "label": "Persuade with Permission",
       "clinician": {
-        "value": 1
+        "value": 1.0
       },
       "onolys": {
-        "value": 1.0,
         "mean": 1.0,
         "min": 1.0,
         "max": 1.0,
         "values": [
           1.0
-        ]
+        ],
+        "value": 1.0
       },
       "diff": {
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       }
     },
     {
@@ -265,22 +270,23 @@
       "kind": "count",
       "label": "Question",
       "clinician": {
-        "value": 6
+        "value": 6.0
       },
       "onolys": {
-        "value": 6.0,
         "mean": 6.0,
         "min": 6.0,
         "max": 6.0,
         "values": [
           6.0
-        ]
+        ],
+        "value": 6.0
       },
       "diff": {
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       }
     },
     {
@@ -288,22 +294,23 @@
       "kind": "count",
       "label": "Simple Reflection",
       "clinician": {
-        "value": 4
+        "value": 4.0
       },
       "onolys": {
-        "value": 2.0,
         "mean": 2.0,
         "min": 2.0,
         "max": 2.0,
         "values": [
           2.0
-        ]
+        ],
+        "value": 2.0
       },
       "diff": {
         "signed": -2.0,
         "abs": 2.0,
         "direction": "onolys_lower",
-        "status": "flagged"
+        "status": "flagged",
+        "within_one": null
       }
     },
     {
@@ -311,22 +318,23 @@
       "kind": "count",
       "label": "Complex Reflection",
       "clinician": {
-        "value": 3
+        "value": 3.0
       },
       "onolys": {
-        "value": 4.0,
         "mean": 4.0,
         "min": 4.0,
         "max": 4.0,
         "values": [
           4.0
-        ]
+        ],
+        "value": 4.0
       },
       "diff": {
         "signed": 1.0,
         "abs": 1.0,
         "direction": "onolys_higher",
-        "status": "flagged"
+        "status": "flagged",
+        "within_one": null
       }
     },
     {
@@ -334,22 +342,23 @@
       "kind": "count",
       "label": "Affirm",
       "clinician": {
-        "value": 2
+        "value": 2.0
       },
       "onolys": {
-        "value": 2.0,
         "mean": 2.0,
         "min": 2.0,
         "max": 2.0,
         "values": [
           2.0
-        ]
+        ],
+        "value": 2.0
       },
       "diff": {
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       }
     },
     {
@@ -357,22 +366,23 @@
       "kind": "count",
       "label": "Seeking Collaboration",
       "clinician": {
-        "value": 2
+        "value": 2.0
       },
       "onolys": {
-        "value": 2.0,
         "mean": 2.0,
         "min": 2.0,
         "max": 2.0,
         "values": [
           2.0
-        ]
+        ],
+        "value": 2.0
       },
       "diff": {
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       }
     },
     {
@@ -380,22 +390,23 @@
       "kind": "count",
       "label": "Emphasizing Autonomy",
       "clinician": {
-        "value": 1
+        "value": 1.0
       },
       "onolys": {
-        "value": 2.0,
         "mean": 2.0,
         "min": 2.0,
         "max": 2.0,
         "values": [
           2.0
-        ]
+        ],
+        "value": 2.0
       },
       "diff": {
         "signed": 1.0,
         "abs": 1.0,
         "direction": "onolys_higher",
-        "status": "flagged"
+        "status": "flagged",
+        "within_one": null
       }
     },
     {
@@ -403,22 +414,23 @@
       "kind": "count",
       "label": "Confront",
       "clinician": {
-        "value": 0
+        "value": 0.0
       },
       "onolys": {
-        "value": 0.0,
         "mean": 0.0,
         "min": 0.0,
         "max": 0.0,
         "values": [
           0.0
-        ]
+        ],
+        "value": 0.0
       },
       "diff": {
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       }
     }
   ],
@@ -448,7 +460,7 @@
         "value": 3,
         "reason": "The clinician asked what made walking important and the client then named their blood pressure and their kids.",
         "example": {
-          "at_s": 165,
+          "at_s": 165.0,
           "text": "What makes walking more important to you right now?"
         }
       },
@@ -512,7 +524,8 @@
       },
       "clinician": {
         "value": 4,
-        "reason": "The clinician moved on from the client's tiredness quickly and returned to the plan."
+        "reason": "The clinician moved on from the client's tiredness quickly and returned to the plan.",
+        "example": null
       },
       "diff": {
         "signed": 0.0,
@@ -567,7 +580,8 @@
       },
       "clinician": {
         "value": 5,
-        "reason": "The clinician asked permission before offering ideas."
+        "reason": "The clinician asked permission before offering ideas.",
+        "example": null
       },
       "diff": {
         "signed": 0.0,
@@ -596,7 +610,14 @@
             "quote": "It's entirely your decision how to start."
           }
         ],
-        "clinician_support_lines": []
+        "clinician_support_lines": [
+          {
+            "turn_id": "t15",
+            "start": 0,
+            "end": 42,
+            "quote": "Would it be helpful if I shared some ideas"
+          }
+        ]
       }
     },
     {
@@ -622,7 +643,8 @@
       },
       "clinician": {
         "value": 3,
-        "reason": "Several reflections, but few went beyond what the client had said."
+        "reason": "Several reflections, but few went beyond what the client had said.",
+        "example": null
       },
       "diff": {
         "signed": 1.0,
@@ -659,6 +681,7 @@
     {
       "item_id": "gi",
       "clinician_count": 2,
+      "clinician_note": null,
       "onolys_count": {
         "mean": 1.0,
         "min": 1.0,
@@ -669,11 +692,11 @@
       },
       "instances": [
         {
-          "id": "i16",
           "turn_id": "t15",
           "start": 176,
           "end": 245,
           "quote": "The guidelines suggest about thirty minutes of activity on most days.",
+          "id": "i16",
           "rationale": "Intended code: gi (synthetic)."
         }
       ],
@@ -682,7 +705,8 @@
         "signed": -1.0,
         "abs": 1.0,
         "direction": "onolys_lower",
-        "status": "flagged"
+        "status": "flagged",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys disagrees, here's why",
@@ -703,6 +727,7 @@
     {
       "item_id": "persuade",
       "clinician_count": 0,
+      "clinician_note": null,
       "onolys_count": {
         "mean": 0.0,
         "min": 0.0,
@@ -717,7 +742,8 @@
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys agrees",
@@ -731,6 +757,7 @@
     {
       "item_id": "persuade_permission",
       "clinician_count": 1,
+      "clinician_note": null,
       "onolys_count": {
         "mean": 1.0,
         "min": 1.0,
@@ -741,11 +768,11 @@
       },
       "instances": [
         {
-          "id": "i15",
           "turn_id": "t15",
           "start": 82,
           "end": 175,
           "quote": "Some people keep walking shoes at the office, walk indoor laps, or take a call while walking.",
+          "id": "i15",
           "rationale": "Intended code: persuade_permission (synthetic)."
         }
       ],
@@ -754,7 +781,8 @@
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys agrees",
@@ -775,6 +803,7 @@
     {
       "item_id": "question",
       "clinician_count": 6,
+      "clinician_note": null,
       "onolys_count": {
         "mean": 6.0,
         "min": 6.0,
@@ -785,51 +814,51 @@
       },
       "instances": [
         {
-          "id": "i3",
           "turn_id": "t4",
           "start": 0,
           "end": 51,
           "quote": "What makes walking more important to you right now?",
+          "id": "i3",
           "rationale": "Intended code: question (synthetic)."
         },
         {
-          "id": "i5",
           "turn_id": "t6",
           "start": 102,
           "end": 131,
           "quote": "What was different back then?",
+          "id": "i5",
           "rationale": "Intended code: question (synthetic)."
         },
         {
-          "id": "i8",
           "turn_id": "t9",
           "start": 0,
           "end": 41,
           "quote": "Where would a walk fit best in your week?",
+          "id": "i8",
           "rationale": "Intended code: question (synthetic)."
         },
         {
-          "id": "i11",
           "turn_id": "t11",
           "start": 102,
           "end": 185,
           "quote": "How confident are you, from one to ten, that you can make three lunch walks happen?",
+          "id": "i11",
           "rationale": "Intended code: question (synthetic)."
         },
         {
-          "id": "i12",
           "turn_id": "t13",
           "start": 0,
           "end": 26,
           "quote": "Why a six and not a three?",
+          "id": "i12",
           "rationale": "Intended code: question (synthetic)."
         },
         {
-          "id": "i20",
           "turn_id": "t17",
           "start": 128,
           "end": 160,
           "quote": "What would you like to do first?",
+          "id": "i20",
           "rationale": "Intended code: question (synthetic)."
         }
       ],
@@ -838,7 +867,8 @@
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys agrees",
@@ -889,6 +919,7 @@
     {
       "item_id": "sr",
       "clinician_count": 4,
+      "clinician_note": "Counted the short repeats of the client's words.",
       "onolys_count": {
         "mean": 2.0,
         "min": 2.0,
@@ -899,19 +930,19 @@
       },
       "instances": [
         {
-          "id": "i7",
           "turn_id": "t8",
           "start": 113,
           "end": 142,
           "quote": "You're tired in the evenings.",
+          "id": "i7",
           "rationale": "Intended code: sr (synthetic)."
         },
         {
-          "id": "i24",
           "turn_id": "t21",
           "start": 0,
           "end": 45,
           "quote": "You came in tired and you're leaving hopeful.",
+          "id": "i24",
           "rationale": "Intended code: sr (synthetic)."
         }
       ],
@@ -920,7 +951,8 @@
         "signed": -2.0,
         "abs": 2.0,
         "direction": "onolys_lower",
-        "status": "flagged"
+        "status": "flagged",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys disagrees, here's why",
@@ -942,12 +974,12 @@
           }
         ],
         "clinician_support_lines": []
-      },
-      "clinician_note": "Counted the short repeats of the client's words."
+      }
     },
     {
       "item_id": "cr",
       "clinician_count": 3,
+      "clinician_note": null,
       "onolys_count": {
         "mean": 4.0,
         "min": 4.0,
@@ -958,35 +990,35 @@
       },
       "instances": [
         {
-          "id": "i4",
           "turn_id": "t6",
           "start": 0,
           "end": 101,
           "quote": "You want to be there for your kids, and you remember feeling great when walking was part of your day.",
+          "id": "i4",
           "rationale": "Intended code: cr (synthetic)."
         },
         {
-          "id": "i10",
           "turn_id": "t11",
           "start": 52,
           "end": 101,
           "quote": "You also want to protect that time from meetings.",
+          "id": "i10",
           "rationale": "Intended code: cr (synthetic)."
         },
         {
-          "id": "i19",
           "turn_id": "t17",
           "start": 0,
           "end": 127,
           "quote": "You have a plan for sunny and rainy days, and the confidence you're showing comes from what you already did on those Saturdays.",
+          "id": "i19",
           "rationale": "Intended code: cr (synthetic)."
         },
         {
-          "id": "i23",
           "turn_id": "t19",
           "start": 95,
           "end": 244,
           "quote": "So you want to be there for your kids, you miss how you felt when you walked, and you have a plan: three lunch walks, with indoor laps when it rains.",
+          "id": "i23",
           "rationale": "Intended code: cr (synthetic)."
         }
       ],
@@ -995,7 +1027,8 @@
         "signed": 1.0,
         "abs": 1.0,
         "direction": "onolys_higher",
-        "status": "flagged"
+        "status": "flagged",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys disagrees, here's why",
@@ -1034,6 +1067,7 @@
     {
       "item_id": "affirm",
       "clinician_count": 2,
+      "clinician_note": null,
       "onolys_count": {
         "mean": 2.0,
         "min": 2.0,
@@ -1044,19 +1078,19 @@
       },
       "instances": [
         {
-          "id": "i6",
           "turn_id": "t8",
           "start": 0,
           "end": 112,
           "quote": "A forty-minute loop on a Saturday took real commitment, and it shows you can do it when you set your mind to it.",
+          "id": "i6",
           "rationale": "Intended code: affirm (synthetic)."
         },
         {
-          "id": "i13",
           "turn_id": "t13",
           "start": 27,
           "end": 121,
           "quote": "You've already thought about blocking your calendar, which shows you're taking this seriously.",
+          "id": "i13",
           "rationale": "Intended code: affirm (synthetic)."
         }
       ],
@@ -1065,7 +1099,8 @@
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys agrees",
@@ -1092,6 +1127,7 @@
     {
       "item_id": "seek_collab",
       "clinician_count": 2,
+      "clinician_note": null,
       "onolys_count": {
         "mean": 2.0,
         "min": 2.0,
@@ -1102,19 +1138,19 @@
       },
       "instances": [
         {
-          "id": "i2",
           "turn_id": "t2",
           "start": 22,
           "end": 67,
           "quote": "Is it all right if we spend our time on that?",
+          "id": "i2",
           "rationale": "Intended code: seek_collab (synthetic)."
         },
         {
-          "id": "i14",
           "turn_id": "t15",
           "start": 0,
           "end": 81,
           "quote": "Would it be helpful if I shared some ideas other people have used for rainy days?",
+          "id": "i14",
           "rationale": "Intended code: seek_collab (synthetic)."
         }
       ],
@@ -1123,7 +1159,8 @@
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys agrees",
@@ -1150,6 +1187,7 @@
     {
       "item_id": "emphasize_autonomy",
       "clinician_count": 1,
+      "clinician_note": null,
       "onolys_count": {
         "mean": 2.0,
         "min": 2.0,
@@ -1160,19 +1198,19 @@
       },
       "instances": [
         {
-          "id": "i18",
           "turn_id": "t15",
           "start": 287,
           "end": 349,
           "quote": "Both ideas are only options, and you know your workplace best.",
+          "id": "i18",
           "rationale": "Intended code: emphasize_autonomy (synthetic)."
         },
         {
-          "id": "i21",
           "turn_id": "t19",
           "start": 0,
           "end": 41,
           "quote": "It's entirely your decision how to start.",
+          "id": "i21",
           "rationale": "Intended code: emphasize_autonomy (synthetic)."
         }
       ],
@@ -1181,7 +1219,8 @@
         "signed": 1.0,
         "abs": 1.0,
         "direction": "onolys_higher",
-        "status": "flagged"
+        "status": "flagged",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys disagrees, here's why",
@@ -1208,6 +1247,7 @@
     {
       "item_id": "confront",
       "clinician_count": 0,
+      "clinician_note": null,
       "onolys_count": {
         "mean": 0.0,
         "min": 0.0,
@@ -1222,7 +1262,8 @@
         "signed": 0.0,
         "abs": 0.0,
         "direction": "same",
-        "status": "agree"
+        "status": "agree",
+        "within_one": null
       },
       "explanation": {
         "headline": "Onolys agrees",
@@ -1346,11 +1387,11 @@
             "concerns": [],
             "evidence": [
               {
-                "role": "supporting",
                 "turn_id": "t4",
                 "start": 0,
                 "end": 51,
-                "quote": "What makes walking more important to you right now?"
+                "quote": "What makes walking more important to you right now?",
+                "role": "supporting"
               }
             ]
           }
@@ -1367,18 +1408,18 @@
             "concerns": [],
             "evidence": [
               {
-                "role": "supporting",
                 "turn_id": "t9",
                 "start": 0,
                 "end": 41,
-                "quote": "Where would a walk fit best in your week?"
+                "quote": "Where would a walk fit best in your week?",
+                "role": "supporting"
               },
               {
-                "role": "qualifying",
                 "turn_id": "t8",
                 "start": 113,
                 "end": 142,
-                "quote": "You're tired in the evenings."
+                "quote": "You're tired in the evenings.",
+                "role": "qualifying"
               }
             ]
           }
@@ -1395,11 +1436,11 @@
             "concerns": [],
             "evidence": [
               {
-                "role": "supporting",
                 "turn_id": "t15",
                 "start": 0,
                 "end": 42,
-                "quote": "Would it be helpful if I shared some ideas"
+                "quote": "Would it be helpful if I shared some ideas",
+                "role": "supporting"
               }
             ]
           }
@@ -1416,11 +1457,11 @@
             "concerns": [],
             "evidence": [
               {
-                "role": "supporting",
                 "turn_id": "t19",
                 "start": 194,
                 "end": 243,
-                "quote": "three lunch walks, with indoor laps when it rains"
+                "quote": "three lunch walks, with indoor laps when it rains",
+                "role": "supporting"
               }
             ]
           }
@@ -1470,13 +1511,16 @@
     }
   ],
   "method": {
-    "statement": "Onolys rated this session against the protocol using a language model; code checks every quote.",
+    "statement": "Onolys reads the recording against the MITI 4.2.1 coding manual and scores the same items you rated. Where Onolys and your rating differ, the report shows Onolys's reading and the lines of the session it is based on, next to the lines that support your rating.",
     "limits": [
-      "A language model can mis-rate; treat differences as prompts to look again.",
-      "Counts and ratings reflect the coded span only."
+      "Onolys reads the transcript only; tone of voice, pauses and body language are not available to it.",
+      "Speaker labels and timestamps come from automatic transcription and can contain errors.",
+      "A difference between two readings is a prompt to look at the session again, not a verdict on either one.",
+      "Behaviour counts depend on where each utterance is split, so small differences are expected.",
+      "This is Onolys's reading of the session, not an official coding."
     ],
     "not_official_miti_coding": true,
-    "citation": "Moyers, T.B., Manuel, J.K., & Ernst, D. Motivational Interviewing Treatment Integrity Coding Manual 4.2.1 (revised June 2015). University of New Mexico, Center on Alcoholism, Substance Abuse, and Addictions (CASAA). Page numbers cited in this pack (\"manual p. N\") are the manual's own page numbers."
+    "citation": "Moyers, T. B., Manuel, J. K., & Ernst, D. (2014). Motivational Interviewing Treatment Integrity Coding Manual 4.2.1."
   },
   "aggregates": {
     "globals_compared": 4,
@@ -1505,7 +1549,9 @@
         "hash": "80ed58b99b2ef764"
       },
       "prompt_hashes": {
-        "engine:tips_templates": "0000000000000000"
+        "tips_system.md": "c8cc446d70112112",
+        "engine:tips_output_format": "775e35f7eb1e7050",
+        "engine:compare_templates": "152a6200e72f1b65"
       },
       "n_runs": 1,
       "usage": {

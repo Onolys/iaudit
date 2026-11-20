@@ -34,6 +34,8 @@ def test_signatures_match_prd():
     assert inspect.iscoroutinefunction(run_evaluation)
     assert inspect.signature(run_evaluation).parameters["progress_cb"].default is None
     assert callable(build_report)
+    assert all(p.kind is inspect.Parameter.KEYWORD_ONLY
+               for p in inspect.signature(build_report).parameters.values())
 
 
 def test_issue_carries_path_and_code_only():
@@ -52,8 +54,3 @@ def test_warning_shape():
 def test_evaluation_output_fields():
     assert set(EvaluationOutput.model_fields) == {"report", "artifacts"}
     assert EvaluationOutput.model_fields["report"].annotation is Report
-
-
-def test_stubs_not_implemented():
-    with pytest.raises(NotImplementedError):
-        build_report()

@@ -33,11 +33,13 @@ COUNTED_ONLY = "Onolys counted {o}."
 NO_VALUE = "Onolys has no value for this item; you recorded {c}."
 NOTE_BOTH = "Both values use the same formula. Reference levels, not pass marks."
 NOTE_ONOLYS = "Onolys values only. Reference levels, not pass marks."
+# Appended to the method limits: the report is Onolys's reading, not an official coding.
+METHOD_LIMIT = "This is Onolys's reading of the session, not an official coding."
 
 
 def template_strings() -> list[str]:
     return [HEADLINE_AGREE, HEADLINE_NEUTRAL, SCORED, COUNTED, SCORED_ONLY, COUNTED_ONLY,
-            NO_VALUE, NOTE_BOTH, NOTE_ONOLYS]
+            NO_VALUE, NOTE_BOTH, NOTE_ONOLYS, METHOD_LIMIT]
 
 
 @dataclass(frozen=True)
@@ -149,5 +151,5 @@ def explain(*, item_id: str, kind: str, label: str, diff: Diff, onolys_value: fl
                        clinician_support_lines=[_line(x) for x in support_lines]), warnings
 
 
-__all__ = ["CompareRule", "compare_item", "compare_rules", "compare_summaries", "explain",
-           "representative_instances", "template_strings"]
+__all__ = ["METHOD_LIMIT", "CompareRule", "compare_item", "compare_rules", "compare_summaries",
+           "explain", "representative_instances", "template_strings"]
