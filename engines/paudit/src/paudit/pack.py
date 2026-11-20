@@ -14,7 +14,7 @@ from jsonschema import Draft202012Validator
 from onolys_core import PackError, PackRef
 from onolys_core.run_info import PackFacts, hash_files
 
-from paudit.formula import FormulaError, names
+from paudit.formula import FormulaError, check
 
 PACK_FORMAT = "0.0.1"
 PROTOCOLS_ENV = "PAUDIT_PROTOCOLS_DIR"
@@ -191,7 +191,7 @@ def _check_parity(root: Path, data: dict[str, Any], rating: dict[str, Any], repo
 
     for s in data.get("summaries", []):
         try:
-            unknown = sorted(names(s["expr"]) - known)
+            unknown = sorted(check(s["expr"]) - known)
         except FormulaError as exc:
             raise PackError(f"summary {s['id']}: bad formula: {exc}") from exc
         if unknown:
