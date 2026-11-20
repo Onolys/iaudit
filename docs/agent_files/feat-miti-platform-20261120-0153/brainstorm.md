@@ -36,6 +36,12 @@ Clinicians learning MI rate their own practice sessions but get no second opinio
 | Delete session removes audio, transcript, ratings, all report versions; auto-expiry a setting, off by default (Tejit) | Fixed 30-day deletion | Tejit handles legal |
 | Legal, BAA, HIPAA mode, MITI permission, price: Tejit owns; not blockers (Tejit) | Gating launch on them | Build PHI-ready controls anyway |
 | Cut for hack: PDF export, team accounts, billing, email notifications, dashboard trends (Tejit) | Building them | Time |
+| No fixed deadline for the hack (Tejit) | Fixed end date | Tejit: don't worry about timing |
+| GCP project `onolys` (Firebase project 1054076260967) (Tejit) | New project | Landing already deploys there |
+| Auth: email+password sign-up, sign-in, forgot password, email verification, plus Google sign-in; open sign-up, no invite allowlist (Tejit) | Invite-only | Tejit: anyone can sign up for now |
+| DNS records for `app.` and `admin.onolys.com`: Tejit adds them; agents supply exact records (Tejit) | Agents edit DNS | Owner task |
+| Test data: Tejit supplies transcripts now, more test data later; agents also write synthetic fixtures (Tejit) | Agents source data | Tejit owns data |
+| Spend: Tejit sets a monthly GCP budget; app enforces a configurable per-user daily run cap, default 20 (Tejit + Claude default) | No cap | Cost safety |
 
 ## Design
 
@@ -90,6 +96,7 @@ Cloud Run (api + worker), Cloud Tasks, Firestore, Cloud Storage, Identity Platfo
 
 ## Builder-check answers
 Answered from the conversation or repo:
+- Access verified 2026-11-20: Firebase CLI on this machine is logged in and lists project `onolys`; Google application-default credentials (user account) exist but their quota project is `juno-medical-clarity` and must be switched to `onolys` for this work; the `gcloud` CLI binary is not installed (install it, or use firebase CLI / REST with ADC).
 - Repos already renamed on GitHub (2026-11-20): `Onolys/onolys` (local folder still `iaudit`), `Onolys/onolys-landing` (local folder still `miti`). Landing edits happen in place in that repo.
 - MITI permission is granted (Tejit); pack may embed manual definitions with citation.
 - Admin UI product registry (`frontend/src/products.ts`) gains a `paudit` entry; `web/` is a separate app.
