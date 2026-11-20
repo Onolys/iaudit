@@ -1,6 +1,7 @@
 """GCS V4 blob store. Signing uses IAM `signBlob` when `signer_email` is given (Cloud Run)."""
 
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 from google.api_core.exceptions import NotFound
@@ -38,6 +39,24 @@ class GcsBlobStore:
             return self._bucket.blob(key).download_as_bytes()
         except NotFound:
             raise BlobNotFoundError(key) from None
+
+    def download_to(self, key: str, dst: Path) -> None:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            self._bucket.blob(key).download_to_filename(str(dst))
+        except NotFound:
+            raise BlobNotFoundError(key) from None
+
+    def upload_from(self, key: str, src: Path, content_type: str) -> None:
+        self._bucket.blob(key).upload_from_filename(str(src), content_type=content_type)
+
+    def move(self, src_key: str, dst_key: str) -> None:
+        src = self._bucket.blob(src_key)
+        try:
+            self._bucket.copy_blob(src, self._bucket, dst_key)
+        except NotFound:
+            raise BlobNotFoundError(src_key) from None
+        src.delete()
 
     def exists(self, key: str) -> bool:
         return bool(self._bucket.blob(key).exists())

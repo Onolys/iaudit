@@ -70,6 +70,15 @@ class StepRecord(BaseModel):
     stt_operation: Any = None  # opaque handle from SttAdapter.start (transcribe step only)
 
 
+class UploadInfo(BaseModel):
+    """The signed PUT in flight (staging object `uploads/{uid}/{sid}/{upload_id}`)."""
+
+    upload_id: str
+    format: str  # canonical format key: mp3 | wav | m4a | webm | ogg
+    content_type: str
+    size_bytes: int
+
+
 class SessionError(BaseModel):
     code: str
     step: str | None = None
@@ -92,6 +101,7 @@ class SessionDoc(Doc):
     rating_submitted: bool = False
     has_rating: bool = False
     first_run_id: str | None = None
+    upload: UploadInfo | None = None
     steps: dict[str, StepRecord] = Field(default_factory=dict)
     warnings: list[str] = Field(default_factory=list)
     error: SessionError | None = None

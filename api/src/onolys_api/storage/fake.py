@@ -3,6 +3,7 @@
 import hashlib
 import hmac
 import os
+import shutil
 import tempfile
 import time
 from datetime import UTC, datetime, timedelta
@@ -64,6 +65,25 @@ class FakeBlobStore:
         if not p.is_file():
             raise BlobNotFoundError(key)
         return p.read_bytes()
+
+    def download_to(self, key: str, dst: Path) -> None:
+        p = self._path(key)
+        if not p.is_file():
+            raise BlobNotFoundError(key)
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(p, dst)
+
+    def upload_from(self, key: str, src: Path, content_type: str) -> None:
+        p = self._path(key)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, p)
+
+    def move(self, src_key: str, dst_key: str) -> None:
+        src, dst = self._path(src_key), self._path(dst_key)
+        if not src.is_file():
+            raise BlobNotFoundError(src_key)
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(src, dst)
 
     def exists(self, key: str) -> bool:
         return self._path(key).is_file()

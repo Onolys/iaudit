@@ -166,3 +166,41 @@ def test_gcs_put_get_exists_delete_list():
     assert s.delete_prefix("p/") == 2
     b1.delete.assert_called_once()
     assert s.uri("a/b") == "gs://onolys-audio-test/a/b"
+
+
+# ---- file transfer helpers used by validate ----
+
+
+def test_fake_download_upload_move(store, tmp_path):
+    store.put_bytes("uploads/u/s/up", b"hello")
+    dst = tmp_path / "x" / "in.bin"
+    store.download_to("uploads/u/s/up", dst)
+    assert dst.read_bytes() == b"hello"
+    with pytest.raises(BlobNotFoundError):
+        store.download_to("nope", tmp_path / "n")
+    store.upload_from("u/s/audio/c.flac", dst, "audio/flac")
+    assert store.get_bytes("u/s/audio/c.flac") == b"hello"
+    store.move("uploads/u/s/up", "u/s/audio/original.wav")
+    assert store.get_bytes("u/s/audio/original.wav") == b"hello"
+    assert not store.exists("uploads/u/s/up")
+    with pytest.raises(BlobNotFoundError):
+        store.move("uploads/u/s/up", "u/s/other")
+
+
+def test_gcs_download_upload_move(tmp_path):
+    from google.api_core.exceptions import NotFound
+
+    s, _client, bucket = _gcs()
+    blob = bucket.blob.return_value
+    s.download_to("k", tmp_path / "f")
+    blob.download_to_filename.assert_called_with(str(tmp_path / "f"))
+    blob.download_to_filename.side_effect = NotFound("x")
+    with pytest.raises(BlobNotFoundError):
+        s.download_to("k", tmp_path / "f")
+    s.upload_from("k2", tmp_path / "f", "audio/flac")
+    blob.upload_from_filename.assert_called_with(str(tmp_path / "f"), content_type="audio/flac")
+    src = MagicMock()
+    bucket.blob.return_value = src
+    s.move("a", "b")
+    bucket.copy_blob.assert_called_once_with(src, bucket, "b")
+    src.delete.assert_called_once()

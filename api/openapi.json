@@ -73,6 +73,81 @@
         "title": "ApiKeyInfo",
         "type": "object"
       },
+      "AudioReadResponse": {
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "expires_at"
+        ],
+        "title": "AudioReadResponse",
+        "type": "object"
+      },
+      "AudioUploadRequest": {
+        "properties": {
+          "content_type": {
+            "default": "",
+            "description": "Browser type; may be empty",
+            "maxLength": 100,
+            "title": "Content Type",
+            "type": "string"
+          },
+          "filename_ext": {
+            "default": "",
+            "description": "Used only when content_type is empty",
+            "maxLength": 16,
+            "title": "Filename Ext",
+            "type": "string"
+          },
+          "size_bytes": {
+            "description": "File size; above 300 MB is `audio_too_large`",
+            "minimum": 1.0,
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "size_bytes"
+        ],
+        "title": "AudioUploadRequest",
+        "type": "object"
+      },
+      "AudioUploadResponse": {
+        "properties": {
+          "required_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Send exactly these headers with the PUT (the canonical Content-Type)",
+            "title": "Required Headers",
+            "type": "object"
+          },
+          "upload_id": {
+            "title": "Upload Id",
+            "type": "string"
+          },
+          "upload_url": {
+            "title": "Upload Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "upload_url",
+          "upload_id",
+          "required_headers"
+        ],
+        "title": "AudioUploadResponse",
+        "type": "object"
+      },
       "CreateSessionRequest": {
         "properties": {
           "language": {
@@ -887,6 +962,170 @@
         "summary": "Session status snapshot (the web app uses the session_status listener instead)",
         "tags": [
           "sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/audio": {
+      "get": {
+        "operationId": "getAudio",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioReadResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Short-lived signed read URL for the original upload",
+        "tags": [
+          "audio"
+        ]
+      },
+      "post": {
+        "description": "Maps browser aliases (`audio/x-m4a`, `audio/mp4`, `audio/mpeg`, empty type + `filename_ext`) to one canonical type, returns one signed PUT (15 min) pinned to it and to a 300 MB size range; the client sends exactly `required_headers`. Unknown type is 422 `unsupported_audio`, over 300 MB is 422 `audio_too_large`. State becomes `uploading`.",
+        "operationId": "requestAudioUpload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AudioUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioUploadResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Get a signed PUT URL for the recording",
+        "tags": [
+          "audio"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/audio/complete": {
+      "post": {
+        "description": "Returns 202 and enqueues `validate`; transcription starts after it passes.",
+        "operationId": "completeAudioUpload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/SessionRef"
+                  },
+                  "title": "Response Completeaudioupload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Tell the server the PUT finished",
+        "tags": [
+          "audio"
         ]
       }
     }

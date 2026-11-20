@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from onolys_api.audio import AudioTools, FfmpegTools
 from onolys_api.auth.deps import Authenticator
 from onolys_api.auth.idtoken import TokenVerifier
 from onolys_api.auth.oidc import OidcVerifier
@@ -20,10 +21,12 @@ from onolys_api.config import LOCAL_ENVS, Settings
 from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse, error_body
 from onolys_api.factory import build_blobs, build_repo
 from onolys_api.jobs.queue import build_queue
-from onolys_api.jobs.worker import TaskRunner
+from onolys_api.jobs.validate import make_validate_handler
+from onolys_api.jobs.worker import HandlerSpec, TaskRunner
 from onolys_api.presets import PresetResolver
 from onolys_api.repo.base import Repo
 from onolys_api.routes import api_key as api_key_routes
+from onolys_api.routes import audio as audio_routes
 from onolys_api.routes import sessions as session_routes
 from onolys_api.routes import tasks as task_routes
 from onolys_api.storage.base import BlobStore
@@ -155,6 +158,7 @@ def create_app(
     blobs: BlobStore | None = None,
     token_verifier: TokenVerifier | None = None,
     oidc_verifier: OidcVerifier | None = None,
+    audio_tools: AudioTools | None = None,
 ) -> FastAPI:
     settings = settings or Settings.from_env()
     app = FastAPI(
@@ -177,6 +181,13 @@ def create_app(
         assert queue is not None or settings.service_mode == "worker"
         # worker without TASKS_QUEUE (local only): follow-up tasks have nowhere to go
         app.state.runner = TaskRunner(app.state.repo, queue or _NoQueue())
+        app.state.runner.register(
+            "validate",
+            HandlerSpec(
+                make_validate_handler(app.state.blobs, audio_tools or FfmpegTools()),
+                step="validate",
+            ),
+        )
         if settings.env not in LOCAL_ENVS:
             if not settings.worker_url or not settings.tasks_sa:
                 raise ConfigError("WORKER_URL and TASKS_SA are required for the worker")
@@ -207,6 +218,7 @@ def create_app(
 
     router.include_router(api_key_routes.router)
     router.include_router(session_routes.router)
+    router.include_router(audio_routes.router)
     app.include_router(router)
     if runs_tasks:
         app.include_router(task_routes.router)  # /tasks/{kind}: Cloud Tasks only, not in schema

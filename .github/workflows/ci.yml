@@ -115,6 +115,8 @@ jobs:
             ~/.cache/firebase/emulators
           key: firebase-${{ runner.os }}-${{ env.FIREBASE_TOOLS_VERSION }}
       - run: npm install -g firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }}
+      - name: Install ffmpeg (validate step + integration test)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - run: uv sync --frozen --package onolys-api
       - run: uv run --no-sync --package onolys-api ruff check api
       - name: pytest with coverage (Firestore emulator)
