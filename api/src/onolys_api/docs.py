@@ -32,8 +32,9 @@ SID=$(curl -sf -X POST "$BASE/sessions" -H "$AUTH" -H "$JSON" \
 # 2. Ask for a signed upload URL, then PUT the file straight to storage
 UP=$(curl -sf -X POST "$BASE/sessions/$SID/audio" -H "$AUTH" -H "$JSON" \
   -d "{\"content_type\":\"audio/mp4\",\"size_bytes\":$(wc -c < "$AUDIO" | tr -d ' ')}")
-# send every required header (Host excluded: curl sets it); the signed URL rejects a PUT without them
-mapfile -t HDRS < <(echo "$UP" | jq -r '.required_headers | to_entries[] | select(.key != "Host") | "-H\n\(.key): \(.value)"')
+# send every required header (not Host: curl sets it); the signed URL rejects a PUT without them
+mapfile -t HDRS < <(echo "$UP" | jq -r '.required_headers | to_entries[]
+  | select(.key != "Host") | "-H\n\(.key): \(.value)"')
 curl -sf -X PUT "$(echo "$UP" | jq -r .upload_url)" "${HDRS[@]}" --data-binary @"$AUDIO"
 
 # 3. Tell the API the upload is done; validation and transcription start
