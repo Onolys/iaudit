@@ -15,8 +15,8 @@ Source of truth: [PRD.md](PRD.md). Lane A. Tests follow SP00 conventions: marker
 | 5 | Select, volley builder, input checks, hook interface | 1, 3 | done |
 | 6 | MITI 4.2.1 pack data, `rules.py` hook, prompt drafts | 2, 4, 5 | done |
 | 7 | Rules, counts, summaries (code side) | 3, 4, 6 | done |
-| 8 | Code pass: batching, warm-first, halving, locate/validate | 5, 6, 7, SP01 T3, T5, T6 | in-progress |
-| 9 | Globals pass: evidence, default, caps | 3, 6, SP01 T3, T5 | todo |
+| 8 | Code pass: batching, warm-first, halving, locate/validate | 5, 6, 7, SP01 T3, T5, T6 | done |
+| 9 | Globals pass: evidence, default, caps | 3, 6, SP01 T3, T5 | in-progress |
 | 10 | `paudit.run`: N runs, aggregate, `run_info` | 8, 9, SP01 T10 | todo |
 | 11 | Synthetic fixtures, `expected.yaml`, thresholds, offline CLI `run`, golden | 10 | todo |
 | 12 | Live `paudit.cli check` | 11 | todo |
