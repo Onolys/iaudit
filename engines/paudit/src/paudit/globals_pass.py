@@ -21,7 +21,7 @@ from onolys_core.llm import LLMBadOutput, LLMClient, LLMRequest, MetricsCollecto
 from onolys_core.locate import locate
 from pydantic import BaseModel, create_model
 
-from paudit.code_pass import _CFG
+from paudit.code_pass import _CFG, _overrides
 from paudit.pack import Pack
 from paudit.prepare import Prepared
 from paudit.result import Evidence, GlobalScore, ResultWarning
@@ -103,7 +103,7 @@ def _build_request(
     tag: str,
     model: type[BaseModel],
 ) -> LLMRequest:
-    pp = pack.data.get("params", {})
+    pp = {**pack.data.get("params", {}), **_overrides(params)}
     system_md = pack.prompt_paths[2].read_text(encoding="utf-8").strip()
     prefix1 = "\n\n".join(
         p

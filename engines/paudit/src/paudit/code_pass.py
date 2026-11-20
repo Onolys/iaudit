@@ -11,6 +11,7 @@ Token limits, timeouts, sampling and model choice belong to the route (core); th
 carries the engine default (or the pack's `params` override), which core clamps to the route.
 """
 
+import asyncio
 import json
 from dataclasses import dataclass, field
 from typing import Any, Literal
@@ -114,11 +115,19 @@ def _render_fewshot(pack: Pack) -> str:
     return ("## Examples\n" + "\n\n".join(blocks)) if blocks else ""
 
 
+_PARAM_KEYS = ("volleys_per_call", "code_max_tokens", "globals_max_tokens")
+
+
+def _overrides(params: dict[str, Any]) -> dict[str, Any]:
+    """Run params beat pack `params`, which beat the engine defaults (PRD R2)."""
+    return {k: params[k] for k in _PARAM_KEYS if params.get(k) is not None}
+
+
 def build_requests_parts(
     pack: Pack, params: dict[str, Any], language: str | None = None
 ) -> RequestParts:
     """Everything shared by all batches of a run (so cache prefixes are byte-identical)."""
-    pp = pack.data.get("params", {})
+    pp = {**pack.data.get("params", {}), **_overrides(params)}
     system_md = pack.prompt_paths[0].read_text(encoding="utf-8").strip()
     prefix1 = "\n\n".join(
         p
@@ -290,16 +299,28 @@ async def code_pass(
     language: str | None = None,
     run_index: int = 0,
     metrics: MetricsCollector | None = None,
+    warmed: asyncio.Event | None = None,
 ) -> CodePassResult:
-    """Run the code pass for one run. Raises `CodePassFailed` when the run cannot be trusted."""
+    """Run the code pass for one run. Raises `CodePassFailed` when the run cannot be trusted.
+    `warmed` (optional) is set once the warm (first) batch has returned, so other runs can
+    start their own fan-out against a written cache."""
     parts = build_requests_parts(pack, params, language)
     runner = _Pass(client, parts, run_index, metrics)
     size = parts.volleys_per_call
     batches = [prepared.volleys[i : i + size] for i in range(0, len(prepared.volleys), size)]
     if not batches:
+        if warmed is not None:
+            warmed.set()
         return CodePassResult()
     calls = [(lambda b=b, n=n: runner.batch(b, f"b{n}")) for n, b in enumerate(batches, 1)]
-    first, rest = await warm_then_fanout(calls[0], calls[1:])
+
+    async def warm_call() -> list[_Attempt]:
+        out = await calls[0]()
+        if warmed is not None:
+            warmed.set()
+        return out
+
+    first, rest = await warm_then_fanout(warm_call, calls[1:])
     attempts = [a for group in [first, *rest] for a in group]
 
     out = CodePassResult()
