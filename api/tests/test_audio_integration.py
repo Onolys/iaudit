@@ -55,6 +55,7 @@ async def test_real_ffmpeg_transcode_to_16k_mono_flac_and_stt_gets_audioref(
         )
         assert put.status_code == 200
         assert (await c.post(f"/v1/sessions/{sid}/audio/complete", headers=A)).status_code == 202
+    app.state.runner._registry.pop("transcribe")  # this test stops at the hand-off to transcribe
     app.state.queue.drain()
 
     s = repo.get_session("alice", sid)

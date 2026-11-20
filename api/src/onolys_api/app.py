@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from onolys_api.adapters import Adapters, build_adapters
 from onolys_api.audio import AudioTools, FfmpegTools
 from onolys_api.auth.deps import Authenticator
 from onolys_api.auth.idtoken import TokenVerifier
@@ -21,6 +22,7 @@ from onolys_api.config import LOCAL_ENVS, Settings
 from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse, error_body
 from onolys_api.factory import build_blobs, build_repo
 from onolys_api.jobs.queue import build_queue
+from onolys_api.jobs.transcribe import make_poll_handler, make_transcribe_handler
 from onolys_api.jobs.validate import make_validate_handler
 from onolys_api.jobs.worker import HandlerSpec, TaskRunner
 from onolys_api.presets import PresetResolver
@@ -159,6 +161,7 @@ def create_app(
     token_verifier: TokenVerifier | None = None,
     oidc_verifier: OidcVerifier | None = None,
     audio_tools: AudioTools | None = None,
+    adapters: Adapters | None = None,
 ) -> FastAPI:
     settings = settings or Settings.from_env()
     app = FastAPI(
@@ -186,6 +189,23 @@ def create_app(
             HandlerSpec(
                 make_validate_handler(app.state.blobs, audio_tools or FfmpegTools()),
                 step="validate",
+            ),
+        )
+        app.state.adapters = adapters or build_adapters(settings)
+        app.state.runner.register(
+            "transcribe",
+            HandlerSpec(
+                make_transcribe_handler(app.state.blobs, app.state.adapters.stt),
+                step="transcribe",
+                complete=False,  # the poll that finishes the transcript marks it done
+            ),
+        )
+        app.state.runner.register(
+            "transcribe-poll",
+            HandlerSpec(
+                make_poll_handler(app.state.blobs, app.state.adapters.stt),
+                step="transcribe",
+                claim=False,  # the step record belongs to `transcribe`
             ),
         )
         if settings.env not in LOCAL_ENVS:

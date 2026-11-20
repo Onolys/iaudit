@@ -36,6 +36,7 @@ async def run_validate(settings, repo, blobs, data: bytes, tools, ct="audio/wav"
         ).json()
         blobs.put_bytes(f"uploads/alice/{sid}/{up['upload_id']}", data)
         assert (await c.post(f"/v1/sessions/{sid}/audio/complete", headers=A)).status_code == 202
+    app.state.runner._registry.pop("transcribe")  # these tests stop at the hand-off to transcribe
     app.state.queue.drain()
     return app, sid
 
