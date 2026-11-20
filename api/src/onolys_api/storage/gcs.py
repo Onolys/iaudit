@@ -14,6 +14,8 @@ from onolys_api.storage.base import (
     SignedUpload,
 )
 
+_CLOUD_PLATFORM_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
+
 
 class GcsBlobStore:
     def __init__(self, client: Any, bucket: str, signer_email: str | None = None) -> None:
@@ -21,6 +23,7 @@ class GcsBlobStore:
         self._bucket_name = bucket
         self._bucket = client.bucket(bucket)
         self._signer_email = signer_email
+        self._signing_creds: Any = None
 
     @property
     def bucket(self) -> str:
@@ -88,10 +91,15 @@ class GcsBlobStore:
     def _signing_kwargs(self) -> dict[str, Any]:
         if not self._signer_email:
             return {}
+        import google.auth
         from google.auth.transport.requests import Request
 
-        creds = self._client._credentials  # noqa: SLF001 (needed for IAM-based V4 signing)
-        creds.refresh(Request())
+        # IAM signBlob needs cloud-platform; the storage client's token is devstorage-only.
+        if self._signing_creds is None:
+            self._signing_creds, _ = google.auth.default(scopes=[_CLOUD_PLATFORM_SCOPE])
+        creds = self._signing_creds
+        if not creds.valid:  # first use or expired (metadata tokens last ~1h)
+            creds.refresh(Request())
         return {"service_account_email": self._signer_email, "access_token": creds.token}
 
     def signed_upload(

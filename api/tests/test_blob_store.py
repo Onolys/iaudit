@@ -127,17 +127,66 @@ def test_gcs_signed_read_is_v4_get():
     assert kw["version"] == "v4" and kw["method"] == "GET"
 
 
-def test_gcs_signing_via_iam_when_signer_email_given():
+class _FakeCreds:
+    """Stands in for google.auth credentials: token only after refresh; expires on demand."""
+
+    def __init__(self):
+        self.valid = False
+        self.token = None
+        self.refreshes = 0
+
+    def refresh(self, _request):
+        self.refreshes += 1
+        self.token = f"cp-token-{self.refreshes}"
+        self.valid = True
+
+
+def _iam_store(monkeypatch):
+    import google.auth
+
+    calls, creds = [], _FakeCreds()
+
+    def fake_default(scopes=None, **_kw):
+        calls.append(scopes)
+        return creds, "onolys"
+
+    monkeypatch.setattr(google.auth, "default", fake_default)
     client = MagicMock()
     s = GcsBlobStore(client, "b", signer_email="api-staging@onolys.iam.gserviceaccount.com")
     blob = client.bucket.return_value.blob.return_value
     blob.generate_signed_url.return_value = "u"
-    client._credentials.token = "tok"
+    return s, client, blob, creds, calls
+
+
+def test_gcs_signing_via_iam_uses_cloud_platform_scoped_token(monkeypatch):
+    s, client, blob, creds, calls = _iam_store(monkeypatch)
+    client._credentials.token = "devstorage-only-token"
     s.signed_read_url("k")
     kw = blob.generate_signed_url.call_args.kwargs
+    assert calls == [["https://www.googleapis.com/auth/cloud-platform"]]
     assert kw["service_account_email"] == "api-staging@onolys.iam.gserviceaccount.com"
-    assert kw["access_token"] == "tok"
-    client._credentials.refresh.assert_called()
+    assert kw["access_token"] == "cp-token-1"  # not the storage client's token
+
+
+def test_gcs_signing_refreshes_expired_token_only(monkeypatch):
+    s, _client, blob, creds, calls = _iam_store(monkeypatch)
+    s.signed_read_url("k")
+    s.signed_read_url("k")
+    assert creds.refreshes == 1 and len(calls) == 1  # still valid: reused
+    creds.valid = False  # token expired
+    s.signed_read_url("k")
+    assert creds.refreshes == 2
+    assert blob.generate_signed_url.call_args.kwargs["access_token"] == "cp-token-2"
+
+
+def test_gcs_no_signer_email_skips_signing_credentials(monkeypatch):
+    import google.auth
+
+    monkeypatch.setattr(google.auth, "default", lambda **_k: pytest.fail("must not be called"))
+    s, _c, bucket = _gcs()
+    bucket.blob.return_value.generate_signed_url.return_value = "u"
+    s.signed_read_url("k")
+    assert "access_token" not in bucket.blob.return_value.generate_signed_url.call_args.kwargs
 
 
 def test_gcs_put_get_exists_delete_list():
