@@ -40,9 +40,11 @@ FULL_RATING: dict[str, Any] = {
         "partnership": {"score": 5, "reason": "The clinician asked permission before offering ideas."},
         "empathy": {"score": 3, "reason": "Several reflections, but few went beyond what the client had said."},
     },
-    "counts": {"gi": 2, "persuade": 0, "persuade_permission": 1, "question": 6, "sr": 4, "cr": 3,
-               "affirm": 2, "seek_collab": 2, "emphasize_autonomy": 1, "confront": 0},
-    "count_notes": {"sr": "Counted the short repeats of the client's words."},
+    "counts": {k: ({"count": n, "note": "Counted the short repeats of the client's words."}
+                   if k == "sr" else {"count": n}) for k, n in
+               {"gi": 2, "persuade": 0, "persuade_permission": 1, "question": 6, "sr": 4,
+                "cr": 3, "affirm": 2, "seek_collab": 2, "emphasize_autonomy": 1,
+                "confront": 0}.items()},
     "notes": "A collaborative session. The client left with a plan for three lunch walks.",
 }
 PARTIAL_RATING: dict[str, Any] = {
@@ -50,8 +52,7 @@ PARTIAL_RATING: dict[str, Any] = {
         "cct": {"score": 4, "reason": "The clinician asked what made walking important, then kept returning to the client's reasons."},
         "partnership": {"score": 5},
     },
-    "counts": {"question": 6, "cr": 3},
-    "count_notes": {},
+    "counts": {"question": {"count": 6}, "cr": {"count": 3}},
     "notes": None,
 }
 

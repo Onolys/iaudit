@@ -318,7 +318,7 @@ def build_report(
     clin: dict[str, Any] = {}
     if rating:
         clin = {g: (v or {}).get("score") for g, v in (rating.get("globals") or {}).items()}
-        clin.update(rating.get("counts") or {})
+        clin.update({k: (v or {}).get("count") for k, v in (rating.get("counts") or {}).items()})
     rated = sum(1 for k in global_ids + count_ids if clin.get(k) is not None)
 
     out_warnings: list[Warning] = [Warning(code=w.code, item_id=w.item_id)
@@ -365,7 +365,7 @@ def build_report(
         out_warnings += w
         behaviours.append(BehaviourEntry(
             item_id=k, clinician_count=c,
-            clinician_note=((rating or {}).get("count_notes") or {}).get(k),
+            clinician_note=(((rating or {}).get("counts") or {}).get(k) or {}).get("note"),
             onolys_count=_stats(o), instances=inst, instances_total=len(inst), diff=d,
             explanation=expl))
 

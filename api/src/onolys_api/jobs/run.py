@@ -30,7 +30,7 @@ from jsonschema import Draft202012Validator
 from onolys_core.engine import RunContext
 
 from onolys_api import logs
-from onolys_api.adapters.base import AdapterError, Evaluation
+from onolys_api.adapters.base import Evaluation
 from onolys_api.adapters.error_map import to_public
 from onolys_api.jobs import caps
 from onolys_api.jobs.machine import RUN_START_PROGRESS, STAGE_WEIGHTS, advance
@@ -38,10 +38,8 @@ from onolys_api.jobs.queue import MAX_ATTEMPTS
 from onolys_api.jobs.transcribe import TRANSCRIPT_ID
 from onolys_api.jobs.transcribe import _run as run_coro
 from onolys_api.jobs.worker import (
-    RETRYABLE_CODES,
     Handler,
     PermanentError,
-    RetryableError,
     TaskContext,
     TaskError,
 )
@@ -189,17 +187,13 @@ def _evaluate(ctx, blobs, evaluation, run_doc, session, started) -> ReportDoc:
         deadline=time.monotonic() + max(0.0, ctx.remaining_s()),
     )  # fmt: skip
     started["llm"] = True
-    try:
-        out = run_coro(
-            evaluation.run(
-                rctx, None, transcript, {"subject": session.clinician_speaker}, params,
-                rating_card, progress_cb,
-            )
-        )  # fmt: skip
-    except AdapterError as e:
-        if e.code in RETRYABLE_CODES:
-            raise RetryableError(e.code) from None
-        raise PermanentError("internal_error") from None  # engine -> public code map: SP09
+    # no catch here: any engine exception reaches the worker, which maps it with `to_public`
+    out = run_coro(
+        evaluation.run(
+            rctx, None, transcript, {"subject": session.clinician_speaker}, params,
+            rating_card, progress_cb,
+        )
+    )  # fmt: skip
 
     if any(True for _ in report_validator().iter_errors(out.report)):
         logs.emit("report_schema_invalid", logging.ERROR, session_id=sid, run_id=run_id)

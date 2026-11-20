@@ -31,6 +31,7 @@ from onolys_api.jobs.transcribe import make_poll_handler, make_transcribe_handle
 from onolys_api.jobs.validate import make_validate_handler
 from onolys_api.jobs.worker import HandlerSpec, TaskRunner
 from onolys_api.presets import PresetResolver
+from onolys_api.rating import load_schema as load_rating_schema
 from onolys_api.repo.base import Repo
 from onolys_api.routes import api_key as api_key_routes
 from onolys_api.routes import audio as audio_routes
@@ -225,6 +226,7 @@ def create_app(
         redoc_url=None,
     )
     app.state.settings = settings
+    load_rating_schema()  # fail at startup, loudly, if the canonical rating schema is missing
     app.state.blobs = blobs or build_blobs(settings)
     app.state.repo = repo or build_repo(settings, app.state.blobs)
     app.state.presets = PresetResolver(settings)

@@ -9,6 +9,7 @@ from pathlib import Path
 import httpx
 import pytest
 from audio_helpers import MAGIC, StubTools
+from cards import valid_card
 
 from onolys_api.adapters import Adapters, FakeEvaluation, FakeStt
 from onolys_api.app import create_app
@@ -16,7 +17,7 @@ from onolys_api.repo.fake import FakeRepo
 
 pytestmark = pytest.mark.integration
 OPENAPI = Path(__file__).resolve().parents[1] / "openapi.json"
-CARD = {"change_goal": "g", "notes": "n"}
+CARD = valid_card()
 ALICE = {"Authorization": "Bearer test:alice"}
 BOB = {"Authorization": "Bearer test:bob"}
 

@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 from onolys_core.engine import RunContext
-from onolys_core.errors import ConfigError
 from onolys_core.stt import AudioRef, SttParams, Word
 from onolys_core.stt.base import words_to_turns
 from onolys_core.stt.fixture import FixtureStt, uri_hash
@@ -175,5 +174,5 @@ async def test_no_progress_cb_ok():
 def test_build_adapters_stub_and_real():
     a = build_adapters(Settings(env="test", adapters="stub"))
     assert isinstance(a.stt, FakeStt) and isinstance(a.evaluation, FakeEvaluation)
-    with pytest.raises(ConfigError, match="SP09"):
-        build_adapters(Settings(env="test", adapters="real"))
+    r = build_adapters(Settings(env="test", adapters="real"))
+    assert type(r.stt).__name__ == "RealStt" and type(r.evaluation).__name__ == "RealEvaluation"

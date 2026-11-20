@@ -1,23 +1,24 @@
 """Rating-card validation: the one seam `PUT /sessions/{id}/rating` goes through (R2, D15).
 
-SP03 will own `validate_rating(pack, obj, final) -> list[Issue]` (SP03 T2) against SP02's
-`engines/paudit/schemas/rating.schema.json` (SP02 T2). Until both land this module checks the card
-with jsonschema against `load_schema()`: the real SP02 schema when it exists in the repo checkout,
-else the bundled stand-in (`schemas/rating.local.schema.json`, written from the PRDs). To adopt
-SP03, replace the body of `validate_rating` with a call to it; `Issue` is the same shape
-(`path`, `code`; paths only, never card text).
+The schema is the canonical SP02 one, `rating.schema.json` of the MITI pack (`protocols/
+miti-4.2.1/`), loaded through `paudit.pack.load_pack` (honours `PAUDIT_PROTOCOLS_DIR`, which the
+image sets to `/app/protocols`). It is the same file the web rating card and the evaluation
+engine's `validate_rating` use, so a stored card flows into the engine unchanged. There is no
+fallback: a missing or unreadable pack raises, and `create_app` loads it at startup so a bad
+deploy fails to boot instead of validating against something else. Issues are paths and codes
+only, never card text.
 """
 
 import json
 from dataclasses import dataclass
 from functools import lru_cache
-from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator
+from paudit.pack import load_pack
 
-REAL_SCHEMA = Path(__file__).resolve().parents[3] / "engines/paudit/schemas/rating.schema.json"
-LOCAL_SCHEMA = Path(__file__).parent / "schemas/rating.local.schema.json"
+from onolys_api.adapters.real import PACK_REF
+
 SCHEMA_VERSION = "miti-1"
 # Hard cap on a stored card (UTF-8 JSON bytes): bounds unknown keys the shape check does not cover.
 MAX_CARD_BYTES = 256 * 1024
@@ -37,8 +38,8 @@ class Issue:
 
 @lru_cache(maxsize=1)
 def load_schema() -> dict[str, Any]:
-    path = REAL_SCHEMA if REAL_SCHEMA.exists() else LOCAL_SCHEMA
-    return json.loads(path.read_text())
+    """The pack's rating schema; raises `paudit` `PackError` when the pack cannot be loaded."""
+    return load_pack(PACK_REF).rating_schema
 
 
 def card_size(obj: Any) -> int:

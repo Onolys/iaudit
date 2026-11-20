@@ -10,12 +10,13 @@ from dataclasses import replace
 import httpx
 import pytest
 from audio_helpers import MAGIC, StubTools
+from cards import valid_card
 
 from onolys_api.app import create_app
 from onolys_api.repo.fake import FakeRepo
 
 pytestmark = pytest.mark.integration
-CARD = {"change_goal": "g", "notes": "n"}
+CARD = valid_card()
 ROUTES = (
     "cheap: &s {litellm_id: anthropic/x, api_key_env: K}\nmid: *s\nstrong: *s\n"
     "paudit_code: {alias: mid}\npaudit_globals: {alias: mid}\ntips: {alias: mid}\n"

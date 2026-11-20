@@ -1,8 +1,9 @@
 """Engine adapters: the only seam to the engines (PRD R6). `ADAPTERS=stub|real`."""
 
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from typing import Any
 
-from onolys_core.errors import ConfigError
 from onolys_core.stt.fixture import FixtureStt
 
 from onolys_api.adapters.base import (
@@ -29,7 +30,17 @@ class Adapters:
     evaluation: Evaluation
 
 
-def build_adapters(settings: Settings) -> Adapters:
+def build_adapters(
+    settings: Settings,
+    *,
+    stt_registry: Mapping[str, Callable[[], Any]] | None = None,
+    llm_factory: Callable[[dict], Any] | None = None,
+) -> Adapters:
+    """`ADAPTERS=stub` -> fakes; `real` -> the SP09 adapters. The keyword hooks (a provider
+    registry, an LLM client factory) let tests run the real wiring with fixture STT/LLM."""
     if settings.adapters == "stub":
         return Adapters(stt=FakeStt(), evaluation=FakeEvaluation())
-    raise ConfigError("ADAPTERS=real is not available yet: the real engine adapters land in SP09")
+    from onolys_api.adapters.real import RealEvaluation, RealStt
+
+    evaluation = RealEvaluation(llm_factory=llm_factory) if llm_factory else RealEvaluation()
+    return Adapters(stt=RealStt(stt_registry), evaluation=evaluation)

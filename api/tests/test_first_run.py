@@ -12,6 +12,7 @@ from datetime import UTC, datetime
 
 import httpx
 import pytest
+from cards import valid_card
 from onolys_core.transcript import Transcript, Turn
 from starlette.testclient import TestClient
 
@@ -27,7 +28,7 @@ from onolys_api.repo.models import RatingDoc, ReportDoc, SttInfo
 pytestmark = pytest.mark.unit
 HAS_EMULATOR = bool(os.environ.get("FIRESTORE_EMULATOR_HOST"))
 TID = "current"
-CARD = {"change_goal": "g", "notes": "n"}
+CARD = valid_card()
 
 
 @pytest.fixture(params=["fake", "firestore"])

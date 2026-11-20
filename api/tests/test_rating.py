@@ -3,11 +3,17 @@
 Runs on FakeRepo always and on the Firestore emulator when FIRESTORE_EMULATOR_HOST is set.
 """
 
+import json
 import os
 import uuid
+from pathlib import Path
 
 import httpx
 import pytest
+from cards import valid_card
+from onolys_core.errors import PackError
+from onolys_evaluation import validate_rating as engine_validate
+from paudit.pack import load_pack
 
 from onolys_api import rating as rating_mod
 from onolys_api.app import create_app
@@ -329,14 +335,38 @@ def test_validate_shape_rules():
     assert codes({"notes": "x" * 3001}, False) == {("notes", "too_long")}
 
 
-def test_schema_loader_prefers_real_schema(tmp_path, monkeypatch):
-    real = tmp_path / "rating.schema.json"
-    real.write_text('{"type": "object", "required": ["marker"]}')
-    monkeypatch.setattr(rating_mod, "REAL_SCHEMA", real)
+REPO = Path(__file__).resolve().parents[2]
+
+
+def test_schema_is_the_canonical_sp02_schema():
+    """The API validates against the pack's rating schema: byte-for-byte the web copy's content."""
+    web = json.loads((REPO / "web/src/protocol/rating.schema.json").read_text())
+    assert rating_mod.load_schema() == web
+    assert not (Path(rating_mod.__file__).parent / "schemas/rating.local.schema.json").exists()
+
+
+def test_schema_missing_fails_loudly_no_fallback(tmp_path, monkeypatch):
+    monkeypatch.setenv("PAUDIT_PROTOCOLS_DIR", str(tmp_path))
     rating_mod.load_schema.cache_clear()
     try:
-        assert rating_mod.load_schema()["required"] == ["marker"]
+        with pytest.raises(PackError):
+            rating_mod.load_schema()
+        with pytest.raises(PackError):  # create_app loads it at startup
+            create_app(Settings(env="test", auth_mode="fake"))
     finally:
         monkeypatch.undo()
         rating_mod.load_schema.cache_clear()
-    assert "$defs" in rating_mod.load_schema() or "properties" in rating_mod.load_schema()
+    assert rating_mod.load_schema()["properties"]
+
+
+def test_card_valid_for_web_schema_is_accepted_by_api_and_engine():
+    """A card with globals/counts + reasons passes the API and the engine's validate_rating."""
+    pack = load_pack("miti@4.2.1")
+    c = valid_card()
+    assert validate_rating(c, final=True) == []
+    assert validate_rating(c, final=False) == []
+    assert engine_validate(pack, c, True) == []
+    # unknown pack item keys are rejected by both
+    bad = {**c, "globals": {"nope": {"score": 3}}}
+    assert validate_rating(bad, final=False)
+    assert engine_validate(pack, bad, False)
