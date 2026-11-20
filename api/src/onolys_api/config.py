@@ -13,6 +13,13 @@ AUTH_MODES = ("fake", "idp")
 LOCAL_ENVS = ("local", "test")
 
 
+def _float(e: Mapping[str, str], name: str, default: float) -> float:
+    try:
+        return float(e.get(name, default))
+    except ValueError:
+        raise ConfigError(f"{name} must be a number") from None
+
+
 @dataclass(frozen=True)
 class Settings:
     env: str = "test"
@@ -33,6 +40,9 @@ class Settings:
     routes_file: str = ""
     default_preset: str = ""
     git_sha: str = "dev"
+    stt_cap_factor: float = 3.0  # STT poll cap = factor x audio duration ...
+    stt_cap_min_s: float = 300.0  # ... but never under this
+    stt_time_limit_s: float = 1200.0  # ... and never over this (the old flat limit)
     uid_hmac_key: str = ""  # keys the `uid_hash` log field (Secret Manager `uid-hmac-key-{env}`)
 
     @classmethod
@@ -52,6 +62,9 @@ class Settings:
             raise ConfigError("MAX_ACTIVE_RUNS must be an integer") from None
         s = cls(
             env=env,
+            stt_cap_factor=_float(e, "STT_CAP_FACTOR", cls.stt_cap_factor),
+            stt_cap_min_s=_float(e, "STT_CAP_MIN_S", cls.stt_cap_min_s),
+            stt_time_limit_s=_float(e, "STT_TIME_LIMIT_S", cls.stt_time_limit_s),
             service_mode=e.get("SERVICE_MODE", "combined" if local else "api"),
             auth_mode=e.get("AUTH_MODE", "fake" if local else "idp"),
             adapters=e.get("ADAPTERS", "stub" if local else "real"),
@@ -91,3 +104,7 @@ class Settings:
             raise ConfigError("DAILY_RUN_CAP must be >= 0")
         if self.max_active_runs < 0:
             raise ConfigError("MAX_ACTIVE_RUNS must be >= 0")
+        if self.stt_cap_factor <= 0 or self.stt_cap_min_s <= 0:
+            raise ConfigError("STT_CAP_FACTOR and STT_CAP_MIN_S must be > 0")
+        if self.stt_time_limit_s < self.stt_cap_min_s:
+            raise ConfigError("STT_TIME_LIMIT_S must be >= STT_CAP_MIN_S")

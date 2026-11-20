@@ -42,6 +42,7 @@ from onolys_api.repo.models import (
     ReportDoc,
     RunDoc,
     SessionDoc,
+    SessionError,
     SessionStatusDoc,
     TranscriptDoc,
     UsageDoc,
@@ -216,6 +217,37 @@ class FirestoreRepo:
         more = len(docs) > limit
         items = docs[:limit]
         return Page(items, _encode_cursor(items[-1].id) if more and items else None)
+
+    def fail_stale_session(
+        self, uid: str, sid: str, state: str, before: datetime, error: SessionError
+    ) -> bool:
+        sref, _ = self._owned_session(uid, sid)
+        stref = self._top("session_status", sid)
+
+        @firestore.transactional
+        def txn_fn(txn) -> bool:
+            snap = sref.get(transaction=txn)
+            sess = snap.to_dict() or {}
+            if sess.get("uid") != uid:
+                raise NotFoundError()
+            if sess.get("state") != state or sess["updated_at"] >= before:
+                return False
+            now = utcnow()
+            fields: dict[str, Any] = {"state": "failed", "error": error.model_dump(),
+                                      "updated_at": now}  # fmt: skip
+            if error.step and error.step in (sess.get("steps") or {}):
+                fields[f"steps.{error.step}.status"] = "failed"
+                fields[f"steps.{error.step}.ended"] = now
+                fields[f"steps.{error.step}.error"] = error.code
+            txn.update(sref, fields)
+            txn.set(
+                stref,
+                {"state": "failed", "error_code": error.code, "uid": uid, "updated_at": now},
+                merge=True,
+            )
+            return True
+
+        return self._contended(txn_fn)
 
     def delete_session(self, uid: str, sid: str) -> bool:
         sref, ssnap = self._owned_session(uid, sid, missing_ok=True)

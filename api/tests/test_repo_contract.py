@@ -19,6 +19,7 @@ from onolys_api.repo.models import (
     ReportDoc,
     RunDoc,
     SessionDoc,
+    SessionError,
     SessionStatusDoc,
     StepRecord,
 )
@@ -642,3 +643,49 @@ def test_claim_survives_exhausted_txn_retries(repo, monkeypatch, kind):
     else:
         assert repo.claim_run(uid, sid, run_id, now, LEASE).outcome == "claimed"
     assert len(calls) == 3
+
+
+# ---- stale-session failing (lazy check on read) ----
+
+T_OLD = datetime(2026, 1, 1, 12, 0, tzinfo=UTC)
+
+
+def seed_state(repo, state, updated_at, step="transcribe"):
+    uid, sid = new_ids()
+    s = SessionDoc(
+        uid=uid, state=state, step=step, created_at=updated_at, updated_at=updated_at,
+        steps={step: StepRecord(status="pending")},
+    )  # fmt: skip
+    st = SessionStatusDoc(uid=uid, state=state, step=step, progress=20, updated_at=updated_at)
+    repo.create_session(uid, sid, s, st)
+    return uid, sid
+
+
+def test_fail_stale_session_marks_failed_and_mirrors_status(repo):
+    cutoff = T_OLD + timedelta(minutes=30)
+    uid, sid = seed_state(repo, "transcribing", T_OLD)
+    err = SessionError(code="transcription_failed", step="transcribe")
+    assert repo.fail_stale_session(uid, sid, "transcribing", cutoff, err) is True
+    s, st = repo.get_session(uid, sid), repo.get_status(uid, sid)
+    assert (s.state, s.error.code, s.error.step) == ("failed", "transcription_failed", "transcribe")
+    assert s.steps["transcribe"].status == "failed"
+    assert s.steps["transcribe"].error == "transcription_failed"
+    assert s.steps["transcribe"].ended is not None
+    assert (st.state, st.error_code, st.progress) == ("failed", "transcription_failed", 20)
+    # idempotent: the second call finds it failed
+    assert repo.fail_stale_session(uid, sid, "transcribing", cutoff, err) is False
+
+
+def test_fail_stale_session_skips_fresh_moved_on_and_foreign(repo):
+    cutoff = T_OLD + timedelta(minutes=30)
+    err = SessionError(code="transcription_failed", step="transcribe")
+    fresh = seed_state(repo, "transcribing", cutoff + timedelta(seconds=1))
+    assert repo.fail_stale_session(*fresh, "transcribing", cutoff, err) is False
+    assert repo.get_session(*fresh).state == "transcribing"
+    done = seed_state(repo, "awaiting_input", T_OLD)  # a poll finished it meanwhile
+    assert repo.fail_stale_session(*done, "transcribing", cutoff, err) is False
+    assert repo.get_session(*done).state == "awaiting_input"
+    uid, sid = seed_state(repo, "transcribing", T_OLD)
+    with pytest.raises(NotFoundError):
+        repo.fail_stale_session("someone-else", sid, "transcribing", cutoff, err)
+    assert repo.get_session(uid, sid).state == "transcribing"

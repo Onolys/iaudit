@@ -71,6 +71,7 @@ class StepRecord(BaseModel):
     error: str | None = None
     stt_operation: Any = None  # opaque handle from SttAdapter.start (transcribe step only)
     stt_started: datetime | None = None  # when `start` returned: the poll time limit runs from it
+    stt_limit_s: float | None = None  # this recording's poll cap (None: the settings maximum)
 
 
 class UploadInfo(BaseModel):

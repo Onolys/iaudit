@@ -21,6 +21,7 @@ from onolys_api.repo.models import (
     ReportDoc,
     RunDoc,
     SessionDoc,
+    SessionError,
     SessionStatusDoc,
     TranscriptDoc,
     UsageDoc,
@@ -89,6 +90,14 @@ class Repo(Protocol):
         self, uid: str, limit: int = 20, cursor: str | None = None
     ) -> Page[SessionDoc]: ...
     def delete_session(self, uid: str, sid: str) -> bool: ...
+
+    # One transaction: if the session is still in `state` with `updated_at < before`, set it
+    # `failed` with `error` (mirrored to session_status; `steps.<error.step>` marked failed) and
+    # return True. Anything else (moved on, written to since, already failed): nothing, False.
+    # Used by the lazy stale check on read; a poll that just finished wins the race.
+    def fail_stale_session(
+        self, uid: str, sid: str, state: str, before: datetime, error: SessionError
+    ) -> bool: ...
 
     # children of a session
     def add_recording(self, uid: str, sid: str, rid: str, rec: RecordingDoc) -> None: ...

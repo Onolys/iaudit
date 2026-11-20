@@ -16,6 +16,7 @@ from onolys_api.errors import ApiError, ErrorResponse
 from onolys_api.jobs.delete import delete_session_data
 from onolys_api.jobs.machine import advance
 from onolys_api.jobs.queue import TaskPayload
+from onolys_api.jobs.stale import settle_if_stale
 from onolys_api.presets import UnknownPreset
 from onolys_api.repo.base import NotFoundError
 from onolys_api.repo.models import IdempotencyDoc, SessionDoc, SessionState, SessionStatusDoc
@@ -197,6 +198,9 @@ def list_sessions(
         page = request.app.state.repo.list_sessions(user.uid, limit=limit, cursor=cursor)
     except NotFoundError:
         raise ApiError.of(422, "invalid_parameters", "cursor: invalid cursor") from None
+    repo, settings = request.app.state.repo, request.app.state.settings
+    now = request.app.state.clock()
+    sessions = [settle_if_stale(repo, s, now, settings) for s in page.items]
     items = [
         SessionListItem(
             id=s.id,
@@ -206,7 +210,7 @@ def list_sessions(
             latest_report_version=s.latest_report_version,
             error_code=s.error.code if s.error else None,
         )
-        for s in page.items
+        for s in sessions
         if s.state != "deleting"
     ]
     return SessionList(items=items, next_cursor=page.next_cursor)
@@ -221,6 +225,7 @@ def list_sessions(
 def get_session(id: str, request: Request, user: User) -> SessionDetail:
     repo = request.app.state.repo
     s = repo.get_session(user.uid, id)
+    s = settle_if_stale(repo, s, request.app.state.clock(), request.app.state.settings)
     if s.state == "deleting":
         raise NotFoundError()
     st = repo.get_status(user.uid, id)

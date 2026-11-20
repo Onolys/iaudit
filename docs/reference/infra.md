@@ -221,6 +221,12 @@ Verified 2026-11-20 against the task-10 test lines (staging, `error_code t10_tes
 
 Alerts (prod always on; staging only with `staging_alerts=true`): an email for each `status="failed"` line (at most one per 5 min) and for more than 5 api 5xx responses in 5 min. The email channel needs its verification click.
 
+### Slow or stuck transcription
+
+`transcribe` logs `stt_started` (`stt_operation` = the Chirp operation name, `stt_started`) and every poll logs `stt_poll` (`poll_n`, `elapsed_s`, `stt_operation`, `outcome` pending|ready). Trail: `jsonPayload.session_id="<sid>" jsonPayload.event=("stt_started" OR "stt_poll")`; look the operation name up in the Speech-to-Text v2 operations API to see Chirp's own state.
+
+Limits: the poll cap is `clamp(STT_CAP_FACTOR x audio seconds, STT_CAP_MIN_S, STT_TIME_LIMIT_S)` (defaults 3, 300 s, 1200 s; stored on the step as `stt_limit_s`), then `transcription_failed`. Each poll queues the next poll before it asks Chirp, so a poll that dies cannot stop the chain; a failed enqueue answers 5xx (Cloud Tasks retries the same poll) and, on the last attempt, fails the session. There is no scheduler. If a chain still stops, the session is failed on the next `GET /v1/sessions/{id}` or list call once `updated_at` is older than cap + 60 s (`session_stale` log line, `status=failed`, `exc_class=StaleSession`); the web app does not poll, so the session shows `transcribing` until something reads it through the API.
+
 ### `error_code` table
 
 The code in the failed log line is the public code `to_public` (`api/src/onolys_api/adapters/error_map.py`) gives; the same code is in the session status and the error card. All codes: `api/src/onolys_api/errors.py`, schema `docs/contracts/public/public-error-response.schema.json`.

@@ -5,7 +5,12 @@
 finds `stt_operation` and only resumes polling: it never re-submits. (A crash between `start`
 returning and the handle being stored can still submit twice: the provider API offers no
 idempotency key.) Each poll task asks `Stt.poll` once; no result re-enqueues the next poll
-(`{sid}-poll-{n}`, ~15 s apart) until the ~20 min limit, then `transcription_failed`.
+(`{sid}-poll-{n}`, ~15 s apart) until the cap, then `transcription_failed`. The cap is
+`clamp(factor x audio duration, min, max)` (settings, default 3x, 300 s..1200 s), stored on the
+step as `stt_limit_s`. The next poll is queued BEFORE the provider is asked, so a poll that dies
+(or whose retries run out) cannot break the chain; a failed enqueue fails the request (5xx, Cloud
+Tasks retries the same poll; terminal `transcription_failed` on the last attempt). A chain that
+still stops is failed lazily on read (`jobs/stale.py`).
 
 A finished transcript is checked (`no_speech`, `speakers_not_separated`), stored (pointer when
 over 500 KB, by the repo), and the session moves to `awaiting_input` with `transcript_ready`.
@@ -41,7 +46,7 @@ from onolys_api.storage.base import BlobStore
 
 TRANSCRIPT_ID = "current"
 POLL_INTERVAL_S = 15.0
-STT_TIME_LIMIT_S = 20 * 60.0
+STT_TIME_LIMIT_S = 20 * 60.0  # default cap maximum (Settings.stt_time_limit_s)
 MIN_WORDS = 50
 MIN_SECOND_SPEAKER_SHARE = 0.10
 STEP = "transcribe"
@@ -120,11 +125,22 @@ def operation_name(handle: Any) -> str | None:
     return str(handle)
 
 
+def stt_cap_s(audio_s: float | None, settings: Settings | None = None) -> float:
+    """The poll cap for a recording: `clamp(factor x duration, min, max)`; the maximum when the
+    duration is unknown."""
+    s = settings or Settings()
+    if audio_s is None:
+        return s.stt_time_limit_s
+    return min(s.stt_time_limit_s, max(s.stt_cap_min_s, s.stt_cap_factor * audio_s))
+
+
 def _poll_payload(ctx: TaskContext, n: int) -> TaskPayload:
     return TaskPayload(kind="transcribe-poll", uid=ctx.uid, sid=ctx.sid, n=n)
 
 
-def make_transcribe_handler(blobs: BlobStore, stt: Stt) -> Handler:
+def make_transcribe_handler(
+    blobs: BlobStore, stt: Stt, *, settings: Settings | None = None
+) -> Handler:
     """Register with `HandlerSpec(fn, step="transcribe", complete=False)`: the step is marked
     `done` by the poll that finishes it."""
 
@@ -150,9 +166,12 @@ def make_transcribe_handler(blobs: BlobStore, stt: Stt) -> Handler:
             except AdapterError as e:
                 raise _provider_error(e, ctx) from None
             started = ctx.clock()
+            ms = recs[0].duration_ms
+            limit = stt_cap_s(None if ms is None else ms / 1000, settings)
             ctx.repo.update_session(
                 uid, sid,
-                {f"steps.{STEP}.stt_operation": handle, f"steps.{STEP}.stt_started": started},
+                {f"steps.{STEP}.stt_operation": handle, f"steps.{STEP}.stt_started": started,
+                 f"steps.{STEP}.stt_limit_s": limit},
             )  # fmt: skip
             logs.emit(
                 "stt_started", session_id=sid, step=STEP, request_id=ctx.request_id,
@@ -205,22 +224,29 @@ def make_poll_handler(
         if rec.stt_operation is None:
             raise PermanentError("internal_error")
 
+        n = ctx.payload.n or 1
+        limit = rec.stt_limit_s or (settings or Settings()).stt_time_limit_s
+        started = rec.stt_started or ctx.clock()
+        elapsed = (ctx.clock() - started).total_seconds()
+        if elapsed < limit:
+            # queue the next poll first: it survives this poll dying or running out of attempts.
+            # A failure here propagates (5xx, Cloud Tasks retries this same poll; terminal on the
+            # last attempt) and a retry re-enqueues the same name (deduped), never a second chain.
+            ctx.enqueue(_poll_payload(ctx, n + 1), POLL_INTERVAL_S)
+
         try:
             transcript = _run(stt.poll(rec.stt_operation))
         except AdapterError as e:
             raise _provider_error(e, ctx) from None
 
-        started = rec.stt_started or ctx.clock()
-        elapsed = (ctx.clock() - started).total_seconds()
         logs.emit(
             "stt_poll", session_id=sid, step=STEP, request_id=ctx.request_id,
-            stt_operation=operation_name(rec.stt_operation), poll_n=ctx.payload.n or 1,
+            stt_operation=operation_name(rec.stt_operation), poll_n=n,
             elapsed_s=round(elapsed), outcome="pending" if transcript is None else "ready",
         )  # fmt: skip
         if transcript is None:
-            if elapsed >= STT_TIME_LIMIT_S:
+            if elapsed >= limit:
                 raise PermanentError("transcription_failed")
-            ctx.enqueue(_poll_payload(ctx, (ctx.payload.n or 1) + 1), POLL_INTERVAL_S)
             return
 
         code = check_transcript(transcript)

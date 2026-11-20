@@ -64,8 +64,21 @@ def test_fake_auth_allowed_locally(env):
         {"AUTH_MODE": "x"},
         {"DAILY_RUN_CAP": "many"},
         {"DAILY_RUN_CAP": "-1"},
+        {"STT_CAP_FACTOR": "lots"},
+        {"STT_CAP_FACTOR": "0"},
+        {"STT_CAP_MIN_S": "-5"},
+        {"STT_CAP_MIN_S": "900", "STT_TIME_LIMIT_S": "600"},
     ],
 )
 def test_invalid_values(bad):
     with pytest.raises(ConfigError):
         Settings.from_env(bad)
+
+
+def test_stt_cap_defaults_and_overrides():
+    d = Settings.from_env({})
+    assert (d.stt_cap_factor, d.stt_cap_min_s, d.stt_time_limit_s) == (3.0, 300.0, 1200.0)
+    s = Settings.from_env(
+        {"STT_CAP_FACTOR": "2", "STT_CAP_MIN_S": "120", "STT_TIME_LIMIT_S": "900"}
+    )
+    assert (s.stt_cap_factor, s.stt_cap_min_s, s.stt_time_limit_s) == (2.0, 120.0, 900.0)

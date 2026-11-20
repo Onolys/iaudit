@@ -4,6 +4,7 @@ import logging
 import re
 import time
 import uuid
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -226,6 +227,7 @@ def create_app(
         redoc_url=None,
     )
     app.state.settings = settings
+    app.state.clock = lambda: datetime.now(UTC)  # tests replace it
     load_rating_schema()  # fail at startup, loudly, if the canonical rating schema is missing
     app.state.blobs = blobs or build_blobs(settings)
     app.state.repo = repo or build_repo(settings, app.state.blobs)
@@ -252,7 +254,7 @@ def create_app(
         app.state.runner.register(
             "transcribe",
             HandlerSpec(
-                make_transcribe_handler(app.state.blobs, app.state.adapters.stt),
+                make_transcribe_handler(app.state.blobs, app.state.adapters.stt, settings=settings),
                 step="transcribe",
                 complete=False,  # the poll that finishes the transcript marks it done
             ),

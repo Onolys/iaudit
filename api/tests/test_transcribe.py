@@ -165,7 +165,8 @@ def test_polls_until_ready_then_awaiting_input(make_env, blobs):
     env = Env(blobs, fixture_stt(blobs, {"A": 60, "B": 60}, polls_before_ready=2))
     env.start()
     env.run_polls()
-    assert env.queue.delays == [("transcribe-poll", n, 15) for n in (1, 2, 3)]
+    # poll 3 queued poll 4 before it found the transcript; poll 4 then found the step done
+    assert env.queue.delays == [("transcribe-poll", n, 15) for n in (1, 2, 3, 4)]
     s = env.session
     assert (s.state, s.transcript_ready) == ("awaiting_input", True)
     assert s.steps["transcribe"].status == "done" and s.error is None
@@ -418,3 +419,155 @@ def test_every_poll_logs_number_elapsed_and_operation(blobs, caplog):
     ]  # fmt: skip
     assert all(d["stt_operation"] == op and d["session_id"] == SID for d in polls)
     assert all("transcript" not in d and "text" not in d for d in polls)
+
+
+# ---- chain hardening: the poll chain cannot silently break ----
+
+
+class ExplodingQueue(RecQueue):
+    """Enqueue of poll tasks fails with `exc` while `fail` is set (Cloud Tasks outage)."""
+
+    def __init__(self, exc) -> None:
+        super().__init__()
+        self.exc, self.fail = exc, False
+
+    def enqueue(self, payload, delay_s: float = 0.0) -> None:
+        if self.fail and payload.kind == "transcribe-poll":
+            raise self.exc
+        super().enqueue(payload, delay_s)
+
+
+def _transient():
+    from google.api_core import exceptions as gexc
+
+    return gexc.ServiceUnavailable("tasks down")
+
+
+def test_next_poll_enqueue_failure_answers_5xx_then_fails_on_the_last_attempt(blobs):
+    env = Env(blobs, fixture_stt(blobs, {"A": 60, "B": 60}, polls_before_ready=10**6))
+    env.queue = ExplodingQueue(_transient())
+    env.runner.queue = env.queue
+    env.start()
+    p = env.queue.pending.pop(0)
+    env.queue.fail = True
+    first = env.runner.handle(p, 0)  # Cloud Tasks must retry this same poll
+    assert (first.status_code, first.outcome) == (503, "retry")
+    assert env.session.state == "transcribing"
+    last = env.runner.handle(p, 1)  # no attempt left: terminal, not silent
+    assert (last.status_code, last.outcome) == (200, "failed")
+    assert env.session.error.code == "transcription_failed"
+
+
+def test_next_poll_enqueue_recovers_on_the_retry(blobs):
+    env = Env(blobs, fixture_stt(blobs, {"A": 60, "B": 60}, polls_before_ready=10**6))
+    env.queue = ExplodingQueue(_transient())
+    env.runner.queue = env.queue
+    env.start()
+    p = env.queue.pending.pop(0)
+    env.queue.fail = True
+    assert env.runner.handle(p, 0).status_code == 503
+    env.queue.fail = False
+    assert env.runner.handle(p, 1).status_code == 200
+    assert [(q.kind, q.n) for q in env.queue.pending] == [("transcribe-poll", 2)]
+
+
+def test_first_poll_enqueue_failure_in_transcribe_is_not_silent(blobs):
+    env = Env(blobs, fixture_stt(blobs, {"A": 60, "B": 60}))
+    env.queue = ExplodingQueue(_transient())
+    env.runner.queue = env.queue
+    env.queue.fail = True
+    assert env.start(0).status_code == 503
+    assert env.start(1).outcome == "failed"
+    assert env.session.error.code == "transcription_failed"
+    assert env.stt.submits == 1  # the retry resumed, never re-submitted
+
+
+def test_permanent_enqueue_error_fails_instead_of_hanging(blobs):
+    from google.api_core import exceptions as gexc
+
+    env = Env(blobs, fixture_stt(blobs, {"A": 60, "B": 60}, polls_before_ready=10**6))
+    env.queue = ExplodingQueue(gexc.PermissionDenied("no"))
+    env.runner.queue = env.queue
+    env.start()
+    p = env.queue.pending.pop(0)
+    env.queue.fail = True
+    assert env.runner.handle(p, 0).outcome == "failed"
+    assert env.session.state == "failed"
+
+
+def test_next_poll_is_queued_before_the_provider_is_asked(blobs):
+    """A poll whose worker dies (OOM, timeout, 429 on both attempts) cannot break the chain:
+    the next poll is already queued."""
+    stt = FlakyPollStt()
+    env = Env(blobs, stt)
+    env.start()
+    p = env.queue.pending.pop(0)
+    assert env.runner.handle(p, 0).status_code == 503  # poll 1 failed
+    assert [(q.kind, q.n) for q in env.queue.pending] == [("transcribe-poll", 2)]
+
+
+def test_a_retried_poll_does_not_fork_the_chain(blobs):
+    stt = FlakyPollStt()
+    env = Env(blobs, stt)
+    env.start()
+    p = env.queue.pending.pop(0)
+    env.runner.handle(p, 0)
+    env.runner.handle(p, 1)  # retry of the same poll: same next-poll name, deduped
+    assert [(q.kind, q.n) for q in env.queue.pending] == [("transcribe-poll", 2)]
+
+
+def test_dangling_poll_after_the_session_finished_is_a_noop(make_env):
+    env = make_env()
+    env.start()
+    env.run_polls()
+    assert env.session.state == "awaiting_input"
+    assert env.hook_calls == [(UID, SID)]  # first-run gate ran exactly once
+
+
+# ---- duration-based cap ----
+
+
+@pytest.mark.parametrize(
+    ("audio_s", "cap"),
+    [(None, 1200), (30, 300), (100, 300), (200, 600), (360, 1080), (400, 1200), (3600, 1200)],
+)
+def test_stt_cap_is_three_times_the_audio_clamped(audio_s, cap):
+    assert tr.stt_cap_s(audio_s) == cap
+
+
+def test_stt_cap_follows_settings():
+    from onolys_api.config import Settings
+
+    s = Settings(stt_cap_factor=2.0, stt_cap_min_s=100.0, stt_time_limit_s=500.0)
+    assert [tr.stt_cap_s(x, s) for x in (10, 120, 1000, None)] == [100, 240, 500, 500]
+
+
+def test_start_stores_the_cap_for_this_recording(blobs):
+    env = Env(blobs, fixture_stt(blobs, {"A": 60, "B": 60}))  # fixture audio: 600 s
+    env.start()
+    assert env.session.steps["transcribe"].stt_limit_s == 1200
+
+
+def test_short_recording_fails_after_its_own_cap(blobs):
+    env = Env(blobs, fixture_stt(blobs, {"A": 60, "B": 60}, polls_before_ready=10**6))
+    env.repo.add_recording(
+        UID, SID, "original", RecordingDoc(gcs_uri="gs://b/x", duration_ms=60_000)
+    )
+    env.start()
+    assert env.session.steps["transcribe"].stt_limit_s == 300
+    env.run_polls()
+    s = env.session
+    assert (s.state, s.error.code) == ("failed", "transcription_failed")
+    assert timedelta(seconds=300) <= env.clock.now - T0 <= timedelta(seconds=330)
+
+
+def test_a_session_without_a_stored_cap_uses_the_maximum(blobs):
+    env = Env(blobs, fixture_stt(blobs, {"A": 60, "B": 60}, polls_before_ready=10**6))
+    env.start()
+    env.repo.update_session(UID, SID, {"steps.transcribe.stt_limit_s": None})
+    env.clock.advance(1190)
+    env.runner.handle(env.queue.pending.pop(0), 0)
+    assert env.session.state == "transcribing"  # 1190 s < 1200 s
+    env.clock.advance(20)
+    env.runner.handle(env.queue.pending.pop(0), 0)
+    assert env.session.state == "failed"
