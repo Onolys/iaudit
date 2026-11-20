@@ -7,7 +7,7 @@ date: 2026-11-20
 
 Repo/branch: Onolys/onolys (local `iaudit`) / `feat/miti-platform` · Depends on: SP01 (`engines/core/`, `engines/` layout) · Blocks: SP03 (consumes result + pack), SP04 (engine contract for stubs), SP07 (admin tab)
 Owns: `engines/paudit/**` (incl. `schemas/{pack,paudit-result}.schema.json`, `cli.py`, tests), `protocols/miti-4.2.1/**`, `eval/datasets/paudit/**`, `docs/decisions/0018-protocol-pack-data-vs-code.md` (+ `docs/contracts/README.md` pointer only)
-Not owned: rating parsing, per-item comparison, tips, report assembly (SP03), and inside the pack SP03 owns `prompts/{rating_parse,tips}_*`, the content of `report.yaml`, the `evaluation:` block of `pack.yaml` and `fixtures/evaluation/**` (SP02 ships the pack format, loader, schemas and a stub `report.yaml`); HTTP endpoint/jobs (SP04); admin tab (SP07); `engines/core/*` (SP01 — needs listed below).
+Not owned: rating validation (`validate_rating`), per-item comparison, tips, report assembly (SP03), and inside the pack SP03 owns `prompts/tips_*`, the content of `report.yaml`, the `evaluation:` block of `pack.yaml` and `fixtures/evaluation/**` (SP02 ships the pack format, loader, schemas and a stub `report.yaml`); HTTP endpoint/jobs (SP04); admin tab (SP07); `engines/core/*` (SP01 — needs listed below).
 
 ## TL;DR
 `paudit` takes a transcript, a pack reference and params, and returns a typed, versioned result: per-utterance behaviour codes (quoted, offset-located), counts, summary scores vs reference levels, four globals with cited lines, warnings, `run_info`. Same pipeline shape as eaudit: models propose (utterance split + code + quote + rationale; globals + cited quotes), code decides (quote location, rule enforcement, counts, summaries, range/default/5-cap). Everything MITI-specific lives in `protocols/miti-4.2.1/` as data (`pack.yaml`) plus a thin `rules.py`; the engine has zero MITI strings. N runs → `results[]` + `aggregate` (mean/min/max, representative run). ~6 model calls per 25-min run.
@@ -22,7 +22,7 @@ Not owned: rating parsing, per-item comparison, tips, report assembly (SP03), an
 - Pack format v0.0.1 (loader + schema validation + parity checks) and a second toy pack in tests proving the engine is protocol-agnostic.
 - MITI 4.2.1 pack complete: 4 globals, 10 codes, rules, formulas, reference levels, input checks, rating schema, prompts, report layout, fixtures.
 - Deterministic offline tests (stub/fixture LLM); eval dataset folder + CLI so quality can be measured.
-- Result shape SP03 can diff against a parsed self-rating without engine knowledge of MITI.
+- Result shape SP03 can diff against the clinician's rating card without engine knowledge of MITI.
 
 **Non-Goals**
 - Official MITI coding claims; inter-rater reliability work (eval later, certified coder data from Tejit).
@@ -57,18 +57,18 @@ protocols/<id>-<version>/
 
 MITI item ids (shared with rating schema, result, report): globals `cct, sst, partnership, empathy`; codes `gi, persuade, persuade_permission, question, sr, cr, affirm, seek_collab, emphasize_autonomy, confront`.
 
-`rating.schema.json` (MITI v1): `{change_goal, coded_span{from_s,to_s}, globals{cct,sst,partnership,empathy: int 1-5|null}, counts{<10 code ids>: int ≥0|null}, reasons{<item id>: string}, notes}`; every key optional/nullable (partial ratings valid). `coded_span` uses **`from_s`/`to_s`** (seconds, int|null): the same names as the engine param `coded_span`, SP03's parser output, SP04's session field and SP05's form; clock strings are normalised to seconds by SP03. [RESOLVED: `from_s`/`to_s` everywhere (reconcile pass); brainstorm's `from`/`to` superseded]
+`rating.schema.json` (MITI v1) is the in-app **rating card** and the only rating input (no file upload, no paste-to-parse, no parser step): `{change_goal (required to start a run), coded_span{from_s,to_s}, globals{cct,sst,partnership,empathy: {score: int 1-5|null, reason: string ≤1,000 chars, example?: {at_s: int|null, text: string}}}, counts{<10 code ids>: {count: int ≥0|null, note?: string ≤1,000 chars}}, notes: string ≤3,000 chars}`. `notes` is the free-text "Additional notes / evaluation reasoning" box: it is never parsed into the card; SP03 hands it to eaudit as additional claims. Limits are hard at the API (SP04 rejects >1,000 per reason/note and >3,000 notes) and soft in the UI (live counter, warn only). Every item key is optional/nullable (partial ratings valid). `coded_span` uses **`from_s`/`to_s`** (seconds, int|null): the same names as the engine param `coded_span`, SP04's session field and SP05's form (the web form converts mm:ss to seconds). [RESOLVED: `from_s`/`to_s` everywhere (reconcile pass); brainstorm's `from`/`to` superseded] [RESOLVED: nested card shape replaces the flat `globals`/`counts`/`reasons` shape (Tejit 2026-11-20 r6)]
 
 `rules.py` hooks (all optional, pure functions, no I/O): `check_input(input, ctx) -> [Warning]`, `validate_codes(instances, ctx) -> [Adjustment]` (extra rules data cannot express; may only down-count with a reason, never add/relabel), `compute_summary(counts, globals, ctx) -> dict | None` (override of formula data). MITI `rules.py` ships one real hook: warning `reflection_before_client_speech` (a reflection in a volley with no prior other-speaker turn). Everything else is data.
 
 Loader (`engines/paudit/pack.py`): resolves `miti@4.2.1` under `protocols/` (dir configurable) or a path; validates `pack.yaml` against `schemas/pack.schema.json`; checks parity (rating schema keys = item ids; `report.yaml` and `compare` ids exist; prompt files present; formulas parse and reference only known ids; precedence lists subset of group); computes `pack_hash` (sha256 over pack.yaml, rules.py, rating schema, prompts, report.yaml; not fixtures). Errors → typed `PackError` at load, never at run time.
 
 **R2. Pipeline** (`paudit.run(transcript, pack, params, client) -> PauditResult`; engine-interface shape from SP01).
-Params: `speaker_map{subject: <speaker id>}` (required), `change_goal`, `coded_span{from_s,to_s}`, `language` (BCP-47 or `auto`), `n_runs` (default 1), `run_temperature` (default 0.0 for N=1, 0.4 for N>1), `tiers{code,globals}` (default `mid`/`strong`; mapped to models by core registry).
+Params: `speaker_map{subject: <speaker id>}` (required), `change_goal`, `coded_span{from_s,to_s}`, `language` (BCP-47 or `auto`), `n_runs` (default 1), `run_temperature` (default 0.0 for N=1, 0.4 for N>1), `tiers{code,globals}` (default `mid`/`strong`; mapped to models by core registry; both resolve to Claude Sonnet by default, r6).
 1. **Input checks** (code): pack `input_checks` + `check_input` hook → typed error or warnings. Unknown-speaker turns treated as `other` + warning.
 2. **Select** (code): keep turns that overlap `coded_span` (any clinician turn partly inside the span is included whole) (no timestamps + span → warning `span_ignored`); mark subject vs other by `speaker_map`.
 3. **Volleys** (code): consecutive subject turns not broken by another speaker's turn (per pack `volley`) = one volley; `v1..vN`. Other-speaker turns kept as read-only context.
-4. **Code pass** (model, batched): ≈25 volleys per call, each preceded by its previous other-speaker turn as context, batches in parallel. Model returns per volley `utterances[{quote, code|null, rationale}]` (split + code in one call; `code` enum built from pack at runtime; `null` = uncoded). Prompt = pack `code_system.md` + definitions rendered from `pack.yaml` (never duplicated) + few-shot; cache prefix = system+definitions, second = transcript header.
+4. **Code pass** (model, batched): ≈25 volleys per call, each preceded by its previous other-speaker turn as context, batches in parallel. Model returns per volley `utterances[{quote, code|null, rationale}]` (split + code in one call; `code` enum built from pack at runtime; `null` = uncoded). Prompt = pack `code_system.md` + definitions rendered from `pack.yaml` (never duplicated) + few-shot; cache prefix = system+definitions, second = transcript header (Claude prompt caching, `anthropic_ephemeral`; the shared prefix is reused across batches and N runs, and batches and N runs run in parallel, r6).
 5. **Validate/locate** (code): each `quote` located inside its volley's turn text via core `locate` (exact → normalized → guarded fuzzy; code-point offsets, ADR 0002); ordered, non-overlapping, never crossing a turn boundary. Unlocatable/overlapping → utterance dropped + `quote_not_found`/`overlap` warning; >20% of a batch dropped → one retry of that batch; still bad → run fails (no silent partial counts, ADR 0012).
 6. **Rules** (code): apply pack `rules[]` then `validate_codes`. Violations never delete: instance stays with `counted:false` + `uncounted_reason` (`duplicate_in_volley`, `superseded_by_cr`, …) so UI/eval can show why. Winner = first in text order, or `precedence` for groups.
 7. **Counts + summaries** (code): counts over `counted` instances; summaries by safe-AST evaluation of pack formulas (public `paudit.formula.evaluate(expr, values) -> float|None`, reused by SP03 for the clinician's own summaries [RESOLVED: public evaluator (reconcile pass)]); label vs reference (`below_fair|fair|good|null`).
@@ -94,12 +94,12 @@ Params: `speaker_map{subject: <speaker id>}` (required), `change_goal`, `coded_s
 - `run_info` (core builder + `engine:"paudit"`, `protocol:{id,version,pack_hash}`, models per tier, per-stage prompt hashes from the pack, per-call counts). Core hash helper must take a file list (eaudit's is hard-wired). No text in `run_info` or logs.
 - Warning codes: `short_session`, `quote_not_found`, `overlap`, `insufficient_evidence`, `capped`, `span_ignored`, `unknown_speaker`, `language_not_validated`, `run_failed`, plus pack-defined.
 
-**R4. Cost/latency.** 25 min ≈ 4k words ≈ 6k tokens → ~60–120 volleys → 3–5 code calls + 1 globals call per run (~6). Est. input ≈ 30–40k tokens/run, ≈ $0.05–0.15 on Flash+Pro-class routes (estimate; measure in eval). Wall ≈ 20–40 s/run (batches parallel); N runs parallel. Target ≤60 s p95 at N=1 so SP04's 5-min job budget holds at N≤3.
+**R4. Cost/latency.** 25 min ≈ 4k words ≈ 6k tokens → ~60–120 volleys → 3–5 code calls + 1 globals call per run (~6). Est. input ≈ 30–40k tokens/run, ≈ $0.10–0.30 on Claude Sonnet routes with prompt caching (unverified estimate; measure at staging). Wall ≈ 20–40 s/run (batches parallel); N runs parallel. Target ≤60 s p95 at N=1 so SP04's 5-min job budget holds at N≤3.
 
 **R5. Testing / eval.**
 - Unit: pack loader (good + 6 malformed packs), safe-expr evaluator (no names outside items, no calls), rules (duplicate GI, SR+CR in a volley → CR counted, cap on 5), quote locating, volley builder, aggregate, schema validation of result, parity test (rating schema ↔ pack items), toy-protocol pack (2 codes, 1 global) run end-to-end to prove genericity; grep test: no `miti|cct|reflection` strings under `engines/paudit/src`.
 - Stub client (call_tag-keyed callables) for logic tests; one recorded-replay golden (`FixtureClient`) re-recorded when prompts freeze. Fixtures: 3 synthetic role-plays under `protocols/miti-4.2.1/fixtures/` (good practice; poor practice with Persuade/Confront; 8-min short) with `expected.yaml` (per-utterance intended codes, expected counts, global ranges).
-- Eval hook: `eval/datasets/paudit/{metadata.json,adapter.py,…}` same adapter style as `eval/datasets/eaudit/synthetic`; metrics minimal: per-code count MAE, global exact / within-1, %CR error; CLI `python -m paudit.cli run --pack miti@4.2.1 --transcript f.json --params p.json`. No admin wiring (SP07).
+- Eval hook: `eval/datasets/paudit/{metadata.json,adapter.py,…}` same adapter style as `eval/datasets/eaudit/synthetic`; metrics minimal: per-code count MAE, global exact / within-1, %CR error; CLI `python -m paudit.cli run --pack miti@4.2.1 --transcript f.json --params p.json`. No admin wiring (SP07). The eval hook is best effort: the eval harness is not a v1 priority and may break.
 
 ## Architecture
 ```
@@ -128,6 +128,7 @@ Engine owns: pipeline, output-format instructions, response models, locate/valid
 | 11 | Failure | Failed batch → run fails; failed run excluded when N>1 | Partial counts | Wrong counts worse than none (ADR 0012) |
 | 12 | Non-English | Best effort + info warning | Block | Params-only swap; unvalidated |
 | 13 | Version | `pack_format`/result `0.0.1`, hash in run_info | Semver compat | Project rule |
+| 14 | Rating input shape | In-app rating card, nested score/reason/example + count/note + notes; API-enforced char limits | File/paste parsed into a flat schema | Card is the only input (Tejit r6); no parsing risk |
 
 ## Manual steps
 - Tejit: ≥3 real role-play transcripts + ≥1 certified-coder rating each (eval ground truth); confirm citation/permission wording shown in `source`.
@@ -135,9 +136,9 @@ Engine owns: pipeline, output-format instructions, response models, locate/valid
 
 ## Risks / Open Questions
 - [DEFERRED: Tejit supplies transcripts and coder ratings] Utterances crossing a turn boundary (diarizer splits one thought). v1 treats as two utterances; may inflate counts. Measure on real transcripts; build and test on synthetic fixtures now.
-- [OPEN] Volley break: does a client "mm-hm" break a volley? Default: any other-speaker turn breaks; `min_other_words` knob exists.
+- [RESOLVED: any other-speaker turn breaks a volley; `min_other_words` knob exists (Tejit 2026-11-20 r6, accepted default)] Does a client "mm-hm" break a volley?
 - [RESOLVED: include any clinician turn that overlaps the span (Tejit 2026-11-20)] Span selection uses overlap (`start_ms < to_s*1000 and end_ms > from_s*1000`), not `start_ms` containment; turns without `end_ms` fall back to `start_ms`.
-- [DEFERRED: Tejit supplies transcripts and coder ratings] Gemini coding quality vs expert (published AI-vs-expert globals r≈0.34–0.63); prompts/few-shot tuning needs real data. Build and test on synthetic fixtures now.
+- [DEFERRED: Claude Sonnet quality, measured on Tejit's transcripts] Claude Sonnet coding quality vs expert (published AI-vs-expert globals r≈0.34–0.63); prompts/few-shot tuning needs real data. Build and test on synthetic fixtures now.
 - [RESOLVED: admin-only `POST /v1/paudit` on SP07's `admin-backend`; the public API exposes paudit only via sessions/runs (reconcile pass)]
 - [DEFERRED: Tejit supplies transcripts and coder ratings] Prompt wording for "prefer fewer parses" and uncoded categories needs certified-coder review; prompts ship as v1 drafts, reviewed later.
 - [DEFERRED] Self-consistency voting across N runs per utterance; non-English prompts; user packs; caudit reuse of pack format.
@@ -151,4 +152,4 @@ Engine owns: pipeline, output-format instructions, response models, locate/valid
 - `n_runs=3` → 3 results + aggregate with mean/min/max and `representative_run`.
 - `run_info` carries pack id/version/hash, models, prompt hashes; no transcript text in logs.
 - No MITI-specific strings in `engines/paudit/src` (grep test).
-- `python -m paudit.cli run …` works offline with stub; `eval/datasets/paudit/` loads in the eval harness and reports MAE/within-1.
+- `python -m paudit.cli run …` works offline with stub; `eval/datasets/paudit/` loads in the eval harness and reports MAE/within-1 (best effort; skipped if the eval harness is broken).

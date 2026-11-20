@@ -18,7 +18,7 @@ Two PRs. **PR-A (pure move):** `git mv eaudit engines/eaudit`, fix every path, C
 
 ## Goals / Non-Goals
 **Goals:** one `engines/` home; shared core usable by 4 consumers; Claude↔Gemini and STT provider/model/language swaps are config; today's eaudit behaves identically (same fixture keys, same `POST /v1/audit`, same tests).
-**Non-goals:** paudit/pack code (SP02), rating parsing/tips (SP03), API/jobs/storage (SP04), GCP resources (SP06), admin deploy (SP07); changing the eaudit contract (SP03 later adds the optional `profile`, schema `0.0.2`), prompts or 17 checks; renaming `iaudit_eval` or `IAUDIT_*`; live Gemini quality tuning (Open Risk, not SP01).
+**Non-goals:** paudit/pack code (SP02), rating validation/tips (SP03), API/jobs/storage (SP04), GCP resources (SP06), admin deploy (SP07); changing the eaudit contract (SP03 later adds the optional `profile`, schema `0.0.2`), prompts or 17 checks; renaming `iaudit_eval` or `IAUDIT_*`; provider quality tuning (Claude Sonnet quality is measured in SP02/SP03 on Tejit's transcripts; Gemini/Vertex is at most an optional future route).
 
 ## Requirements
 **R1 Move (PR-A).** `git mv eaudit engines/eaudit` (history kept). Fix, all verified by grep (52 non-historical files contain `eaudit/`; most are docs):
@@ -51,7 +51,7 @@ Unchanged (verified): `frontend/vite.config.ts` proxies only `/eval-api` → :81
 **R3 Model-route registry.** Config file (YAML; default shipped in core; override path env `ROUTES_FILE`, with `IAUDIT_LLM_ROUTES_FILE` kept as an alias; deployed environments point it at `config/{env}/routes.yaml`, SP06 R14). Each route name (the tiers `cheap|mid|strong` remain valid names; engines add their own, e.g. SP03's `parse` and `tips`; SP02 maps its `tiers{code,globals}` params to `mid`/`strong` by default):
 ```yaml
 cheap:
-  litellm_id: anthropic/claude-haiku-5-5
+  litellm_id: anthropic/claude-sonnet-5-5   # r6: every shipped default route is Claude Sonnet; swap any route by editing this file
   provider: anthropic            # anthropic | vertex_ai | openai | …
   structured_output_mode: json_object   # json_object | json_schema | tool_call
   caching_mode: anthropic_ephemeral     # anthropic_ephemeral | none | provider_implicit
@@ -59,18 +59,20 @@ cheap:
   phi_allowed: true
   extra_params: {thinking: {type: disabled}}   # provider quirks live here, not in code
 ```
+**Default routes (r6).** `cheap`, `mid`, `strong` and every engine-added route (`tips`, etc.) all default to `anthropic/claude-sonnet-5-5` through the existing LiteLLM client; the Anthropic API is called directly with `ANTHROPIC_API_KEY` (Secret Manager in deploy, env var locally). Google is used for speech-to-text only; Gemini/Vertex stays an optional future route (the `vertex_ai` route format keeps working) and nothing in v1 defaults to it. `caching_mode: anthropic_ephemeral` stays on so engines can cache shared prefixes (pack + transcript) across calls and N runs. Swapping a model stays a config edit. [RESOLVED: Claude Sonnet for all LLM work (Tejit 2026-11-20 r6)]
 `LLMRequest.tier` becomes "route name" (type `str`, same values today, so fixture keys `tier|call_tag|…` stay byte-identical). Back-compat: `IAUDIT_MODEL_CHEAP/MID/STRONG` and `IAUDIT_LLM_RESPONSE_FORMAT` override the default route's `litellm_id` / `structured_output_mode`. Client reads mode, caching and `extra_params` from the route, so a Gemini route is a YAML edit. `phi_allowed=false` routes are rejected at startup when `IAUDIT_PHI_MODE=1` (default off; Tejit owns legal). `run_info.models` reports route → `litellm_id`. **Presets.** The same file may carry a top-level `presets:` map, each preset a named bundle `{routes: {route_name: <route overrides>}, stt: {provider, model, location?}}`; env `DEFAULT_PRESET` (default `default`) names the preset used when a caller names none. The preset names in the file are the allowlist SP04 exposes to users (`preset` param, `GET /v1/presets`); users never pass raw routes or STT params. Core exposes `resolve_preset(name) -> (routes view, SttParams)`; an unknown name raises `InputError`. [RESOLVED: presets live in the routes file, default chosen by `DEFAULT_PRESET` (reconcile pass)]
 
 **R4 STT interface (core).**
 ```python
 class SttParams(BaseModel):
     provider: str = "google"; model: str = "chirp_3"
+    recognition: str = "standard"   # r6: standard recognition (not dynamic batch)
     language: str = "auto"          # BCP-47 or "auto"
     diarization: bool = True; speakers: int = 2
     location: str = "us"           # Chirp 3 is offered in multi-regions us/eu, not us-central1 (SP06 R3); env STT_LOCATION / STT_ENDPOINT override
 async def transcribe(audio_uri: str, params: SttParams) -> Transcript   # turns carry speaker label + start_ms/end_ms
 ```
-Adapters: `GoogleChirp3` (Speech-to-Text v2, recognizer location `us` multi-region via endpoint `us-speech.googleapis.com`, `gs://` URIs, diarization config min/max speakers = `speakers`, ADC auth, no keys in code); `FixtureStt` (replays recorded `Transcript` JSON by audio-uri hash; used by tests, api stub, CI). Per-language provider map in `stt/providers.yaml` (override path env `STT_PROVIDERS_FILE`; deployed: `config/{env}/stt_providers.yaml`; `default: {provider, model}`, `by_language: {xx: {…}}`) so Whisper+diarizer can be added later as an adapter without touching callers. Word-level diarized output is merged into turns by speaker change; adapter never invents speakers or timestamps (mission rule).
+Adapters: `GoogleChirp3` (Speech-to-Text v2, recognizer location `us` multi-region via endpoint `us-speech.googleapis.com`, `gs://` URIs, standard (not dynamic-batch) recognition (long audio via `BatchRecognize` with the default processing strategy, since sync `Recognize` is capped at about 1 min; confirm in the spike), diarization config min/max speakers = `speakers`, ADC auth, no keys in code); `FixtureStt` (replays recorded `Transcript` JSON by audio-uri hash; used by tests, api stub, CI). Per-language provider map in `stt/providers.yaml` (override path env `STT_PROVIDERS_FILE`; deployed: `config/{env}/stt_providers.yaml`; `default: {provider, model}`, `by_language: {xx: {…}}`) so Whisper+diarizer can be added later as an adapter without touching callers. Word-level diarized output is merged into turns by speaker change; adapter never invents speakers or timestamps (mission rule).
 
 **R5 Transcript types.** `Turn{id, speaker:str|None, text, start_ms:int|None, end_ms:int|None, role:str|None, language:str|None}`, `Transcript{turns, language, duration_ms, stt_run:dict}`, `Span{turn_id, start, end}` (code-point offsets, ADR 0002). `eaudit.models.audit.Turn` (API contract, `timestamp: str`, extra=forbid) is NOT replaced; core ships `Transcript.from_eaudit_turns()/to_eaudit_turns()` helpers (ms ↔ `"mm:ss"` string) so api can feed STT output to eaudit.
 
@@ -87,7 +89,7 @@ class PackRef(BaseModel): id: str; version: str; path: str   # SP02 defines pack
 
 **R7 PHI-safe logging.** `onolys_core.safe_log` keeps the allowlist + blocked name parts (`text, body, transcript, excerpt, message`) and 200-char cap; logger name stays `"iaudit"` (tests use it [verified: 9 `logger="iaudit"` hits]). Base allowlist is generic (request ids, status, counts, tokens, latency, models); engines add theirs via `register_fields(frozenset)` (eaudit registers today's list, so output is identical). New generic fields for STT/jobs: `audio_ms, stt_provider, stt_model, language, speakers, job_id, step`. Audio URIs, transcript text, ratings are never loggable. Unit test: every blocked pattern dropped; a log of a full STT call contains no text.
 
-**R8 Workspace + packaging.** Root `pyproject.toml` (virtual) with `[tool.uv.workspace] members = ["engines/*", "api", "admin/*"], exclude = ["eval"]`; one root `uv.lock` (members over time: `engines/{core,eaudit}`, then `engines/{paudit,evaluation}` (SP02/SP03), `api` (SP04), `admin/{auth,backend}` (SP07)). `engines/eaudit` depends on `onolys-core = { workspace = true }`. `eval/` stays standalone with its own `uv.lock` (its boundary test forbids importing engines). CI: `uv sync --frozen --package eaudit` etc. from repo root; cache glob `uv.lock`. Core optional extra `stt-google` (`google-cloud-speech`) keeps the eaudit install light.
+**R8 Workspace + packaging.** Root `pyproject.toml` (virtual) with `[tool.uv.workspace] members = ["engines/*", "api", "admin/*"], exclude = ["eval"]`; one root `uv.lock` (members over time: `engines/{core,eaudit}`, then `engines/{paudit,evaluation}` (SP02/SP03), `api` (SP04), `admin/{auth,backend}` (SP07)). `engines/eaudit` depends on `onolys-core = { workspace = true }`. `eval/` stays standalone with its own `uv.lock` (its boundary test forbids importing engines). The eval harness is not a v1 priority and may break: fix it if cheap, otherwise disable or skip the eval-related CI jobs that block; do not hack around it. [RESOLVED (Tejit 2026-11-20 r6)] CI: `uv sync --frozen --package eaudit` etc. from repo root; cache glob `uv.lock`. Core optional extra `stt-google` (`google-cloud-speech`) keeps the eaudit install light.
 
 **R9 Docs and mission.** `docs/mission.md`: add "Platform scope" (evidence audit = eaudit; protocol audit = paudit, scoring and protocol review against a protocol pack; clinician audit = caudit, future); replace "Our boundaries / No interview administration or protocol review" and the "does not … assign scores" lines with a scoped version stating those are now in scope per Tejit 2026-11-20 but live in other engines; the 17-check list and eaudit's "not a clinical-correctness judge" stance stay verbatim. `AGENTS.md` line 3 rewritten likewise; docs table gains `engines/`. New ADR 0017 (workspace, routes, shared core). `docs/implementation/llm-client.md` repathed + routes section.
 
@@ -115,23 +117,24 @@ Data flow for the platform: `audio_uri → stt.transcribe → Transcript → Eng
 ## Manual steps
 - Branch protection: none today [verified: `gh api …/branches/main/protection` → 404 "Branch not protected"]. If Tejit adds required checks, job names `eaudit` and `frontend` must be kept (this PRD keeps them).
 - Tejit: confirm Speech-to-Text v2 API enabled on project `onolys` and Chirp 3 usable in the `us` multi-region (SP06 R3); ADC quota project must be `onolys` (brief: currently `juno-medical-clarity`).
+- Tejit adds the Anthropic API key (`ANTHROPIC_API_KEY`) to Secret Manager (SP06 R10); every default LLM route needs it.
 - Tejit supplies a short 2-speaker audio sample for the Chirp 3 diarization check.
 
 ## Risks / Open Questions
-- [OPEN] Does dynamic-batch pricing support `chirp_3` diarization? Cheapest test: one API call in the STT adapter spike; fallback is standard recognizer pricing.
-- [RESOLVED: STT location `us` multi-region; Vertex stays `us-central1` (reconcile pass)] Chirp 3 is only documented for `us`/`eu` multi-regions (SP06 R3); accepted deviation from single-region, recorded in ADR 0017 and SP06's ADR.
-- [OPEN] `uv` behaviour for an excluded standalone `eval/` under a workspace root; verify with `uv sync --project eval` before merging PR-A/B (fallback: D1 alternative, path deps). Also confirm uv tolerates member paths that do not exist yet (`api`, `admin/*`); else add each member as its SP lands.
-- [OPEN] Whether `structured_output_mode=json_schema` works for Gemini on Vertex via LiteLLM for all eaudit schemas; SP01 ships the switch, SP02/SP03 evaluate quality.
+- [RESOLVED: standard (non-dynamic-batch) recognition; cost not a concern (Tejit 2026-11-20 r6)] The dynamic-batch pricing / `chirp_3` diarization question is moot.
+- [RESOLVED: STT location `us` multi-region (reconcile pass); data-residency claims dropped (Tejit 2026-11-20 r6)] Chirp 3 is only documented for `us`/`eu` multi-regions (SP06 R3); no residency claim is made; recorded in ADR 0017 and SP06's ADR.
+- [RESOLVED: eval may break; fix if cheap, otherwise disable/skip the eval CI job; not a hack priority (Tejit 2026-11-20 r6)] `uv` behaviour for an excluded standalone `eval/` under a workspace root; verify with `uv sync --project eval` before merging PR-A/B (fallback: D1 alternative, path deps). Also confirm uv tolerates member paths that do not exist yet (`api`, `admin/*`); else add each member as its SP lands.
+- [RESOLVED: default LLM is Claude Sonnet via the Anthropic API with today's json_object/tool_call modes; `json_schema` for Gemini on Vertex is an optional future route, not evaluated in v1 (Tejit 2026-11-20 r6)] SP01 still ships the `json_schema` switch.
 - [RESOLVED: no change needed] frontend dev proxy and `vite.config.ts` have no `eaudit/` paths.
 - [RESOLVED: keep] fixture keys use `tier|call_tag|…`; route names equal old tier names so recordings stay valid.
 - [DEFERRED] `ONOLYS_*` rename; removal of shims; Whisper adapter; `caudit`.
 
 ## Acceptance Criteria
 1. `eaudit/` no longer exists; `engines/eaudit/` holds it; `git log --follow` works; `grep -rIn "[^s/]eaudit/src" . --exclude-dir=agent_files` finds no stale path.
-2. PR-A: `cd engines/eaudit && uv run pytest -q` passes the same test count as on `main`; `cd eval && uv run pytest -q` and `cd frontend && npm test` pass; CI jobs `eaudit`, `frontend` green; nightly `eval-oracle` dry-run (`workflow_dispatch`) green.
+2. PR-A: `cd engines/eaudit && uv run pytest -q` passes the same test count as on `main`; `cd frontend && npm test` passes; CI jobs `eaudit`, `frontend` green; `cd eval && uv run pytest -q` and the nightly `eval-oracle` dry-run are best-effort (eval is not a v1 priority; a blocking eval job may be disabled/skipped).
 3. PR-B: same eaudit tests pass untouched (only shims added); fixture-replay tests need no re-recording; `POST /v1/audit` response for a recorded example is byte-identical to before.
 4. `onolys_core` imports with no eaudit/paudit/api import (boundary test); `uv run --package onolys-core pytest` covers routes, STT fixture adapter, safe_log, retry.
-5. A route file with a Gemini route (`vertex_ai/gemini-…`, `json_schema`, `caching_mode: none`, no `thinking`) is accepted and `LiteLLMClient` builds kwargs from it with a fake `acompletion` (test); no code change needed to swap; a `presets:` entry + `DEFAULT_PRESET` select it and `ROUTES_FILE`/`STT_PROVIDERS_FILE` redirect the loaders (tests).
+5. A route file with a Gemini route (`vertex_ai/gemini-…`, `json_schema`, `caching_mode: none`, no `thinking`) is accepted and `LiteLLMClient` builds kwargs from it with a fake `acompletion` (test); no code change needed to swap; a `presets:` entry + `DEFAULT_PRESET` select it and `ROUTES_FILE`/`STT_PROVIDERS_FILE` redirect the loaders (tests); every shipped default route resolves to `anthropic/claude-sonnet-5-5` with the key read from `ANTHROPIC_API_KEY`.
 6. `FixtureStt` returns a `Transcript` with ≥2 speaker labels and `start_ms/end_ms`; `GoogleChirp3` request builder unit-tested offline (diarization min/max = 2, language `auto` handled, location `us` → endpoint `us-speech.googleapis.com`).
 7. A log-capture test shows no transcript/audio text or URI in any core log line.
 8. `docs/mission.md` and `AGENTS.md` state the widened scope, keep the 17 checks; `docs/decisions/0017-*` exists; no broken relative links (`grep` link check).

@@ -44,6 +44,12 @@ Clinicians learning MI rate their own practice sessions but get no second opinio
 | Spend: Tejit sets a monthly GCP budget; app enforces a configurable per-user daily run cap, default 20 (Tejit + Claude default) | No cap | Cost safety |
 | Move engines under one `engines/` folder (`engines/core`, `engines/eaudit`, `engines/paudit`); rework of CI/eval paths accepted (Tejit) | Keep top-level siblings | Tejit: one engines folder |
 | Landing: top right = Sign up + Log in; every early-access CTA becomes "Try it out" → app sign-up; early-access component kept (Tejit 2026-11-20) | "Try it out" in top bar only | Tejit's call |
+| Models: Google only for speech-to-text; ALL LLM work (coding, globals, tips, eaudit stages) on Claude Sonnet `anthropic/claude-sonnet-5-5` via the Anthropic API through LiteLLM; routes stay swappable by config (Tejit r6) | Gemini on Vertex as default LLM | Eaudit is tuned on Claude; one key, fewer moving parts; ship fast |
+| STT: Google Speech-to-Text v2 Chirp 3 standard recognition from `us`; cost not a concern; no data-residency claims, no BAA work (Tejit r6) | Dynamic batch pricing; single-region/residency engineering | Simpler and faster; legal is Tejit's |
+| Rating input = in-app rating card only (scores, reasons, counts, notes, change goal, coded span) plus one free-text "Additional notes" box audited by eaudit as extra claims; no file upload, paste-to-parse or parser model (Tejit r6) | Paste + file upload (docx/pdf/xlsx/txt) parsed by a model, user confirms | No parsing step or confirm gate; user fills the card while transcription runs |
+| Async: every mutation returns at once (202 + ids); worker writes a PHI-free `session_status/{id}` Firestore doc; web subscribes with `onSnapshot`; rules allow owner read only, all writes server-only (Tejit r6) | 3 s polling with ETag; Firestore fully client-denied | Faster feel, less load |
+| Auth: no two-factor/MFA anywhere; admin = Identity Platform sign-in limited to an email allowlist; password min 8 chars, no other rules (Tejit r6) | TOTP MFA for admin and optionally users | Ship fast |
+| Admin: `admin.onolys.com` = today's eaudit review UI + new paudit tab only; eval server/Eval tab, `admin-eval` service, GCS FUSE volume and admin data bucket not deployed in v1 (Tejit r6) | Deploy eval server with GCS-backed storage | Eval harness is not a priority and may break |
 
 ## Design
 
