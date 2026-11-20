@@ -1,4 +1,9 @@
 import type { RouteObject } from "react-router";
+import { ForgotPassword } from "../auth/pages/ForgotPassword";
+import { Login } from "../auth/pages/Login";
+import { Signup } from "../auth/pages/Signup";
+import { VerifyEmail } from "../auth/pages/VerifyEmail";
+import { PublicOnly, RequireUnverified, RequireVerified } from "../auth/guards";
 import { Layout } from "./Layout";
 import * as P from "./placeholders";
 
@@ -6,16 +11,26 @@ export const routes: RouteObject[] = [
   {
     element: <Layout />,
     children: [
-      { path: "/signup", element: <P.Signup /> },
-      { path: "/login", element: <P.Login /> },
-      { path: "/forgot-password", element: <P.ForgotPassword /> },
-      { path: "/verify-email", element: <P.VerifyEmail /> },
-      { path: "/", element: <P.Dashboard /> },
-      { path: "/sessions/new", element: <P.NewSession /> },
-      { path: "/sessions/:id", element: <P.SessionDetail /> },
-      { path: "/sessions/:id/reports/:version", element: <P.ReportPage /> },
+      {
+        element: <PublicOnly />,
+        children: [
+          { path: "/signup", element: <Signup /> },
+          { path: "/login", element: <Login /> },
+          { path: "/forgot-password", element: <ForgotPassword /> },
+        ],
+      },
+      { element: <RequireUnverified />, children: [{ path: "/verify-email", element: <VerifyEmail /> }] },
+      {
+        element: <RequireVerified />,
+        children: [
+          { path: "/", element: <P.Dashboard /> },
+          { path: "/sessions/new", element: <P.NewSession /> },
+          { path: "/sessions/:id", element: <P.SessionDetail /> },
+          { path: "/sessions/:id/reports/:version", element: <P.ReportPage /> },
+          { path: "/settings", element: <P.Settings /> },
+        ],
+      },
       { path: "/sample-report", element: <P.SampleReport /> },
-      { path: "/settings", element: <P.Settings /> },
       { path: "*", element: <P.NotFound /> },
     ],
   },

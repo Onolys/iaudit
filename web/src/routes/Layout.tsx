@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
+import { useAuth } from "../auth/AuthProvider";
 
 export function Layout() {
   const { pathname } = useLocation();
+  const { status } = useAuth();
   const mainRef = useRef<HTMLElement>(null);
 
   // A11y (R8): after each route change move focus to the page h1.
@@ -12,7 +14,7 @@ export function Layout() {
       h1.setAttribute("tabindex", "-1");
       h1.focus();
     }
-  }, [pathname]);
+  }, [pathname, status]);
 
   return (
     <div className="app">

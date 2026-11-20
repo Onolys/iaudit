@@ -10,10 +10,6 @@ function Page({ title, children }: { title: string; children?: ReactNode }) {
   );
 }
 
-export const Signup = () => <Page title="Sign up" />;
-export const Login = () => <Page title="Log in" />;
-export const ForgotPassword = () => <Page title="Reset your password" />;
-export const VerifyEmail = () => <Page title="Verify your email" />;
 export const Dashboard = () => <Page title="Sessions" />;
 export const NewSession = () => <Page title="New session" />;
 export const SessionDetail = () => {

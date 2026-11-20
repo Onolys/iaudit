@@ -27,3 +27,13 @@ main { flex: 1; width: 100%; max-width: 64rem; margin: 0 auto; padding: var(--sp
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Auth forms (SP05 T3) */
+.auth-form { display: grid; gap: var(--space-4); max-width: 26rem; }
+.auth-form label { display: grid; gap: var(--space-1); font-weight: 600; }
+.auth-form input { padding: 0 var(--space-3); border: 1px solid var(--color-gray-300); border-radius: 6px; font: inherit; }
+.auth-form .primary { background: var(--color-accent); color: var(--color-on-accent); border: 0; border-radius: 6px; font: inherit; padding: 0 var(--space-4); }
+.auth-form .secondary { background: var(--color-background); color: var(--color-accent); border: 1px solid var(--color-accent); border-radius: 6px; font: inherit; padding: 0 var(--space-4); }
+.auth-form button:disabled { opacity: 0.6; }
+.form-error { border: 1px solid var(--color-score-low); background: var(--color-score-low-background); color: var(--color-score-low); padding: var(--space-3); border-radius: 6px; }
+.form-note { color: var(--color-gray-600); }
