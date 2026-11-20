@@ -5,3 +5,14 @@ Checks whether a written assessment faithfully represents the interview evidence
 [Mission](docs/mission.md) · [Docs](docs/) · [Review UI](frontend/README.md) · [Backend](eaudit/README.md) · [Contract](docs/contracts/README.md)
 
 Getting started: [local setup and live verification](docs/testing/local-setup.md).
+
+## Claude Code skills (thepass)
+
+Open this repo in Claude Code and trust the folder: it prompts to install the `thepass` marketplace and plugin (declared in `.claude/settings.json`).
+
+Manual fallback:
+
+```
+/plugin marketplace add tejitpabari99/thepass
+/plugin install thepass@thepass
+```

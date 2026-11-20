@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "thepass": {
+      "source": { "source": "github", "repo": "tejitpabari99/thepass" }
+    }
+  },
+  "enabledPlugins": {
+    "thepass@thepass": true
+  }
+}
