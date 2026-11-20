@@ -89,7 +89,29 @@ Findings:
 
 Cleanup: 3 sessions deleted (204, then 404; includes the session of the failed first PUT), bucket prefix for the user empty, `api_keys`, `users` and `usage` docs for the test user removed (key now 401), test user deleted (lookup returns no account).
 
+## Task 10: forced failures and failure alert
+
+Same sample, staging, deployed sha `a47d593`, one session (N=1, language `auto`, rated card with change goal + notes). Test user created and deleted via Identity Toolkit. Alert policies `Onolys failed step/run (staging)` and `Onolys api 5xx rate (staging)` checked through the Monitoring API before the runs: both exist, enabled, channel `Onolys owner email`.
+
+| # | Run | Result | Run doc | Time |
+|---|---|---|---|---|
+| 0 | `default` (auto after speakers confirm) | `report_ready`, report v1 | `done`, 1 attempt | 67.3 s |
+| 1 | `test-broken-llm` | **session `failed`, `error_code=internal_error`** (expected `upstream_unavailable`): NOT MET | `failed`, 1 attempt (expected both attempts) | 0.9 s (POST -> ended) |
+| 2 | `default` (run again, same session) | `report_ready`, report v2 | `done`, 1 attempt | 42.3 s |
+| 3 | `test-broken-eaudit` | `report_ready`, report v3; `reasons_audit.status=failed` (0 items); warnings `short_session`, `reflection_before_client_speech`, `reasons_audit_failed`; `run_info.eaudit` null | `done`, 1 attempt | 44.6 s |
+
+Broken-LLM failure (run 1), request_id `4202fe4c62b746d0bbbbb5209c436e3d` (the `X-Request-Id` of `POST /runs`):
+
+- Runbook query (`docs/reference/infra.md`, `jsonPayload.request_id="<id>" AND jsonPayload.status="failed"`, `entries:list`, `orderBy timestamp desc`) returns exactly one line: `onolys-worker-staging`, 22:01:00.348Z, `event run_failed`, `step run`, `error_code internal_error`, `exc_class AllRunsFailed`. Without the `status` term the request_id returns 2 lines (the api request line 22:00:59.405Z and the failed line). With `orderBy timestamp asc` and no time bound the same filter returned nothing; use `desc` or a `timestamp>=` bound.
+- Cause chain from the worker logs: paudit `run_index=0` failed with `exc_class=LLMUnavailable` (litellm `NotFound` for the made-up model, 3 route calls in 0.7 s), then `AllRunsFailed`. `error_map._classify` maps `AllRunsFailed` (an `OnolysError`, code `run_failed`) to `internal_error`, not retryable, so there was no second attempt and no `upstream_unavailable`. See Open.
+- Alert: one incident, policy `Onolys failed step/run (staging)` (id `3934617429481960380`), alert `0.of8xgp0aphrb`, opened 2026-11-20 22:02:11Z (71 s after the log line), state OPEN at check time (auto-close 1800 s; notification rate limit 300 s). It is the only incident for this policy since the earlier synthetic-line one (21:06:27Z-21:40:50Z, closed). Exactly one `status=failed` line for the run (the broken-eaudit run wrote none: it ends `report_ready`, as required). Email arrival to the owner inbox not checked by the agent (orchestrator to confirm).
+- Rate tier: not a factor; the broken routes never reach the provider, runs 0, 2, 3 completed in 42-67 s with 1 attempt, no back-off seen.
+
+Cleanup: session deleted (204, then 404), bucket prefix for the user empty (`onolys-audio-staging`), `users` and `usage` docs removed (no `api_keys` doc was created), test user deleted (lookup returns no account).
+
 ## Open
+
+- **Task 10: broken-LLM run ends `internal_error`, one attempt, not `upstream_unavailable` after two (R3, D3, AC7).** `paudit.engine.run` catches each run's `LLMError` and raises a fresh `AllRunsFailed` outside the `except`, so the cause is lost; `error_map._classify` then sees a plain `OnolysError` -> `internal_error`. Proposed fix (test-first, paudit + api): in `engine.run`, keep the first caught exception and `raise AllRunsFailed(...) from first_exc`; in `error_map._classify`, before the `OnolysError` branch, walk `__cause__` and map a chained `LLMError` (not `FixtureMiss`) to `(UPSTREAM, True)`. Re-verify on staging after deploy. Offline mapping tests (Tasks 1, 5) did not cover an engine-wrapped LLM failure.
 
 - The task's 10-25 min recording size is not met: the only real sample is 6.7 min. Run time scales with audio length, so a 10-25 min recording should be re-measured when one is available (the 85 s transcribe step is the part that grows).
 - No SP01 p95 figure to compare against (see above).
