@@ -331,6 +331,21 @@ compare:
 
 # Owned and filled by SP03.
 evaluation:
+  # Reasons audit (SP03 R3): eaudit audit profile for the clinician's own rating reasons.
+  # Names are eaudit ConcernType values (a test validates them). Kept types (not listed) test
+  # whether the cited behaviour or client statement happened as described.
+  reasons_audit:
+    suppress_concerns:
+      - timeframe_mismatch  # one short session: no past/present drift to catch
+      - quantity_mismatch  # tallies are compared per item by compare
+      - calculation_error  # tallies are compared per item by compare
+      - opinion_as_fact  # a rating rationale is interpretive by nature
+      - unsupported_causal_link
+      - unsupported_inference
+      - conflicting_accounts_flattened  # one client, no competing sources
+    context_note: >-
+      This is the interviewer's own rating of their conduct. First person refers to the
+      interviewer (speaker role interviewer); item names are protocol codes.
   # Tone rules (SP03 R6). Phrases match whole words, case-insensitive; patterns are regexes
   # (case-insensitive) aimed at second-person verdicts. Applied in code to every
   # model-authored string and, by a unit test, to every static string in report.yaml.
