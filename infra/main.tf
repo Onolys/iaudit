@@ -101,17 +101,19 @@ locals {
 module "staging" {
   source = "./modules/environment"
 
-  project              = var.project
-  region               = var.region
-  env                  = "staging"
-  database_id          = "staging"
-  delete_protection    = false
-  worker_concurrency   = var.worker_concurrency
-  worker_max_instances = var.worker_max_instances
-  api_max_instances    = 3
-  llm_secrets          = local.llm_secret_ids
-  stt_secrets          = local.stt_secret_ids
-  admin_enabled        = var.admin_enabled
+  project                  = var.project
+  region                   = var.region
+  env                      = "staging"
+  database_id              = "staging"
+  delete_protection        = false
+  worker_concurrency       = var.worker_concurrency
+  worker_max_instances     = var.worker_max_instances
+  api_max_instances        = 3
+  llm_secrets              = local.llm_secret_ids
+  stt_secrets              = local.stt_secret_ids
+  admin_enabled            = var.admin_enabled
+  alerts_enabled           = var.staging_alerts
+  notification_channel_ids = [google_monitoring_notification_channel.owner_email.id]
   admin_cors_origins = [
     "https://${var.admin_staging_site_id}.web.app",
     "http://localhost:5173",

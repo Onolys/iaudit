@@ -95,3 +95,15 @@ variable "git_sha" {
   type        = string
   default     = "unset"
 }
+
+variable "alerts_enabled" {
+  description = "Create the failure alert policies (prod true; staging via staging_alerts)."
+  type        = bool
+  default     = false
+}
+
+variable "notification_channel_ids" {
+  description = "Monitoring notification channel ids for the failure alerts."
+  type        = list(string)
+  default     = []
+}

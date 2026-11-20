@@ -21,8 +21,21 @@ variable "staging_alerts" {
 }
 
 variable "monthly_budget_usd" {
-  type    = number
-  default = 50
+  description = "Monthly budget in USD (alerts only, no spend cap)."
+  type        = number
+  default     = 20
+}
+
+variable "alert_email" {
+  description = "Owner email for budget and failure alerts (Monitoring channel needs a verification click)."
+  type        = string
+  default     = "tejitpabari99@gmail.com"
+}
+
+variable "billing_account_id" {
+  description = "Billing account linked to the project (from cloudbilling projects/onolys/billingInfo)."
+  type        = string
+  default     = "0175C5-F7E3DF-EE9F98"
 }
 
 variable "llm_secrets" {
