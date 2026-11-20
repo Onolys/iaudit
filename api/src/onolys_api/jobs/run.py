@@ -31,6 +31,7 @@ from onolys_core.engine import RunContext
 
 from onolys_api import logs
 from onolys_api.adapters.base import AdapterError, Evaluation
+from onolys_api.adapters.error_map import to_public
 from onolys_api.jobs import caps
 from onolys_api.jobs.machine import RUN_START_PROGRESS, STAGE_WEIGHTS, advance
 from onolys_api.jobs.queue import MAX_ATTEMPTS
@@ -104,8 +105,9 @@ def make_run_handler(
             if not retryable or ctx.attempt >= MAX_ATTEMPTS:
                 release_once(repo, uid, sid, run_id, not started["llm"], date)
             raise
-        except Exception:
-            release_once(repo, uid, sid, run_id, not started["llm"], date)
+        except Exception as e:
+            if not to_public(e, ctx.attempt)[1] or ctx.attempt >= MAX_ATTEMPTS:
+                release_once(repo, uid, sid, run_id, not started["llm"], date)
             raise
         release_once(repo, uid, sid, run_id, False, date)
 

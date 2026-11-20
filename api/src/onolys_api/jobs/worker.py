@@ -2,7 +2,8 @@
 
 Per delivery: claim the step/run record (lease = deadline + 60 s), run the handler, then
 - success: record `done` (unless the handler finishes the step itself: `complete=False`);
-- PermanentError / unexpected exception: record `failed` + error code, answer 2xx (no retry);
+- PermanentError: record `failed` + error code, answer 2xx (no retry);
+- any other exception: `error_map.to_public` picks the public code and retry rule (SP09 R3);
 - RetryableError / TimeoutError: if another attempt is left (X-CloudTasks-TaskRetryCount + 1 <
   MAX_ATTEMPTS) release the claim and answer 503 so Cloud Tasks retries; on the last attempt
   record `failed` and answer 2xx.
@@ -18,6 +19,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Literal
 
 from onolys_api import logs
+from onolys_api.adapters.error_map import to_public
 from onolys_api.errors import ApiError
 from onolys_api.jobs.machine import advance
 from onolys_api.jobs.queue import MAX_ATTEMPTS, TaskPayload, TaskQueue
@@ -162,7 +164,10 @@ class TaskRunner:
         except TaskError as e:
             return self._on_error(spec, payload, e, last)
         except Exception as e:
-            return self._on_error(spec, payload, PermanentError("internal_error"), last, e)
+            stage = "stt" if spec.step == "transcribe" else "run"
+            code, retryable = to_public(e, attempt, stage)
+            err = RetryableError(code) if retryable else PermanentError(code)
+            return self._on_error(spec, payload, err, last, e)
 
     # ---- records ----
 
