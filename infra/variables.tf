@@ -47,3 +47,25 @@ variable "worker_max_instances" {
   type        = number
   default     = 3
 }
+
+# Hosting site ids are globally unique across Firebase. If one is taken, use the
+# `onolys-miti-app*` fallbacks (PRD R11) and record which in docs/reference/infra.md.
+variable "app_site_id" {
+  type    = string
+  default = "onolys-app"
+}
+
+variable "app_staging_site_id" {
+  type    = string
+  default = "onolys-app-staging"
+}
+
+variable "admin_site_id" {
+  type    = string
+  default = "onolys-admin"
+}
+
+variable "admin_staging_site_id" {
+  type    = string
+  default = "onolys-admin-staging"
+}
