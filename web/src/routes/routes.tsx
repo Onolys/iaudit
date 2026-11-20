@@ -4,6 +4,8 @@ import { Login } from "../auth/pages/Login";
 import { Signup } from "../auth/pages/Signup";
 import { VerifyEmail } from "../auth/pages/VerifyEmail";
 import { PublicOnly, RequireUnverified, RequireVerified } from "../auth/guards";
+import { Dashboard } from "../features/dashboard/Dashboard";
+import { SampleReportPage } from "../features/report/SampleReportPage";
 import { ReportPage } from "../features/report/ReportPage";
 import { NewSessionPage } from "../features/upload/NewSessionPage";
 import { SessionPage } from "../features/session/SessionPage";
@@ -26,14 +28,14 @@ export const routes: RouteObject[] = [
       {
         element: <RequireVerified />,
         children: [
-          { path: "/", element: <P.Dashboard /> },
+          { path: "/", element: <Dashboard /> },
           { path: "/sessions/new", element: <NewSessionPage /> },
           { path: "/sessions/:id", element: <SessionPage /> },
           { path: "/sessions/:id/reports/:version", element: <ReportPage /> },
           { path: "/settings", element: <P.Settings /> },
         ],
       },
-      { path: "/sample-report", element: <P.SampleReport /> },
+      { path: "/sample-report", element: <SampleReportPage /> },
       { path: "*", element: <P.NotFound /> },
     ],
   },

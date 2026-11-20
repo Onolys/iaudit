@@ -10,8 +10,6 @@ function Page({ title, children }: { title: string; children?: ReactNode }) {
   );
 }
 
-export const Dashboard = () => <Page title="Sessions" />;
-export const SampleReport = () => <Page title="Sample report" />;
 export const Settings = () => <Page title="Settings" />;
 export const NotFound = () => (
   <Page title="Page not found">

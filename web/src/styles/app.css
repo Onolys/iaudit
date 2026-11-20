@@ -129,3 +129,9 @@ main { flex: 1; width: 100%; max-width: 64rem; margin: 0 auto; padding: var(--sp
   .report-table th, .report-table td { display: block; border: 0; padding: var(--space-1) 0; }
   .report-table td[data-label]::before { content: attr(data-label) ": "; font-weight: 600; }
 }
+.session-list { list-style: none; padding: 0; }
+.session-row { padding: var(--space-3) 0; border-bottom: 1px solid var(--color-gray-300); }
+.chip[data-tone="progress"] { color: var(--color-accent); border-color: var(--color-accent); }
+.chip[data-tone="wait"] { color: var(--color-score-fair); background: var(--color-score-fair-background); border-color: var(--color-score-fair); }
+.chip[data-tone="done"] { color: var(--color-score-good); background: var(--color-score-good-background); border-color: var(--color-score-good); }
+.chip[data-tone="failed"] { color: var(--color-score-low); background: var(--color-score-low-background); border-color: var(--color-score-low); }
