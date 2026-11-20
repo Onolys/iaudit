@@ -14,7 +14,12 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from onolys_api.config import Settings
 from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse, error_body
+from onolys_api.factory import build_blobs, build_repo
 from onolys_api.queue import InMemoryQueue
+from onolys_api.repo.base import Repo
+from onolys_api.storage.base import BlobStore
+from onolys_api.storage.fake import FakeBlobStore
+from onolys_api.storage.fake_routes import make_fake_blob_router
 
 log = logging.getLogger("onolys_api")
 _REQUEST_ID_OK = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
@@ -130,7 +135,11 @@ def register_error_handlers(app: FastAPI) -> None:
         return _response(request, 500, message, [{"code": "internal_error", "message": message}])
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    repo: Repo | None = None,
+    blobs: BlobStore | None = None,
+) -> FastAPI:
     settings = settings or Settings.from_env()
     app = FastAPI(
         title="Onolys API",
@@ -140,6 +149,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redoc_url=None,
     )
     app.state.settings = settings
+    app.state.blobs = blobs or build_blobs(settings)
+    app.state.repo = repo or build_repo(settings, app.state.blobs)
     if settings.service_mode == "combined":
         app.state.queue = InMemoryQueue()  # handlers registered in Task 5
 
@@ -167,4 +178,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return Healthz(service_mode=settings.service_mode, code_version=settings.git_sha)
 
     app.include_router(router)
+    if isinstance(app.state.blobs, FakeBlobStore):  # dev/tests: serve the fake signed URLs
+        app.include_router(make_fake_blob_router(app.state.blobs))
     return app

@@ -6,6 +6,8 @@ import pytest
 
 from onolys_api.app import create_app
 from onolys_api.config import Settings
+from onolys_api.repo.fake import FakeRepo
+from onolys_api.storage.fake import FakeBlobStore
 
 SCHEMA = (
     Path(__file__).resolve().parents[2] / "docs/contracts/public/public-error-response.schema.json"
@@ -29,8 +31,13 @@ def settings() -> Settings:
 
 
 @pytest.fixture
-def app(settings):
-    return create_app(settings)
+def blobs(tmp_path):
+    return FakeBlobStore(tmp_path / "blobs")
+
+
+@pytest.fixture
+def app(settings, blobs):
+    return create_app(settings, repo=FakeRepo(blobs), blobs=blobs)
 
 
 @pytest.fixture
