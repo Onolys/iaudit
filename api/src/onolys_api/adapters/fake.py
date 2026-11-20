@@ -205,6 +205,21 @@ def _paudit_result(
     }
 
 
+def _global_diff(clinician: float | None, onolys: float) -> dict[str, Any]:
+    """Minimal score_diff `Diff` (mirrors onolys_evaluation.compare.compare_item; differs at >=1)."""
+    if clinician is None:
+        return {"signed": None, "abs": None, "direction": None, "status": "not_rated"}
+    signed = onolys - clinician
+    a = abs(signed)
+    return {
+        "signed": signed,
+        "abs": a,
+        "direction": "same" if signed == 0 else "onolys_higher" if signed > 0 else "onolys_lower",
+        "status": "differs" if a >= 1 else "agree",
+        "within_one": a <= 1,
+    }
+
+
 class FakeEvaluation:
     """Fake `Evaluation`: schema-valid report built from the transcript; calls `progress_cb`
     for every stage in a fixed order; magic-title failure injection."""
@@ -282,6 +297,7 @@ class FakeEvaluation:
                 "label": label,
                 "clinician": {"value": 3 if has_rating else None},
                 "onolys": {"value": 3, "mean": 3.0, "min": 3, "max": 3, "values": [3]},
+                "diff": _global_diff(3 if has_rating else None, 3),
             }
             for gid, label in _GLOBALS
         ]
