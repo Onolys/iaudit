@@ -544,7 +544,7 @@ describe("transcript and speaker fixtures", () => {
     backend.settle(sid);
     const sp = backend.getSpeakers(U, sid);
     expect(sp.speakers.map((s) => s.speaker)).toEqual(["spk_0", "spk_1"]);
-    for (const s of sp.speakers) expect(s.sample_lines).toHaveLength(3);
+    for (const s of sp.speakers) expect(s.samples).toHaveLength(3);
     expect(backend.getTranscript(U, sid).turns.every((t) => t.role === null)).toBe(true);
     backend.confirmSpeaker(U, sid, "spk_0");
     const turns = backend.getTranscript(U, sid).turns;
@@ -558,7 +558,7 @@ describe("transcript and speaker fixtures", () => {
     backend.settle(sid);
     const sp = backend.getSpeakers(U, sid);
     expect(sp.speakers).toHaveLength(3);
-    for (const s of sp.speakers) expect(s.sample_lines).toHaveLength(3);
+    for (const s of sp.speakers) expect(s.samples).toHaveLength(3);
   });
 
   it("utf8-edge title serves the UTF-8 edge transcript", () => {

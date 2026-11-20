@@ -179,7 +179,7 @@ function SessionView({ id }: { id: string }) {
 
           {doc.state === "created" || doc.state === "uploading" ? <UploadSlot sessionId={id} doc={doc} /> : null}
           {doc.state !== "deleting" ? <RatingCardSlot sessionId={id} doc={doc} /> : null}
-          {doc.transcript_ready && !doc.speaker_confirmed && doc.state !== "deleting" ? (
+          {doc.transcript_ready && doc.state !== "deleting" && (!doc.speaker_confirmed || doc.state === "report_ready" || doc.state === "failed") ? (
             <SpeakerGateSlot sessionId={id} doc={doc} />
           ) : null}
 

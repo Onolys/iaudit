@@ -98,7 +98,7 @@ export interface components {
       final?: { rating_id: string; no_rating: boolean; card: components["schemas"]["RatingCard"] };
       draft?: { card: components["schemas"]["RatingCard"]; updated_at: string };
     };
-    SpeakerSample: { speaker: string; sample_lines: string[] };
+    SpeakerSample: { speaker: string; turn_count: number; samples: string[] };
     SpeakersResponse: {
       speakers: components["schemas"]["SpeakerSample"][];
       clinician_speaker: string | null;
