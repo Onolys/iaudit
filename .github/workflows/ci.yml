@@ -13,9 +13,7 @@ permissions:
   contents: read
 
 env:
-  # SP01 Task 2 moves eaudit into the workspace: change only this value
-  # (and the matching `paths` in scripts/ci/changes.sh).
-  EAUDIT_DIR: eaudit
+  EAUDIT_DIR: engines/eaudit
 
 jobs:
   changes:
@@ -55,18 +53,15 @@ jobs:
     if: needs.changes.outputs.eaudit == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: ${{ env.EAUDIT_DIR }}
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: ${{ env.EAUDIT_DIR }}/uv.lock
-      - run: uv sync --frozen
-      - run: uv run --no-sync ruff check src tests
-      - run: uv run --no-sync pytest -q
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package eaudit
+      - run: uv run --no-sync --package eaudit ruff check ${{ env.EAUDIT_DIR }}/src ${{ env.EAUDIT_DIR }}/tests
+      - run: uv run --no-sync --package eaudit pytest -q ${{ env.EAUDIT_DIR }}
 
   core:
     needs: changes

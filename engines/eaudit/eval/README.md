@@ -1,12 +1,12 @@
 # Evaluation harness
 
-Run from `eaudit/`. Results are labelled split `poc-all`: a smoke check on data the authors have
+Run from `engines/eaudit/`. Results are labelled split `poc-all`: a smoke check on data the authors have
 seen, not a generalization estimate. Reports are per bucket (mission check 1-13); there is no
 overall score.
 
 | Command | What it does |
 |---|---|
-| `uv run python -m eval.smoke` | The POC gate through `POST /v1/audit` (see `eaudit/README.md`). |
+| `uv run python -m eval.smoke` | The POC gate through `POST /v1/audit` (see `engines/eaudit/README.md`). |
 | `uv run python -m eval.run --mode oracle --gate poc` | Gold echoed through the assembler. Proves the harness without an LLM. |
 | `uv run python -m eval.run --mode gold\|linked\|e2e` | Gold: checker alone on gold claims and evidence. Linked: linker then checker. E2E: full pipeline. |
 | `--live [--record]`, `--max-cost USD`, `--strict-fresh` | Call providers (keys needed), write recordings, cap the estimated cost, fail on stale recordings. |

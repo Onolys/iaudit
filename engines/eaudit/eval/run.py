@@ -1,4 +1,4 @@
-"""Evaluation harness CLI (07 R9). Run from eaudit/:
+"""Evaluation harness CLI (07 R9). Run from engines/eaudit/:
 
     uv run python -m eval.run --mode gold|linked|e2e|oracle [--only v1,v3] [--replay | --live
         [--record]] [--max-cost USD] [--out DIR] [--gate poc] [--strict-fresh] [--baseline NAME]

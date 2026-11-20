@@ -1,6 +1,6 @@
 """Deterministic spec -> committed fixture files.
 
-Run from eaudit/:  uv run python -m eval.build_adhd
+Run from engines/eaudit/:  uv run python -m eval.build_adhd
 """
 
 import json

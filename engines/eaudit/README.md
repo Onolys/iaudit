@@ -1,8 +1,8 @@
 # Backend
 
-HTTP service for the Interview Evidence Auditor. `POST /v1/audit` takes an assessment and an interview and returns a claim-by-claim evidence audit (with `full`, plus `run_info`: model ids and prompt hashes). It implements the [contract](../docs/contracts/README.md) (version 0.0.1).
+HTTP service for the Interview Evidence Auditor. `POST /v1/audit` takes an assessment and an interview and returns a claim-by-claim evidence audit (with `full`, plus `run_info`: model ids and prompt hashes). It implements the [contract](../../docs/contracts/README.md) (version 0.0.1).
 
-Endpoint, errors, settings and warnings: [docs/reference/backend-api.md](../docs/reference/backend-api.md).
+Endpoint, errors, settings and warnings: [docs/reference/backend-api.md](../../docs/reference/backend-api.md).
 
 ## Requirements
 
@@ -12,7 +12,7 @@ Endpoint, errors, settings and warnings: [docs/reference/backend-api.md](../docs
 ## Setup
 
 ```bash
-cd eaudit
+cd engines/eaudit
 uv sync
 ```
 
@@ -34,7 +34,7 @@ To try an audit without a key, start the stub pipeline and post the contract exa
 ```bash
 IAUDIT_PIPELINE=stub uv run uvicorn eaudit.app:app --port 8000
 curl -s -X POST http://localhost:8000/v1/audit -H 'content-type: application/json' \
-  -d @../docs/contracts/examples/request.json
+  -d @../../docs/contracts/examples/request.json
 ```
 
 ## Test

@@ -10,7 +10,7 @@ v1 is one synchronous JSON exchange. The frontend owns the contract in [contract
 
 ## Backend
 
-The backend ([../eaudit/](../eaudit/)) serves `POST /v1/audit` and calls model providers through LiteLLM. It reads the schemas in [contracts/](contracts/) in place. For each claim in the assessment, a model proposes evidence and a verdict, and code decides what is reported. The model never returns positions. Code computes them. Endpoint, errors, settings and warnings: [reference/backend-api.md](reference/backend-api.md).
+The backend ([../engines/eaudit/](../engines/eaudit/)) serves `POST /v1/audit` and calls model providers through LiteLLM. It reads the schemas in [contracts/](contracts/) in place. For each claim in the assessment, a model proposes evidence and a verdict, and code decides what is reported. The model never returns positions. Code computes them. Endpoint, errors, settings and warnings: [reference/backend-api.md](reference/backend-api.md).
 
 One call, one reply. The target is 30 to 45 seconds, the hard cap is 100 (`IAUDIT_AUDIT_DEADLINE_S`), and the review UI waits up to 120.
 
@@ -28,7 +28,7 @@ Five stages, with claims streaming through stages 2 and 3 as soon as stage 1 pro
 | 3 Check | Observe how the evidence relates to the claim, then pick the verdict and concerns | Model observes, code decides |
 | 4 Assemble | Turn text into positions, repair the rules, validate the reply | Code only |
 
-Where the code lives, under `eaudit/`:
+Where the code lives, under `engines/eaudit/`:
 
 | Path | Holds |
 |---|---|

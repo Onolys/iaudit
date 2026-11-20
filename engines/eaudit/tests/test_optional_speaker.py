@@ -113,7 +113,7 @@ def test_speaker_free_request_audits_through_api_and_warns():
     from eaudit.link.models import LinkerOutput
     from eaudit.llm import StubClient
 
-    examples = Path(__file__).resolve().parents[2] / "docs/contracts/examples"
+    examples = Path(__file__).resolve().parents[3] / "docs/contracts/examples"
     request = json.loads((examples / "no-speaker.request.json").read_text())
     llm = StubClient()
     llm.register(

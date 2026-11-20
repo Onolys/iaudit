@@ -13,7 +13,7 @@ def test_group_map_matches_schema():
     from eaudit.models import ConcernType
     from eaudit.models.concern_groups import GROUP_OF
 
-    schema = json.loads((Path(__file__).parents[2] / "docs/contracts/audit-response.schema.json").read_text())
+    schema = json.loads((Path(__file__).parents[3] / "docs/contracts/audit-response.schema.json").read_text())
     concern = schema["$defs"]["Concern"]
     assert list(ConcernType) == concern["properties"]["type"]["enum"]
     assert len(GROUP_OF) == 17

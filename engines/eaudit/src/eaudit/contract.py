@@ -42,8 +42,8 @@ def default_contracts_dir() -> Path:
     env = os.environ.get("IAUDIT_CONTRACTS_DIR")
     if env:
         return Path(env)
-    # eaudit/src/eaudit/contract.py -> repo root is parents[3]
-    return Path(__file__).resolve().parents[3] / "docs" / "contracts"
+    # engines/eaudit/src/eaudit/contract.py -> repo root is parents[4]
+    return Path(__file__).resolve().parents[4] / "docs" / "contracts"
 
 
 @dataclass(frozen=True)

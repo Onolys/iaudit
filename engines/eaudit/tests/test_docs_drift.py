@@ -8,9 +8,9 @@ import pytest
 from eaudit.config import Settings
 from eaudit.models.audit import WarningCode
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 DOCS = REPO / "docs"
-SRC = REPO / "eaudit" / "src" / "eaudit"
+SRC = REPO / "engines" / "eaudit" / "src" / "eaudit"
 
 pytestmark = pytest.mark.skipif(not DOCS.is_dir(), reason="docs directory not present")
 
@@ -79,8 +79,8 @@ def _markdown_files():
     files = [p for p in DOCS.rglob("*.md") if "agent_files" not in p.parts]
     files += [
         REPO / "README.md",
-        REPO / "eaudit" / "README.md",
-        REPO / "eaudit" / "eval" / "README.md",
+        REPO / "engines" / "eaudit" / "README.md",
+        REPO / "engines" / "eaudit" / "eval" / "README.md",
     ]
     return [p for p in files if p.is_file()]
 

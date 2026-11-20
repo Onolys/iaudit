@@ -4,7 +4,7 @@ How to write and run tests in every package. One convention for all.
 
 **Audience:** contributors.
 
-Package paths below are `eaudit/` today. SP01 T2 moves it to `engines/eaudit/`; the other Python packages (`engines/core`, `engines/paudit`, `engines/evaluation`, `api`) follow the same layout. When it moves, replace the `eaudit/` prefix in the commands.
+Package paths below are `engines/eaudit/`; the other Python packages (`engines/core`, `engines/paudit`, `engines/evaluation`, `api`) follow the same layout.
 
 ## Markers (Python, pytest)
 
@@ -26,7 +26,7 @@ markers = [
 ]
 ```
 
-Mark new tests with `@pytest.mark.unit`, `@pytest.mark.integration` or `@pytest.mark.live`. Unmarked tests still run (existing `eaudit` tests are unmarked); mark new ones. `eaudit/tests/test_markers.py` is the sample of each kind.
+Mark new tests with `@pytest.mark.unit`, `@pytest.mark.integration` or `@pytest.mark.live`. Unmarked tests still run (existing `eaudit` tests are unmarked); mark new ones. `engines/eaudit/tests/test_markers.py` is the sample of each kind.
 
 Select with `-m`. `-m` on the command line overrides the default `addopts` value, so `-m live` runs only live tests.
 
@@ -41,7 +41,7 @@ Select with `-m`. `-m` on the command line overrides the default `addopts` value
 Python (from the package directory; first run `uv sync`):
 
 ```bash
-cd eaudit
+cd engines/eaudit
 uv run --no-sync ruff check src tests                 # lint
 uv run --no-sync pytest -q                            # default: everything except live
 uv run --no-sync pytest -q -m unit                    # only unit
@@ -73,7 +73,7 @@ The `api/` package does not exist yet; this command applies once it does.
 No threshold in v1. Python uses `pytest-cov` (a dev dependency):
 
 ```bash
-cd eaudit
+cd engines/eaudit
 uv run --no-sync pytest -q --cov=eaudit --cov-report=term-missing
 ```
 
@@ -82,6 +82,6 @@ Web: add `@vitest/coverage-v8` to the package's dev dependencies, then `npx vite
 ## Add a package to CI
 
 1. Create the package with the marker block above and `pytest`, `pytest-cov`, `ruff` in its dev group. Commit its lockfile.
-2. Add a job to `.github/workflows/ci.yml`, modeled on the `eaudit` job: `working-directory: <package>`, `uv sync --frozen`, `ruff check`, `pytest -q` (live is excluded by the default `addopts`). Web packages follow the `frontend` job (`npm ci`, `npm run typecheck`, `npm test`).
+2. Add a job to `.github/workflows/ci.yml`, modeled on the `eaudit` job: `uv sync --frozen --package <name>` from the repo root, `ruff check`, `pytest -q` (live is excluded by the default `addopts`). Web packages follow the `frontend` job (`npm ci`, `npm run typecheck`, `npm test`).
 3. Keep the job skipped while the package directory is absent, so main stays green.
 4. Never run `live` tests in PR CI.

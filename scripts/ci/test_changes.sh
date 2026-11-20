@@ -3,8 +3,8 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
-mkdir -p "$T/eaudit" "$T/frontend" "$T/engines/core" "$T/api" "$T/engines/paudit"
-touch "$T/eaudit/pyproject.toml" "$T/engines/core/pyproject.toml" "$T/api/pyproject.toml"
+mkdir -p "$T/engines/eaudit" "$T/frontend" "$T/engines/core" "$T/api" "$T/engines/paudit"
+touch "$T/engines/eaudit/pyproject.toml" "$T/engines/core/pyproject.toml" "$T/api/pyproject.toml"
 # paudit dir exists but has no pyproject.toml; web/infra/evaluation absent
 mkdir -p "$T/web/src"   # web dir without package.json must still skip
 fail=0
@@ -16,7 +16,7 @@ run() {
   if [[ "$got" == "$want" ]]; then echo "ok   $*"; else echo "FAIL $*"; echo "  got:  $got"; echo "  want: $want"; fail=1; fi
 }
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=true web=false infra=false" frontend/src/a.ts
-run false "eaudit=true core=false paudit=false evaluation=false api=false frontend=false web=false infra=false" eaudit/src/x.py
+run false "eaudit=true core=false paudit=false evaluation=false api=false frontend=false web=false infra=false" engines/eaudit/src/x.py
 run false "eaudit=true core=true paudit=false evaluation=false api=true frontend=false web=false infra=false" engines/core/x.py
 run false "eaudit=true core=true paudit=false evaluation=false api=true frontend=false web=false infra=false" uv.lock
 run false "eaudit=true core=true paudit=false evaluation=false api=true frontend=true web=false infra=false" .github/workflows/ci.yml

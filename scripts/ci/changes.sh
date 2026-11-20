@@ -12,7 +12,7 @@ OUT="${GITHUB_OUTPUT:-/dev/stdout}"
 
 # name:dir:kind (kind python => also triggered by Python-shared paths; node => needs package.json)
 PACKAGES=(
-  "eaudit:eaudit:python"
+  "eaudit:engines/eaudit:python"
   "core:engines/core:python"
   "paudit:engines/paudit:python"
   "evaluation:engines/evaluation:python"

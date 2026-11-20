@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-CONTRACTS = Path(__file__).resolve().parents[2] / "docs" / "contracts"
+CONTRACTS = Path(__file__).resolve().parents[3] / "docs" / "contracts"
 
 
 @pytest.fixture
