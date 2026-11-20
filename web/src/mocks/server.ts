@@ -1,7 +1,7 @@
 /** Node MSW server for Vitest. */
 import { setupServer } from "msw/node";
-import { mockBackend } from "./backend";
+import { mockBackend, mockEmitter } from "./backend";
 import { handlers } from "./handlers";
 
-export { mockBackend };
+export { mockBackend, mockEmitter };
 export const server = setupServer(...handlers);

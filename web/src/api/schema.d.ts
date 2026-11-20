@@ -69,8 +69,8 @@ export interface components {
       step: string | null;
       progress: number;
       flags: components["schemas"]["SessionFlags"];
-      warnings: { code: string }[];
-      error?: { code: string; step?: string };
+      warnings: string[];
+      error?: { code: string; step?: string } | null;
       latest_report_version: number | null;
     };
     AudioUploadRequest: { content_type: string; size_bytes: number; filename_ext: string };
