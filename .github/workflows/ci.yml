@@ -40,6 +40,8 @@ jobs:
         run: python3 scripts/ci/check_links.py
       - name: Test config guard
         run: bash scripts/ci/test_check_config.sh
+      - name: Test deploy-prod workflow guard
+        run: bash scripts/ci/test_deploy_prod.sh
       - name: Test deploy-admin workflow guard
         run: bash scripts/ci/test_deploy_admin.sh
       - name: actionlint (workflows)
