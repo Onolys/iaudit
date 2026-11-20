@@ -13,7 +13,9 @@ def build_blobs(settings: Settings) -> BlobStore:
     """Local/test: FakeBlobStore (dir from FAKE_BLOB_DIR, else a temp dir). Cloud: GCS."""
     if settings.env in LOCAL_ENVS and not settings.audio_bucket:
         root = os.environ.get("FAKE_BLOB_DIR")
-        return FakeBlobStore(root=None if not root else Path(root))
+        base = os.environ.get("FAKE_BLOB_BASE_URL")  # where clients reach the fake signed URLs
+        kw = {"base_url": base} if base else {}
+        return FakeBlobStore(root=None if not root else Path(root), **kw)
     from google.cloud import storage
 
     from onolys_api.storage.gcs import GcsBlobStore

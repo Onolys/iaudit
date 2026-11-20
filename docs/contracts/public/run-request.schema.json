@@ -1,0 +1,37 @@
+{
+  "$id": "run-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "n_runs": {
+      "anyOf": [
+        {
+          "maximum": 5,
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Default: the session's",
+      "title": "N Runs"
+    },
+    "preset": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Allowlisted; LLM routes only",
+      "title": "Preset"
+    }
+  },
+  "title": "RunRequest",
+  "type": "object"
+}

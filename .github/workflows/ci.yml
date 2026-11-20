@@ -132,10 +132,11 @@ jobs:
           npm ci --prefix firestore-rules-test
           firebase emulators:exec --config firebase.json --only firestore --project demo-onolys \
             'npm test --prefix firestore-rules-test'
-      - name: OpenAPI is up to date
+      - name: OpenAPI and public contracts are up to date
         run: |
           uv run --no-sync --package onolys-api python -m onolys_api.openapi
-          git diff --exit-code api/openapi.json
+          uv run --no-sync --package onolys-api python -m onolys_api.contracts
+          git diff --exit-code api/openapi.json docs/contracts/public
 
   paudit:
     needs: changes

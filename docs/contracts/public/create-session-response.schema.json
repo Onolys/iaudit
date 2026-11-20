@@ -1,0 +1,45 @@
+{
+  "$defs": {
+    "SessionRef": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "created",
+            "uploading",
+            "validating",
+            "transcribing",
+            "awaiting_input",
+            "running",
+            "report_ready",
+            "failed",
+            "deleting"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ],
+      "title": "SessionRef",
+      "type": "object"
+    }
+  },
+  "$id": "create-session-response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "session": {
+      "$ref": "#/$defs/SessionRef"
+    }
+  },
+  "required": [
+    "session"
+  ],
+  "title": "CreateSessionResponse",
+  "type": "object"
+}

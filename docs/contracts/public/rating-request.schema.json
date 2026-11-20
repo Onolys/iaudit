@@ -1,0 +1,29 @@
+{
+  "$id": "rating-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "card": {
+      "additionalProperties": true,
+      "description": "The rating card (`rating.schema.json`)",
+      "title": "Card",
+      "type": "object"
+    },
+    "final": {
+      "description": "`false` autosaves the draft; `true` submits a new revision",
+      "title": "Final",
+      "type": "boolean"
+    },
+    "no_rating": {
+      "default": false,
+      "description": "With `final`: submit as a \"no rating\" revision",
+      "title": "No Rating",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "final",
+    "card"
+  ],
+  "title": "RatingRequest",
+  "type": "object"
+}

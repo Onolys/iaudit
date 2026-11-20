@@ -21,6 +21,7 @@ from onolys_api.auth.deps import Authenticator
 from onolys_api.auth.idtoken import TokenVerifier
 from onolys_api.auth.oidc import OidcVerifier
 from onolys_api.config import LOCAL_ENVS, Settings
+from onolys_api.docs import DESCRIPTION, add_error_responses, make_docs_router
 from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse, error_body
 from onolys_api.factory import build_blobs, build_repo
 from onolys_api.jobs.delete import make_delete_handler
@@ -218,6 +219,7 @@ def create_app(
     app = FastAPI(
         title="Onolys API",
         version="0.1.0",
+        description=DESCRIPTION,
         openapi_url="/v1/openapi.json",
         docs_url=None,
         redoc_url=None,
@@ -307,6 +309,14 @@ def create_app(
     router.include_router(run_routes.runs_router)
     router.include_router(usage_routes.router)
     app.include_router(router)
+    app.include_router(make_docs_router())
+
+    def openapi_with_errors() -> dict:
+        if app.openapi_schema is None:
+            app.openapi_schema = add_error_responses(FastAPI.openapi(app))
+        return app.openapi_schema
+
+    app.openapi = openapi_with_errors  # type: ignore[method-assign]
     if runs_tasks:
         app.include_router(task_routes.router)  # /tasks/{kind}: Cloud Tasks only, not in schema
     if isinstance(app.state.blobs, FakeBlobStore):  # dev/tests: serve the fake signed URLs

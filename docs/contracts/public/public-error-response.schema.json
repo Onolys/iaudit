@@ -79,6 +79,21 @@
             "type": "string",
             "minLength": 1,
             "description": "Schema paths and fixed text only; never instance values."
+          },
+          "field": {
+            "type": "string",
+            "description": "Dotted path of the offending field (e.g. `globals.cct.reason`); `$` is the whole body. Set on `rating_invalid`. A path only, never user text."
+          },
+          "issue": {
+            "enum": [
+              "too_long",
+              "unknown_key",
+              "required",
+              "invalid",
+              "order",
+              "too_large"
+            ],
+            "description": "What is wrong at `field`. Set on `rating_invalid`."
           }
         }
       }

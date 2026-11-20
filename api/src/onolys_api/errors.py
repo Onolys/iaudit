@@ -1,8 +1,8 @@
 """Public error bodies. Messages are fixed text only, never instance values."""
 
-from typing import Literal, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 SCHEMA_VERSION = "0.0.1"
 
@@ -47,11 +47,23 @@ ErrorCode = Literal[ERROR_CODES]  # type: ignore[valid-type]
 class ErrorDetail(TypedDict):
     code: str
     message: str
+    field: NotRequired[str]
+    issue: NotRequired[str]
 
 
 class ErrorDetailModel(BaseModel):
     code: ErrorCode
     message: str
+    field: str | None = Field(
+        None,
+        description=(
+            "Dotted path of the offending field (e.g. `globals.cct.reason`); `$` is the whole "
+            "body. Set on `rating_invalid`. A path only, never user text."
+        ),
+    )
+    issue: (
+        Literal["too_long", "unknown_key", "required", "invalid", "order", "too_large"] | None
+    ) = Field(None, description="What is wrong at `field`. Set on `rating_invalid`.")
 
 
 class ErrorResponse(BaseModel):
@@ -77,6 +89,22 @@ class ApiError(Exception):
     @classmethod
     def of(cls, status: int, code: str, message: str) -> "ApiError":
         return cls(status, message, [{"code": code, "message": message}])
+
+
+def error_responses(*statuses: int) -> dict[int | str, dict]:
+    """OpenAPI `responses=` entries that point each status at the shared `ErrorResponse` model."""
+    return {s: {"model": ErrorResponse, "description": _STATUS_TEXT[s]} for s in statuses}
+
+
+_STATUS_TEXT = {
+    401: "`unauthenticated`: missing, invalid or revoked credentials",
+    404: "`not_found`: no such resource for this user (never 403, so ids cannot be probed)",
+    409: "`invalid_state` or `conflict`: not allowed in the session's current state",
+    422: "`invalid_parameters`, `unsupported_audio`, `audio_too_large` or `rating_invalid`",
+    429: "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`",
+    500: "`internal_error`",
+    503: "`upstream_unavailable`: retry shortly",
+}
 
 
 def error_body(

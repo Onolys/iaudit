@@ -1,0 +1,43 @@
+{
+  "$id": "report-view.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "report": {
+      "additionalProperties": true,
+      "description": "The typed report JSON, stored verbatim",
+      "title": "Report",
+      "type": "object"
+    },
+    "report_id": {
+      "title": "Report Id",
+      "type": "string"
+    },
+    "report_schema_version": {
+      "title": "Report Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "version": {
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "version",
+    "report_id",
+    "run_id",
+    "created_at",
+    "report_schema_version",
+    "report"
+  ],
+  "title": "ReportView",
+  "type": "object"
+}

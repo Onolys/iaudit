@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "DraftRating": {
+      "properties": {
+        "card": {
+          "additionalProperties": true,
+          "title": "Card",
+          "type": "object"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "card",
+        "updated_at"
+      ],
+      "title": "DraftRating",
+      "type": "object"
+    },
+    "FinalRating": {
+      "properties": {
+        "card": {
+          "additionalProperties": true,
+          "title": "Card",
+          "type": "object"
+        },
+        "no_rating": {
+          "title": "No Rating",
+          "type": "boolean"
+        },
+        "rating_id": {
+          "title": "Rating Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rating_id",
+        "no_rating",
+        "card"
+      ],
+      "title": "FinalRating",
+      "type": "object"
+    }
+  },
+  "$id": "rating-view.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "draft": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DraftRating"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Only when newer than the last final"
+    },
+    "final": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FinalRating"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "title": "RatingView",
+  "type": "object"
+}

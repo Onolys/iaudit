@@ -14,9 +14,15 @@ from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
 from onolys_api.auth.deps import AuthUser, current_user
-from onolys_api.errors import ApiError, ErrorResponse
+from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse
 from onolys_api.jobs.first_run import maybe_start_first_run
-from onolys_api.rating import SCHEMA_VERSION, draft_issues, has_content, validate_rating
+from onolys_api.rating import (
+    SCHEMA_VERSION,
+    Issue,
+    draft_issues,
+    has_content,
+    validate_rating,
+)
 from onolys_api.repo.base import NotFoundError
 from onolys_api.repo.models import RatingDoc, RatingDraftDoc
 
@@ -56,6 +62,21 @@ class RatingView(BaseModel):
     draft: DraftRating | None = Field(None, description="Only when newer than the last final")
 
 
+MAX_ISSUES = 20
+
+
+def _invalid(issues: list[Issue]) -> ApiError:
+    """422 `rating_invalid`: one detail per issue (card path + issue code, never card text)."""
+    details: list[ErrorDetail] = []
+    for i in sorted(set(issues), key=lambda i: (i.path, i.code))[:MAX_ISSUES]:
+        field = i.path or "$"
+        details.append(
+            {"code": "rating_invalid", "message": f"{field}: {i.code}", "field": field,
+             "issue": i.code}
+        )  # fmt: skip
+    return ApiError(422, INVALID, details)
+
+
 def _open_session(request: Request, user: AuthUser, id: str):
     s = request.app.state.repo.get_session(user.uid, id)
     if s.state == "deleting":
@@ -84,13 +105,13 @@ def put_rating(id: str, body: RatingRequest, request: Request, user: User) -> Ra
     _open_session(request, user, id)
     now = datetime.now(UTC)
     if not body.final:
-        if draft_issues(body.card):
-            raise ApiError.of(422, "rating_invalid", INVALID)
+        if issues := draft_issues(body.card):
+            raise _invalid(issues)
         repo.put_rating_draft(uid, id, RatingDraftDoc(card=body.card, updated_at=now))
         return RatingSaved(final=False, updated_at=now)
 
-    if validate_rating(body.card, final=True):
-        raise ApiError.of(422, "rating_invalid", INVALID)
+    if issues := validate_rating(body.card, final=True):
+        raise _invalid(issues)
     no_rating = body.no_rating or not has_content(body.card)
     rating_id = uuid4().hex
     repo.put_rating_revision(

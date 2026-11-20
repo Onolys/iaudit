@@ -1,0 +1,50 @@
+{
+  "$defs": {
+    "RunSessionRef": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "created",
+            "uploading",
+            "validating",
+            "transcribing",
+            "awaiting_input",
+            "running",
+            "report_ready",
+            "failed",
+            "deleting"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ],
+      "title": "RunSessionRef",
+      "type": "object"
+    }
+  },
+  "$id": "run-started.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "session": {
+      "$ref": "#/$defs/RunSessionRef"
+    }
+  },
+  "required": [
+    "run_id",
+    "session"
+  ],
+  "title": "RunStarted",
+  "type": "object"
+}
