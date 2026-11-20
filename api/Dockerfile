@@ -34,10 +34,13 @@ RUN apt-get update \
 COPY --from=build /opt/venv /opt/venv
 COPY protocols /app/protocols
 COPY config /app/config
+# eaudit's assembler validates every response against these schemas (IAUDIT_CONTRACTS_DIR);
+# a non-editable install cannot find them relative to the package.
+COPY docs/contracts/*.schema.json /app/contracts/
 COPY api/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ARG GIT_SHA=dev
 ENV PATH=/opt/venv/bin:$PATH PYTHONUNBUFFERED=1 PORT=8080 GIT_SHA=${GIT_SHA} \
-    PAUDIT_PROTOCOLS_DIR=/app/protocols
+    PAUDIT_PROTOCOLS_DIR=/app/protocols IAUDIT_CONTRACTS_DIR=/app/contracts
 WORKDIR /app
 USER onolys
 EXPOSE 8080
