@@ -12,8 +12,8 @@ Source of truth: 07-admin/PRD.md. **AFTER LAUNCH (r7): none of this is v1 work; 
 | 2 | `admin/backend` gateway: auth + CORS + mounted eaudit app | 1 | done |
 | 3 | `POST /v1/paudit` and `GET /v1/paudit/fixtures` | 2, SP02 T10 | done |
 | 4 | `admin/backend/Dockerfile` image | 3 | blocked (code done; docker not on box — container build/run still to verify in CI) |
-| 5 | Frontend registry, product-to-view mapping, `VITE_EVAL_ENABLED` | SP01 | todo |
-| 6 | Login gate and bearer transport (`auth/`, `transport/`) | 5 | todo |
+| 5 | Frontend registry, product-to-view mapping, `VITE_EVAL_ENABLED` | SP01 | done |
+| 6 | Login gate and bearer transport (`auth/`, `transport/`) | 5 | in-progress |
 | 7 | paudit tab (`paudit/`), types and schema vitest, mock mode | 5, 6, 3 (contract) | todo |
 | 8 | Hosting config: SPA fallback and security headers | 5 | todo |
 | 9 | Flip `admin_enabled`, secrets, staging admin resources | 4, SP06 T2, SP06 T4 (owner step: allowlist emails) | todo |
