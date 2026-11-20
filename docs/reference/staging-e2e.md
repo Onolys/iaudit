@@ -129,3 +129,65 @@ Cleanup: session deleted (204, then 404), bucket prefix empty, `users`/`usage`/`
 - No SP01 p95 figure to compare against (see above).
 - `run_info.preset`/`code_version` appear in the run doc and report header; `cost_usd` in evaluation usage is `null`.
 - Quickstart on staging still shows the old PUT until the next deploy (see Task 9). A deleted user's API key stays valid until its doc is removed (consider revoking keys on account deletion).
+
+## Task 11: Hosting, CSP and `validate` memory checks
+
+Staging, deployed sha `94c97ec`, test user created and deleted via Identity Toolkit. Numbers and headers only.
+
+### (a) Hosting forwards `Authorization`, does not cache `/v1`: PASS
+
+Through `https://onolys-app-staging.web.app/v1`, 3 repeated authed `GET /sessions`, 2 unauthenticated, 1 bad token, 2 `GET /healthz`, `GET /v1/docs`:
+
+| Call | Status | Cache-Control | X-Cache | Age | Vary |
+|---|---|---|---|---|---|
+| authed `GET /sessions` x3 | 200, 200, 200 | `no-cache` | MISS, MISS, MISS | absent | `Origin,cookie,need-authorization, x-fh-requested-host, accept-encoding` |
+| no `Authorization` x2 | 401, 401 | absent | MISS, MISS | absent | `Origin, x-fh-requested-host, accept-encoding` |
+| bad token | 401 | absent | MISS | absent | same |
+| `GET /healthz` x2 | 200 | `no-cache` | MISS, MISS | absent | as authed |
+| `GET /v1/docs` | 200 | `no-cache` | MISS | absent | as authed |
+
+- Authed calls succeed (200) and the same path without the header is 401, so Hosting forwards `Authorization`. No `HIT`, no `Age` on any `/v1` response.
+- Finding (minor): SP05 R8 expects `private, no-cache` on `/v1`; live value is `no-cache` (the `**` header rule in `firebase.json` also covers `/v1`). Not a caching defect, since `no-cache` forces revalidation and Hosting's `Vary` includes `need-authorization`; log as a handed-back item to SP05/SP06 if `private` is wanted.
+- HTML `/`: `Cache-Control: no-cache`, `Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`.
+
+### (b) CSP in the browser (web app `web/`, Playwright + Chromium): PASS
+
+Sign-in through the real form (email/password; the app supports it), then `/sessions/{id}` of a session in `transcribing` (Firestore status listener running), then `/login` and the Google button (popup). `securitypolicyviolation` listener on every page plus console capture.
+
+| Check | Result |
+|---|---|
+| CSP violations (sign-in, dashboard, session page with listener, Google popup click) | 0 |
+| Console errors on the app pages | 0 (the popup window itself logged a 404 and a 400 from `onolys.firebaseapp.com`/Google; not CSP, headless popup without a Google session) |
+| Hosts contacted | `onolys-app-staging.web.app`, `identitytoolkit.googleapis.com`, `firestore.googleapis.com`, `apis.google.com`, `onolys.firebaseapp.com`, `www.googleapis.com` |
+| Session page | rendered the live `transcribing` state (Upload done, Check audio done, Transcribe in progress) |
+
+Live CSP header: `default-src 'self'; script-src 'self' https://apis.google.com; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://storage.googleapis.com; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com; img-src 'self' data:; style-src 'self'; frame-ancestors 'none'`.
+
+Compared with SP05 R8: `connect-src`, `img-src`, `style-src`, `frame-ancestors`, `default-src` identical (Firestore listener host `firestore.googleapis.com` and Identity Platform hosts exact). Two additions in the live header: `script-src ... https://apis.google.com` (the popup flow loads it; contacted in this run) and `frame-src 'self'`. `www.googleapis.com` is contacted but not in `connect-src` and produced no violation (loaded as a script/frame from an allowed source). Same value is in `firebase.json` for both targets (not a deploy drift). R8 text should be updated to include these.
+
+### (c) `validate` memory with a 300 MB upload: PASS (no OOM)
+
+Upload cap in code: `MAX_UPLOAD_BYTES` = 300 MiB (314,572,800 B); `max_audio_s` 1200 s. Synthetic file (outside the repo, deleted after): WAV PCM 24-bit stereo 48 kHz, sine + pink noise, 1050 s, **302,400,102 B** (the largest practical ~300 MB inside both limits). Worker: 2 Gi, `worker_concurrency` 2, max 3 instances.
+
+| Item | Result |
+|---|---|
+| Signed PUT of 302 MB | 12.7 s (single), 14 s each (two concurrent) |
+| upload-complete -> `validate` done (session reached `transcribing`/`failed`) | about 14 s (single and with two concurrent) |
+| Scenario 1 | 1 big upload while a second session (6.7 min mp3) was in `transcribing` (STT poll task every 15 s) |
+| Scenario 2 | 2 rounds of 2 concurrent big uploads (4 validates, pairs overlapping) plus the same transcribing session |
+| Result of validate | all 5 sessions passed `validate` and went to `transcribing`; they then failed `no_speech` (expected: a tone has no speech) |
+| Worker memory, `run.googleapis.com/container/memory/utilizations`, p99 per minute, 22:21-22:31Z | idle 0.20; peak **0.23** of 2 Gi (about 470 MiB), bucket max 0.23-0.24, p50 0.06-0.08 |
+| Instance restarts / OOM | none: no `Memory limit` or container-terminated log line, one revision (`00019`), instance count 1 then 2 (scale-out, not a restart) |
+| Local measurement of the same steps | `ffprobe` max RSS 52 MB; `ffmpeg` to FLAC 16 kHz mono max RSS 59 MB, 7.8 s, output FLAC 35.6 MB |
+
+The Cloud Monitoring series is sampled about once a minute per instance (2 samples per point), so a 14 s validate does not show above 0.23. Bound by calculation: `validate` downloads the file to `/tmp` (in-memory on Cloud Run) and writes the FLAC there. Per validate about 302 + 36 + 59 = 397 MB; baseline about 470 MiB (0.23); two concurrent validates on one instance about 470 + 2 x 397 = 1,264 MB (about 0.62 of 2 Gi). Margin about 0.38. No fallback applied.
+
+Observation (not part of the task): the second session (real 6.7 min sample, uploaded 22:22:08Z) was still `transcribing` 10 minutes later (poll tasks every 15 s, no error) while the earlier runs of the same sample took 85-176 s. It was deleted during cleanup; cause not investigated (likely Chirp batch latency).
+
+### (d) Phone check (iOS Safari): PENDING OWNER
+
+Sign-in (Google redirect fallback) and a large upload on iOS Safari need a person with an iPhone (Tejit); not attempted by an agent.
+
+### Cleanup
+
+6 sessions deleted (204, then 404), bucket `onolys-audio-staging` prefixes `{uid}/` and `uploads/{uid}/` empty, `users/{uid}` doc removed (no subcollections; `usage`, `api_keys`, `session_status` hold no doc for the user), test user deleted (lookup returns no account), local synthetic file and cached token removed.
