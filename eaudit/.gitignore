@@ -7,3 +7,4 @@ __pycache__/
 
 # eval: real interview material never enters the repo (07 R1, R11)
 eval/private/
+.coverage
