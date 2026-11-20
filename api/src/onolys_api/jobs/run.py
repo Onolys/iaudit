@@ -49,9 +49,12 @@ from onolys_api.repo.base import NotFoundError
 from onolys_api.repo.models import ReportDoc
 from onolys_api.storage.base import BlobStore
 
-REAL_REPORT_SCHEMA = (
-    Path(__file__).resolve().parents[4] / "engines/evaluation/schemas/report.schema.json"
-)
+try:  # resolves for editable (repo) and installed (wheel package data) layouts alike
+    from onolys_evaluation.report import schema_path as _report_schema_path
+
+    REAL_REPORT_SCHEMA = _report_schema_path()
+except (ImportError, FileNotFoundError):
+    REAL_REPORT_SCHEMA = Path("/nonexistent/report.schema.json")
 LOCAL_REPORT_SCHEMA = Path(__file__).resolve().parents[1] / "schemas/report.local.schema.json"
 ARTIFACTS = ("paudit", "eaudit", "tips")
 MAX_PROGRESS = 99

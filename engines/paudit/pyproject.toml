@@ -23,6 +23,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/paudit"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"schemas" = "paudit/schemas"
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
