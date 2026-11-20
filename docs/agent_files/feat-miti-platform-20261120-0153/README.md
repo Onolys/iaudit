@@ -1,6 +1,6 @@
 ---
 status: draft
-summary: "Design: 10 PRDs (SP00 foundation: CI, testing, PR previews; SP07 admin after launch), r7 audit + r8 decisions applied (no Playwright, 3 build lanes), tasks generated (r8), ready for dev-code"
+summary: "Design: 10 PRDs (SP00 foundation: CI, testing, PR previews; SP07 admin after launch), r7 audit + r8 decisions applied (no Playwright, 3 build lanes), tasks generated (r8), ready for dev-code; SP10/SP11 PRDs drafted (future)"
 date: 2026-11-20
 ---
 
@@ -22,6 +22,18 @@ Branch folder for the Onolys MITI platform (`app.onolys.com`). Brief: [brainstor
 | 07 | `07-admin/` | [PRD](07-admin/PRD.md) (draft, **after launch**) | [TASKS](07-admin/TASKS.md) (13) | `admin.onolys.com`: eaudit review UI + paudit tab behind an email allowlist. Cut from v1 (r7); until then results are inspected with `python -m paudit.cli` locally and the run artifacts in GCS. | 01, 02, 06 | After launch |
 | 08 | `08-landing/` | [PRD](08-landing/PRD.md) (draft) | [TASKS](08-landing/TASKS.md) (5) | Repo `onolys-landing` (local `/root/projects/onolys/miti`): top right = "Sign up" + "Log in" → app; every other "Get early access" CTA becomes "Try it out" → `${PUBLIC_APP_URL}/signup`; early-access components kept, unused; click analytics after launch. PRD lives here; code goes to that repo. | — (release after 05/06 live) | any; release with prod |
 | 09 | `09-integration/` | [PRD](09-integration/PRD.md) (draft) | [TASKS](09-integration/TASKS.md) (12) | Real `Stt` + `Evaluation` adapters in the worker, engine-error → public-code mapping, run artifacts + `run_info`, staging end-to-end on real audio (web + API key), the staging checks SP04/05/06 handed over. | 02, 03, 04, 06 (05 for the web check) | Slice 1 |
+| 10 | `10-ai-interview/` | [PRD](10-ai-interview/PRD.md) (draft, future) | — (not generated) | AI practice interview: the clinician role-plays against an AI client (Gemini Live voice via a backend WebSocket relay), the recording flows into the normal upload/evaluation path; scenario schema + sample, interview API/state/sweeper, web interview feature. | SP11 + SP00-SP09 done | After SP00-SP09; 11 then 10 (10 T1 spike any time) |
+| 11 | `11-usage-limits/` | [PRD](11-usage-limits/PRD.md) (draft, future) | — (not generated) | Generic per-user usage limits: kinds eval/interview x UTC day/month, defaults from config, per-user overrides in `users/{uid}.limits`, new `GET /usage` shape, first AI-linked evaluation free; replaces SP04 `DAILY_RUN_CAP`. | SP04/SP05 landed | After SP00-SP09; 11 then 10 |
+
+## Future: SP10 AI interview + SP11 usage limits
+- Brief: `10-ai-interview/brainstorm.md`; PRDs drafted, tasks not generated, built after SP00-SP09 (SP11 first, then SP10; SP10 T1 spike any time).
+- Voice: Gemini Live through a backend WebSocket relay in a separate Cloud Run service `onolys-voice-{env}`; the browser connects directly to its run.app `wss` URL (Hosting rewrites have a 60 s timeout); relay talks to Vertex.
+- Model is config: default `gemini-3.8-live`; the spike also tries `gemini-2.5-flash-native-audio`; session resumption on.
+- Exception to "all LLM on Claude": the voice client only (Gemini); all rating/eval LLM work stays on Claude.
+- Limits (SP11): eval 10/day, 100/month; interview 5/day, 30/month; per-user overrides in `users/{uid}.limits` via the Firebase console.
+- The first evaluation of an AI-interview session is free (exempt via `session.interview_id`).
+- SP11 replaces SP04's `DAILY_RUN_CAP`; seam: SP10 calls `reserve`/`release` and stores `reservation_date` on `interviews/{id}`.
+- Open items are listed in each PRD (Risks / Open Questions).
 
 ## Dependency graph and build order (3 parallel lanes, r8)
 ```
