@@ -20,7 +20,7 @@ Source of truth: [PRD.md](PRD.md). One PR (D3), no shims (D4). Tests follow SP00
 | 10 | `RunInfo`, transcript converters, `EauditEngine` wrapper | 3, 4, 7 | done |
 | 11 | Live checks: `llm.smoke` and `stt.check` | 5, 8 | done |
 | 12 | Docs, mission widening, ADR 0017 skeleton, CI finish | 2 | done |
-| 13 | Run the gate and record the result in ADR 0017 | 11, 12 | todo |
+| 13 | Run the gate and record the result in ADR 0017 | 11, 12 | in-progress |
 
 Parallel lanes: Task 1 is small and goes first. After Task 3, the LLM chain (4, 5, 6), the STT chain (7, 8; only needs Task 1) and Tasks 9 and 12 can run at the same time. Task 10 waits for 4 and 7. Cross-lane sync points: Task 1 (workspace + types; SP04 in Lane B starts on it, push it as soon as it is green) and Task 13 (gate; SP02 may not start before it). Task 2 also fixes the eaudit CI path SP00 left pointing at `eaudit/`.
 
