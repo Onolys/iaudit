@@ -7,6 +7,7 @@ members = [
     "eaudit",
     "onolys-api",
     "onolys-core",
+    "onolys-paudit",
 ]
 
 [[package]]
@@ -1086,6 +1087,41 @@ dev = [
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-asyncio", specifier = ">=0.23" },
     { name = "pytest-cov", specifier = ">=5" },
+    { name = "ruff", specifier = ">=0.6" },
+]
+
+[[package]]
+name = "onolys-paudit"
+version = "0.1.0"
+source = { editable = "engines/paudit" }
+dependencies = [
+    { name = "jsonschema" },
+    { name = "onolys-core" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "jsonschema", specifier = ">=4.22" },
+    { name = "onolys-core", editable = "engines/core" },
+    { name = "pydantic", specifier = ">=2.7" },
+    { name = "pyyaml", specifier = ">=6" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=8" },
+    { name = "pytest-asyncio", specifier = ">=0.23" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
     { name = "ruff", specifier = ">=0.6" },
 ]
 
