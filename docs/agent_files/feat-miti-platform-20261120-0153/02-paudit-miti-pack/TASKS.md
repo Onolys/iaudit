@@ -8,8 +8,8 @@ Source of truth: [PRD.md](PRD.md). Lane A. Tests follow SP00 conventions: marker
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | `engines/paudit` skeleton, pack schema, loader, `pack_hash`, grep test | SP01 T1 | todo |
-| 2 | `rating.schema.json` (rating card) + parity test | 1 | todo |
+| 1 | `engines/paudit` skeleton, pack schema, loader, `pack_hash`, grep test | SP01 T1 | done |
+| 2 | `rating.schema.json` (rating card) + parity test | 1 | in-progress |
 | 3 | Result models and `paudit-result.schema.json` | 1 | todo |
 | 4 | Safe formula evaluator `paudit.formula.evaluate` | 1 | todo |
 | 5 | Select, volley builder, input checks, hook interface | 1, 3 | todo |
