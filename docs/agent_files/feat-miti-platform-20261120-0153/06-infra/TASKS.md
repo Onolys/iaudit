@@ -15,9 +15,9 @@ Source of truth: 06-infra/PRD.md. Tasks 1-9 are the STAGING MINIMAL slice (SP00 
 | 5 | Firestore rules, indexes wiring, emulator rules tests | 1 | done |
 | 6 | Identity Platform, web apps, authorised domains, outputs | 2 (owner step: billing) | done |
 | 7 | WIF pool + `deployer-staging` (incl. preview roles) | 3, 4 | done |
-| 8 | First staging apply, seeding, IAM and egress checks | 4, 5, 6, 7 (owner step: Anthropic key) | in-progress |
+| 8 | First staging apply, seeding, IAM and egress checks | 4, 5, 6, 7 (owner step: Anthropic key) | done |
 | 9 | `_deploy-cloudrun.yml` + `deploy-staging.yml` | 8, SP04 T1, SP04 T16, SP05 T1 | todo |
-| 10 | Budget, failure alerts, alert email channel | 8 (owner step: alert email) | todo |
+| 10 | Budget, failure alerts, alert email channel | 8 (owner step: alert email) | in-progress |
 | 11 | Prod environment + `deployer-prod` | 8, 10 | todo |
 | 12 | Custom domain `app.onolys.com` + DNS output | 11 (owner step: DNS) | todo |
 | 13 | `deploy-prod.yml`: gated promotion + rollback drill | 9, 11 (owner step: GitHub env) | todo |
