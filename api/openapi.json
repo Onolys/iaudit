@@ -1697,6 +1697,48 @@
       }
     },
     "/v1/sessions/{id}": {
+      "delete": {
+        "description": "Marks the session `deleting`, removes every stored object and document, then answers 204. If storage or Firestore fails the session stays `deleting` (hidden everywhere), a cleanup task finishes it, and this call answers 503 `upstream_unavailable`: repeat it or wait. Deleting a finished session again answers 404. Usage counters are kept.",
+        "operationId": "deleteSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Hard delete: audio, transcript, ratings, runs, reports, status",
+        "tags": [
+          "sessions"
+        ]
+      },
       "get": {
         "operationId": "getSession",
         "parameters": [

@@ -21,6 +21,7 @@ from onolys_api.auth.oidc import OidcVerifier
 from onolys_api.config import LOCAL_ENVS, Settings
 from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse, error_body
 from onolys_api.factory import build_blobs, build_repo
+from onolys_api.jobs.delete import make_delete_handler
 from onolys_api.jobs.queue import build_queue
 from onolys_api.jobs.run import make_run_handler
 from onolys_api.jobs.transcribe import make_poll_handler, make_transcribe_handler
@@ -219,6 +220,9 @@ def create_app(
                 make_run_handler(app.state.blobs, lambda: app.state.adapters.evaluation, settings),
                 scope="run",
             ),
+        )
+        app.state.runner.register(
+            "delete", HandlerSpec(make_delete_handler(app.state.blobs), claim=False)
         )
         if settings.env not in LOCAL_ENVS:
             if not settings.worker_url or not settings.tasks_sa:

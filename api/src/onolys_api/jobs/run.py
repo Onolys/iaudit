@@ -80,8 +80,8 @@ def release_once(repo, uid: str, sid: str, run_id: str, refund: bool, date: str 
             return
         date = run.cap_date or date
         repo.update_run(uid, sid, run_id, {"released": True})
-    except NotFoundError:  # session deleted under the run: still free the slot
-        pass
+    except NotFoundError:  # session deleted under the run: the delete already freed the slot
+        return
     if date:
         caps.release_run(repo, uid, date, refund)
 
