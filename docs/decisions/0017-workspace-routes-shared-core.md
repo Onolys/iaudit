@@ -36,4 +36,21 @@ Run 2026-11-20 with live credentials, preset `default`, by the Task 13 agent. **
 
 **Environment note.** The ADC quota project is another project (`juno-medical-clarity`), which has Speech-to-Text disabled. The first STT call failed with `SERVICE_DISABLED` until `GOOGLE_CLOUD_QUOTA_PROJECT=onolys` was set. Set it wherever the adapter runs with user credentials. APIs used (`speech`, `texttospeech`, `storage`) were already enabled on `onolys`; nothing was enabled by this run.
 
+### Real-sample re-run (2026-11-20)
+
+Owner-supplied real mock MI session: 2 speakers, MP3 128 kbps 44.1 kHz stereo, 6.7 min of audio (shorter than the 10 min target, so `--min-minutes 6` was used). Uploaded temporarily to `gs://onolys-audio-staging/gate-t13-real/` (MP3 sent as is; Chirp 3 auto-decodes it, no transcode) and deleted afterwards; no audio or transcript text is in the repo, logs or this ADR. Preset `default`, `--language auto`, 2 speakers requested. Counts and metrics only.
+
+| Item | Result |
+|---|---|
+| Strict `stt.check` verdict | FAIL, same way on 3 runs: `turn t24: start_ms > end_ms`. Cause: 1 of 1357 words came back from Chirp 3 with `end_offset` = 0 (start 108.72 s), which made the turn's last-word end earlier than its start. Not a diarization or recognition problem. |
+| Wall time | 78.1 s, 77.8 s, 78.2 s (about 0.19 s per audio second) |
+| Turns, speakers, language | 74 turns, 2 speakers (S1 39 turns, S2 35), `language=en` detected |
+| Word offsets | Present on all 1357 words. 1 word has `end_ms` = 0 (above). No word starts earlier than the one before it; no turn overlaps the next. Last end 402.2 s. |
+| Diarization (qualitative, no text) | Speaker changes between consecutive turns: 68 of 73 (93%). Word-level speaker flips: 68. Talk time S1 98 s, S2 147 s. 22 of 74 turns are 3 words or fewer (short acknowledgements, as expected in MI); median 12 words per turn, longest 124. No 1-speaker collapse and no third label. Plausible; not checked against a human-labelled reference. |
+
+- (a) Word offsets present: **yes** on real audio, with one defect (1 word in 1357 has `end_ms` = 0). The adapter should repair it (set a word's `end_ms` to at least its own `start_ms`, e.g. the next word's start) so `stt.check` and downstream offset logic hold. This is a follow-up in `google_chirp.extract_words`; not changed here. No STT fallback needed.
+- (b) Diarization with `language: auto`: **yes** on real voices: 2 speakers, `en` detected, 93% alternation. `auto` stays in the SP05 list.
+- (c) Latency: about 78 s for 6.7 min, consistent with the synthetic estimate (0.16-0.24 s per audio second); about 4 min extrapolated to the 20 min cap.
+- **SP02-unblock condition: met.** (a) and (b) hold on real voices; the single zero-end word is a small adapter fix, not a blocker.
+
 If (a) is no: use another STT model or provider through the adapter. If (b) is no: default language becomes `en-US` and `auto` leaves the web language list. If (c) exceeds the transcribe poll window (about 20 minutes): another model or provider as in (a).
