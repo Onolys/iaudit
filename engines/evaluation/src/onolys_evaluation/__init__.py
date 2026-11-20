@@ -7,8 +7,8 @@ from onolys_evaluation.api import (
     TipsArtifact,
     build_report,
     run_evaluation,
-    validate_rating,
 )
+from onolys_evaluation.rating import is_no_rating, validate_rating
 from onolys_evaluation.report import SCHEMA_VERSION, Issue, Report, Warning
 
 __all__ = [
@@ -21,6 +21,7 @@ __all__ = [
     "TipsArtifact",
     "Warning",
     "build_report",
+    "is_no_rating",
     "run_evaluation",
     "validate_rating",
 ]

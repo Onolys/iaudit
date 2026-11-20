@@ -56,6 +56,4 @@ def test_evaluation_output_fields():
 
 def test_stubs_not_implemented():
     with pytest.raises(NotImplementedError):
-        validate_rating(None, {}, True)
-    with pytest.raises(NotImplementedError):
         build_report()

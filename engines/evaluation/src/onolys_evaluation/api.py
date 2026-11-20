@@ -10,7 +10,8 @@ from paudit.pack import Pack
 from paudit.result import PauditResult
 from pydantic import BaseModel
 
-from onolys_evaluation.report import Issue, Report, Tip
+from onolys_evaluation.rating import is_no_rating, validate_rating  # noqa: F401
+from onolys_evaluation.report import Report, Tip
 
 Stage = Literal["paudit", "eaudit", "tips", "compare", "assemble"]
 StageStatus = Literal["started", "done", "failed"]
@@ -35,11 +36,6 @@ class EvaluationOutput(BaseModel):
 
     report: Report
     artifacts: Artifacts
-
-
-def validate_rating(pack: Pack, obj: Any, final: bool) -> list[Issue]:
-    """R2: check a rating card. `final=False` is a draft (shape and limits only)."""
-    raise NotImplementedError("SP03 task 2")
 
 
 async def run_evaluation(
