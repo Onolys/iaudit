@@ -1,0 +1,12 @@
+# Packaged default STT provider map (PRD R4, D10). Used when no stt_providers.yaml
+# sits next to the file named by ROUTES_FILE. No STT env vars: edit this file.
+providers:
+  google_chirp3:
+    provider: google
+    model: chirp_3
+    options:
+      recognition: standard
+      location: us
+      endpoint: us-speech.googleapis.com
+default: google_chirp3
+by_language: {}

@@ -36,6 +36,10 @@ jobs:
         run: bash scripts/ci/test_changes.sh
       - name: Check markdown links
         run: python3 scripts/ci/check_links.py
+      - name: Test config guard
+        run: bash scripts/ci/test_check_config.sh
+      - name: actionlint (workflows)
+        run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7 && ./actionlint -color
       - id: flags
         env:
           EVENT: ${{ github.event_name }}
