@@ -35,8 +35,12 @@ def test_runtime_sa_user_includes_admin_sa_only_when_enabled():
         assert "var.admin_enabled" in DEPLOYER[DEPLOYER.index(f"{env}_runtime_sas") :][:400], env
 
 
-def test_hosting_conditions_cover_admin_sites_only_when_enabled():
-    stg = local_block("hosting_staging_sites")
-    assert "var.admin_staging_site_id" in stg and "var.admin_enabled" in stg
-    prod = local_block("hosting_prod_sites")
-    assert "var.admin_site_id" in prod and "var.admin_enabled" in prod
+def test_hosting_admin_is_project_level_without_name_condition():
+    # Run 44812626576: 403 on firebasehosting `.../sites/onolys-app-staging/versions` with a resource.name condition.
+    # Hosting site resources are unknown to Policy Troubleshooter and never matched the condition (covers admin sites too).
+    for env in ("staging", "prod"):
+        m = re.search(r'resource "google_project_iam_member" "deployer_%s_hosting" \{(.*?)\n\}' % env, DEPLOYER, re.S)
+        assert m, env
+        assert '"roles/firebasehosting.admin"' in m.group(1), env
+        assert "condition" not in m.group(1), env
+    assert "hosting_staging_sites" not in DEPLOYER and "hosting_prod_sites" not in DEPLOYER

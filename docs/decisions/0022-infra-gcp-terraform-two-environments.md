@@ -14,6 +14,7 @@
 - **D4 Same-origin API**: Hosting site with a `/v1/**` rewrite to Cloud Run (no CORS, no load balancer).
 - **D5 Deploy auth**: Workload Identity Federation with one deployer service account per env; prod trusts only the `production` GitHub environment.
   - Firebase deploys also need `firebase.projects.get` (custom role `firebaseProjectGet`, both deployers) and `firebaserules.admin` at project level: firebase-tools calls rulesets `:test`/create on the bare project resource, which IAM conditions on `resource.name` did not match (403 in CI). Trade-off: `deployer-staging` could release prod rules; accepted (same repo trust, workflow targets `firestore:staging` only). `datastore.indexAdmin` stays limited per database.
+  - Hosting: `firebasehosting.admin` is also project level for both deployers (app and admin sites). Conditions on `resource.name` never matched Hosting calls (403 on `sites/<id>/versions`, run 44812626576) and Policy Troubleshooter does not support Hosting site resources. Trade-off: a deployer could deploy to any site, prod included; accepted (same repo trust; workflows target their own site only).
 - **D6 Prod promotion**: the same image digest that ran in staging, after manual approval; no rebuild.
 - **D7 Backups**: PITR off, no backups, GCS soft-delete 0, prod DB delete-protection on, so "delete removes everything" holds. An erroneous prod delete cannot be recovered (accepted v1 risk).
 - **D8 Admin**: Hosting site plus Cloud Run, app-level email allowlist, no MFA; behind `admin_enabled` (default off, after launch).

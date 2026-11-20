@@ -59,16 +59,6 @@ locals {
     { api = module.staging.api_sa_email, worker = module.staging.worker_sa_email },
     var.admin_enabled["staging"] ? { admin = module.staging.admin_backend_sa_email } : {},
   )
-  hosting_staging_sites = concat(
-    [
-      "projects/${var.project}/sites/${var.app_staging_site_id}",
-      "projects/-/sites/${var.app_staging_site_id}",
-    ],
-    var.admin_enabled["staging"] ? [
-      "projects/${var.project}/sites/${var.admin_staging_site_id}",
-      "projects/-/sites/${var.admin_staging_site_id}",
-    ] : [],
-  )
 }
 
 # firebase-tools reads the Firebase project (firebase.projects.get) before every deploy. That permission is
@@ -121,17 +111,14 @@ resource "google_project_iam_member" "deployer_staging_usage" {
   member  = local.deployer_staging_member
 }
 
-# Hosting admin limited (IAM condition on resource name) to the staging site and its channels.
+# Hosting admin is project level on purpose: IAM conditions on resource.name (site name by id, `projects/-`, and the
+# versions/releases children) never matched what Hosting presents (run 44812626576, 403 on .../versions), and Policy
+# Troubleshooter cannot evaluate Hosting site names. Trade-off: either deployer could deploy to any site (incl. admin
+# and prod). Accepted: same GitHub repo trust, workflows only target their own site. See ADR 0022 (D5).
 resource "google_project_iam_member" "deployer_staging_hosting" {
   project = var.project
   role    = "roles/firebasehosting.admin"
   member  = local.deployer_staging_member
-
-  condition {
-    title       = "hosting-app-staging-only"
-    description = "Only the ${var.app_staging_site_id}${var.admin_enabled["staging"] ? " and ${var.admin_staging_site_id}" : ""} site${var.admin_enabled["staging"] ? "s" : ""} (and ${var.admin_enabled["staging"] ? "their" : "its"} channels/versions)"
-    expression  = join(" || ", [for s in local.hosting_staging_sites : "resource.name.startsWith(\"${s}\")"])
-  }
 }
 
 # Firestore rules/indexes. Indexes are limited to the staging database by condition. Rules are project level on
@@ -211,18 +198,6 @@ locals {
     { api = module.prod.api_sa_email, worker = module.prod.worker_sa_email },
     var.admin_enabled["prod"] ? { admin = module.prod.admin_backend_sa_email } : {},
   )
-  # Exact site or its children only: a bare startsWith would also match `onolys-app-staging`
-  # (and `onolys-admin` would match `onolys-admin-staging`).
-  hosting_prod_sites = concat(
-    [var.app_site_id],
-    var.admin_enabled["prod"] ? [var.admin_site_id] : [],
-  )
-  hosting_prod_expr = join(" || ", flatten([
-    for id in local.hosting_prod_sites : [
-      for s in ["projects/${var.project}/sites/${id}", "projects/-/sites/${id}"] :
-      ["resource.name == \"${s}\"", "resource.name.startsWith(\"${s}/\")"]
-    ]
-  ]))
 }
 
 resource "google_cloud_run_v2_service_iam_member" "deployer_prod_developer" {
@@ -262,16 +237,11 @@ resource "google_project_iam_member" "deployer_prod_firebase_project_get" {
   member  = local.deployer_prod_member
 }
 
+# Project level for the same reason as deployer_staging_hosting (see above).
 resource "google_project_iam_member" "deployer_prod_hosting" {
   project = var.project
   role    = "roles/firebasehosting.admin"
   member  = local.deployer_prod_member
-
-  condition {
-    title       = "hosting-app-prod-only"
-    description = "Only the ${var.app_site_id}${var.admin_enabled["prod"] ? " and ${var.admin_site_id}" : ""} site${var.admin_enabled["prod"] ? "s" : ""} (and ${var.admin_enabled["prod"] ? "their" : "its"} channels/versions)"
-    expression  = local.hosting_prod_expr
-  }
 }
 
 resource "google_project_iam_member" "deployer_prod_index_admin" {
