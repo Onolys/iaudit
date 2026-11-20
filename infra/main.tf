@@ -78,6 +78,25 @@ resource "google_firebase_hosting_site" "admin_staging" {
   depends_on = [google_project_service.api]
 }
 
+# Provider-key secret shells (PRD D12): one per llm_secrets/stt_secrets entry, shared by both envs.
+# Values are seeded outside state by scripts/seed-secrets.py (PRD D9).
+resource "google_secret_manager_secret" "provider" {
+  for_each  = merge(var.llm_secrets, var.stt_secrets)
+  project   = var.project
+  secret_id = each.value
+
+  replication {
+    auto {}
+  }
+
+  depends_on = [google_project_service.api]
+}
+
+locals {
+  llm_secret_ids = { for k in keys(var.llm_secrets) : k => google_secret_manager_secret.provider[k].secret_id }
+  stt_secret_ids = { for k in keys(var.stt_secrets) : k => google_secret_manager_secret.provider[k].secret_id }
+}
+
 module "staging" {
   source = "./modules/environment"
 
@@ -88,6 +107,14 @@ module "staging" {
   delete_protection    = false
   worker_concurrency   = var.worker_concurrency
   worker_max_instances = var.worker_max_instances
+  api_max_instances    = 3
+  llm_secrets          = local.llm_secret_ids
+  stt_secrets          = local.stt_secret_ids
+  admin_enabled        = var.admin_enabled
+  admin_cors_origins = [
+    "https://${var.admin_staging_site_id}.web.app",
+    "http://localhost:5173",
+  ]
   cors_origins = [
     "https://${var.app_staging_site_id}.web.app",
     "http://localhost:5173",

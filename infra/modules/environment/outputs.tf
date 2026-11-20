@@ -29,3 +29,11 @@ output "tasks_invoker_sa_email" {
 output "stt_service_agent_email" {
   value = google_project_service_identity.speech.email
 }
+
+output "api_url" {
+  value = google_cloud_run_v2_service.api.uri
+}
+
+output "worker_url" {
+  value = google_cloud_run_v2_service.worker.uri
+}
