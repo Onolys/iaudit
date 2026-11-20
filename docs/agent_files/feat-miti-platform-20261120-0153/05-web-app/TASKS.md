@@ -8,8 +8,8 @@ Source of truth: [PRD.md](PRD.md). Lane C. Built on MSW mocks from day one (D5);
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Scaffold `web/`, tokens, router shell, lint rules, `web` CI job turns on | none | todo |
-| 2 | API client, error mapping, MSW handlers, fixtures, state machine, status-listener seam | 1 | todo |
+| 1 | Scaffold `web/`, tokens, router shell, lint rules, `web` CI job turns on | none | done |
+| 2 | API client, error mapping, MSW handlers, fixtures, state machine, status-listener seam | 1 | done |
 | 3 | Auth: sign-up, login, reset, verify-email, guards, token retry | 1, 2 | todo |
 | 4 | Session page: status listener, derived timeline, error cards, delete | 2, 3 | todo |
 | 5 | Create session form and uploader | 4 | todo |

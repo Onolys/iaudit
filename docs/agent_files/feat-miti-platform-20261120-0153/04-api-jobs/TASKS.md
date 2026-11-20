@@ -8,11 +8,11 @@ Source of truth: [PRD.md](PRD.md). Lane B (platform). Built and accepted on fake
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | API skeleton, `SERVICE_MODE=combined`, healthz, error schema, committed `openapi.json` | SP01 T1 | todo |
-| 2 | `Repo` protocol, Firestore + fake repos, blob store, data model, indexes | 1 | todo |
-| 3 | Auth: ID tokens, API keys, `/api-key` | 1, 2 | todo |
-| 4 | Sessions: create (idempotent), list, get, `session_status`, state machine core | 2, 3 | todo |
-| 5 | Task queue + worker framework (retry, idempotency, OIDC) | 1, 2 | todo |
+| 1 | API skeleton, `SERVICE_MODE=combined`, healthz, error schema, committed `openapi.json` | SP01 T1 | done |
+| 2 | `Repo` protocol, Firestore + fake repos, blob store, data model, indexes | 1 | done |
+| 3 | Auth: ID tokens, API keys, `/api-key` | 1, 2 | done |
+| 4 | Sessions: create (idempotent), list, get, `session_status`, state machine core | 2, 3 | done |
+| 5 | Task queue + worker framework (retry, idempotency, OIDC) | 1, 2 | done |
 | 6 | Engine adapters and fakes (`Stt`, `Evaluation`) | 1 | todo |
 | 7 | Audio upload, `complete`, `validate` + FLAC transcode | 4, 5, 2 | todo |
 | 8 | `transcribe` + `transcribe-poll` | 5, 6, 7 | todo |

@@ -8,13 +8,13 @@ Source of truth: 06-infra/PRD.md. Tasks 1-9 are the STAGING MINIMAL slice (SP00 
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Tooling, state bucket, Terraform skeleton | — (owner step: GCP Owner) | todo |
-| 2 | Project base: APIs, Artifact Registry, Hosting sites, `admin_enabled` flag | 1 | todo |
-| 3 | Environment module: Firestore DB, bucket, queue, service accounts (staging) | 2 | todo |
-| 4 | Secrets maps, `seed-secrets.py`, Cloud Run api+worker shells (staging) | 3 | todo |
+| 1 | Tooling, state bucket, Terraform skeleton | — (owner step: GCP Owner) | done |
+| 2 | Project base: APIs, Artifact Registry, Hosting sites, `admin_enabled` flag | 1 | done |
+| 3 | Environment module: Firestore DB, bucket, queue, service accounts (staging) | 2 | done |
+| 4 | Secrets maps, `seed-secrets.py`, Cloud Run api+worker shells (staging) | 3 | done |
 | 5 | Firestore rules, indexes wiring, emulator rules tests | 1 | todo |
-| 6 | Identity Platform, web apps, authorised domains, outputs | 2 (owner step: billing) | todo |
-| 7 | WIF pool + `deployer-staging` (incl. preview roles) | 3, 4 | todo |
+| 6 | Identity Platform, web apps, authorised domains, outputs | 2 (owner step: billing) | done |
+| 7 | WIF pool + `deployer-staging` (incl. preview roles) | 3, 4 | in-progress |
 | 8 | First staging apply, seeding, IAM and egress checks | 4, 5, 6, 7 (owner step: Anthropic key) | todo |
 | 9 | `_deploy-cloudrun.yml` + `deploy-staging.yml` | 8, SP04 T1, SP04 T16, SP05 T1 | todo |
 | 10 | Budget, failure alerts, alert email channel | 8 (owner step: alert email) | todo |

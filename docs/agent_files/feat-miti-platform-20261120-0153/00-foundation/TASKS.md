@@ -8,11 +8,11 @@ Source of truth: 00-foundation/PRD.md. Tasks 1-6 are CI/test work with no depend
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Test conventions + `testing.md` | — | todo |
-| 2 | `ci.yml` absent-package guard on existing jobs | — | todo |
-| 3 | Python package jobs: core, paudit, evaluation | 2 | todo |
-| 4 | `api` job (emulator + OpenAPI diff) | 2, 3 | todo |
-| 5 | `web` and `infra` jobs | 2 | todo |
+| 1 | Test conventions + `testing.md` | — | done |
+| 2 | `ci.yml` absent-package guard on existing jobs | — | done |
+| 3 | Python package jobs: core, paudit, evaluation | 2 | done |
+| 4 | `api` job (emulator + OpenAPI diff) | 2, 3 | done |
+| 5 | `web` and `infra` jobs | 2 | done |
 | 6 | CI behaviour proof (skip, fail, live-excluded, fork) | 2, 3, 4, 5 | todo |
 | 7 | `pr-preview.yml`: build, deploy, comment | 6, SP06 T9, SP04 T1, SP05 T1 | todo |
 | 8 | `pr-preview-cleanup.yml` | 7 | todo |
