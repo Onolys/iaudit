@@ -65,6 +65,7 @@ Set by Terraform (`infra/modules/environment/services.tf`). Values below are the
 | `TASKS_SA` | yes | yes | `tasks-invoker-{env}@onolys.iam.gserviceaccount.com` |
 | `WORKER_URL` | yes | yes | `https://onolys-worker-{env}-1054076260967.us-central1.run.app` (also the OIDC audience) |
 | `ADAPTERS` | yes | yes | `real` |
+| `BLOB_SIGNER_EMAIL` | yes | no | `api-{env}@onolys.iam.gserviceaccount.com` (signs V4 upload/read URLs through IAM `signBlob`) |
 | `DAILY_RUN_CAP` | yes | yes | `20` (per user, app-side) |
 | `ROUTES_FILE` | yes | yes | `config/{env}/routes.yaml` (baked into the image; `stt_providers.yaml` sits next to it) |
 | `DEFAULT_PRESET` | yes | yes | `default` |
