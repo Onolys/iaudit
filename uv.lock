@@ -1045,6 +1045,8 @@ dependencies = [
     { name = "eaudit" },
     { name = "fastapi" },
     { name = "onolys-admin-auth" },
+    { name = "onolys-core" },
+    { name = "onolys-paudit" },
     { name = "uvicorn" },
 ]
 
@@ -1062,6 +1064,8 @@ requires-dist = [
     { name = "eaudit", editable = "engines/eaudit" },
     { name = "fastapi", specifier = ">=0.115" },
     { name = "onolys-admin-auth", editable = "admin/auth" },
+    { name = "onolys-core", editable = "engines/core" },
+    { name = "onolys-paudit", editable = "engines/paudit" },
     { name = "uvicorn", specifier = ">=0.30" },
 ]
 

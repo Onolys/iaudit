@@ -1,7 +1,8 @@
 """Gateway app. Layer order (outermost first): CORS -> auth -> routes.
 
 CORS is outermost so preflights are answered before auth (they carry no token) and
-CORS headers also appear on 401/403 responses. eaudit is mounted unchanged at "/".
+CORS headers also appear on 401/403 responses. paudit routes are served by the parent app;
+eaudit is mounted unchanged at "/".
 """
 
 import os
@@ -11,6 +12,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from onolys_admin_auth import AdminAuthConfig, AdminAuthMiddleware, ConfigError
+
+from onolys_admin_backend.paudit_routes import DEFAULT_MAX_BODY_BYTES, register_paudit_routes
 
 ALLOWED_HEADERS = ["authorization", "content-type"]
 ALLOWED_METHODS = ["GET", "POST", "OPTIONS"]
@@ -29,6 +32,7 @@ def create_app(
     eaudit_app: FastAPI | None = None,
     env: Mapping[str, str] | None = None,
     verifier=None,
+    paudit_client=None,
 ) -> FastAPI:
     env = os.environ if env is None else env
     config = AdminAuthConfig.from_env(env)
@@ -50,6 +54,14 @@ def create_app(
         docs_url=None,
         redoc_url=None,
         openapi_url=None,
+    )
+    # paudit routes first so they win routing over the catch-all eaudit mount.
+    settings = getattr(eaudit_app.state, "settings", None)
+    register_paudit_routes(
+        app,
+        env,
+        client=paudit_client,
+        max_body_bytes=getattr(settings, "max_body_bytes", DEFAULT_MAX_BODY_BYTES),
     )
     app.mount("/", eaudit_app)
     # add_middleware prepends: the last one added is the outermost.
