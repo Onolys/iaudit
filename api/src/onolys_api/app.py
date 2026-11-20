@@ -29,6 +29,7 @@ from onolys_api.presets import PresetResolver
 from onolys_api.repo.base import Repo
 from onolys_api.routes import api_key as api_key_routes
 from onolys_api.routes import audio as audio_routes
+from onolys_api.routes import rating as rating_routes
 from onolys_api.routes import sessions as session_routes
 from onolys_api.routes import tasks as task_routes
 from onolys_api.routes import usage as usage_routes
@@ -240,6 +241,7 @@ def create_app(
     router.include_router(api_key_routes.router)
     router.include_router(session_routes.router)
     router.include_router(audio_routes.router)
+    router.include_router(rating_routes.router)
     router.include_router(usage_routes.router)
     app.include_router(router)
     if runs_tasks:

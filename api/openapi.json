@@ -204,6 +204,26 @@
         "title": "CreateSessionResponse",
         "type": "object"
       },
+      "DraftRating": {
+        "properties": {
+          "card": {
+            "additionalProperties": true,
+            "title": "Card",
+            "type": "object"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card",
+          "updated_at"
+        ],
+        "title": "DraftRating",
+        "type": "object"
+      },
       "ErrorDetailModel": {
         "properties": {
           "code": {
@@ -299,6 +319,30 @@
         "title": "ErrorResponse",
         "type": "object"
       },
+      "FinalRating": {
+        "properties": {
+          "card": {
+            "additionalProperties": true,
+            "title": "Card",
+            "type": "object"
+          },
+          "no_rating": {
+            "title": "No Rating",
+            "type": "boolean"
+          },
+          "rating_id": {
+            "title": "Rating Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rating_id",
+          "no_rating",
+          "card"
+        ],
+        "title": "FinalRating",
+        "type": "object"
+      },
       "Flags": {
         "properties": {
           "has_rating": {
@@ -348,6 +392,112 @@
           "code_version"
         ],
         "title": "Healthz",
+        "type": "object"
+      },
+      "RatingRequest": {
+        "properties": {
+          "card": {
+            "additionalProperties": true,
+            "description": "The rating card (`rating.schema.json`)",
+            "title": "Card",
+            "type": "object"
+          },
+          "final": {
+            "description": "`false` autosaves the draft; `true` submits a new revision",
+            "title": "Final",
+            "type": "boolean"
+          },
+          "no_rating": {
+            "default": false,
+            "description": "With `final`: submit as a \"no rating\" revision",
+            "title": "No Rating",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "final",
+          "card"
+        ],
+        "title": "RatingRequest",
+        "type": "object"
+      },
+      "RatingSaved": {
+        "properties": {
+          "final": {
+            "title": "Final",
+            "type": "boolean"
+          },
+          "has_rating": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Rating"
+          },
+          "no_rating": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "No Rating"
+          },
+          "rating_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating Id"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "final",
+          "updated_at"
+        ],
+        "title": "RatingSaved",
+        "type": "object"
+      },
+      "RatingView": {
+        "properties": {
+          "draft": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DraftRating"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only when newer than the last final"
+          },
+          "final": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FinalRating"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "RatingView",
         "type": "object"
       },
       "SessionDetail": {
@@ -1150,6 +1300,115 @@
         "summary": "Tell the server the PUT finished",
         "tags": [
           "audio"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/rating": {
+      "get": {
+        "operationId": "getRating",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RatingView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "The latest final revision and, if newer, the autosaved draft",
+        "tags": [
+          "rating"
+        ]
+      },
+      "put": {
+        "description": "`final=false`: overwrites the draft; only the size limits are checked and nothing else changes. `final=true`: validates the card (`change_goal` required), writes a new revision and sets `rating_submitted`/`has_rating`; `no_rating=true`, or a card with no scores, counts or notes, is a \"no rating\" revision (`has_rating=false`). Over 1,000 chars per reason/note/example or 3,000 for `notes` is 422 `rating_invalid`. Allowed in every state but `deleting`. A final card may start the first run (R4).",
+        "operationId": "putRating",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RatingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RatingSaved"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Save the rating card (draft autosave or final revision)",
+        "tags": [
+          "rating"
         ]
       }
     },
