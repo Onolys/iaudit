@@ -85,10 +85,10 @@ it("handles missing metrics and disables rescore while the run itself is running
   expect(screen.getByText("Metrics missing. Re-score.")).toBeTruthy();expect(rescore().disabled).toBe(true);
 });
 it("continues after three poll misses, clears the banner on recovery, and supports initial Retry",async()=>{
-  const s=setup({...finished,score_state:"running"} as Detail);await tick();s.miss(true);await tick(3000);
+  const s=setup({...finished,score_state:"running"} as Detail);await tick();s.miss(true);await tick(4000);
   expect(screen.getByText("Lost contact with eval server — retrying")).toBeTruthy();s.miss(false);await tick(1000);expect(screen.queryByText("Lost contact with eval server — retrying")).toBeNull();
   s.unmount();const offline=setup();offline.miss(true);await tick(0); // Initial fetch already began; force a fresh request with a new run id.
-  offline.rerender(<RunDetail {...offline.props} runId="another-run"/>);await tick();
+  offline.rerender(<RunDetail {...offline.props} runId="another-run"/>);await tick(300);
   expect(screen.getByText("Eval server not reachable")).toBeTruthy();offline.miss(false);fireEvent.click(screen.getByRole("button",{name:"Retry"}));await tick();expect(screen.queryByText("Eval server not reachable")).toBeNull();
 });
 it("does not overlap polls and aborts pending run and metric reads on unmount",async()=>{

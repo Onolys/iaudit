@@ -1,0 +1,16 @@
+{
+  "schema_version": "0.0.1",
+  "request_id": "example-001",
+  "status": 400,
+  "message": "The request does not match the audit contract.",
+  "details": [
+    {
+      "code": "schema_violation",
+      "message": "transcript/0/text: must be of type string"
+    },
+    {
+      "code": "schema_violation",
+      "message": "assessment/0: required property missing"
+    }
+  ]
+}

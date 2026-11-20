@@ -26,6 +26,19 @@ const run = () => screen.getByRole("button", { name: "Run" }) as HTMLButtonEleme
 beforeEach(() => { localStorage.clear(); vi.useFakeTimers(); });
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); });
 describe("RunPanel form", () => {
+  it("groups datasets by product and retains flat stored ids", async () => {
+    const api = createEvalApi({ fetch: (async url => {
+      if (url === "/eval-api/datasets") return Response.json([
+        { ...datasets[0], product: "eaudit" }, { ...datasets[1], product: "paudit" },
+      ]);
+      return Response.json(metadata);
+    }) as typeof fetch });
+    render(<RunPanel api={api} />); await tick(0);
+    expect(screen.getByRole("group", { name: "eaudit" }).querySelector("option")?.value).toBe("fictional-alpha");
+    expect(screen.getByRole("group", { name: "paudit" }).querySelector("option")?.value).toBe("fictional-beta");
+    fireEvent.change(screen.getByLabelText("Dataset"), { target: { value: "fictional-beta" } }); await tick(0);
+    expect(localStorage.getItem("iaudit.eval.dataset")).toBe("fictional-beta");
+  });
   it("debounces whole-split cost and submits blank cap as omitted", async () => {
     const { requests, onRun } = setup(); await tick(0); await tick(399); expect(requests).toEqual([]); await tick(1);
     expect(requests).toEqual([{ dataset: "fictional-alpha", split: "validation" }]);

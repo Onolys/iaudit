@@ -48,6 +48,7 @@ class SplitMeta(SplitSummary):
 
 class DatasetSummary(Model):
     name: str
+    product: str
     title: str
     data_present: bool
     splits: list[SplitSummary]
@@ -57,6 +58,7 @@ class DatasetMeta(Model):
     # Unknown metadata fields are preserved, just as by B2 DatasetMeta.to_dict().
     model_config = ConfigDict(extra="allow")
     name: str
+    product: str
     title: str = ""
     description: str = ""
     dataset_version: str = ""

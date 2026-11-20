@@ -33,27 +33,18 @@ describe("validateResponse", () => {
     const r = validateResponse(v, req());
     expect(r).toEqual({ ok: false, error: { kind: "not_object" } });
   });
-  it("rejects wrong version before schema", () => {
+  it.each(["9.8.7", "8.7.6"])("rejects nonmatching version %s with schema issues", (version) => {
     const bad = res();
-    bad.schema_version = "2.0.0";
-    bad.extra = 1;
-    expect(validateResponse(bad, req())).toEqual({ ok: false, error: { kind: "wrong_version" } });
+    bad.schema_version = version;
+    expect(validateResponse(bad, req())).toMatchObject({
+      ok: false, error: { kind: "schema", issues: [{ path: "/schema_version" }] },
+    });
   });
-  it("rejects 1.0.0 as wrong_version", () => {
-    const bad = res();
-    bad.schema_version = "1.0.0";
-    expect(validateResponse(bad, req())).toEqual({ ok: false, error: { kind: "wrong_version" } });
-  });
-  it("rejects 1.1.0 as wrong_version", () => {
-    const bad = res();
-    bad.schema_version = "1.1.0";
-    expect(validateResponse(bad, req())).toEqual({ ok: false, error: { kind: "wrong_version" } });
-  });
-  it("accepts a 1.2.0 response with run_info", () => {
+  it("accepts a 0.0.1 response with run_info", () => {
     expect(res().run_info).toBeDefined();
     expect(validateResponse(res(), req()).ok).toBe(true);
   });
-  it("accepts a 1.2.0 response without run_info", () => {
+  it("accepts a 0.0.1 response without run_info", () => {
     const ok = res();
     delete ok.run_info;
     expect(validateResponse(ok, req()).ok).toBe(true);

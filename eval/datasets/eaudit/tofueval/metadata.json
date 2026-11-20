@@ -1,4 +1,5 @@
 {
+  "product": "eaudit",
   "name": "tofueval",
   "title": "TofuEval",
   "description": "Factual consistency of topic-focused dialogue summaries from MediaSum and MeetingBank. Each item is one summary, with source documents defining the dev/test split and clustering. Licensed source text is downloaded locally.",
@@ -159,6 +160,34 @@
       "positive": true
     },
     "concern_detected:CO": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern:NMS": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern_detected:NMS": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern:RE": {
+      "labels": [
+        false,
+        true
+      ],
+      "positive": true
+    },
+    "concern_detected:RE": {
       "labels": [
         false,
         true
@@ -508,6 +537,70 @@
       ]
     },
     {
+      "name": "concern_match_rate_NMS",
+      "fn": "recall_by_type",
+      "level": "concern:NMS",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_inconsistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_base_rate_NMS",
+      "fn": "recall_by_type",
+      "level": "concern:NMS",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_consistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_given_detected_NMS",
+      "fn": "recall",
+      "level": "concern_detected:NMS",
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_rate_RE",
+      "fn": "recall_by_type",
+      "level": "concern:RE",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_inconsistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_base_rate_RE",
+      "fn": "recall_by_type",
+      "level": "concern:RE",
+      "params": {
+        "tag_key": "concern_population",
+        "tag": "gold_consistent"
+      },
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
+      "name": "concern_match_given_detected_RE",
+      "fn": "recall",
+      "level": "concern_detected:RE",
+      "slices": [
+        "group_dataset"
+      ]
+    },
+    {
       "name": "claims_per_sentence",
       "fn": "claims_per_sentence",
       "level": "sentence"
@@ -555,14 +648,6 @@
       }
     },
     {
-      "name": "concern_not_in_mapping_question_as_answer",
-      "fn": "concern_not_in_mapping",
-      "level": "summary",
-      "params": {
-        "key": "concern_not_in_mapping:question_as_answer"
-      }
-    },
-    {
       "name": "concern_not_in_mapping_correction_ignored",
       "fn": "concern_not_in_mapping",
       "level": "summary",
@@ -576,14 +661,6 @@
       "level": "summary",
       "params": {
         "key": "concern_not_in_mapping:conflicting_accounts_flattened"
-      }
-    },
-    {
-      "name": "concern_not_in_mapping_unsupported_causal_link",
-      "fn": "concern_not_in_mapping",
-      "level": "summary",
-      "params": {
-        "key": "concern_not_in_mapping:unsupported_causal_link"
       }
     },
     {

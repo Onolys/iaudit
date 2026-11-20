@@ -4,10 +4,11 @@ from dataclasses import replace
 
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import Dataset, Item, load
+from iaudit_eval.datasets import Dataset, Item
 from iaudit_eval.datasets.base import DatasetError, validate_items
 from iaudit_eval.engine import Selection, start_run
 from iaudit_eval.server.guards import ApiError, resolve_under, validate_item_id
@@ -53,7 +54,7 @@ def test_item_contract_does_not_relax_run_or_dataset_paths(tmp_path, value):
 
 
 async def test_synthetic_run_persists_every_permitted_id(tmp_path):
-    synthetic = load("synthetic")
+    synthetic = engine_dataset()
     renamed = dict(zip((it.id for it in synthetic.items("all")), VALID_IDS, strict=True))
 
     class RenamedAdapter:

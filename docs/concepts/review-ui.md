@@ -40,11 +40,10 @@ verdict navigation remain available; they neither edit saved results nor call an
 audit service. There is no upload action in this read-only view. Gold annotations
 appear in a separate collapsible panel, without changing assessment highlights.
 
-Failed items show saved error details instead of review panes. Invalid or stale saved
-responses show the normal validation error screen. The current 1.2.0 contract pin
-rejects saved 1.0.0 and 1.1.0 responses.
-There is no replay compatibility layer. Lists, metrics and comparisons are separate
-from this validation and remain inspectable.
+Failed items show saved error details instead of review panes. Saved responses that
+fail the current `0.0.1` schema show the normal validation error screen; the owner
+deletes non-conforming files. Lists, metrics and comparisons are separate from this
+validation and remain inspectable.
 
 ## Known limits
 

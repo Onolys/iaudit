@@ -20,7 +20,7 @@ from iaudit_eval.server.guards import Settings
 @pytest.fixture
 def roots(tmp_path):
     datasets = tmp_path / "datasets"
-    shutil.copytree(paths.datasets_dir() / "synthetic", datasets / "synthetic")
+    shutil.copytree(paths.datasets_dir() / "eaudit/synthetic", datasets / "eaudit/synthetic")
     return datasets, tmp_path / "data", tmp_path / "runs"
 
 

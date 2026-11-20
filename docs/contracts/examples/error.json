@@ -1,8 +1,12 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "0.0.1",
   "request_id": "example-001",
-  "error": {
-    "code": "invalid_request",
-    "message": "transcript must contain at least one turn."
-  }
+  "status": 400,
+  "message": "The request does not match the audit contract.",
+  "details": [
+    {
+      "code": "empty_transcript",
+      "message": "transcript: must contain at least 1 item"
+    }
+  ]
 }

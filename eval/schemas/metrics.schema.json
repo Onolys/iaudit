@@ -8,7 +8,7 @@
                "scored", "bootstrap", "run", "dataset_extra", "reference_caveats",
                "items", "failures", "entries", "references"],
   "properties": {
-    "schema_version": {"const": "1.0.0"},
+    "schema_version": {"const": "0.0.1"},
     "run_id": {"type": "string", "minLength": 1},
     "dataset": {"type": "string", "minLength": 1},
     "dataset_version": {"type": "string"},

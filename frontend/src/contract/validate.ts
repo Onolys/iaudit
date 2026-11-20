@@ -13,7 +13,6 @@ export interface ValidationIssue {
 
 export type ResponseError =
   | { kind: "not_object" }
-  | { kind: "wrong_version" }
   | { kind: "schema"; issues: ValidationIssue[] }
   | { kind: "request_id_mismatch"; expected: string; received: string | undefined }
   | { kind: "duplicate_claim_id"; id: string }
@@ -43,7 +42,6 @@ export function validateResponse(
   request: AuditRequest,
 ): Result<AuditResponse, ResponseError> {
   if (!isObject(raw)) return { ok: false, error: { kind: "not_object" } };
-  if (raw.schema_version !== "1.2.0") return { ok: false, error: { kind: "wrong_version" } };
   if (!checkResponse(raw)) {
     return { ok: false, error: { kind: "schema", issues: issues(checkResponse.errors) } };
   }

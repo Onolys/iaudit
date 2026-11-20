@@ -5,10 +5,10 @@ import textwrap
 
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import Selection, start_run
 from iaudit_eval.scoring import ScoringError, score
 
@@ -23,7 +23,7 @@ def _make_run(tmp_path, mode="ok", **kw):
     async def go():
         fb = FakeBackend(mode)
         client = AuditClient(URL, transport=fb.transport(), sleep=_nosleep)
-        h = start_run(load("synthetic"), Selection(split="all"), base_url=URL,
+        h = start_run(engine_dataset(), Selection(split="all"), base_url=URL,
                       runs_root=tmp_path, client=client, **kw)  # fmt: skip
         await h.wait()
         return h.run_id
@@ -149,7 +149,7 @@ EXTRA
 '''
 
 _META = {
-    "name": "tiny", "dataset_version": "7", "kind": "adapter",
+    "name": "tiny", "product": "eaudit", "dataset_version": "7", "kind": "adapter",
     "splits": [{"name": "all"}], "default_split": "all", "cluster_key": "doc",
     "slices": ["grp"], "levels": {"item": {"labels": [False, True], "positive": True}},
 }  # fmt: skip
@@ -157,7 +157,7 @@ _META = {
 
 def _tiny(tmp_path, *, meta=None, extra="", missing=False, files=None):
     root = tmp_path / "datasets"
-    d = root / "tiny"
+    d = root / "eaudit/tiny"
     d.mkdir(parents=True)
     (d / "metadata.json").write_text(json.dumps({**_META, **(meta or {})}))
     src = _ADAPTER.replace("EXTRA", textwrap.indent(textwrap.dedent(extra), "    "))

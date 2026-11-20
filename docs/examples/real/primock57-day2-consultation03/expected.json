@@ -35,6 +35,7 @@
       "concerns": [
         {
           "type": "timeframe_mismatch",
+          "group": "changed_detail",
           "explanation": "A duration of about three weeks is recorded as one week.",
           "evidence_ids": [
             "e2"
@@ -131,6 +132,7 @@
       "concerns": [
         {
           "type": "contradictory_evidence",
+          "group": "opposite_of_interview",
           "explanation": "A reported family condition conflicts with \"no family history of note\".",
           "evidence_ids": [
             "e1"

@@ -138,7 +138,7 @@ def test_request_version_comes_from_loaded_schema(dataset, tmp_path, monkeypatch
     assert not contracts.validate_request(request)
 
 
-def _saved_run(root, run_id, *, split="test", version="1.0.0", **fields):
+def _saved_run(root, run_id, *, split="test", version="0.0.1", **fields):
     from iaudit_eval import store
 
     store.create_run(root, {
@@ -180,7 +180,7 @@ def test_integrity_counts_matching_runs_read_only_in_chronological_order(dataset
         (folder / "run.json").write_text(body)
     before = {p: (p.read_bytes(), p.stat().st_mtime_ns) for p in root.rglob("*") if p.is_file()}
     extra = dataset.adapter.report_extra(current, root)
-    assert extra["mapping_version"] == "1.0.0"
+    assert extra["mapping_version"] == "0.0.1"
     assert len(extra["mapping_sha256"]) == 64
     assert extra["test_run_count"] == 9
     assert extra["test_run_ordinal"] == 5  # z-earlier, a, aborted, aborted-cost, current
@@ -214,8 +214,8 @@ def test_mapping_is_lazy_cached_and_independent_of_downloaded_data(tmp_path, mon
 
     monkeypatch.setattr(Path, "read_bytes", counted)
     assert reads == []
-    assert dataset.adapter.mapping_version() == "1.0.0"
-    assert dataset.adapter.mapping_version() == "1.0.0"
+    assert dataset.adapter.mapping_version() == "0.0.1"
+    assert dataset.adapter.mapping_version() == "0.0.1"
     assert not list(tmp_path.iterdir())
     assert len(reads) == 1
 
@@ -230,7 +230,7 @@ def test_saved_fixture_scoring_uses_adapter_hooks_and_compare_warns(dataset, tmp
     item = items[0]
     sentence = item.payload["sentences"][0]
     response = {
-        "schema_version": "1.2.0", "status": "complete", "warnings": [],
+        "schema_version": "0.0.1", "status": "complete", "warnings": [],
         "claims": [{"id": "fictional", "verdict": "supported", "concerns": [],
                     "explanation": "Fictional support.",
                     "evidence": [{"id": "e1", "role": "supporting",
@@ -272,7 +272,7 @@ def test_saved_fixture_scoring_uses_adapter_hooks_and_compare_warns(dataset, tmp
     report = score("first", runs_root=root, data_root=dataset.adapter.data_dir.parent)
     assert report["dataset_extra"]["test_run_count"] == 1
     assert report["dataset_extra"]["test_run_ordinal"] == 1
-    assert report["run"]["mapping_version"] == "1.0.0"
+    assert report["run"]["mapping_version"] == "0.0.1"
     assert report["entries"]
     persisted = json.loads((root / "first/item_rows.json").read_text())
     assert persisted["rows"][0]["item_id"] == item.id

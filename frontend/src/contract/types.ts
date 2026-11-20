@@ -2,6 +2,8 @@ import type { EvidenceRole, Verdict } from "../tokens";
 
 export type { EvidenceRole, Verdict };
 
+export const SCHEMA_VERSION = "0.0.1" as const;
+
 export const VERDICTS = [
   "supported",
   "partially_supported",
@@ -10,7 +12,7 @@ export const VERDICTS = [
   "out_of_scope",
 ] as const;
 
-// Mission checks 1-13, in order.
+// Concern types in contract order.
 export const CONCERN_TYPES = [
   "unsupported_claim",
   "contradictory_evidence",
@@ -25,6 +27,10 @@ export const CONCERN_TYPES = [
   "conflicting_accounts_flattened",
   "unsupported_causal_link",
   "quantity_mismatch",
+  "opinion_as_fact",
+  "calculation_error",
+  "meaning_shift",
+  "unsupported_inference",
 ] as const;
 
 export const EVIDENCE_ROLES = ["supporting", "contradicting", "qualifying"] as const;
@@ -39,13 +45,18 @@ export const WARNING_CODES = [
 
 export const STATUSES = ["complete", "partial"] as const;
 
+export type ConcernGroup =
+  | "not_in_interview"
+  | "opposite_of_interview"
+  | "changed_detail"
+  | "missing_context";
 export type ConcernType = (typeof CONCERN_TYPES)[number];
 export type WarningCode = (typeof WARNING_CODES)[number];
 export type Status = (typeof STATUSES)[number];
 
 export interface Turn {
   id: string;
-  speaker: string;
+  speaker?: string;
   role?: "interviewer" | "respondent" | "informant" | "other";
   text: string;
   timestamp?: string;
@@ -59,7 +70,7 @@ export interface Section {
 }
 
 export interface AuditRequest {
-  schema_version: "1.2.0";
+  schema_version: typeof SCHEMA_VERSION;
   request_id?: string;
   transcript: Turn[];
   assessment: Section[];
@@ -84,6 +95,7 @@ export interface Evidence {
 
 export interface Concern {
   type: ConcernType;
+  group: ConcernGroup;
   explanation: string;
   evidence_ids: string[];
 }
@@ -118,7 +130,7 @@ export interface RunInfo {
 }
 
 export interface AuditResponse {
-  schema_version: "1.2.0";
+  schema_version: typeof SCHEMA_VERSION;
   request_id?: string;
   status: Status;
   warnings: Warning[];

@@ -2,10 +2,10 @@
 
 import pytest
 from fakes.fake_backend import FakeBackend
+from fakes.synthetic import engine_dataset
 
 from iaudit_eval import store
 from iaudit_eval.client import AuditClient
-from iaudit_eval.datasets import load
 from iaudit_eval.engine import Selection, resume, start_run
 
 
@@ -19,7 +19,7 @@ from iaudit_eval.engine import Selection, resume, start_run
 async def test_resume_progress_matches_saved_statuses_after_each_retry(
     tmp_path, mode, script, abort, expected,
 ):
-    dataset = load("synthetic")
+    dataset = engine_dataset()
     first_backend = FakeBackend("500", script=["ok"])
     async with AuditClient("http://fake", transport=first_backend.transport()) as client:
         first = start_run(dataset, Selection(split="all"), base_url="http://fake",

@@ -66,7 +66,7 @@ def test_default_pairs_rejects_inconsistent_failure():
 
 
 def test_cluster_is_doc_id_not_cluster_key():
-    meta = DatasetMeta.from_dict({"name": "x", "cluster_key": "something"})
+    meta = DatasetMeta.from_dict({"product": "eaudit", "name": "x", "cluster_key": "something"})
     cfg = metrics_config(meta)
     assert cfg.cluster_key == "something"
     (p,) = default_pairs(_item(doc_id="docZ"), "a", "b", None)
@@ -74,7 +74,7 @@ def test_cluster_is_doc_id_not_cluster_key():
 
 
 def test_defaults_without_levels():
-    cfg = metrics_config(DatasetMeta.from_dict({"name": "x"}))
+    cfg = metrics_config(DatasetMeta.from_dict({"product": "eaudit", "name": "x"}))
     assert cfg.levels == {"item": DEFAULT_ITEM_LEVEL}
     assert DEFAULT_ITEM_LEVEL == LevelSpec((False, True), True)
     assert BUILTIN_METRICS == (
@@ -87,6 +87,7 @@ def test_defaults_without_levels():
 
 def test_defaults_every_declared_level():
     meta = DatasetMeta.from_dict({
+        "product": "eaudit",
         "name": "x",
         "levels": {"sentence": {"labels": [False, True], "positive": True},
                    "summary": {"labels": ["a", "b", "c"]}},
@@ -100,6 +101,7 @@ def test_defaults_every_declared_level():
 
 def test_explicit_metrics_and_keys():
     meta = DatasetMeta.from_dict({
+        "product": "eaudit",
         "name": "x",
         "levels": {"sentence": {"labels": [False, True], "positive": True}},
         "metrics": [
@@ -120,12 +122,13 @@ def test_explicit_metrics_and_keys():
 
 
 def test_explicit_empty_metrics_is_respected():
-    cfg = metrics_config(DatasetMeta.from_dict({"name": "x", "metrics": []}))
+    cfg = metrics_config(DatasetMeta.from_dict({"product": "eaudit", "name": "x", "metrics": []}))
     assert cfg.metrics == ()
 
 
 def test_metric_level_must_be_declared():
     meta = DatasetMeta.from_dict({
+        "product": "eaudit",
         "name": "x", "levels": {"item": {"labels": [False, True]}},
         "metrics": [{"name": "recall", "level": "nope"}],
     })  # fmt: skip

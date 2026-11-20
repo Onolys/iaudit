@@ -12,7 +12,7 @@ import items from "./fixtures/items.json";
 import saved from "./fixtures/item-ok.json";
 import comparison from "./fixtures/comparison.json";
 
-const healthy = { eval_api_version: "1.0.0", backend: { url: "http://backend.invalid", reachable: true } };
+const healthy = { eval_api_version: "0.1.0", backend: { url: "http://backend.invalid", reachable: true } };
 const fakeApi = (fetcher: typeof fetch = async () => Response.json(healthy)) => createEvalApi({ fetch: async (url, opts) => (String(url).endsWith("/datasets") || String(url).endsWith("/runs")) ? Response.json([]) : fetcher(url, opts) });
 const deferred = <T,>() => {
   let resolve!: (value: T) => void;
@@ -121,9 +121,9 @@ describe("shared eval error presentation", () => {
   });
   it("renders API message and structured detail as plain text", () => {
     const message = '<img src=x onerror="alert(1)">';
-    const { container } = render(<EvalErrorMessage error={{ kind: "api", status: 409, code: "schema_mismatch", message, detail: { expected: "1.2.0", actual: "1.0.0", note: "<script>oops</script>" } }} />);
+    const { container } = render(<EvalErrorMessage error={{ kind: "api", status: 409, code: "schema_mismatch", message, detail: { expected: "0.0.1", actual: "9.8.7", note: "<script>oops</script>" } }} />);
     expect(screen.getByText(message)).toBeTruthy();
-    expect(container.textContent).toContain('"expected": "1.2.0"');
+    expect(container.textContent).toContain('"expected": "0.0.1"');
     expect(container.querySelector("img, script")).toBeNull();
   });
 });

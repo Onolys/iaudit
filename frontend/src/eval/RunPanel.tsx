@@ -113,7 +113,10 @@ export function RunPanel({ api, onRun, onRunsChanged, onActiveRunChange, attachm
       <form className="eval-run-form" onSubmit={submit} noValidate>
         <label htmlFor="eval-dataset">Dataset</label>
         <select id="eval-dataset" value={dataset} onChange={event => setDataset(event.target.value)}>
-          {datasets.map(item => <option key={item.name} value={item.name}>{item.title}</option>)}
+          {Array.from(new Set(datasets.map(item => item.product))).map(product =>
+            <optgroup key={product} label={product}>
+              {datasets.filter(item => item.product === product).map(item => <option key={item.name} value={item.name}>{item.title}</option>)}
+            </optgroup>)}
         </select>
         <label htmlFor="eval-split">Split</label>
         <select id="eval-split" value={split} disabled={!selectedMeta} onChange={event => { setSplit(event.target.value); setClampNote(""); }}>

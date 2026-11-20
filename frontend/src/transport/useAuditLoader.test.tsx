@@ -81,8 +81,8 @@ describe("useAuditLoader", () => {
     const { m, result } = setup();
     act(() => void result.current.loadFile(file(requestA)));
     await waitFor(() => expect(m.calls).toHaveLength(1));
-    await act(async () => m.calls[0].resolve(new Response("oops", { status: 503 })));
-    expect(result.current.state).toMatchObject({ status: "error", error: { kind: "http_5xx", status: 503 } });
+    await act(async () => m.calls[0].resolve(new Response("oops", { status: 500 })));
+    expect(result.current.state).toMatchObject({ status: "error", error: { kind: "http_5xx", status: 500 } });
     act(() => result.current.retry());
     expect(result.current.state).toMatchObject({ status: "loading", fileName: "r.json" });
     await waitFor(() => expect(m.calls).toHaveLength(2));
