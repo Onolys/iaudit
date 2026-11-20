@@ -23,6 +23,8 @@ run false "eaudit=true core=true paudit=false evaluation=false api=true frontend
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=false infra=false" docs/readme.md
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=false infra=false" infra/main.tf web/a.ts engines/paudit/a.py
 run true  "eaudit=true core=true paudit=false evaluation=false api=true frontend=true web=false infra=false" docs/readme.md
+run false "eaudit=false core=false paudit=false evaluation=false api=true frontend=false web=false infra=false" firestore.rules
+run false "eaudit=false core=false paudit=false evaluation=false api=true frontend=false web=false infra=false" firestore-rules-test/rules.test.mjs
 touch "$T/web/package.json"; mkdir -p "$T/infra"   # web (package.json) and infra (dir) now exist
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=true infra=false" web/src/a.ts
 run false "eaudit=false core=false paudit=false evaluation=false api=false frontend=false web=false infra=true" infra/main.tf

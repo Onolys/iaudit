@@ -25,6 +25,8 @@ PACKAGES=(
 # Shared paths: Python-shared hit python packages; CI-shared hits everything.
 PY_SHARED_RE='^(pyproject\.toml|uv\.lock|engines/core/)'
 CI_SHARED_RE='^(\.github/workflows/|scripts/ci/)'
+# Extra paths per package: Firestore rules and their emulator tests run in the api job.
+API_EXTRA_RE='^(firestore\.rules|firebase\.json|firestore-rules-test/)'
 
 mapfile -t FILES
 
@@ -40,7 +42,8 @@ for entry in "${PACKAGES[@]}"; do
     else
       for f in "${FILES[@]}"; do
         if [[ "$f" == "$dir/"* || "$f" =~ $CI_SHARED_RE ||
-              ( "$kind" == python && "$f" =~ $PY_SHARED_RE ) ]]; then
+              ( "$kind" == python && "$f" =~ $PY_SHARED_RE ) ||
+              ( "$name" == api && "$f" =~ $API_EXTRA_RE ) ]]; then
           run=true
           break
         fi

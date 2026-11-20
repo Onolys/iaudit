@@ -125,6 +125,11 @@ jobs:
             echo "### Coverage: onolys-api"
             uv run --no-sync --package onolys-api coverage report --format=markdown
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Firestore rules tests (emulator)
+        run: |
+          npm ci --prefix firestore-rules-test
+          firebase emulators:exec --config firebase.json --only firestore --project demo-onolys \
+            'npm test --prefix firestore-rules-test'
       - name: OpenAPI is up to date
         run: |
           uv run --no-sync --package onolys-api python -m onolys_api.openapi
