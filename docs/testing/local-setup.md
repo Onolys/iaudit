@@ -85,3 +85,14 @@ These need a key, spend money and are not run by agents. Start a cost-capped pil
 - [ ] **h. Refresh recordings (prompts changed in taxonomy v1).** In `eaudit/`: `uv run python -m eval.run --mode all --live --record --max-cost 5`, then replay with `--strict-fresh` (for example `uv run python -m eval.run --mode all --strict-fresh`) must pass. Commit only synthetic ADHD recordings ([pre-release-checklist.md](pre-release-checklist.md) step 4, [recorded/README.md](../../eaudit/eval/recorded/README.md)).
 
 Then the rest of [pre-release-checklist.md](pre-release-checklist.md).
+
+## Claude Code skills (thepass)
+
+Open this repo in Claude Code and trust the folder: it prompts to install the `thepass` marketplace and plugin (declared in `.claude/settings.json`).
+
+Manual fallback:
+
+```
+/plugin marketplace add tejitpabari99/thepass
+/plugin install thepass@thepass
+```
