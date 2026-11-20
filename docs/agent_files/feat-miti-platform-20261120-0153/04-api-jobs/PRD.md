@@ -101,7 +101,7 @@ Cloud Run `onolys-api-{env}` + `onolys-worker-{env}` (`env` = `staging`|`prod`; 
 
 ## Manual steps
 - Tejit/SP06: enable Identity Platform, email verification templates, authorised domains, Google OAuth client; create resources above.
-- Tejit: supply 2-3 real audio samples for ffprobe/format sanity; confirm legal stance on content-free deletion tombstones and backup retention.
+- Tejit: supply 2-3 real audio samples for ffprobe/format sanity; legal stance on content-free deletion tombstones and backup retention is Tejit's and not a blocker [RESOLVED: keep engineering defaults (soft-delete 0, PITR off, content-free tombstone) (Tejit 2026-11-20)].
 
 ## Risks / Open Questions
 - [RESOLVED: Hosting site `onolys-app`, `/v1/**` rewrite to Cloud Run, same origin (SP05 D1, SP06 D4; (reconcile pass))] Residual staging check (SP05): `Authorization`/`ETag` pass through and `/v1` is not cached; fallback `api.onolys.com` + CORS (R11).

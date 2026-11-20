@@ -66,7 +66,7 @@ Loader (`engines/paudit/pack.py`): resolves `miti@4.2.1` under `protocols/` (dir
 **R2. Pipeline** (`paudit.run(transcript, pack, params, client) -> PauditResult`; engine-interface shape from SP01).
 Params: `speaker_map{subject: <speaker id>}` (required), `change_goal`, `coded_span{from_s,to_s}`, `language` (BCP-47 or `auto`), `n_runs` (default 1), `run_temperature` (default 0.0 for N=1, 0.4 for N>1), `tiers{code,globals}` (default `mid`/`strong`; mapped to models by core registry).
 1. **Input checks** (code): pack `input_checks` + `check_input` hook → typed error or warnings. Unknown-speaker turns treated as `other` + warning.
-2. **Select** (code): keep turns whose `start_ms` ∈ `coded_span` (no timestamps + span → warning `span_ignored`); mark subject vs other by `speaker_map`.
+2. **Select** (code): keep turns that overlap `coded_span` (any clinician turn partly inside the span is included whole) (no timestamps + span → warning `span_ignored`); mark subject vs other by `speaker_map`.
 3. **Volleys** (code): consecutive subject turns not broken by another speaker's turn (per pack `volley`) = one volley; `v1..vN`. Other-speaker turns kept as read-only context.
 4. **Code pass** (model, batched): ≈25 volleys per call, each preceded by its previous other-speaker turn as context, batches in parallel. Model returns per volley `utterances[{quote, code|null, rationale}]` (split + code in one call; `code` enum built from pack at runtime; `null` = uncoded). Prompt = pack `code_system.md` + definitions rendered from `pack.yaml` (never duplicated) + few-shot; cache prefix = system+definitions, second = transcript header.
 5. **Validate/locate** (code): each `quote` located inside its volley's turn text via core `locate` (exact → normalized → guarded fuzzy; code-point offsets, ADR 0002); ordered, non-overlapping, never crossing a turn boundary. Unlocatable/overlapping → utterance dropped + `quote_not_found`/`overlap` warning; >20% of a batch dropped → one retry of that batch; still bad → run fails (no silent partial counts, ADR 0012).
@@ -134,12 +134,12 @@ Engine owns: pipeline, output-format instructions, response models, locate/valid
 - Implementer: read manual 4.2.1 (PDF) and write item definitions with citation; do not paraphrase loosely.
 
 ## Risks / Open Questions
-- [OPEN] Utterances crossing a turn boundary (diarizer splits one thought). v1 treats as two utterances; may inflate counts. Measure on real transcripts.
+- [DEFERRED: Tejit supplies transcripts and coder ratings] Utterances crossing a turn boundary (diarizer splits one thought). v1 treats as two utterances; may inflate counts. Measure on real transcripts; build and test on synthetic fixtures now.
 - [OPEN] Volley break: does a client "mm-hm" break a volley? Default: any other-speaker turn breaks; `min_other_words` knob exists.
-- [OPEN] Span boundaries: turn included by `start_ms`; user's coded from-to semantics (partial turns) unconfirmed.
-- [OPEN] Gemini coding quality vs expert (published AI-vs-expert globals r≈0.34–0.63); prompts/few-shot tuning needs real data.
+- [RESOLVED: include any clinician turn that overlaps the span (Tejit 2026-11-20)] Span selection uses overlap (`start_ms < to_s*1000 and end_ms > from_s*1000`), not `start_ms` containment; turns without `end_ms` fall back to `start_ms`.
+- [DEFERRED: Tejit supplies transcripts and coder ratings] Gemini coding quality vs expert (published AI-vs-expert globals r≈0.34–0.63); prompts/few-shot tuning needs real data. Build and test on synthetic fixtures now.
 - [RESOLVED: admin-only `POST /v1/paudit` on SP07's `admin-backend`; the public API exposes paudit only via sessions/runs (reconcile pass)]
-- [OPEN] Prompt wording for "prefer fewer parses" and uncoded categories needs certified-coder review.
+- [DEFERRED: Tejit supplies transcripts and coder ratings] Prompt wording for "prefer fewer parses" and uncoded categories needs certified-coder review; prompts ship as v1 drafts, reviewed later.
 - [DEFERRED] Self-consistency voting across N runs per utterance; non-English prompts; user packs; caudit reuse of pack format.
 - [RESOLVED: tests need no network — stub client by call_tag + one recorded golden]
 

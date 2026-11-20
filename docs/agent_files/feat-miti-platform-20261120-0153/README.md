@@ -1,12 +1,12 @@
 ---
 status: draft
-summary: "Design: 8 PRDs written, awaiting review"
+summary: "Design: 8 PRDs, Tejit's round-5 answers resolved, ready for dev-tasks"
 date: 2026-11-20
 ---
 
 # feat/miti-platform
 
-Branch folder for the Onolys MITI platform (`app.onolys.com`). Brief: [brainstorm.md](brainstorm.md) (approved 2026-11-20). All 8 PRDs are written and reconciled against each other (seams, names, field names, env vars); next step is review, then `dev-tasks`.
+Branch folder for the Onolys MITI platform (`app.onolys.com`). Brief: [brainstorm.md](brainstorm.md) (approved 2026-11-20). All 8 PRDs are written and reconciled against each other (seams, names, field names, env vars); Tejit's round-5 answers (2026-11-20) are resolved in the PRDs; next step is `dev-tasks`.
 
 ## Sub-projects
 
@@ -19,7 +19,7 @@ Branch folder for the Onolys MITI platform (`app.onolys.com`). Brief: [brainstor
 | 05 | `05-web-app/` | [PRD](05-web-app/PRD.md) (draft) | `web/` (app.onolys.com): sign-up, sign-in, forgot password, Google sign-in, upload, speaker check, rating check, run status, report page, dashboard, settings (API key, delete). | 04 API contract, 03 report schema | 3 |
 | 06 | `06-infra/` | [PRD](06-infra/PRD.md) (draft) | GCP project `onolys`: Identity Platform, Firestore (`(default)` prod + `staging`), buckets, Cloud Run staging/prod, Cloud Tasks, Secret Manager, Hosting sites, budget; Terraform; WIF deploy workflows; DNS records list for Tejit. | — | 1 |
 | 07 | `07-admin/` | [PRD](07-admin/PRD.md) (draft) | Today's frontend + eval server on `admin.onolys.com` behind allowlisted login + TOTP; admin-only `POST /v1/paudit`; `paudit` tab in `frontend/src/products.ts`. | 01, 02, 06 | 4 |
-| 08 | `08-landing/` | [PRD](08-landing/PRD.md) (draft) | Repo `onolys-landing` (local `/root/projects/onolys/miti`): top-right "Sign up" / "Log in" → app; "Try it out" replaces "Get early access" top-bar CTA; `CtaButton` component kept. PRD lives here; code goes to that repo. | — (release after 05/06 live) | any |
+| 08 | `08-landing/` | [PRD](08-landing/PRD.md) (draft) | Repo `onolys-landing` (local `/root/projects/onolys/miti`): top right = "Sign up" + "Log in" → app; every other "Get early access" CTA becomes "Try it out" → `${PUBLIC_APP_URL}/signup`; `CtaButton`/`SignupDialog` early-access components kept in the repo, unused. PRD lives here; code goes to that repo. | — (release after 05/06 live) | any |
 
 ## Dependency graph
 ```
@@ -45,22 +45,17 @@ See the Decision log in [brainstorm.md](brainstorm.md). Headlines:
 Report JSON = SP03 `report.schema.json` (SP04 stores, SP05 renders); `GET /v1/sessions/{id}/transcript` + `GET /v1/presets` added to SP04; `n_runs` (1-5) + allowlisted `preset` under "Advanced" in web; Hosting site `onolys-app` same-origin rewrite; `FIRESTORE_DATABASE`, `ROUTES_FILE`, `STT_PROVIDERS_FILE`, `DEFAULT_PRESET`, `uploads/` staging prefix, extra SA roles; `coded_span{from_s,to_s}` everywhere; eaudit `profile` passthrough; `evaluation:` pack block; public `paudit.formula.evaluate`; admin-only `POST /v1/paudit`; admin services `onolys-admin-{backend,eval}-{env}`, bucket `onolys-admin-data-{env}` mounted at `/data`, reusable `_deploy-cloudrun.yml`; ADR numbers made unique (0017 SP01, 0018 SP02, 0019 SP03, 0020 SP04, 0021 SP05, 0022 SP06, 0023 SP07); rating file cap 10 MB (SP03 aligned to SP04/SP05); `locate` + typed errors added to core.
 
 ## Cross-cutting risks / open questions
-Every remaining `[OPEN]` across the PRDs (34). "Tejit" = only he can answer; "build" = resolved by a spike or measurement during implementation.
+Every remaining `[OPEN]` across the PRDs (25 distinct; 9 resolved or deferred on 2026-11-20, listed below the table). "Tejit" = only he can answer; "build" = resolved by a spike or measurement during implementation.
 
 | PRD | Open item | Default / cheapest test | Who |
 |---|---|---|---|
 | 01 | Dynamic-batch pricing may not support `chirp_3` diarization | One API call in the STT spike; fallback standard recognizer pricing | build |
 | 01 | `uv` with excluded standalone `eval/` and not-yet-existing workspace members | `uv sync --project eval` before merging PR-A/B; fallback path deps / add members as SPs land | build |
 | 01 | `json_schema` structured output for Gemini on Vertex via LiteLLM for all eaudit schemas | SP01 ships the switch; SP02/SP03 evaluate quality | build |
-| 02 | Utterances crossing a turn boundary (diarizer splits one thought) may inflate counts | Treated as two utterances; measure on real transcripts | build (needs Tejit's transcripts) |
 | 02 | Does a client "mm-hm" break a volley? | Any other-speaker turn breaks; `min_other_words` knob | build |
-| 02 | Span boundary semantics for the user's coded from-to (partial turns) | Turn included by `start_ms` | Tejit |
-| 02 | Gemini coding quality vs expert (r≈0.34-0.63) | Eval on 3 role-plays with certified-coder ratings | Tejit (data) + build |
-| 02 | Prompt wording for "prefer fewer parses" and uncoded categories | Needs certified-coder review | Tejit |
 | 03 | Where verifier flags enter the decision table (one filter point for `profile`) | Read `check/checker.py`/`group_a.py` first | build |
 | 03 | Assessment span `Pointer.index` = section index? | Check `docs/contracts/examples`; else carry a section-id map | build |
 | 03 | eaudit link step (BM25) ignores timestamps clinicians cite | Measure retrieval recall; deferred timestamp-hinted shortlist | build |
-| 03 | Gemini vs Claude quality for atomize/check on first-person self-ratings | Run eval once real self-ratings exist | build (needs Tejit's ratings) |
 | 03 | Real cost of reasons audit on a verbose rating; reason-length cap | Default 1,000 chars/item, truncate + warning | build |
 | 03 | One tips call yields ≥3 valid quotes on Gemini? | Retry once built in; tune on real transcripts | build |
 | 03 | Parser accuracy on messy xlsx | Fallback is paste | build |
@@ -68,7 +63,6 @@ Every remaining `[OPEN]` across the PRDs (34). "Tejit" = only he can answer; "bu
 | 04 | Cloud Tasks cannot cancel mid-handler; write-after-delete race | Handlers re-check `deleting` before every write | build |
 | 05 | Custom email-action handler for verify/reset links | Default Firebase handler accepted for v1 | build |
 | 05 | CSP `frame-src`/`connect-src` for Identity Platform popup; `style-src` hashes | Confirm on staging | build |
-| 05 | Contact address for account-removal requests (settings text) | none | Tejit |
 | 06 | Chirp 3 diarization from `us` (batch vs sync); STT service agent needs bucket `objectViewer`? | Verify in SP01 spike; Terraform grants if needed | build |
 | 06 | Gemini availability in `us-central1` vs `global`/`us` endpoint (residency claim) | Verify at model pinning | build |
 | 06 | Org policy may block `allUsers` invoker on Cloud Run | Check at first apply; fallback `api.onolys.com` domain mapping (also public) | Tejit (Owner access) if blocked |
@@ -79,10 +73,13 @@ Every remaining `[OPEN]` across the PRDs (34). "Tejit" = only he can answer; "bu
 | 07 | Eval start/resume probes <60 s through Hosting rewrite | Rewrite for `/eval-api`, direct URL if not | build |
 | 07 | GCS FUSE spike result (atomic rename, chmod) | Fallback: local disk + copy to bucket | build |
 | 07 | Exact Hosting→Cloud Run timeout and header pass-through | Confirm on staging | build |
-| 07 | "Do not paste real PHI until BAA" note on the paudit tab | Show the note; legal decision | Tejit |
-| 08 | Hero/learner-page "Get early access" CTAs also become "Try it out"? | No, top bar only | Tejit |
-| 08 | Enterprise page: keep early access in sections and auth links in its top bar? | Yes / yes | Tejit |
-| 08 | Mobile top-bar layout and styling | Confirm in PR preview | Tejit |
+
+**Resolved/deferred by Tejit 2026-11-20 (round 5):**
+- Real PHI in the admin paudit tab and deletion tombstone/backup retention (SP04, SP07): not a blocker; admin is internal-only (staff allowlist), separate from what users see; legal/BAA is Tejit's. Engineering defaults kept (PITR off, soft-delete 0). [RESOLVED]
+- Coded span partial turns (SP02): include any clinician turn that overlaps the span. [RESOLVED]
+- Certified-coder review of coding prompts, real transcripts and ratings (SP02, SP03): Tejit supplies later; build and test on synthetic fixtures now. [DEFERRED: Tejit supplies transcripts and coder ratings] (SP02 turn-boundary utterances, Gemini coding quality, prompt wording; SP03 Gemini vs Claude on self-ratings)
+- Landing CTAs (SP08): top right = Sign up + Log in only; every other "Get early access" CTA (learner hero, sections, team, enterprise) becomes "Try it out" -> app sign-up; early-access component kept; mobile = Sign up + Log in. [RESOLVED]
+- Account-removal contact (SP05): Tejit's Onolys contact address, exact address filled by Tejit before launch (Manual steps). [RESOLVED]
 
 Brainstorm-level risks (see [brainstorm.md](brainstorm.md)): AI-vs-expert agreement on globals, diarization errors on role-plays, many shapes of uploaded ratings, no official MITI form (Tejit checking).
 
@@ -96,8 +93,8 @@ Owner-only tasks, consolidated from the PRDs (agents supply exact values where n
 6. **Secrets/values:** admin allowlist emails (secret `admin-allowed-emails-{env}`); Anthropic key if an alternate Claude route is used (SP06/SP07).
 7. **Data (needed for tuning and eval):** ≥3 real role-play transcripts each with ≥1 certified-coder rating; 3 real self-ratings in the formats users send (docx/pdf/xlsx/pasted); a short 2-speaker audio sample for the Chirp 3 diarization check and 2-3 real audio samples for format sanity; upload real data to `onolys-admin-data-{env}` under `eval/data/` by hand, never to the repo (SP01/SP02/SP03/SP04/SP07).
 8. **Sign-offs:** MITI citation/permission wording in `pack.yaml › source`; tone `banned` list, report headline and method/limits text (SP02/SP03); certified-coder review of coding prompts ("prefer fewer parses", uncoded categories) (SP02).
-9. **Product/legal:** contact address for account-removal requests (SP05); legal stance on content-free deletion tombstones, backup retention and real PHI in the admin paudit tab (SP04/SP07); landing CTA questions above (SP08); check for an official MITI self-rating form (brainstorm).
+9. **Product/legal:** his Onolys contact address for account-removal requests, exact address to fill in before launch (SP05); legal/BAA stance on deletion tombstones, backup retention and real PHI in the admin paudit tab (SP04/SP07; not blockers); the data in step 7 for the deferred certified-coder prompt review (SP02/SP03); check for an official MITI self-rating form (brainstorm).
 10. **Branch protection:** none today; if added, required job names are `eaudit` and `frontend` (SP01).
 
 ## Status
-Design phase done: 8 PRDs written and reconciled, awaiting review. Next: `dev-tasks` per approved PRD.
+Design phase done: 8 PRDs written, reconciled, Tejit's round-5 answers resolved. Next: `dev-tasks` per approved PRD.

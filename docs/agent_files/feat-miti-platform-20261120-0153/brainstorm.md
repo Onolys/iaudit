@@ -43,13 +43,14 @@ Clinicians learning MI rate their own practice sessions but get no second opinio
 | Test data: Tejit supplies transcripts now, more test data later; agents also write synthetic fixtures (Tejit) | Agents source data | Tejit owns data |
 | Spend: Tejit sets a monthly GCP budget; app enforces a configurable per-user daily run cap, default 20 (Tejit + Claude default) | No cap | Cost safety |
 | Move engines under one `engines/` folder (`engines/core`, `engines/eaudit`, `engines/paudit`); rework of CI/eval paths accepted (Tejit) | Keep top-level siblings | Tejit: one engines folder |
+| Landing: top right = Sign up + Log in; every early-access CTA becomes "Try it out" → app sign-up; early-access component kept (Tejit 2026-11-20) | "Try it out" in top bar only | Tejit's call |
 
 ## Design
 
 ### Hosts
 | Host | What |
 |---|---|
-| `miti.onolys.com` | Landing (repo `onolys-landing`, Astro, Firebase Hosting). Top right: "Sign up", "Log in" → app. "Try it out" replaces the "Get early access" top-bar CTA; `CtaButton` component kept in the repo for later. |
+| `miti.onolys.com` | Landing (repo `onolys-landing`, Astro, Firebase Hosting). Top right: "Sign up", "Log in" → app. Every other early-access CTA becomes "Try it out" → app sign-up; `CtaButton`/`SignupDialog` early-access components kept in the repo, unused. |
 | `app.onolys.com` | Web app + public API: auth, upload, jobs, reports, dashboard. |
 | `admin.onolys.com` | Today's iaudit frontend + eval server, behind a login (Google IAP or similar), internal only. May move to its own repo if needed. |
 

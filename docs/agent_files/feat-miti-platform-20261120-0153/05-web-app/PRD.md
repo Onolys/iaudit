@@ -94,13 +94,14 @@ Report/transcript data flow: `GET /reports/{rid}` (typed JSON; instances carry `
 - SP06 (Terraform) creates Hosting sites `onolys-app` (target `app`) and `onolys-app-staging` (target `app-staging`); Tejit adds the `app.onolys.com` DNS records from SP06's output; add `app.onolys.com` to Identity Platform authorised domains; add `https://app.onolys.com/__/auth/handler` to the Google OAuth client redirect URIs; customise verification/reset email templates (sender name, link domain).
 - SP06: Cloud Run `api` must allow unauthenticated invocation (app-level auth) for the Hosting rewrite; GCS CORS on audio bucket (origin app host(s); methods PUT; headers `Content-Type`, `x-goog-content-length-range`).
 - SP06: deploy workflow for `web/` (build with `VITE_FIREBASE_*` public config, `firebase deploy --only hosting:app-staging` on merge to `main`, `hosting:app` on prod promotion; SP06 R13).
-- Tejit: provide a contact address for account-removal requests; sample real self-ratings for the rating-form check.
+- Tejit: provide his Onolys contact address for account-removal requests (exact address filled by Tejit before launch; settings text uses a config placeholder); sample real self-ratings for the rating-form check.
 
 ## Risks / Open Questions
 - [RESOLVED: Hosting rewrite, same origin (SP04, SP05 D1, SP06 D4; (reconcile pass))] Residual staging check: verify that Hosting forwards `Authorization`, `If-None-Match`/`ETag` and does not cache `/v1` (API must send `Cache-Control: private, no-cache`); fallback is `api.onolys.com` + CORS (already allowed by SP04 R11) with a one-line base-URL change (`VITE_API_BASE`).
 - [RESOLVED: SP04 adds `GET /sessions/{id}/transcript` (owner-scoped, access-logged) ((reconcile pass))] The rating-gate form keeps the static `protocol/miti-items.ts` (parity-tested against `rating.schema.json`); no protocol-metadata endpoint in v1.
 - [RESOLVED: SP03 `report.schema.json` is the contract; UI types are generated from it ((reconcile pass))] Unknown `layout[]` sections are skipped, so later report additions do not break the UI.
 - [RESOLVED: API accepts `n_runs` (1–5, default 1) and allowlisted `preset`; `GET /v1/presets` lists them; web shows both under Advanced ((reconcile pass))]
+- [RESOLVED: Tejit's Onolys contact address; exact address filled by Tejit before launch (Tejit 2026-11-20)] Contact address for account-removal requests (settings text).
 - [OPEN] Custom email-action handler (verify/reset links land on Firebase default handler then continue to `/verify-email`); default accepted for v1.
 - [OPEN] CSP `frame-src`/`connect-src` hosts for Identity Platform popup: confirm in staging; `style-src 'self'` may need hashes if a lib injects styles.
 - [RESOLVED: copy] Share code with `frontend/` (D2).

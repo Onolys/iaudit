@@ -68,7 +68,7 @@ Secret `admin-allowed-emails-{env}` → `ADMIN_ALLOWED_EMAILS`; `ADMIN_SERVICE_A
 | GCS FUSE lacks semantics eval relies on (atomic rename, `chmod`, partial writes) | Day-1 spike running a synthetic eval run on the mount; fallback: local disk + copy to bucket on run completion and restore at boot |
 | `min=1` CPU-always eval instance costs a fixed amount per month | Prod only; staging scale-to-zero; revisit if unused |
 | Hosting strips/changes `Authorization` or caches `/eval-api` | Verify on staging (same check as SP05); fallback direct URL + CORS |
-| Real clinical transcripts pasted into the paudit tab | Admin-only, in-memory, no logging of text; bucket private; tab shows a "do not paste real PHI until BAA" note [OPEN with legal] |
+| Real clinical transcripts pasted into the paudit tab | Admin-only, in-memory, no logging of text; bucket private; tab shows a "do not paste real PHI until BAA" note [RESOLVED: not a blocker; admin is internal-only (staff allowlist), separate from what users see; legal/BAA is Tejit's; keep engineering defaults (Tejit 2026-11-20)] |
 
 ## Open Questions
 - [OPEN] Does Identity Platform MFA apply to Google sign-in? Default: email/password + TOTP only until a token with `sign_in_second_factor` is observed.

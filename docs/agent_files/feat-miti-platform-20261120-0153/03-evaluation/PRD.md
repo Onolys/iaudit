@@ -134,7 +134,7 @@ Engine owns: mechanics (mapping, filter hook, validation, locate, compare arithm
 - [OPEN] Verify where the verifier flags enter the decision table in `check/checker.py`/`group_a.py` so one filter point covers all 12 flag types plus `unsupported_claim` derivation.
 - [OPEN] Confirm assessment span `Pointer.index` is the section index so claims map back to items (examples in `docs/contracts/examples`); else carry a section-id map.
 - [OPEN] eaudit's link step is BM25 on claim text; clinicians often cite timestamps ("at 3:10") which it ignores. Measure retrieval recall on fixtures; DEFERRED fix: timestamp-hinted shortlist.
-- [OPEN] Gemini vs Claude quality for atomize/check with first-person self-ratings (eaudit tuned on Claude); eval run once real self-ratings exist.
+- [DEFERRED: Tejit supplies transcripts and coder ratings] Gemini vs Claude quality for atomize/check with first-person self-ratings (eaudit tuned on Claude); eval run once real self-ratings exist. Build and test on synthetic fixtures now.
 - [OPEN] Real cost of reasons audit on a verbose rating; cap reason length (default 1,000 chars/item, truncate + warning)?
 - [OPEN] Does one tips call reliably give ≥3 valid quotes on Gemini? Retry once is built in; tune on real transcripts.
 - [OPEN] Parser accuracy on messy xlsx layouts; fallback is paste.
