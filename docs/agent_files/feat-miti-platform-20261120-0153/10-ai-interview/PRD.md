@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: AI practice interview — clinician holds a live voice MI session with an AI client (Gemini Live on Vertex, via a server-side WebSocket relay on a new Cloud Run service); browser records the mix and feeds the unchanged upload/evaluate pipeline; spike gate first
 date: 2026-11-20
 ---
@@ -91,13 +91,13 @@ Module split: `voice/prompt.py` (R2), `voice/relay.py` (loop, clock, resumption)
 ## Open Questions
 | Q | Status |
 |---|---|
-| Gemini model id for default (`gemini-3.8-live` unverified; 2.5 id seen as `gemini-live-2.5-flash-native-audio`) | [OPEN: confirm exact ids in spike] |
+| Gemini model id for default (`gemini-3.8-live` unverified; 2.5 id seen as `gemini-live-2.5-flash-native-audio`) | [DEFERRED: confirmed in R0 spike task (owner 2026-11-21)] |
 | SP03 `run_evaluation` with no `change_goal` / no rating | [RESOLVED: verified run.py:152, code_pass.py:138; no-goal run accepted] |
-| Cost per minute | [OPEN: measure in spike] |
+| Cost per minute | [DEFERRED: measured in R0 spike task (owner 2026-11-21)] |
 | Hosting-to-Cloud Run WebSocket support | [DEFERRED: not needed; 60 s timeout rules it out for this use] |
 | Privacy of clinician audio sent to Google | [RESOLVED: owner "don't worry" 2026-11-20] |
 | Reconnect scope | [RESOLVED: supported via relay, kept simple] |
-| Does api `ADAPTERS=real` need Vertex SDK dependency footprint in the shared image | [OPEN: check image size; voice may need `google-genai` only in voice mode] |
+| Does api `ADAPTERS=real` need Vertex SDK dependency footprint in the shared image | [DEFERRED: checked in R0 spike / voice adapter task; default add google-genai to the shared image unless size is a problem (owner 2026-11-21)] |
 | Free first eval + usage component specifics | [DEFERRED: SP11] |
 
 ## Acceptance Criteria
