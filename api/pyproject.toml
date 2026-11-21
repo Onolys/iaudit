@@ -44,11 +44,12 @@ select = ["E", "F", "I", "UP", "B"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-addopts = "-m 'not live'"
+addopts = "-m 'not live and not flaky'"
 markers = [
   "unit: fast, no network or external services",
   "integration: multiple components or local services, no paid/live providers",
   "live: calls real external providers (STT/LLM); excluded by default",
+  "flaky: known-flaky test; excluded from the blocking run, run non-blocking in CI",
 ]
 
 [tool.ruff.lint.per-file-ignores]

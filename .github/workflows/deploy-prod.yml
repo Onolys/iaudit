@@ -47,6 +47,9 @@ jobs:
       sha: ${{ steps.sha.outputs.sha }}
       image: ${{ steps.digest.outputs.image }}
     steps:
+      # Checkout comes BEFORE auth: checkout cleans the workspace and would delete the gha-creds-*.json that auth writes
+      # there. The default-ref checkout is only a git repo to move to the resolved sha later (no checkout after auth).
+      - uses: actions/checkout@v4
       - id: auth
         uses: google-github-actions/auth@v2
         with:
@@ -68,9 +71,12 @@ jobs:
           fi
           [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "sha must be a full 40-char lowercase hex commit sha, got '$sha'" >&2; exit 1; }
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.sha.outputs.sha }}
+      - name: Move the workspace to the resolved commit (plain git, keeps the creds file)
+        env:
+          SHA: ${{ steps.sha.outputs.sha }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$SHA"
+          git checkout --detach "$SHA"
       - name: Config guard (source tree at this commit)
         run: bash scripts/ci/check_config.sh
       - name: Resolve the sha tag to a digest and require that staging deployed exactly that digest

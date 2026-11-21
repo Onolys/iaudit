@@ -46,3 +46,24 @@ async def client(app):
         transport=httpx.ASGITransport(app=app, raise_app_exceptions=False), base_url="http://t"
     ) as c:
         yield c
+
+
+# Firestore-emulator transaction contention ("Aborted: 409 Transaction lock timeout") makes these
+# firestore-backed params flaky. The in-memory ("fake") params are deterministic and stay blocking.
+FLAKY_FIRESTORE_TESTS = {
+    "test_concurrent_reservations_never_exceed_the_cap",
+    "test_concurrent_attempts_cannot_exceed_the_active_run_limit",
+    "test_two_concurrent_claims_one_wins",
+}
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_collection_modifyitems(items):
+    for item in items:
+        callspec = getattr(item, "callspec", None)
+        if (
+            item.originalname in FLAKY_FIRESTORE_TESTS
+            and callspec is not None
+            and callspec.params.get("repo") == "firestore"
+        ):
+            item.add_marker(pytest.mark.flaky)

@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit -p .",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:flaky": "FLAKY=1 vitest run --passWithNoTests",
     "gen:api": "openapi-typescript ../api/openapi.json -o src/api/schema.d.ts --default-non-nullable false && json2ts -i ../engines/evaluation/schemas/report.schema.json -o src/api/report.d.ts --additionalProperties=false",
     "check:api": "npm run gen:api && git diff --exit-code -- src/api/schema.d.ts src/api/report.d.ts"
   },

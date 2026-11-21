@@ -48,6 +48,8 @@ jobs:
           fi
       - name: Test workflow_run fork-safety guard
         run: python3 scripts/ci/test_workflow_run_guard.py
+      - name: Test no checkout after GCP auth in workflows
+        run: python3 scripts/ci/test_workflow_checkout_before_auth.py
       - name: Test config guard
         run: bash scripts/ci/test_check_config.sh
       - name: Test deploy-prod workflow guard
@@ -146,11 +148,22 @@ jobs:
       - name: pytest with coverage (Firestore emulator)
         run: |
           firebase emulators:exec --config api/firebase.json --only firestore --project demo-onolys \
-            'uv run --no-sync --package onolys-api pytest api -m "not live" --cov=api/src --cov-report='
+            'uv run --no-sync --package onolys-api pytest api -m "not live and not flaky" --cov=api/src --cov-report='
           {
             echo "### Coverage: onolys-api"
             uv run --no-sync --package onolys-api coverage report --format=markdown
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: pytest flaky (non-blocking)
+        id: flaky_api
+        continue-on-error: true
+        run: |
+          firebase emulators:exec --config api/firebase.json --only firestore --project demo-onolys \
+            'uv run --no-sync --package onolys-api pytest api -m "flaky and not live" -p no:cacheprovider'
+      - name: Warn on flaky api failures
+        if: steps.flaky_api.outcome == 'failure'
+        run: |
+          echo "::warning title=Flaky tests failed::api flaky tests failed (non-blocking). See this step's log; open a follow-up to fix the root cause."
+          echo "### :warning: api flaky tests failed (non-blocking)" >> "$GITHUB_STEP_SUMMARY"
       - name: Firestore rules tests (emulator)
         run: |
           npm ci --prefix firestore-rules-test
@@ -298,6 +311,15 @@ jobs:
             cat coverage-summary.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: vitest flaky (non-blocking)
+        id: flaky_web
+        continue-on-error: true   # never fails the job; surfaced by the warning step below
+        run: npm run test:flaky
+      - name: Warn on flaky web failures
+        if: steps.flaky_web.outcome == 'failure'
+        run: |
+          echo "::warning title=Flaky tests failed::web flaky tests failed (non-blocking). See this step's log; open a follow-up to fix the root cause."
+          echo "### :warning: web flaky tests failed (non-blocking)" >> "$GITHUB_STEP_SUMMARY"
       - run: npm run build
 
   infra:
