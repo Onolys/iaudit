@@ -32,6 +32,9 @@ API_EXTRA_RE='^(firestore\.rules|firebase\.json|firestore-rules-test/)'
 # The web job also runs on the contracts its generated types come from (gen:api staleness check).
 WEB_EXTRA_RE='^(api/openapi\.json|engines/evaluation/schemas/report\.schema\.json)$'
 
+# paudit packs are built from protocols/ (and the admin image ships it, see ADMIN_BACKEND_EXTRA_RE).
+PAUDIT_EXTRA_RE='^protocols/'
+
 # The frontend's pauditSchema.test.ts imports the paudit result schema through the @paudit-schema alias.
 FRONTEND_EXTRA_RE='^engines/paudit/schemas/'
 
@@ -39,7 +42,48 @@ FRONTEND_EXTRA_RE='^engines/paudit/schemas/'
 # docs/contracts/, so it re-runs when any of them (or .dockerignore) changes.
 ADMIN_BACKEND_EXTRA_RE='^(admin/auth/|engines/eaudit/|engines/paudit/|protocols/|docs/contracts/|\.dockerignore)'
 
+# Direct workspace dependencies (name: deps), mirrored from each pyproject [project].dependencies.
+# A change in a package also runs every package that (transitively) depends on it.
+# test_changes_deps.py fails if this drifts from the pyprojects.
+DEPS=(
+  "eaudit:core"
+  "paudit:core"
+  "evaluation:core eaudit paudit"
+  "api:core evaluation paudit"
+  "admin-backend:admin-auth eaudit core paudit"
+)
+
 mapfile -t FILES
+
+declare -A HIT=()
+for entry in "${PACKAGES[@]}"; do
+  IFS=: read -r name dir kind <<<"$entry"
+  for f in "${FILES[@]}"; do
+    if [[ "$f" == "$dir/"* || "$f" =~ $CI_SHARED_RE ||
+          ( "$kind" == python && "$f" =~ $PY_SHARED_RE ) ||
+          ( "$name" == api && "$f" =~ $API_EXTRA_RE ) ||
+          ( "$name" == paudit && "$f" =~ $PAUDIT_EXTRA_RE ) ||
+          ( "$name" == admin-backend && "$f" =~ $ADMIN_BACKEND_EXTRA_RE ) ||
+          ( "$name" == frontend && "$f" =~ $FRONTEND_EXTRA_RE ) ||
+          ( "$name" == web && "$f" =~ $WEB_EXTRA_RE ) ]]; then
+      HIT[$name]=1
+      break
+    fi
+  done
+done
+
+# Propagate to dependents until stable.
+changed=true
+while [[ "$changed" == true ]]; do
+  changed=false
+  for entry in "${DEPS[@]}"; do
+    name="${entry%%:*}"
+    [[ -n "${HIT[$name]:-}" ]] && continue
+    for dep in ${entry#*:}; do
+      if [[ -n "${HIT[$dep]:-}" ]]; then HIT[$name]=1; changed=true; break; fi
+    done
+  done
+done
 
 for entry in "${PACKAGES[@]}"; do
   IFS=: read -r name dir kind <<<"$entry"
@@ -51,17 +95,7 @@ for entry in "${PACKAGES[@]}"; do
     if [[ "${FORCE_ALL:-false}" == "true" ]]; then
       run=true
     else
-      for f in "${FILES[@]}"; do
-        if [[ "$f" == "$dir/"* || "$f" =~ $CI_SHARED_RE ||
-              ( "$kind" == python && "$f" =~ $PY_SHARED_RE ) ||
-              ( "$name" == api && "$f" =~ $API_EXTRA_RE ) ||
-              ( "$name" == admin-backend && "$f" =~ $ADMIN_BACKEND_EXTRA_RE ) ||
-              ( "$name" == frontend && "$f" =~ $FRONTEND_EXTRA_RE ) ||
-              ( "$name" == web && "$f" =~ $WEB_EXTRA_RE ) ]]; then
-          run=true
-          break
-        fi
-      done
+      [[ -n "${HIT[$name]:-}" ]] && run=true
     fi
   fi
   echo "$name=$run" >>"$OUT"
