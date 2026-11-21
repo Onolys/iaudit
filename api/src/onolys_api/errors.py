@@ -62,12 +62,23 @@ class ErrorDetailModel(BaseModel):
     field: str | None = Field(
         None,
         description=(
-            "Dotted path of the offending field (e.g. `globals.cct.reason`); `$` is the whole "
-            "body. Set on `rating_invalid`. A path only, never user text."
+            "`/`-joined path of the offending field in the rating card (e.g. "
+            "`globals/cct/reason`); `$` is the whole card. Set on `rating_invalid`. A path only, "
+            "never user text."
         ),
     )
     issue: (
-        Literal["too_long", "unknown_key", "required", "invalid", "order", "too_large"] | None
+        Literal[
+            "invalid_type",
+            "too_long",
+            "out_of_range",
+            "required",
+            "unknown_key",
+            "invalid",
+            "order",
+            "too_large",
+        ]
+        | None
     ) = Field(None, description="What is wrong at `field`. Set on `rating_invalid`.")
 
 

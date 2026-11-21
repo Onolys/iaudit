@@ -12,6 +12,7 @@ import httpx
 import pytest
 from cards import valid_card
 from onolys_core.errors import PackError
+from onolys_evaluation import is_no_rating
 from onolys_evaluation import validate_rating as engine_validate
 from paudit.pack import load_pack
 
@@ -100,10 +101,10 @@ async def test_draft_overwritten_single_doc(env):
     assert g["draft"]["card"] == {"notes": "two"}
 
 
-async def test_draft_checks_limits_only(env):
+async def test_draft_checks_shape_and_limits_only(env):
     c, h, repo, uid, sid = env
-    # incomplete / wrong-shaped values are accepted in a draft
-    r = await put(c, h, sid, {"final": False, "card": {"globals": {"cct": {"score": 9}}}})
+    # incomplete values are accepted in a draft (the engine checks shape and limits only)
+    r = await put(c, h, sid, {"final": False, "card": {"globals": {"cct": {"score": None}}}})
     assert r.status_code == 202
     for bad in (
         {"notes": "x" * 3001},
@@ -113,6 +114,39 @@ async def test_draft_checks_limits_only(env):
     ):
         r = await put(c, h, sid, {"final": False, "card": bad})
         assert r.status_code == 422 and r.json()["details"][0]["code"] == "rating_invalid", bad
+
+
+@pytest.mark.parametrize(
+    ("bad", "path", "code"),
+    [
+        ({"globals": {"nope": {"score": 3}}}, "globals/nope", "unknown_key"),
+        ({"counts": {"cct": {"count": 1}}}, "counts/cct", "unknown_key"),
+        ({"globals": {"cct": {"score": 9}}}, "globals/cct/score", "out_of_range"),
+        ({"counts": {"gi": {"count": -1}}}, "counts/gi/count", "out_of_range"),
+        ({"coded_span": {"from_s": -1, "to_s": 5}}, "coded_span/from_s", "out_of_range"),
+        ({"globals": {"cct": {"score": "x"}}}, "globals/cct/score", "invalid_type"),
+    ],
+)
+@pytest.mark.parametrize("final", [False, True])
+async def test_engine_rules_reject_with_engine_issue_format(env, bad, path, code, final):
+    """Cards the interim jsonschema-only validator accepted; the engine rejects them (R2)."""
+    c, h, repo, uid, sid = env
+    r = await put(c, h, sid, {"final": final, "card": card(**bad)})
+    assert r.status_code == 422, r.text
+    details = r.json()["details"]
+    assert any(d["field"] == path and d["issue"] == code for d in details), details
+    assert all(d["code"] == "rating_invalid" for d in details)
+    assert repo.latest_rating(uid, sid) is None
+
+
+async def test_draft_with_unset_change_goal_still_autosaves(env):
+    c, h, repo, uid, sid = env
+    for goal in (None, "", "  "):
+        r = await put(c, h, sid, {"final": False, "card": card(change_goal=goal)})
+        assert r.status_code == 202, (goal, r.text)
+    r = await put(c, h, sid, {"final": False, "card": {"globals": {"cct": {"score": 3}}}})
+    assert r.status_code == 202
+    assert (await put(c, h, sid, {"final": True, "card": card(change_goal=None)})).status_code == 422
 
 
 async def test_draft_size_cap(env):
@@ -308,11 +342,20 @@ async def test_openapi_has_rating_and_no_upload_or_parse():
     assert not any("rating" in path and "audio" in path for path in spec["paths"])
 
 
-# ---- validate_rating seam (stand-in until SP03 lands) ----
+# ---- validate_rating seam: a thin wrapper over the evaluation engine ----
 
 
 def codes(obj, final):
     return {(i.path, i.code) for i in validate_rating(obj, final=final)}
+
+
+def test_validate_is_the_engine_validator_plus_size_cap():
+    pack = load_pack("miti@4.2.1")
+    for c in (card(), card(change_goal=""), {"globals": {"cct": {"score": 9}}}, {"x": 1}):
+        for final in (False, True):
+            assert validate_rating(c, final=final) == engine_validate(pack, c, final)
+    big = {"junk": "x" * rating_mod.MAX_CARD_BYTES}
+    assert ("", "too_large") in codes(big, False)
 
 
 def test_validate_draft_vs_final_change_goal():
@@ -328,11 +371,19 @@ def test_validate_issue_paths_carry_no_text():
 
 
 def test_validate_shape_rules():
-    assert ("globals.cct.score", "invalid") in codes({"globals": {"cct": {"score": 0}}}, False)
-    assert ("globals.cct.score", "invalid") in codes({"globals": {"cct": {"score": True}}}, False)
+    assert ("globals/cct/score", "out_of_range") in codes({"globals": {"cct": {"score": 0}}}, False)
+    assert ("globals/cct/score", "invalid_type") in codes(
+        {"globals": {"cct": {"score": True}}}, False
+    )
     assert validate_rating({"globals": {"cct": {"score": None}}, "counts": {}}, final=False) == []
     assert ("coded_span", "order") in codes({"coded_span": {"from_s": 5, "to_s": 1}}, False)
     assert codes({"notes": "x" * 3001}, False) == {("notes", "too_long")}
+    assert ("", "invalid_type") in codes([], False)
+
+
+def test_has_content_matches_engine_no_rating():
+    for c in ({}, {"notes": " "}, card(), {"counts": {"gi": {"count": 0}}}, {"notes": "n"}):
+        assert rating_mod.has_content(c) is (not is_no_rating(c))
 
 
 REPO = Path(__file__).resolve().parents[2]
@@ -347,7 +398,7 @@ def test_schema_is_the_canonical_sp02_schema():
 
 def test_schema_missing_fails_loudly_no_fallback(tmp_path, monkeypatch):
     monkeypatch.setenv("PAUDIT_PROTOCOLS_DIR", str(tmp_path))
-    rating_mod.load_schema.cache_clear()
+    rating_mod.load_pack_cached.cache_clear()
     try:
         with pytest.raises(PackError):
             rating_mod.load_schema()
@@ -355,7 +406,7 @@ def test_schema_missing_fails_loudly_no_fallback(tmp_path, monkeypatch):
             create_app(Settings(env="test", auth_mode="fake"))
     finally:
         monkeypatch.undo()
-        rating_mod.load_schema.cache_clear()
+        rating_mod.load_pack_cached.cache_clear()
     assert rating_mod.load_schema()["properties"]
 
 

@@ -126,16 +126,16 @@ async def test_rating_invalid_details_carry_field_paths(client):
         json.loads((ROOT / "docs/contracts/public/public-error-response.schema.json").read_text()),
     )
     by_field = {d["field"]: d for d in body["details"]}
-    assert by_field["globals.cct.reason"]["issue"] == "too_long"
-    assert by_field["globals.cct.reason"]["code"] == "rating_invalid"
-    assert by_field["$"]["issue"] == "unknown_key"
+    assert by_field["globals/cct/reason"]["issue"] == "too_long"
+    assert by_field["globals/cct/reason"]["code"] == "rating_invalid"
+    assert by_field["extra_key"]["issue"] == "unknown_key"
     assert "y" * 10 not in json.dumps(body)  # never card text
     # draft autosave too
     r = await client.put(
         f"/v1/sessions/{sid}/rating", json={"final": False, "card": card}, headers=A
     )
     assert r.status_code == 422
-    assert r.json()["details"][0]["field"] == "globals.cct.reason"
+    assert r.json()["details"][0]["field"] == "extra_key"
 
 
 def test_error_schema_matches_model():

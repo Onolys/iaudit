@@ -151,7 +151,7 @@ export interface paths {
         get: operations["getRating"];
         /**
          * Save the rating card (draft autosave or final revision)
-         * @description `final=false`: overwrites the draft; only the size limits are checked and nothing else changes. `final=true`: validates the card (`change_goal` required), writes a new revision and sets `rating_submitted`/`has_rating`; `no_rating=true`, or a card with no scores, counts or notes, is a "no rating" revision (`has_rating=false`). Over 1,000 chars per reason/note/example or 3,000 for `notes` is 422 `rating_invalid`. Allowed in every state but `deleting`. A final card may start the first run (R4).
+         * @description `final=false`: overwrites the draft; the shape and size limits are checked (an unset `change_goal` is fine) and nothing else changes. `final=true`: validates the card (`change_goal` required), writes a new revision and sets `rating_submitted`/`has_rating`; `no_rating=true`, or a card with no scores, counts or notes, is a "no rating" revision (`has_rating=false`). Over 1,000 chars per reason/note/example or 3,000 for `notes` is 422 `rating_invalid`. Allowed in every state but `deleting`. A final card may start the first run (R4).
          */
         put: operations["putRating"];
         post?: never;
@@ -434,14 +434,14 @@ export interface components {
             code: "invalid_json" | "unsupported_media_type" | "schema_violation" | "empty_transcript" | "empty_assessment" | "duplicate_ids" | "invalid_parameters" | "body_too_large" | "too_many_turns" | "too_many_sections" | "rate_limited" | "not_found" | "method_not_allowed" | "cors_rejected" | "request_rejected" | "upstream_unavailable" | "deadline_exceeded" | "internal_error" | "missing_parameter" | "unknown_pack" | "input_rejected" | "run_failed" | "unauthenticated" | "forbidden" | "invalid_state" | "unsupported_audio" | "audio_too_long" | "audio_too_large" | "audio_unreadable" | "no_speech" | "speakers_not_separated" | "transcription_failed" | "rating_invalid" | "daily_cap_reached" | "conflict";
             /**
              * Field
-             * @description Dotted path of the offending field (e.g. `globals.cct.reason`); `$` is the whole body. Set on `rating_invalid`. A path only, never user text.
+             * @description `/`-joined path of the offending field in the rating card (e.g. `globals/cct/reason`); `$` is the whole card. Set on `rating_invalid`. A path only, never user text.
              */
             field?: string | null;
             /**
              * Issue
              * @description What is wrong at `field`. Set on `rating_invalid`.
              */
-            issue?: ("too_long" | "unknown_key" | "required" | "invalid" | "order" | "too_large") | null;
+            issue?: ("invalid_type" | "too_long" | "out_of_range" | "required" | "unknown_key" | "invalid" | "order" | "too_large") | null;
             /** Message */
             message: string;
         };

@@ -47,11 +47,11 @@ Every non-2xx body is `ErrorResponse` ([schema](../contracts/public/public-error
 
 ```json
 {"schema_version": "0.0.1", "request_id": "…", "status": 422,
- "message": "…", "details": [{"code": "rating_invalid", "message": "globals.cct.reason: too_long",
-                              "field": "globals.cct.reason", "issue": "too_long"}]}
+ "message": "…", "details": [{"code": "rating_invalid", "message": "globals/cct/reason: too_long",
+                              "field": "globals/cct/reason", "issue": "too_long"}]}
 ```
 
-`details[].code` is a closed enum (a superset of the eaudit one). Messages are fixed text and paths, never user content. `field` and `issue` are set on `rating_invalid` only: `field` is the dotted card path (`$` = the whole card), `issue` is one of `too_long`, `unknown_key`, `required`, `invalid`, `order`, `too_large`; at most 20 issues are listed.
+`details[].code` is a closed enum (a superset of the eaudit one). Messages are fixed text and paths, never user content. `field` and `issue` are set on `rating_invalid` only: `field` is the `/`-joined card path (`$` = the whole card), `issue` is one of `invalid_type`, `too_long`, `out_of_range`, `required`, `unknown_key`, `invalid`, `order`, `too_large` (the evaluation engine's `validate_rating` issues, plus the API size cap `too_large`); at most 20 issues are listed.
 
 | Status | Codes |
 |---|---|

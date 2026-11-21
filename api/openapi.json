@@ -337,16 +337,18 @@
                 "type": "null"
               }
             ],
-            "description": "Dotted path of the offending field (e.g. `globals.cct.reason`); `$` is the whole body. Set on `rating_invalid`. A path only, never user text.",
+            "description": "`/`-joined path of the offending field in the rating card (e.g. `globals/cct/reason`); `$` is the whole card. Set on `rating_invalid`. A path only, never user text.",
             "title": "Field"
           },
           "issue": {
             "anyOf": [
               {
                 "enum": [
+                  "invalid_type",
                   "too_long",
-                  "unknown_key",
+                  "out_of_range",
                   "required",
+                  "unknown_key",
                   "invalid",
                   "order",
                   "too_large"
@@ -2429,7 +2431,7 @@
         ]
       },
       "put": {
-        "description": "`final=false`: overwrites the draft; only the size limits are checked and nothing else changes. `final=true`: validates the card (`change_goal` required), writes a new revision and sets `rating_submitted`/`has_rating`; `no_rating=true`, or a card with no scores, counts or notes, is a \"no rating\" revision (`has_rating=false`). Over 1,000 chars per reason/note/example or 3,000 for `notes` is 422 `rating_invalid`. Allowed in every state but `deleting`. A final card may start the first run (R4).",
+        "description": "`final=false`: overwrites the draft; the shape and size limits are checked (an unset `change_goal` is fine) and nothing else changes. `final=true`: validates the card (`change_goal` required), writes a new revision and sets `rating_submitted`/`has_rating`; `no_rating=true`, or a card with no scores, counts or notes, is a \"no rating\" revision (`has_rating=false`). Over 1,000 chars per reason/note/example or 3,000 for `notes` is 422 `rating_invalid`. Allowed in every state but `deleting`. A final card may start the first run (R4).",
         "operationId": "putRating",
         "parameters": [
           {

@@ -1,21 +1,22 @@
 """Rating-card validation: the one seam `PUT /sessions/{id}/rating` goes through (R2, D15).
 
-The schema is the canonical SP02 one, `rating.schema.json` of the MITI pack (`protocols/
-miti-4.2.1/`), loaded through `paudit.pack.load_pack` (honours `PAUDIT_PROTOCOLS_DIR`, which the
-image sets to `/app/protocols`). It is the same file the web rating card and the evaluation
-engine's `validate_rating` use, so a stored card flows into the engine unchanged. There is no
-fallback: a missing or unreadable pack raises, and `create_app` loads it at startup so a bad
-deploy fails to boot instead of validating against something else. Issues are paths and codes
-only, never card text.
+A thin wrapper over the evaluation engine's `onolys_evaluation.rating` (`validate_rating`,
+`is_no_rating`), so a card the API stores is one the engine accepts, with the engine's rules (pack
+item ids, score scales, counts and spans >= 0, limits) and its issue format (`Issue(path, code)`,
+`/`-joined paths). The only API-only rule is the HTTP size cap `MAX_CARD_BYTES`. The pack is
+loaded through `paudit.pack.load_pack` (honours `PAUDIT_PROTOCOLS_DIR`, which the image sets to
+`/app/protocols`). There is no fallback: a missing or unreadable pack raises, and `create_app`
+loads it at startup so a bad deploy fails to boot. Issues are paths and codes only, never card text.
 """
 
 import json
-from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
 
-from jsonschema import Draft202012Validator
-from paudit.pack import load_pack
+from onolys_evaluation.rating import is_no_rating
+from onolys_evaluation.rating import validate_rating as engine_validate_rating
+from onolys_evaluation.report import Issue
+from paudit.pack import Pack, load_pack
 
 from onolys_api.adapters.real import PACK_REF
 
@@ -23,23 +24,18 @@ SCHEMA_VERSION = "miti-1"
 # Hard cap on a stored card (UTF-8 JSON bytes): bounds unknown keys the shape check does not cover.
 MAX_CARD_BYTES = 256 * 1024
 
-_CODES = {
-    "maxLength": "too_long",
-    "additionalProperties": "unknown_key",
-    "required": "required",
-}
-
-
-@dataclass(frozen=True)
-class Issue:
-    path: str  # dotted card path; never card text
-    code: str  # too_long | unknown_key | required | invalid | order | too_large
+__all__ = ["MAX_CARD_BYTES", "SCHEMA_VERSION", "Issue", "has_content", "validate_rating"]
 
 
 @lru_cache(maxsize=1)
+def load_pack_cached() -> Pack:
+    """The MITI pack; raises `paudit` `PackError` when it cannot be loaded."""
+    return load_pack(PACK_REF)
+
+
 def load_schema() -> dict[str, Any]:
-    """The pack's rating schema; raises `paudit` `PackError` when the pack cannot be loaded."""
-    return load_pack(PACK_REF).rating_schema
+    """The pack's rating schema (the canonical SP02 `rating.schema.json`)."""
+    return load_pack_cached().rating_schema
 
 
 def card_size(obj: Any) -> int:
@@ -47,45 +43,16 @@ def card_size(obj: Any) -> int:
 
 
 def validate_rating(obj: Any, final: bool) -> list[Issue]:
-    """Issues for a rating card. Draft: shape + limits. Final: also a non-empty `change_goal`."""
-    if not isinstance(obj, dict):
-        return [Issue("", "invalid")]
-    issues: list[Issue] = []
+    """Engine issues for a card, plus `too_large` over the size cap.
+
+    `final=False` (autosave): shape and limits only. `final=True`: also a non-empty `change_goal`.
+    """
+    issues = list(engine_validate_rating(load_pack_cached(), obj, final))
     if card_size(obj) > MAX_CARD_BYTES:
-        issues.append(Issue("", "too_large"))
-    for e in Draft202012Validator(load_schema()).iter_errors(obj):
-        code = _CODES.get(e.validator, "invalid")
-        issues.append(Issue(".".join(str(p) for p in e.absolute_path), code))
-    span = obj.get("coded_span")
-    if isinstance(span, dict):
-        a, b = span.get("from_s"), span.get("to_s")
-        if _num(a) and _num(b) and a > b:
-            issues.append(Issue("coded_span", "order"))
-    if final:
-        goal = obj.get("change_goal")
-        if not isinstance(goal, str) or not goal.strip():
-            issues.append(Issue("change_goal", "required"))
+        issues.insert(0, Issue(path="", code="too_large"))
     return issues
-
-
-def draft_issues(obj: Any) -> list[Issue]:
-    """What a draft autosave is rejected for: size limits only (never incompleteness)."""
-    if not isinstance(obj, dict):
-        return [Issue("", "invalid")]
-    return [i for i in validate_rating(obj, final=False) if i.code in ("too_long", "too_large")]
-
-
-def _num(v: Any) -> bool:
-    return isinstance(v, int | float) and not isinstance(v, bool)
 
 
 def has_content(card: dict[str, Any]) -> bool:
     """True when the card carries any score, count or non-blank notes ("no rating" otherwise)."""
-    globals_ = card.get("globals") or {}
-    counts = card.get("counts") or {}
-    if any(isinstance(g, dict) and g.get("score") is not None for g in globals_.values()):
-        return True
-    if any(isinstance(c, dict) and c.get("count") is not None for c in counts.values()):
-        return True
-    notes = card.get("notes")
-    return isinstance(notes, str) and bool(notes.strip())
+    return not is_no_rating(card)

@@ -16,13 +16,7 @@ from pydantic import BaseModel, Field
 from onolys_api.auth.deps import AuthUser, current_user
 from onolys_api.errors import ApiError, ErrorDetail, ErrorResponse
 from onolys_api.jobs.first_run import maybe_start_first_run
-from onolys_api.rating import (
-    SCHEMA_VERSION,
-    Issue,
-    draft_issues,
-    has_content,
-    validate_rating,
-)
+from onolys_api.rating import SCHEMA_VERSION, Issue, has_content, validate_rating
 from onolys_api.repo.base import NotFoundError
 from onolys_api.repo.models import RatingDoc, RatingDraftDoc
 
@@ -68,11 +62,11 @@ MAX_ISSUES = 20
 def _invalid(issues: list[Issue]) -> ApiError:
     """422 `rating_invalid`: one detail per issue (card path + issue code, never card text)."""
     details: list[ErrorDetail] = []
-    for i in sorted(set(issues), key=lambda i: (i.path, i.code))[:MAX_ISSUES]:
-        field = i.path or "$"
+    for path, code in sorted({(i.path, i.code) for i in issues})[:MAX_ISSUES]:
+        field = path or "$"
         details.append(
-            {"code": "rating_invalid", "message": f"{field}: {i.code}", "field": field,
-             "issue": i.code}
+            {"code": "rating_invalid", "message": f"{field}: {code}", "field": field,
+             "issue": code}
         )  # fmt: skip
     return ApiError(422, INVALID, details)
 
@@ -91,8 +85,9 @@ def _open_session(request: Request, user: AuthUser, id: str):
     response_model=RatingSaved,
     summary="Save the rating card (draft autosave or final revision)",
     description=(
-        "`final=false`: overwrites the draft; only the size limits are checked and nothing else "
-        "changes. `final=true`: validates the card (`change_goal` required), writes a new revision "
+        "`final=false`: overwrites the draft; the shape and size limits are checked (an unset "
+        "`change_goal` is fine) and nothing else changes. `final=true`: validates the card "
+        "(`change_goal` required), writes a new revision "
         "and sets `rating_submitted`/`has_rating`; `no_rating=true`, or a card with no scores, "
         'counts or notes, is a "no rating" revision (`has_rating=false`). Over 1,000 chars per '
         "reason/note/example or 3,000 for `notes` is 422 `rating_invalid`. Allowed in every state "
@@ -105,7 +100,7 @@ def put_rating(id: str, body: RatingRequest, request: Request, user: User) -> Ra
     _open_session(request, user, id)
     now = datetime.now(UTC)
     if not body.final:
-        if issues := draft_issues(body.card):
+        if issues := validate_rating(body.card, final=False):
             raise _invalid(issues)
         repo.put_rating_draft(uid, id, RatingDraftDoc(card=body.card, updated_at=now))
         return RatingSaved(final=False, updated_at=now)

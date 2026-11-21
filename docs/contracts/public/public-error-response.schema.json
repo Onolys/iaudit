@@ -86,13 +86,15 @@
           },
           "field": {
             "type": "string",
-            "description": "Dotted path of the offending field (e.g. `globals.cct.reason`); `$` is the whole body. Set on `rating_invalid`. A path only, never user text."
+            "description": "`/`-joined path of the offending field in the rating card (e.g. `globals/cct/reason`); `$` is the whole card. Set on `rating_invalid`. A path only, never user text."
           },
           "issue": {
             "enum": [
+              "invalid_type",
               "too_long",
-              "unknown_key",
+              "out_of_range",
               "required",
+              "unknown_key",
               "invalid",
               "order",
               "too_large"
