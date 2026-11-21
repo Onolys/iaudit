@@ -1,5 +1,6 @@
 """01 optional: streaming body cap, Server-Timing, call `unit`, multiple cache breakpoints."""
 
+import dataclasses
 import json
 
 import pytest
@@ -133,9 +134,24 @@ async def test_unit_defaults_to_none():
 # -- cache breakpoints -----------------------------------------------------------------------
 
 
+def _anthropic_cfg():
+    """eaudit's default routes are Gemini (implicit caching); breakpoints are Anthropic-only."""
+    cfg = Settings(llm_mode="live").llm_config()
+    routes = {k: dataclasses.replace(r, caching_mode="anthropic_ephemeral") for k, r in cfg.routes.items()}
+    return dataclasses.replace(cfg, routes=routes)
+
+
+async def test_gemini_default_prefixes_are_plain_text_no_breakpoints():
+    fake = Fake(completion('{"answer": "a"}'))
+    cfg = Settings(llm_mode="live").llm_config()
+    assert {r.caching_mode for r in cfg.routes.values()} == {"provider_implicit"}
+    await LiteLLMClient(cfg, acompletion=fake).complete_json(_req(cache_prefixes=["ONE", "TWO"]))
+    assert fake.calls[0]["messages"][0]["content"] == "ONE\n\nTWO\n\nsys"
+
+
 async def test_two_cache_prefixes_give_two_breakpoints():
     fake = Fake(completion('{"answer": "a"}'))
-    await LiteLLMClient(Settings(llm_mode="live").llm_config(), acompletion=fake).complete_json(
+    await LiteLLMClient(_anthropic_cfg(), acompletion=fake).complete_json(
         _req(cache_prefixes=["ONE", "TWO"])
     )
     system = fake.calls[0]["messages"][0]["content"]
@@ -153,7 +169,7 @@ async def test_more_than_two_prefixes_rejected():
 
 async def test_single_cache_prefix_still_works():
     fake = Fake(completion('{"answer": "a"}'))
-    await LiteLLMClient(Settings(llm_mode="live").llm_config(), acompletion=fake).complete_json(
+    await LiteLLMClient(_anthropic_cfg(), acompletion=fake).complete_json(
         _req(cache_prefix="P")
     )
     system = fake.calls[0]["messages"][0]["content"]

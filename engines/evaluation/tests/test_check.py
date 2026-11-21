@@ -99,7 +99,7 @@ def test_eaudit_run_info_missing_is_tolerated(report, tr):
 
 
 def test_format_prints_stage_latency_tokens_and_no_key(report, tr, monkeypatch):
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-secret-value")
+    monkeypatch.setenv("GEMINI_API_KEY", "sk-secret-value")
     text = check.format_result(ev(report, tr))
     for word in ("paudit", "eaudit", "tips", "quote-valid", "tokens", "PASS", "cost"):
         assert word in text
@@ -131,9 +131,9 @@ def test_stage_timer_failed_stage_is_recorded():
 
 
 def test_main_without_key_exits_nonzero_and_does_not_print_key(monkeypatch, capsys):
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     assert check.main([]) == 1
-    assert "ANTHROPIC_API_KEY" in capsys.readouterr().err
+    assert "GEMINI_API_KEY" in capsys.readouterr().err
 
 
 def test_default_pack_is_the_only_pack_dir():

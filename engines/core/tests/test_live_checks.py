@@ -80,8 +80,8 @@ def test_smoke_main_exit_codes(capsys):
 
 
 def test_smoke_main_missing_key_is_config_error(monkeypatch):
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    with pytest.raises(ConfigError, match="ANTHROPIC_API_KEY"):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    with pytest.raises(ConfigError, match="GEMINI_API_KEY"):
         smoke.main(["--preset", "default"])
 
 

@@ -8,7 +8,7 @@ Set up every component, run the offline checks, and work through the owner live 
 
 - [uv](https://docs.astral.sh/uv/) and Python 3.12 (`requires-python = ">=3.12,<3.13"` in `engines/eaudit/` and `eval/`).
 - Node and npm. CI uses Node 22; the repo pins no other version.
-- For live runs, a provider key that LiteLLM reads. `scripts/dev.sh` checks `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` and `LITELLM_API_KEY` for presence; the default models are Anthropic ([configuration](../reference/configuration.md)). Offline tests and stub modes need no key.
+- For live runs, a provider key that LiteLLM reads. `scripts/dev.sh` checks `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` and `LITELLM_API_KEY` for presence; the default models are Google Gemini (`GEMINI_API_KEY`) ([configuration](../reference/configuration.md)). Offline tests and stub modes need no key.
 
 ## One-time setup
 

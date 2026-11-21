@@ -8,6 +8,20 @@ from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
+def _provider_defaults(litellm_id: str) -> tuple[str, dict]:
+    """(caching_mode, extra_params) for a model id, by provider prefix.
+
+    gemini/: implicit caching; thinking kept low (Gemini 4 thinks by default and thinking tokens
+    count against max_tokens, so small stage caps could be consumed). anthropic/: ephemeral
+    caching; thinking disabled (the model thinks by default and can spend all of max_tokens on it).
+    """
+    if litellm_id.startswith("gemini/"):
+        return "provider_implicit", {"reasoning_effort": "low"}
+    if litellm_id.startswith("anthropic/"):
+        return "anthropic_ephemeral", {"thinking": {"type": "disabled"}}
+    return "none", {}
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="IAUDIT_", env_file=".env", extra="ignore", frozen=True
@@ -20,9 +34,9 @@ class Settings(BaseSettings):
     # CORS
     cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:5173"]
     # Models (LiteLLM ids)
-    model_cheap: str = "anthropic/claude-haiku-5-5"
-    model_mid: str = "anthropic/claude-sonnet-5-5"
-    model_strong: str = "anthropic/claude-opus-5-5"
+    model_cheap: str = "gemini/gemini-4-hydrogen"
+    model_mid: str = "gemini/gemini-4-neon"
+    model_strong: str = "gemini/gemini-4-neon"
     # Timeouts / retries / concurrency
     llm_timeout_s: float = 30
     audit_deadline_s: float = 100
@@ -141,18 +155,18 @@ class Settings(BaseSettings):
             ("mid", self.model_mid),
             ("strong", self.model_strong),
         ):
+            caching_mode, extra_params = _provider_defaults(model)
             routes[name] = Route(
                 litellm_id=model,
                 structured_output_mode=self.llm_response_format,
-                caching_mode="anthropic_ephemeral",
-                supports_temperature=True,
+                caching_mode=caching_mode,
+                supports_temperature=False,
                 max_output_tokens=max(16000, self.atomize_max_tokens),
                 timeout_s=timeout,  # per-stage caps clamp below this
                 max_concurrency=self.llm_max_concurrency,
                 max_retries=self.llm_max_retries,
                 backoff_s=0,
-                # Haiku 5.5 thinks by default and can spend all of max_tokens on it.
-                extra_params={"thinking": {"type": "disabled"}},
+                extra_params=extra_params,
             )
         return LLMConfig(
             llm_mode=self.llm_mode,

@@ -28,7 +28,7 @@ def test_long_deadline_warns_at_startup(caplog):
 
 
 def test_live_mode_without_key_warns_by_presence_only(monkeypatch, caplog):
-    for k in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "LITELLM_API_KEY"):
+    for k in ("GEMINI_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "LITELLM_API_KEY"):
         monkeypatch.delenv(k, raising=False)
     with caplog.at_level(logging.WARNING, logger="iaudit"):
         with TestClient(create_app(Settings(llm_mode="live"))):

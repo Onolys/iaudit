@@ -27,9 +27,10 @@ from onolys_core.transcript import Transcript
 
 MIN_TIPS = 3
 ENGINES = ("paudit", "eaudit", "evaluation")
-# ESTIMATE, USD per million tokens: Claude Sonnet published list prices (input $3, output $15,
-# 5-minute cache write $3.75, cache read $0.30). Assumed to apply to the route's Sonnet model.
-PRICES_USD_PER_MTOK = {"input": 3.0, "output": 15.0, "cache_write": 3.75, "cache_read": 0.30}
+# ESTIMATE, USD per million tokens: gemini-4-neon list prices from the LiteLLM model map (input $3,
+# output $15, cache read $0.15; Gemini caches implicitly, so no cache-write fee). Assumed to apply
+# to every route (mid/strong are neon; the cheap route is cheaper, so this is an upper bound).
+PRICES_USD_PER_MTOK = {"input": 3.0, "output": 15.0, "cache_write": 0.0, "cache_read": 0.15}
 _FIELDS = {"input_tokens": "input", "output_tokens": "output",
            "cache_write_tokens": "cache_write", "cache_read_tokens": "cache_read"}
 

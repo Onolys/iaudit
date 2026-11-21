@@ -217,5 +217,5 @@ def test_make_client_modes(tmp_path, monkeypatch):
     assert isinstance(
         make_client(LLMConfig(llm_mode="fixture", fixture_dir=str(tmp_path))), FixtureClient
     )
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
     assert isinstance(make_client(LLMConfig(llm_mode="live")), LiteLLMClient)

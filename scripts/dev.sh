@@ -58,11 +58,11 @@ preflight() {
     fi
   done
   local have_key=0 k
-  for k in ANTHROPIC_API_KEY OPENAI_API_KEY LITELLM_API_KEY; do
+  for k in GEMINI_API_KEY ANTHROPIC_API_KEY OPENAI_API_KEY LITELLM_API_KEY; do
     [ -n "${!k:-}" ] && have_key=1
   done
   if [ "$have_key" -eq 0 ] && [ "$STUB" -eq 0 ]; then
-    echo "warning: none of ANTHROPIC_API_KEY / OPENAI_API_KEY / LITELLM_API_KEY is set; live runs will fail (use --stub for the stub pipeline)" >&2
+    echo "warning: none of GEMINI_API_KEY / ANTHROPIC_API_KEY / OPENAI_API_KEY / LITELLM_API_KEY is set; live runs will fail (use --stub for the stub pipeline)" >&2
   fi
   return "$failed"
 }

@@ -1,11 +1,15 @@
 # Packaged default model routes (PRD R3, D6, D11, D12). Used when env ROUTES_FILE is unset.
-# Every shipped route is Claude Sonnet; swapping a model is an edit to this file.
-# `thinking` is deliberately not set: claude-sonnet-5-5 rejects {type: disabled}.
-cheap: &sonnet
-  litellm_id: anthropic/claude-sonnet-5-5
-  api_key_env: ANTHROPIC_API_KEY
+# Every shipped route runs on the Google Gemini API (AI Studio, key in GEMINI_API_KEY); swapping a model is an edit
+# to this file. cheap = gemini-4-hydrogen (fast workhorse); mid/strong = gemini-4-neon (fast frontier).
+# The `claude` preset restores the Claude Sonnet routes (needs ANTHROPIC_API_KEY).
+# Thinking is kept low (extra_params reasoning_effort: low -> generationConfig.thinkingConfig.thinkingLevel) for parity with the
+# previous no-thinking setup: Gemini 4 thinks by default and thinking tokens count against max_tokens, so small stage caps
+# (eaudit prep/link/check) could otherwise be eaten by thinking. Tunable per route. supports_temperature is false: Gemini 3+ keeps default sampling.
+cheap: &gemini
+  litellm_id: gemini/gemini-4-hydrogen
+  api_key_env: GEMINI_API_KEY
   structured_output_mode: json_object
-  caching_mode: anthropic_ephemeral
+  caching_mode: provider_implicit
   supports_temperature: false
   max_output_tokens: 16000
   context_tokens: 1000000
@@ -13,9 +17,9 @@ cheap: &sonnet
   max_concurrency: 8
   max_retries: 3
   backoff_s: 2
-  extra_params: {}
-mid: *sonnet
-strong: *sonnet
+  extra_params: {reasoning_effort: low}
+mid: &gemini_mid {<<: *gemini, litellm_id: gemini/gemini-4-neon}
+strong: *gemini_mid
 paudit_code: {alias: mid}
 paudit_globals: {alias: mid}
 tips: {alias: mid}
@@ -24,3 +28,22 @@ tips: {alias: mid}
 presets:
   default:
     routes: {}
+  claude:
+    # Flip-back: the previous Claude Sonnet routes (needs ANTHROPIC_API_KEY on the worker).
+    # `thinking` is deliberately not set: claude-sonnet-5-5 rejects {type: disabled}.
+    routes:
+      cheap: &claude
+        litellm_id: anthropic/claude-sonnet-5-5
+        api_key_env: ANTHROPIC_API_KEY
+        structured_output_mode: json_object
+        caching_mode: anthropic_ephemeral
+        supports_temperature: false
+        max_output_tokens: 16000
+        context_tokens: 1000000
+        timeout_s: 180
+        max_concurrency: 8
+        max_retries: 3
+        backoff_s: 2
+        extra_params: {}
+      mid: *claude
+      strong: *claude

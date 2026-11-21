@@ -10,7 +10,7 @@ One GCP project (`onolys`, number `1054076260967`), region `us-central1`, two en
 
 ```
 Browser -> Hosting site (onolys-app) -> /v1/** rewrite -> Cloud Run onolys-api-prod -> Firestore (default), GCS, Cloud Tasks
-Cloud Tasks steps-prod -(OIDC)-> onolys-worker-prod -> STT (location us) + Anthropic API
+Cloud Tasks steps-prod -(OIDC)-> onolys-worker-prod -> STT (location us) + Gemini API (Anthropic API for the `claude` preset)
 staging: same shape, site onolys-app-staging, Firestore DB `staging`, *-staging services
 ```
 
@@ -26,7 +26,7 @@ staging: same shape, site onolys-app-staging, Firestore DB `staging`, *-staging 
 | Cloud Tasks queue | `steps-staging` | `steps-prod` |
 | Service accounts (`@onolys.iam.gserviceaccount.com`) | `api-staging`, `worker-staging`, `tasks-invoker-staging`, `deployer-staging` | `api-prod`, `worker-prod`, `tasks-invoker-prod`, `deployer-prod` |
 | Secret `uid-hmac-key-{env}` | `uid-hmac-key-staging` | `uid-hmac-key-prod` |
-| Secret `<base>-{env}` per `llm_secrets` / `stt_secrets` entry (default base `anthropic-api-key`) | `anthropic-api-key-staging` | `anthropic-api-key-prod` |
+| Secret `<base>-{env}` per `llm_secrets` / `stt_secrets` entry (default bases `gemini-api-key`, `anthropic-api-key`) | `gemini-api-key-staging`, `anthropic-api-key-staging` | `gemini-api-key-prod`, `anthropic-api-key-prod` |
 | Log-based metric (5xx) | `onolys-api-5xx-staging` | `onolys-api-5xx-prod` |
 | Alert policies | none while `staging_alerts=false` | `Onolys failed step/run (prod)`, `Onolys api 5xx rate (prod)` |
 | Hosting site | `onolys-app-staging` (`https://onolys-app-staging.web.app`) | `onolys-app` (`https://onolys-app.web.app`, custom domain `app.onolys.com`) |
@@ -72,7 +72,7 @@ Set by Terraform (`infra/modules/environment/services.tf`). Values below are the
 | `DEFAULT_PRESET` | yes | yes | `default` |
 | `CORS_ORIGINS` | yes | no | staging `https://onolys-app-staging.web.app,http://localhost:5173`; prod `https://app.onolys.com` |
 | `UID_HMAC_KEY` | yes | yes | secret ref `uid-hmac-key-{env}` (keys the `uid_hash` log field) |
-| `ANTHROPIC_API_KEY` | no | yes | secret ref `anthropic-api-key-{env}` (one ref per `llm_secrets` / `stt_secrets` entry, always the env's own secret; staging and prod use separate provider keys) |
+| `GEMINI_API_KEY` (evaluation LLM) and `ANTHROPIC_API_KEY` (only for the `claude` preset) | no | yes | secret refs `gemini-api-key-{env}` and `anthropic-api-key-{env}` (one ref per `llm_secrets` / `stt_secrets` entry, always the env's own secret; staging and prod use separate provider keys) |
 | `GIT_SHA` | yes | yes | set by CI at deploy. `unset` until the first CI deploy (the services still run the placeholder image `us-docker.pkg.dev/cloudrun/container/hello`) |
 
 There are no STT env vars. No model id appears in infra.
@@ -150,7 +150,7 @@ Environments: create `production` with Tejit as required reviewer (all prod jobs
 
 `VITE_FIREBASE_PROJECT_ID` is taken from `GCP_PROJECT`/`onolys` in the workflow; `VITE_FIRESTORE_DATABASE` is hard-coded per workflow (see Terraform outputs).
 
-Secrets: the only one is `ANTHROPIC_API_KEY`, read by `nightly.yml` (job `api-real-mode`, a live Claude run); it should hold the staging/test key, never the prod key (prod's key lives only in Secret Manager as `anthropic-api-key-prod`). Deploys use WIF, so no JSON key and no deploy secret exists. Do not add a GCP key.
+Secrets: the only one is `GEMINI_API_KEY`, read by `nightly.yml` (job `api-real-mode`, a live Gemini run); it should hold the staging/test key, never the prod key (prod's key lives only in Secret Manager as `gemini-api-key-prod`). Deploys use WIF, so no JSON key and no deploy secret exists. Do not add a GCP key.
 
 Workflows: `deploy-staging.yml` runs after the `CI` workflow succeeds on `main` (also manual). `deploy-prod.yml` is manual (`workflow_dispatch`, input `sha` or `version`) or on a `v*` tag. `deploy-admin.yml` deploys the staging admin only (backend + `onolys-admin-staging` site): automatically on push to `main` touching `admin/`, `frontend/`, `engines/`, `protocols/`, contracts or deps; also manual. There is no prod admin. `nightly.yml` runs 06:17 UTC daily.
 
@@ -175,7 +175,7 @@ set -a; . ~/.config/onolys/keys.env; set +a
 python3 infra/scripts/seed-secrets.py --env staging     # also: --env prod
 ```
 
-It creates `uid-hmac-key-{env}` (random, only if missing) and writes the key for each `--map ENVVAR=base-id` (default `ANTHROPIC_API_KEY=anthropic-api-key`) into `<base-id>-{env}`, so `--env staging` and `--env prod` fill different secrets from the key in your shell. Re-running is a no-op unless a value changed.
+It creates `uid-hmac-key-{env}` (random, only if missing) and writes the key for each `--map ENVVAR=base-id` (default `GEMINI_API_KEY=gemini-api-key` and `ANTHROPIC_API_KEY=anthropic-api-key`; a key whose variable is unset keeps its existing version) into `<base-id>-{env}`, so `--env staging` and `--env prod` fill different secrets from the key in your shell. Re-running is a no-op unless a value changed.
 
 ### Cutover: shared `anthropic-api-key` to per-env secrets (one-time, owner decision 2026-11-20)
 
@@ -216,16 +216,17 @@ Then deploy a new revision as above. First-time order for an env: `terraform app
 
 ## Adding an LLM or STT provider
 
-1. **tfvars line.** In a `terraform.tfvars` (local, not committed), extend the map, keeping the default entry:
+1. **tfvars line.** The committed default already holds the two shipped providers (`GEMINI_API_KEY = "gemini-api-key"` for the evaluation routes, `ANTHROPIC_API_KEY = "anthropic-api-key"` for the `claude` preset). For a further provider, in a `terraform.tfvars` (local, not committed) extend the map, keeping the default entries (shown here with a hypothetical `OPENAI_API_KEY`):
    ```hcl
    llm_secrets = {
-     ANTHROPIC_API_KEY = "anthropic-api-key"
      GEMINI_API_KEY    = "gemini-api-key"
+     ANTHROPIC_API_KEY = "anthropic-api-key"
+     OPENAI_API_KEY    = "openai-api-key"
    }
    ```
    STT keys go in `stt_secrets` (empty by default; Google STT uses the worker service account, not a key). The tfvars value is the BASE id; the module creates `<base>-staging` and `<base>-prod`. `terraform plan` must show exactly two new secret shells (one per env), their accessor bindings (that env's worker only) and one env ref per worker; existing resources unchanged. As in the cutover above, create the shells first with a `-target` apply, seed, then do the full apply, otherwise the new revision references a secret with no version.
-2. **Seed the value** per env, with that env's own key: `GEMINI_API_KEY=<staging key> python3 infra/scripts/seed-secrets.py --env staging --map ANTHROPIC_API_KEY=anthropic-api-key --map GEMINI_API_KEY=gemini-api-key`, then the same with the prod key and `--env prod`. Pass every `--map` you want checked; unset variables keep their existing version.
-3. **Route.** Add a route (or preset) in `config/{staging,prod}/routes.yaml` with `litellm_id: <provider>/<model>` and `api_key_env: GEMINI_API_KEY` (the map key). For STT, add a provider under `providers:` in `config/{env}/stt_providers.yaml`, then point `default`, `by_language` or a preset's `stt` at it.
+2. **Seed the value** per env, with that env's own key: `GEMINI_API_KEY=<staging key> python3 infra/scripts/seed-secrets.py --env staging` (the default map covers Gemini and Anthropic; for another provider add `--map ENVVAR=base-id` and pass every `--map` you want checked), then the same with the prod key and `--env prod`. Pass every `--map` you want checked; unset variables keep their existing version.
+3. **Route.** Add a route (or preset) in `config/{staging,prod}/routes.yaml` with `litellm_id: <provider>/<model>` and `api_key_env: <ENVVAR>` (the map key; shipped routes use `GEMINI_API_KEY`). For STT, add a provider under `providers:` in `config/{env}/stt_providers.yaml`, then point `default`, `by_language` or a preset's `stt` at it.
 4. **Ship.** PR, merge to `main` (deploys staging), then dispatch `deploy-prod`. The new secret is only mounted on a new revision, which the deploy creates. CI fails if a config file is missing for an env.
 
 ## Runbook: a user reports a failed session
@@ -260,7 +261,7 @@ The code in the failed log line is the public code `to_public` (`api/src/onolys_
 
 | `error_code` | Meaning | Usual fix |
 |---|---|---|
-| `upstream_unavailable` | LLM or STT provider failed or timed out (retryable; one retry is automatic) | Check Anthropic / Google status; check the worker has its secret ref and a valid key (`ANTHROPIC_API_KEY`); user runs again shortly |
+| `upstream_unavailable` | LLM or STT provider failed or timed out (retryable; one retry is automatic) | Check Google (Gemini) / Anthropic status; check the worker has its secret ref and a valid key (`GEMINI_API_KEY`); user runs again shortly |
 | `transcription_failed` | STT failed twice, or a non-transient STT error | Ask for a different file; look at `exc_class` (`SttProviderError`); check `config/{env}/stt_providers.yaml` and the STT service agent's bucket access |
 | `no_speech` | No usable speech found | Nothing to fix; user uploads another recording |
 | `speakers_not_separated` | Diarization could not separate speakers | Nothing to fix; another recording |

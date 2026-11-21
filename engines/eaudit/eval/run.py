@@ -34,7 +34,7 @@ EVAL_DIR = Path(__file__).resolve().parent
 RECORDED = EVAL_DIR / "recorded"
 GATED = ["faithful", *[f"v{i}" for i in range(1, 9)]]  # v4-noroles is an extra check, not gated
 SPLIT = "poc-all"
-KEY_VARS = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "LITELLM_API_KEY")
+KEY_VARS = ("GEMINI_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "LITELLM_API_KEY")
 PROMPTS = Path(__file__).resolve().parents[1] / "src" / "eaudit" / "prompts"
 STAGE_FILES = {
     "atomize": ["atomize_system.md", "atomize_fewshot.json"],
@@ -93,7 +93,7 @@ def estimate_cost(mode: str, names: list[str], settings: Settings) -> float:
         return 0.0
     per_call_in, per_call_out = 6000, 600
     calls = {"gold": 11, "linked": 22, "e2e": 23}[mode] * len(names)
-    p = prices()["models"]["sonnet"]
+    p = prices()["models"]["gemini-4-neon"]
     return round(calls * (per_call_in * p["input"] + per_call_out * p["output"]) / 1e6, 2)
 
 

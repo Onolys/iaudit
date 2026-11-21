@@ -12,4 +12,5 @@ What exactly is supported? Precise, lookup-oriented facts.
 - [eval-ui.md](eval-ui.md): eaudit/Eval switch, run lifecycle, results/metrics, saved items/gold, comparisons and local proxy.
 - [eval-api.md](eval-api.md): local evaluation endpoints, states, errors and configuration.
 - [testing.md](testing.md): test markers (`unit`/`integration`/`live`), fixtures, local commands, emulator, coverage, adding a package to CI.
+- [web-email-actions.md](web-email-actions.md): in-app `/auth/action` handler for verify-email and reset-password links, and why.
 - [infra.md](infra.md): GCP resources, env vars, Terraform outputs, DNS records, GitHub settings, provider how-to, failure runbook, rollback.

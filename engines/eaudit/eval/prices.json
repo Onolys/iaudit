@@ -1,6 +1,9 @@
 {
- "note": "Estimates, $ per million tokens, from the brainstorm; edit when pricing changes. Keys match a fragment of the model id.",
+ "note": "Estimates, $ per million tokens, from the brainstorm; edit when pricing changes. Keys match a fragment of the model id. Gemini prices are the LiteLLM model-map list prices (no cache-write fee: Gemini caches implicitly); the Claude rows stay for the `claude` preset.",
  "models": {
+  "gemini-4-hydrogen": {"input": 1.5, "output": 7.5, "cache_read": 0.075, "cache_write": 1.5},
+  "gemini-4-neon": {"input": 3.0, "output": 15.0, "cache_read": 0.15, "cache_write": 3.0},
+  "gemini-4-carbon": {"input": 2.0, "output": 10.0, "cache_read": 0.1, "cache_write": 2.0},
   "haiku": {"input": 1.0, "output": 5.0},
   "sonnet": {"input": 2.0, "output": 10.0},
   "opus": {"input": 4.0, "output": 20.0}

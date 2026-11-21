@@ -27,7 +27,7 @@ Flags:
 - `--check`: preflight only (`uv`, `node`/`npm`, `frontend/node_modules`, free ports; names the port holder), then exit.
 - `--stub`: sets `IAUDIT_PIPELINE=stub` for the backend.
 
-Provider keys (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `LITELLM_API_KEY`) are checked for presence only; a warning is printed if none is set. Values are never printed.
+Provider keys (`GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `LITELLM_API_KEY`) are checked for presence only; a warning is printed if none is set. Values are never printed.
 
 After start it waits up to 30 s for backend `/healthz` and eval `/health`, then prints URLs. Ctrl-C (or any child exiting) stops all children (TERM, then KILL after 5 s); a child exit makes the script exit non-zero.
 

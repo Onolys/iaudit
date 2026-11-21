@@ -10,9 +10,9 @@ def test_defaults():
     assert s.max_turns == 2000
     assert s.max_sections == 50
     assert s.cors_origins == ["http://localhost:5173"]
-    assert s.model_cheap == "anthropic/claude-haiku-5-5"
-    assert s.model_mid == "anthropic/claude-sonnet-5-5"
-    assert s.model_strong == "anthropic/claude-opus-5-5"
+    assert s.model_cheap == "gemini/gemini-4-hydrogen"
+    assert s.model_mid == "gemini/gemini-4-neon"
+    assert s.model_strong == "gemini/gemini-4-neon"
     assert s.llm_timeout_s == 30
     assert s.audit_deadline_s == 100
     assert s.llm_max_retries == 1
@@ -51,3 +51,35 @@ def test_bad_mode_rejected(monkeypatch):
     monkeypatch.setenv("IAUDIT_LLM_MODE", "bogus")
     with pytest.raises(ValidationError):
         Settings()
+
+
+def _routes(monkeypatch, **env):
+    for k, v in env.items():
+        monkeypatch.setenv(k, v)
+    return Settings().llm_config().routes
+
+
+def test_llm_config_gemini_defaults(monkeypatch):
+    routes = _routes(monkeypatch)
+    for r in routes.values():
+        assert r.litellm_id.startswith("gemini/")
+        assert r.caching_mode == "provider_implicit"
+        assert r.extra_params == {"reasoning_effort": "low"}
+
+
+def test_llm_config_anthropic_ids_restore_claude_behavior(monkeypatch):
+    routes = _routes(
+        monkeypatch,
+        IAUDIT_MODEL_CHEAP="anthropic/claude-x",
+        IAUDIT_MODEL_MID="anthropic/claude-x",
+        IAUDIT_MODEL_STRONG="anthropic/claude-x",
+    )
+    for r in routes.values():
+        assert r.caching_mode == "anthropic_ephemeral"
+        assert r.extra_params == {"thinking": {"type": "disabled"}}
+
+
+def test_llm_config_unknown_provider_plain(monkeypatch):
+    routes = _routes(monkeypatch, IAUDIT_MODEL_MID="vertex_ai/other")
+    assert routes["mid"].caching_mode == "none"
+    assert routes["mid"].extra_params == {}

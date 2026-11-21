@@ -18,7 +18,7 @@ uv sync
 
 ## Configure
 
-Settings are `IAUDIT_*` environment variables (see the reference). For real audits, set a provider key that LiteLLM reads, for example `ANTHROPIC_API_KEY`. Tests and the stub modes need no key.
+Settings are `IAUDIT_*` environment variables (see the reference). For real audits, set a provider key that LiteLLM reads, for example `GEMINI_API_KEY`. Tests and the stub modes need no key.
 
 ## Run
 

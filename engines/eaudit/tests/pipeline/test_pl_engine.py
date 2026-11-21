@@ -66,7 +66,7 @@ async def test_profile_reaches_the_request(monkeypatch):
 
 async def test_run_info_for_an_eaudit_run(monkeypatch):
     monkeypatch.setenv("GIT_SHA", "deadbeef")
-    monkeypatch.setenv("ANTHROPIC_API_KEY", SECRET)
+    monkeypatch.setenv("GEMINI_API_KEY", SECRET)
     s = Scripted(None)
     req, transcript, params = _inputs(s)
     metrics = MetricsCollector()
@@ -77,7 +77,7 @@ async def test_run_info_for_an_eaudit_run(monkeypatch):
     assert ri.engine == "eaudit" and ri.code_version == "deadbeef" and ri.preset == "default"
     assert set(ri.routes) == {"cheap", "mid", "strong"}
     for f in ri.routes.values():
-        assert f.provider == "anthropic" and f.temperature_effective == 0.0
+        assert f.provider == "gemini" and f.temperature_effective is None
         assert len(f.params_hash) == 16
     assert set(ri.prompt_hashes) >= {"atomize", "link", "check", "prep"}
     assert ri.stt is None and ri.pack is None and ri.n_runs == 1

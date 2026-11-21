@@ -14,8 +14,8 @@ pytestmark = [pytest.mark.live, pytest.mark.integration]
 
 
 async def test_live_check_passes_on_the_fixture():
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        pytest.skip("set ANTHROPIC_API_KEY (live LLM)")
+    if not os.environ.get("GEMINI_API_KEY"):
+        pytest.skip("set GEMINI_API_KEY (live LLM)")
     result = await check.run_check(check.default_pack(), None)
     print(check.format_result(result))
     assert result.passed, result.problems
