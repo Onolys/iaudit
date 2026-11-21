@@ -71,7 +71,7 @@ export function useSessionStatus(id: string, quiet: RefObject<boolean>): StatusV
         // The listener shows the resulting `failed` by itself; the response and errors are ignored.
         void client
           .GET("/sessions/{id}", { params: { path: { id } } })
-          .catch((e: unknown) => console.warn("stale nudge failed", describeError(e)));
+          .catch(() => undefined);
         armNudge(doc);
       }, Math.max(0, dueAt - now));
     };
