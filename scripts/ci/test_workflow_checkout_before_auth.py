@@ -26,3 +26,8 @@ def _violations():
 
 def test_no_checkout_after_gcp_auth():
     assert _violations() == []
+
+
+if __name__ == "__main__":
+    test_no_checkout_after_gcp_auth()
+    print("ok   no actions/checkout after google-github-actions/auth")

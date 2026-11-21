@@ -48,6 +48,8 @@ jobs:
           fi
       - name: Test workflow_run fork-safety guard
         run: python3 scripts/ci/test_workflow_run_guard.py
+      - name: Test no checkout after GCP auth in workflows
+        run: python3 scripts/ci/test_workflow_checkout_before_auth.py
       - name: Test config guard
         run: bash scripts/ci/test_check_config.sh
       - name: Test deploy-prod workflow guard
