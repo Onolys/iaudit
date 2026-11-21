@@ -8,13 +8,9 @@ name: deploy-admin
 #   per env (Terraform outputs web_env_admin_staging / web_env_admin_prod):
 #     ADMIN_STAGING_VITE_FIREBASE_{API_KEY,AUTH_DOMAIN,APP_ID}   ADMIN_PROD_VITE_FIREBASE_{API_KEY,AUTH_DOMAIN,APP_ID}
 # VITE_EVAL_ENABLED is deliberately never set here: frontend/.env.production sets it to false (SP07 R1).
-# TEMP (owner-approved 2026-11-20): deploy admin staging from feat/miti-platform before merge. REMOVE before merging PR #35.
-# (the second push branch below). TARGET already falls back to staging for any non-dispatch event, so prod can never run on
-# push. The same `paths` filter applies to both branches (GitHub has one filter per push trigger), which is intended:
-# only admin-relevant changes redeploy.
 on:
   push:
-    branches: [main, feat/miti-platform] # feat/miti-platform is TEMP, see above
+    branches: [main]
     paths:
       - "admin/**"
       - "frontend/**"
