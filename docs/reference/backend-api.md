@@ -72,7 +72,7 @@ A claim that stalls on a model failure or the deadline is returned with verdict 
 
 ## Admin deployment
 
-The internal admin site (`admin.onolys.com`, staging `onolys-admin-staging.web.app`) runs one Cloud Run service, `onolys-admin-backend-{env}`. It serves the unchanged eaudit app (`POST /v1/audit`) plus admin-only paudit routes, behind a login check. Everything above applies to `/v1/audit` there. Code: `admin/backend/src/onolys_admin_backend/app.py`, `admin/auth/src/onolys_admin_auth/`. Why it is built this way: [ADR 0023](../decisions/0023-admin-deployment-and-auth.md).
+The internal admin site (`admin.onolys.com`, also `onolys-admin-staging.web.app`) is a single environment, staging (owner decision 2026-11-21; no prod admin), and runs one Cloud Run service, `onolys-admin-backend-staging`. It uses only synthetic MITI fixtures, no user data; its CORS allows `https://admin.onolys.com` and `https://onolys-admin-staging.web.app`. It serves the unchanged eaudit app (`POST /v1/audit`) plus admin-only paudit routes, behind a login check. Everything above applies to `/v1/audit` there. Code: `admin/backend/src/onolys_admin_backend/app.py`, `admin/auth/src/onolys_admin_auth/`. Why it is built this way: [ADR 0023](../decisions/0023-admin-deployment-and-auth.md).
 
 ### Auth
 

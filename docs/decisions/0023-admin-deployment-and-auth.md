@@ -15,7 +15,7 @@
 - **D5 Email/password and Google sign-in**, both gated by the allowlist. No MFA anywhere (Tejit).
 - **D6 Eval storage deferred.** No GCS FUSE volume or admin data bucket.
 - **D7 paudit eval deferred.** The tab is single-run only; the eval client is hard-wired to the audit contract.
-- **D8 Staging and prod**, one project. Staging is live; prod admin is off (`admin_enabled.prod=false`).
+- **D8 Single staging admin environment**, one project. Owner decision 2026-11-21 (supersedes the earlier staging + prod plan): only staging exists; it serves `admin.onolys.com` (Hosting custom domain on `onolys-admin-staging`, authorised domain, backend CORS) and auto-deploys from `main`. Prod admin was destroyed (`admin_enabled.prod=false`). Admin uses only synthetic MITI fixtures, no user data.
 - **D9 After launch.** Until used, results are inspected with `python -m paudit.cli` and run artifacts in GCS.
 
 Consequences worth knowing: the Cloud Run service is public by design (`allUsers` invoker), so the app's 401/403 is the only gate; a changed allowlist needs a new revision; the CSP stays strict (`script-src 'self' https://apis.google.com`), so the frontend validators are precompiled (commit 4a2b33a) because Ajv's `new Function` was blocked and the deployed site rendered blank.

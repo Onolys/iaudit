@@ -53,7 +53,7 @@ Secret `admin-allowed-emails-{env}` → `ADMIN_ALLOWED_EMAILS`. SA (SP06 R9): `a
 | D5 | Sign-in providers | Email/password and Google, both gated by the allowlist | MFA of any kind | No MFA (Tejit r6), so Google sign-in needs no special handling |
 | D6 | Eval storage | [DEFERRED] not deployed in v1 | GCS FUSE volume; GCS adapter | Eval server deferred (Tejit r6) |
 | D7 | paudit eval | Defer; tab is single-run only. `eval/datasets/paudit/` (SP02) stays adapter-only | Generalise eval client to per-product endpoint | Eval client is hard-wired to `POST /v1/audit` + audit contract validation [verified: `client.py:125`]; needs a product-aware engine, beyond minimal scope |
-| D8 | Environments | Staging + prod services/buckets/sites, one project | Prod only | Matches brief |
+| D8 | Environments | Staging + prod services/buckets/sites, one project | Prod only | Matches brief. **Owner decision 2026-11-21: only staging exists and serves `admin.onolys.com`; prod admin removed (see ADR 0023 D8).** |
 | D9 | Timing | Whole sub-project After launch; until then `python -m paudit.cli` locally + run artifacts in GCS | Build the admin site for v1 | Owner-approved cut: not needed by the first early-access users. r7 audit (2026-11-20) |
 
 ## Manual steps (Tejit)

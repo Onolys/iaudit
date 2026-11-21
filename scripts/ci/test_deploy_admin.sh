@@ -15,14 +15,14 @@ ok "deploy-admin.yml exists"
 has   "push to main trigger"                 '^  push:'
 for p in 'admin/\*\*' 'frontend/\*\*' 'engines/\*\*' 'protocols/\*\*'; do has "push paths include $p" "^      - \"?$p"; done
 has   "manual dispatch trigger"              '^  workflow_dispatch:'
-has   "prod runs in the production environment" "'production'"
+hasnt "no prod target (single staging admin env, owner 2026-11-21)" 'prod\)|ADMIN_PROD_|DEPLOYER_PROD_SA|'"'"'production'"'"'|environment: production'
+hasnt "no env dispatch input"                'options: \[staging, prod\]'
 has   "calls the reusable Cloud Run deploy"  'uses: \./\.github/workflows/_deploy-cloudrun\.yml'
-has   "service onolys-admin-backend-<env>"   'onolys-admin-backend-\$TARGET'
+has   "service onolys-admin-backend-staging" 'onolys-admin-backend-staging'
 has   "image built from admin/backend/Dockerfile" 'file: admin/backend/Dockerfile'
 has   "image passed by digest"               'steps\.push\.outputs\.digest'
 has   "git_sha passed to the revision"       'git_sha:'
 has   "hosting target admin-staging"         'hosting_target=admin-staging'
-has   "hosting target admin"                 'hosting_target="admin" ;;'
 has   "VITE_AUTH_REQUIRED true"              'VITE_AUTH_REQUIRED: "true"'
 has   "VITE_AUDIT_URL set"                   'VITE_AUDIT_URL:'
 has   "origin substituted into firebase.json" 'set_admin_origin\.sh'

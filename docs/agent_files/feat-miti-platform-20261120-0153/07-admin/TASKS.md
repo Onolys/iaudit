@@ -20,7 +20,7 @@ Source of truth: 07-admin/PRD.md. **AFTER LAUNCH (r7): none of this is v1 work; 
 | 10 | `deploy-admin.yml` and PR CI for `admin/` | 4, 8, 9 | done (prod run pending merge) |
 | 11 | Staging verification (auth, timeout, audit, paudit) | 7, 10 | done |
 | 12 | Docs: `backend-api.md` admin section and ADR 0023 | 11 | done |
-| 13 | Prod flip, domain, deploy, acceptance sweep | 11, 12 (owner steps: DNS, approval) | todo |
+| 13 | Prod flip, domain, deploy, acceptance sweep | 11, 12 (owner steps: DNS, approval) | in-progress |
 
 Parallel lanes: backend 1-4 and frontend 5-8 are independent until task 7 needs the paudit route contract from task 3 (the frontend builds on the SP02 schema and mock mode first, so 7 can start after 5 and 6 and finish once 3 lands). 6 and 8 both touch `frontend/` but different files, so they can run in parallel after 5; keep 5 first because it changes `App.tsx` and `products.ts`. Task 9 can run alongside 5-8 once 4 exists. Sync points: SP01 owns the root `pyproject.toml` (additive `admin/*` members only here); SP02 owns the paudit result schema and `paudit.run`; SP06 owns the admin Terraform resources behind `admin_enabled`, `_deploy-cloudrun.yml`, DNS values and WIF `deployer-{env}`; SP05 header conventions are reused for Hosting. Lane C web tasks (SP05) share nothing with `frontend/` files here.
 
