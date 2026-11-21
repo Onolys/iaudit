@@ -247,12 +247,12 @@ jobs:
           echo "$body"
           echo "$body" | jq -e --arg sha "$SHA" '.code_version == $sha'
 
-  # Runs only when every prod deploy job succeeded (default success() over `needs`). Tags the promoted commit
+  # Runs only when every prod deploy job AND the healthz smoke succeeded (default success() over `needs`). Tags the promoted commit
   # prod-<UTC date>.<n>, always a NEW tag (also for a rollback / re-deploy of an already-tagged sha), so the newest
   # prod-* tag = what is live. The only job that may write to the repo. Checks out the workflow ref (not the target sha) so
-  # next_prod_tag.py is available; the target commit is fetched just to tag it.
+  # next_prod_tag.py is available (limitation: a v* tag pushed from a commit that predates that script would fail here; no v* tags exist yet); the target commit is fetched just to tag it.
   tag:
-    needs: [resolve, deploy-api, deploy-worker, rules, web]
+    needs: [resolve, deploy-api, deploy-worker, rules, web, smoke]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

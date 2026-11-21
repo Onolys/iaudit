@@ -47,7 +47,7 @@ hasnt "sha not interpolated in run scripts"  'run:.*\$\{\{ *(inputs|github\.even
 TAGJOB="$(awk '/^  tag:/{f=1;print;next} f&&/^  [A-Za-z_-]+:/{exit} f{print}' "$WF")"
 [[ -n "$TAGJOB" ]] && ok "tag job exists" || bad "tag job exists"
 needs_line="$(printf '%s\n' "$TAGJOB" | grep -E '^    needs:' | head -1)"
-for j in resolve deploy-api deploy-worker rules web; do
+for j in resolve deploy-api deploy-worker rules web smoke; do
   [[ "$needs_line" =~ (\[|[[:space:],])"$j"([],[:space:]]|$) ]] && ok "tag job needs $j" || bad "tag job needs $j"
 done
 printf '%s\n' "$TAGJOB" | grep -Eq '^      contents: write' && ok "tag job has contents: write" || bad "tag job has contents: write"
