@@ -71,6 +71,9 @@ check_tag "prod-2026-11-21.1"  ""
 check_tag "prod-2026-11-21.11" "aaa\trefs/tags/prod-2026-11-21.9\nbbb\trefs/tags/prod-2026-11-21.10\nccc\trefs/tags/prod-2026-11-21.2\n"
 check_tag "prod-2026-11-21.4"  "aaa\trefs/tags/prod-2026-11-21.3\nbbb\trefs/tags/prod-2026-11-20.99\n"
 has   "tag pushed"                           'git push origin "refs/tags/'
+# Old-commit tag push: a shallow checkout makes git upload the commit's trees/blobs (incl. .github/workflows), which GITHUB_TOKEN may not push
+printf '%s\n' "$TAGJOB" | grep -Eq 'fetch-depth: 0' && ok "tag job checks out full history" || bad "tag job checks out full history"
+printf '%s\n' "$TAGJOB" | grep -Eq 'git fetch .*--depth' && bad "tag job must not shallow-fetch the target sha" || ok "tag job does not shallow-fetch the target sha"
 
 command -v actionlint >/dev/null 2>&1 && { (cd "$ROOT" && actionlint "$WF") && ok "actionlint" || bad "actionlint"; }
 exit $fail
