@@ -18,3 +18,4 @@ Put PRDs, task lists, reviews, plans, and notes for a branch in `docs/agent_file
 | [feat-eval-core-b2-b4-20261021-0607](feat-eval-core-b2-b4-20261021-0607/README.md) | Project B B2–B4 implementation closeout: task commit map, offline verification, integration notes and consolidated review PASS. |
 | [feat-eval-tofueval-ui-20261021](feat-eval-tofueval-ui-20261021/README.md) | Projects C and D implementation run: TofuEval plug-in and Eval frontend; branch execution and review artifacts. |
 | [feat-eval-review-taxonomy-v1-20261021-2100](feat-eval-review-taxonomy-v1-20261021-2100/README.md) | Deep review + fixes of Projects B/C/D, then implementation of Project A (taxonomy-v1). |
+| [ci-api-speedup-20261121](ci-api-speedup-20261121/review-2026-11-21-2230.md) | ci/api-speedup branch: review artifacts for the API CI speedup (unit/emulator split, per-uid txn lock). |
