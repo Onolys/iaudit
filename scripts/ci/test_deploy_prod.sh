@@ -21,6 +21,9 @@ has   "calls the reusable Cloud Run deploy"  'uses: \./\.github/workflows/_deplo
 has   "env prod passed to the reusable"      'env: prod'
 has   "api service onolys-api-prod"          'service: onolys-api-prod'
 has   "worker service onolys-worker-prod"    'service: onolys-worker-prod'
+has   "voice service onolys-voice-prod"      'service: onolys-voice-prod'
+has   "voice runs with SERVICE_MODE=voice"   'SERVICE_MODE=voice'
+has   "digest check covers the staging voice service" 'onolys-worker-staging onolys-voice-staging'
 has   "git_sha passed to the revisions"      'git_sha: \$\{\{ needs\.resolve\.outputs\.sha \}\}'
 has   "image passed by digest"               'needs\.resolve\.outputs\.image'
 has   "matcher copied before the detach checkout" 'cp scripts/ci/staging_ran_image\.py "\$RUNNER_TEMP/staging_ran_image\.py"'
@@ -54,7 +57,7 @@ hasnt "sha not interpolated in run scripts"  'run:.*\$\{\{ *(inputs|github\.even
 TAGJOB="$(awk '/^  tag:/{f=1;print;next} f&&/^  [A-Za-z_-]+:/{exit} f{print}' "$WF")"
 [[ -n "$TAGJOB" ]] && ok "tag job exists" || bad "tag job exists"
 needs_line="$(printf '%s\n' "$TAGJOB" | grep -E '^    needs:' | head -1)"
-for j in resolve deploy-api deploy-worker rules web smoke; do
+for j in resolve deploy-api deploy-worker deploy-voice rules web smoke; do
   [[ "$needs_line" =~ (\[|[[:space:],])"$j"([],[:space:]]|$) ]] && ok "tag job needs $j" || bad "tag job needs $j"
 done
 printf '%s\n' "$TAGJOB" | grep -Eq '^      contents: write' && ok "tag job has contents: write" || bad "tag job has contents: write"

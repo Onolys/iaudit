@@ -8,15 +8,15 @@ Source of truth: [PRD.md](PRD.md). Generalises SP04's single daily cap into kind
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | Config: four caps, validation, `DAILY_RUN_CAP` removed everywhere | SP04 | todo |
-| 2 | Error codes + `period` detail (api, schema, web messages) | SP04 | todo |
-| 3 | Usage models + pure `effective_cap` | 1 | todo |
-| 4 | Atomic `reserve` / `release` / `usage_view` (both repos) | 1, 2, 3 | todo |
-| 5 | First-run exemption + SP04 call-site migration | 4 | todo |
-| 6 | New `GET /usage` + OpenAPI/schema regeneration | 4 | todo |
-| 7 | Web: `useUsage()`, helpers, `<UsageLeft>`, MSW mocks | 2, 6, SP05 | todo |
-| 8 | Web: Dashboard, Settings, SessionPage, ReportPage, timeline | 7 | todo |
-| 9 | Docs: infra console runbook, env/error tables, public-api | 1, 2, 6 | todo |
+| 1 | Config: four caps, validation, `DAILY_RUN_CAP` removed everywhere | SP04 | done |
+| 2 | Error codes + `period` detail (api, schema, web messages) | SP04 | done |
+| 3 | Usage models + pure `effective_cap` | 1 | done |
+| 4 | Atomic `reserve` / `release` / `usage_view` (both repos) | 1, 2, 3 | done |
+| 5 | First-run exemption + SP04 call-site migration | 4 | done |
+| 6 | New `GET /usage` + OpenAPI/schema regeneration | 4 | done |
+| 7 | Web: `useUsage()`, helpers, `<UsageLeft>`, MSW mocks | 2, 6, SP05 | done |
+| 8 | Web: Dashboard, Settings, SessionPage, ReportPage, timeline | 7 | done |
+| 9 | Docs: infra console runbook, env/error tables, public-api | 1, 2, 6 | done |
 
 ## Task 1 — Config: four caps, validation, `DAILY_RUN_CAP` removed everywhere
 What it is / what it means: replace the one daily cap setting with four limits from config. Traces to R2, D10, AC1.

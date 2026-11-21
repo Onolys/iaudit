@@ -35,6 +35,14 @@ Branch folder for the Onolys MITI platform (`app.onolys.com`). Brief: [brainstor
 - SP11 replaces SP04's `DAILY_RUN_CAP`; seam: SP10 calls `reserve`/`release` and stores `reservation_date` on `interviews/{id}`.
 - Open items are listed in each PRD (Risks / Open Questions).
 
+## Branch `feat/ai-interview` artifacts (SP10 + SP11)
+SP10 and SP11 are built on branch `feat/ai-interview`, in this shared folder. Reference: [public-api.md](../../reference/public-api.md#ai-practice-interviews), [ADR 0024](../../decisions/0024-ai-practice-interview-gemini-live-relay.md).
+
+| Folder | Artifacts |
+|---|---|
+| `10-ai-interview/` | [PRD](10-ai-interview/PRD.md), [TASKS](10-ai-interview/TASKS.md), [brainstorm](10-ai-interview/brainstorm.md), [acceptance mapping](10-ai-interview/acceptance.md), spike ([README](10-ai-interview/spike/README.md), [RESULTS](10-ai-interview/spike/RESULTS.md), [leak tests](10-ai-interview/spike/leak_tests.md)) |
+| `11-usage-limits/` | [PRD](11-usage-limits/PRD.md), [TASKS](11-usage-limits/TASKS.md), [code-2026-11-21-1905](11-usage-limits/code-2026-11-21-1905.md), [review-2026-11-21-1833](11-usage-limits/review-2026-11-21-1833.md), [review-2026-11-21-1905](11-usage-limits/review-2026-11-21-1905.md) |
+
 ## Dependency graph and build order (3 parallel lanes, r8)
 ```
 Start     00 CI + test conventions (Lane C, first; nothing else starts before CI is green on main)

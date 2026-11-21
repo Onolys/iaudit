@@ -68,6 +68,19 @@
       "title": "Id",
       "type": "string"
     },
+    "interview_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Set when an AI interview created this session: its first run is free.",
+      "title": "Interview Id"
+    },
     "language": {
       "title": "Language",
       "type": "string"

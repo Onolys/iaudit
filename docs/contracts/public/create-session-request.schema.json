@@ -2,6 +2,21 @@
   "$id": "create-session-request.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
+    "interview_id": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "An `ended`, not yet linked AI interview of the caller: the session takes its scenario language and title (unless `title` is set) and a prefilled rating draft",
+      "title": "Interview Id"
+    },
     "language": {
       "default": "auto",
       "description": "BCP-47 tag or `auto`",

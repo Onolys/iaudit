@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onolys.com/schemas/miti-4.2.1/scenario.schema.json",
+  "title": "AI interview scenario (miti 4.2.1)",
+  "description": "A curated practice-client scenario. Only `id`, `public` and `language` are ever sent to clients; everything else is server-only (persona prompt).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "difficulty",
+    "language",
+    "voice",
+    "public",
+    "persona",
+    "change_goal",
+    "stage_of_change",
+    "ambivalence_level",
+    "emotional_state",
+    "opening_line",
+    "hidden_info",
+    "response_rules"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "difficulty": {
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}-[A-Z]{2}$"
+    },
+    "voice": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Default voice; must be in the configured voice list."
+    },
+    "public": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "difficulty",
+        "summary"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "difficulty": {
+          "enum": [
+            "easy",
+            "medium",
+            "hard"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "persona": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "age",
+        "situation"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "age": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "situation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "change_goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage_of_change": {
+      "enum": [
+        "precontemplation",
+        "contemplation",
+        "preparation",
+        "action",
+        "maintenance"
+      ]
+    },
+    "ambivalence_level": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "emotional_state": {
+      "type": "string",
+      "minLength": 1
+    },
+    "opening_line": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hidden_info": {
+      "type": "string",
+      "minLength": 1
+    },
+    "response_rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

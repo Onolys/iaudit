@@ -76,7 +76,10 @@
               "transcription_failed",
               "rating_invalid",
               "daily_cap_reached",
-              "conflict"
+              "monthly_cap_reached",
+              "interview_cap_reached",
+              "conflict",
+              "interview_too_long"
             ]
           },
           "message": {
@@ -100,6 +103,13 @@
               "too_large"
             ],
             "description": "What is wrong at `field`. Set on `rating_invalid`."
+          },
+          "period": {
+            "enum": [
+              "day",
+              "month"
+            ],
+            "description": "Which usage period was exhausted. Set on `daily_cap_reached`, `monthly_cap_reached` and `interview_cap_reached`."
           }
         }
       }

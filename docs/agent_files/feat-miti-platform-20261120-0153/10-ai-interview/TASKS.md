@@ -12,19 +12,19 @@ External dependency (not SP10 work): **SP11 usage limits**, built before SP10 ex
 
 | # | Task | Depends on | Status |
 |---|---|---|---|
-| 1 | R0 spike go/no-go gate | none (owner in the loop) | todo |
-| 2 | Scenario schema, loader, `GET /scenarios`, persona prompt builder | 1 | todo |
-| 3 | Core voice adapter (`VoiceAdapter`, Gemini Live Vertex, fixture, config) | 1 | todo |
-| 4 | Interview API + state + SP11 reserve/release seam | 2, 3, SP11 | todo |
-| 5 | Voice relay service (auth, pump, clock, resumption, reconnect) | 2, 3, 4 | todo |
-| 6 | Sweeper task + short-interview refund | 4, SP11 | todo |
-| 7 | Session link (`interview_id`, draft rating) + validate rules | 4, SP11 | todo |
-| 8 | Infra: `onolys-voice-{env}` Cloud Run service | 1 | todo |
-| 9 | Web audio engine (worklet capture/playback, recording graph) | 1 | todo |
-| 10 | Web CSP + MSW mocks + in-page fake relay | 4, 5, 9 | todo |
-| 11 | Web interview feature + landing cards | 7, 9, 10, SP11 | todo |
+| 1 | R0 spike go/no-go gate | none (owner in the loop) | done |
+| 2 | Scenario schema, loader, `GET /scenarios`, persona prompt builder | 1 | done |
+| 3 | Core voice adapter (`VoiceAdapter`, Gemini Live Vertex, fixture, config) | 1 | done |
+| 4 | Interview API + state + SP11 reserve/release seam | 2, 3, SP11 | done |
+| 5 | Voice relay service (auth, pump, clock, resumption, reconnect) | 2, 3, 4 | done |
+| 6 | Sweeper task + short-interview refund | 4, SP11 | done |
+| 7 | Session link (`interview_id`, draft rating) + validate rules | 4, SP11 | done |
+| 8 | Infra: `onolys-voice-{env}` Cloud Run service | 1 | done |
+| 9 | Web audio engine (worklet capture/playback, recording graph) | 1 | done |
+| 10 | Web CSP + MSW mocks + in-page fake relay | 4, 5, 9 | done |
+| 11 | Web interview feature + landing cards | 7, 9, 10, SP11 | done |
 | 12 | Staging end-to-end (LIVE) | 5, 6, 7, 8, 11 | todo |
-| 13 | Docs: public API, ADR, branch README | 1-12 | todo |
+| 13 | Docs: public API, ADR, branch README | 1-12 | done |
 
 Parallel lanes (disjoint files): after 1, run 2 / 3 / 8 / 9 together. After 2+3 and 4, run 5 / 6 / 7 together (5 in `voice/`, 6 in `jobs/`, 7 in sessions + validate; 6 and 4 both touch `routes/interviews.py`, hence sequential). 10 follows once 4's OpenAPI exists. Each API task regenerates `api/openapi.json`; do not run them concurrently.
 

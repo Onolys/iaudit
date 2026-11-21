@@ -29,3 +29,4 @@ Why is it like this? Architecture decision records.
 | [0021](0021-web-app-hosting-and-sharing.md) | Web app hosting: same-origin `/v1` rewrite, strict CSP, privacy checks as tests |
 | [0022](0022-infra-gcp-terraform-two-environments.md) | Infrastructure: one GCP project, Terraform, staging and prod, STT in `us`, no residency claims |
 | [0023](0023-admin-deployment-and-auth.md) | Admin deployment and auth: one Cloud Run service, direct calls, verified email plus allowlist, no MFA |
+| [0024](0024-ai-practice-interview-gemini-live-relay.md) | AI practice interview: Gemini Live via a server-side relay, separate Cloud Run service |
