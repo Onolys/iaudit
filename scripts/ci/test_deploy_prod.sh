@@ -24,13 +24,20 @@ has   "worker service onolys-worker-prod"    'service: onolys-worker-prod'
 has   "git_sha passed to the revisions"      'git_sha: \$\{\{ needs\.resolve\.outputs\.sha \}\}'
 has   "image passed by digest"               'needs\.resolve\.outputs\.image'
 has   "matcher copied before the detach checkout" 'cp scripts/ci/staging_ran_image\.py "\$RUNNER_TEMP/staging_ran_image\.py"'
-has   "matcher run from RUNNER_TEMP"          'python3 "\$RUNNER_TEMP/staging_ran_image\.py"'
+has   "matcher run from RUNNER_TEMP, isolated (python3 -I)" 'python3 -I "\$RUNNER_TEMP/staging_ran_image\.py"'
+hasnt "matcher never run without -I"         'python3 "\$RUNNER_TEMP/staging_ran_image'
+has   "config guard copied before the detach checkout" 'cp scripts/ci/check_config\.sh "\$RUNNER_TEMP/check_config\.sh"'
+cpl="$(grep -n 'cp scripts/ci/check_config.sh' "$WF" | head -1 | cut -d: -f1)"; col="$(grep -n 'git checkout --detach' "$WF" | head -1 | cut -d: -f1)"
+[[ -n "$cpl" && -n "$col" && "$cpl" -lt "$col" ]] && ok "config guard copy precedes git checkout --detach" || bad "config guard copy precedes git checkout --detach"
+has   "config guard runs the RUNNER_TEMP copy in an empty env on the target tree" 'env -i .*ROOT="\$GITHUB_WORKSPACE" bash "\$RUNNER_TEMP/check_config\.sh"$'
+hasnt "no target-tree check_config.sh is ever run (both guards use the RUNNER_TEMP copy)" 'bash scripts/ci/check_config\.sh'
+has   "image guard runs the RUNNER_TEMP copy in an empty env" 'env -i .*bash "\$RUNNER_TEMP/check_config\.sh" --image "\$IMAGE"'
 hasnt "matcher not run from the checked-out tree" 'python3 scripts/ci/staging_ran_image\.py'
 hasnt "no scratch files in the workspace"    '(-o|>) (index|revisions)\.json'
 hasnt "no rebuild (no build-push-action)"    'docker/build-push-action'
 has   "resolves tag to digest"               'image_summary\.digest'
 has   "checks the digest ran in staging"     'onolys-api-staging'
-has   "config guard against the image"       'check_config\.sh --image'
+has   "config guard against the image"       'check_config\.sh" --image'
 has   "rules to (default) database"          'only .firestore:\(default\).'
 hasnt "rules not to staging database"        'firestore:staging'
 has   "hosting target app"                   'hosting:app( |$)'
@@ -74,6 +81,17 @@ has   "tag pushed"                           'git push origin "refs/tags/'
 # Old-commit tag push: a shallow checkout makes git upload the commit's trees/blobs (incl. .github/workflows), which GITHUB_TOKEN may not push
 printf '%s\n' "$TAGJOB" | grep -Eq 'fetch-depth: 0' && ok "tag job checks out full history" || bad "tag job checks out full history"
 printf '%s\n' "$TAGJOB" | grep -Eq 'git fetch .*--depth' && bad "tag job must not shallow-fetch the target sha" || ok "tag job does not shallow-fetch the target sha"
+
+# Behaviour of the config guard as the workflow runs it: workflow-ref copy, empty env, target tree passed as ROOT (data only)
+GT="$(mktemp -d)"; trap 'rm -rf "$GT"' EXIT
+cp "$ROOT/scripts/ci/check_config.sh" "$GT/check_config.sh"
+env -i PATH=/usr/bin:/bin HOME="$GT" ROOT="$ROOT" bash "$GT/check_config.sh" >/dev/null 2>&1 && ok "config guard (copy, env -i) passes on a valid target tree" || bad "config guard (copy, env -i) passes on a valid target tree"
+mkdir -p "$GT/empty"
+env -i PATH=/usr/bin:/bin HOME="$GT" ROOT="$GT/empty" bash "$GT/check_config.sh" >/dev/null 2>&1 && bad "config guard still rejects a target tree missing config" || ok "config guard still rejects a target tree missing config"
+# a hostile target tree cannot influence the guard: its own scripts/ci/check_config.sh (would pass) is never run
+mkdir -p "$GT/evil/scripts/ci"; printf '#!/usr/bin/env bash\ntouch "%s/pwned"; echo "config guard: ok"\n' "$GT" > "$GT/evil/scripts/ci/check_config.sh"
+env -i PATH=/usr/bin:/bin HOME="$GT" ROOT="$GT/evil" bash "$GT/check_config.sh" >/dev/null 2>&1 && bad "guard ignores the target's own check_config.sh" || ok "guard ignores the target's own check_config.sh"
+[[ ! -e "$GT/pwned" ]] && ok "target-tree script never executed" || bad "target-tree script never executed"
 
 command -v actionlint >/dev/null 2>&1 && { (cd "$ROOT" && actionlint "$WF") && ok "actionlint" || bad "actionlint"; }
 exit $fail

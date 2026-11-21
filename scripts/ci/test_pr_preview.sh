@@ -32,6 +32,13 @@ has   "tag pr-<N>"                              "$WF" '--tag "pr-\$\{PR\}"'
 has   "deterministic revision suffix"           "$WF" '--revision-suffix "\$SUFFIX"'
 has   "suffix has pr, sha, run number, attempt" "$WF" 'revision_suffix=pr-\$\{PR\}-\$\{SHA:0:7\}-\$\{GITHUB_RUN_NUMBER\}-\$\{GITHUB_RUN_ATTEMPT\}'
 hasnt "no traffic flags that could route to the preview" "$WF" '--to-latest|--to-revisions|--set-tags|update-traffic'
+has   "restore step runs pr_preview.sh restore-template" "$WF" 'pr_preview\.sh restore-template "\$PR"'
+has   "restore step runs even if the deploy step failed (always, but not when it never started)" "$WF" "always\(\) && steps\.run\.outcome != 'skipped'"
+has   "restore step gets project/region for the helper" "$WF" 'GCP_REGION: \$\{\{ env\.REGION \}\}'
+rl="$(grep -n 'run: bash scripts/ci/pr_preview\.sh restore-template' "$WF" | head -1 | cut -d: -f1)"; dl="$(grep -n 'gcloud run deploy' "$WF" | head -1 | cut -d: -f1)"; sl="$(grep -n 'name: Smoke the tag URL' "$WF" | head -1 | cut -d: -f1)"
+[[ -n "$rl" && -n "$dl" && -n "$sl" && "$dl" -lt "$rl" && "$rl" -lt "$sl" ]] && ok "restore step sits between the deploy and the smoke test" || bad "restore step sits between the deploy and the smoke test"
+hasnt "restore never moves traffic (no update-traffic/--to-* in the workflow)" "$WF" 'update-traffic|--to-latest|--to-revisions'
+has   "cleanup restores the template (helper)" "$PP" 'restore_template "\$pr"'
 hasnt "no IAM change from the preview"          "$WF" '--allow-unauthenticated|add-iam-policy-binding'
 hasnt "no service-level label leak"             "$WF" '--labels'
 has   "combined mode via env-overrides helper"  "$WF" 'pr_preview\.sh env-overrides'
@@ -170,7 +177,86 @@ exit "${NPX_RC:-0}"
 STUB
 chmod +x "$T/bin/gcloud" "$T/bin/npx"
 export CALLS="$T/calls"
-run_cleanup() { : > "$CALLS"; PATH="$T/bin:$PATH" bash "$PP" cleanup "$@" >/dev/null 2>&1; }
+cat > "$T/bin/curl" <<'STUB'
+#!/usr/bin/env bash
+# curl stub for the Cloud Run v2 API: -X METHOD ... URL. Files: CURL_SVC, CURL_REV (GET), CURL_PATCH_RC/CURL_PATCH_MSG, CURL_OP (operation poll)
+echo "curl $*" >> "$CALLS"
+method=GET; url=""; body=""
+while [[ $# -gt 0 ]]; do case "$1" in -X) method="$2"; shift 2 ;; -d) body="$2"; shift 2 ;; -H) shift 2 ;; -*) shift ;; *) url="$1"; shift ;; esac; done
+case "$method $url" in
+  "GET "*/revisions/*) cat "${CURL_REV:?}" ;;
+  "GET "*/operations/*) echo '{"error":{"code":403,"status":"PERMISSION_DENIED"}}'; exit 22 ;;  # the deployer SA may not read operations
+  "GET "*/services/*) if [[ -e "$PATCH_BODY" ]]; then cat "${CURL_POLL:-$CURL_SVC}"; else cat "${CURL_SVC:?}"; fi ;;  # after the PATCH: the polled service
+  "PATCH "*) echo "$url" > "$PATCH_URL"
+    if [[ "${CURL_PATCH_RC:-0}" != 0 ]]; then printf '%s\n' "${CURL_PATCH_MSG:-error}"; exit "$CURL_PATCH_RC"; fi
+    printf '%s' "$body" > "$PATCH_BODY"
+    printf '{"name":"projects/onolys/locations/us-central1/operations/op1","metadata":{"generation":"%s"}}' "${CURL_PATCH_GEN:-7}" ;;
+esac
+exit 0
+STUB
+chmod +x "$T/bin/curl"
+export PATCH_BODY="$T/patch_body" PATCH_URL="$T/patch_url" RESTORE_POLL_SLEEP=0 RESTORE_RETRY_SLEEP=0
+# fixtures: serving revision R7 (real/api), service template either equal to it (clean) or the preview config
+SRV=onolys-api-staging-abc1234-7-1; PRV=onolys-api-staging-pr-42-fc89744-14-1
+jq -n --arg n "projects/onolys/locations/us-central1/services/onolys-api-staging/revisions/$SRV" '{name:$n,uid:"u1",generation:"1",createTime:"t",logUri:"l",conditions:[],observedGeneration:"1",
+  labels:{"managed-by":"github-actions","cloud.googleapis.com/location":"us-central1","run.googleapis.com/startupProbeType":"Default"},annotations:{"run.googleapis.com/client-name":"gcloud","autoscaling.knative.dev/maxScale":"3","serving.knative.dev/creator":"d@x","client.knative.dev/user-image":"i","team":"keep"},scaling:{maxInstanceCount:3},timeout:"60s",serviceAccount:"api-staging@onolys.iam.gserviceaccount.com",maxInstanceRequestConcurrency:80,client:"gcloud",
+  containers:[{name:"api-1",image:"r/api@sha256:aaa",env:[{name:"ADAPTERS",value:"real"},{name:"SERVICE_MODE",value:"api"},{name:"GIT_SHA",value:"abc1234"}],resources:{limits:{cpu:"1"},cpuIdle:true}}]}' > "$T/rev.json"
+mk_svc() {  # mk_svc <clean|preview> [serving revision name or "none"] [template revision name]
+  jq --arg rname "${3:-}" --arg mode "$1" --arg srv "${2:-$SRV}" --arg prv "$PRV" '{etag:"\"e1\"",
+    traffic:([{type:"TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION",revision:$srv,percent:100},{type:"TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION",revision:$prv,percent:0,tag:"pr-42"}] | if $srv=="none" then map(select(.percent==0)) else . end),
+    template:(del(.name,.uid,.generation,.createTime,.logUri,.conditions,.observedGeneration,.client) | .labels |= with_entries(select(.key | test("/") | not)) | .annotations |= with_entries(select(.key | test("/") | not)) | . + {revision:(if $rname == "" then $prv else $rname end)}
+      | .containers[0] |= (del(.name) | .image="r/api@sha256:bbb")
+      | if $mode=="preview" then .containers[0].env=[{name:"ADAPTERS",value:"stub"},{name:"SERVICE_MODE",value:"combined"},{name:"GIT_SHA",value:"fc89744"}] | .containers[0].resources.cpuIdle=false else . end)}' "$T/rev.json" 
+}
+mk_gen() { jq --arg g "$1" --arg r "$2" --arg c "$3" '. + {generation:$g, observedGeneration:$r, terminalCondition:{type:"Ready",state:$c}}' "$T/svc_clean.json"; }
+mk_svc clean > "$T/svc_clean.json"; mk_gen 7 7 CONDITION_SUCCEEDED > "$T/svc_done.json"; mk_gen 7 6 CONDITION_RECONCILING > "$T/svc_pending.json"; mk_gen 7 7 CONDITION_FAILED > "$T/svc_failed.json"; mk_gen 9 9 CONDITION_SUCCEEDED > "$T/svc_newer.json"; mk_svc preview > "$T/svc_preview.json"; mk_svc preview none > "$T/svc_notraffic.json"
+mk_svc preview "$SRV" onolys-api-staging-def5678-9-1 > "$T/svc_maindeploy.json"      # main deploy gap: template = NEW release, traffic still on the old revision
+mk_svc preview "$SRV" onolys-api-staging-pr-42-tpl-1795284254 > "$T/svc_tplname.json" # already restored once
+jq '. + {reconciling:true}' "$T/svc_preview.json" > "$T/svc_reconciling.json"
+export CURL_REV="$T/rev.json" CURL_SVC="$T/svc_clean.json" CURL_POLL="$T/svc_done.json"
+run_restore() { : > "$CALLS"; rm -f "$PATCH_BODY" "$PATCH_URL"; PATH="$T/bin:$PATH" bash "$PP" restore-template "$@" >"$T/restore.out" 2>&1; }
+
+run_cleanup() { : > "$CALLS"; rm -f "$PATCH_BODY" "$PATCH_URL"; PATH="$T/bin:$PATH" bash "$PP" cleanup "$@" >/dev/null 2>&1; }
+
+# --- restore-template: the staging service template goes back to the serving revision; traffic is never part of the write
+CURL_SVC="$T/svc_clean.json" run_restore 42 && ok "restore: clean template succeeds" || bad "restore: clean template succeeds"
+[[ ! -e "$PATCH_BODY" ]] && ok "restore: no PATCH when the template already matches (image digest form ignored)" || bad "restore: no PATCH when the template already matches"
+CURL_SVC="$T/svc_preview.json" run_restore 42 && ok "restore: preview template succeeds" || { bad "restore: preview template succeeds"; cat "$T/restore.out"; }
+[[ "$(grep -c '^curl .*-X PATCH' "$CALLS")" == 1 ]] && ok "restore: exactly one PATCH" || bad "restore: exactly one PATCH"
+grep -q 'services/onolys-api-staging?updateMask=template$' "$PATCH_URL" && ok "restore: updateMask is template only (traffic untouched)" || bad "restore: updateMask is template only ($(cat "$PATCH_URL" 2>/dev/null))"
+jq -e '.template.containers[0].env | (map(select(.name=="ADAPTERS").value)==["real"]) and (map(select(.name=="SERVICE_MODE").value)==["api"]) and (map(select(.name=="GIT_SHA").value)==["abc1234"])' "$PATCH_BODY" >/dev/null && ok "restore: body env is the serving revision's (real/api/GIT_SHA)" || bad "restore: body env is the serving revision's"
+jq -e '.template.containers[0].resources.cpuIdle == true and .template.scaling.maxInstanceCount == 3 and .template.serviceAccount != null' "$PATCH_BODY" >/dev/null && ok "restore: body cpuIdle/scaling/serviceAccount from the serving revision" || bad "restore: body cpuIdle/scaling/serviceAccount"
+jq -e '(.template.revision | test("^onolys-api-staging-pr-42-tpl-[0-9]+$")) and .etag == "\"e1\"" and (has("traffic") | not) and (.template | has("name","uid","conditions","logUri") | not)' "$PATCH_BODY" >/dev/null && ok "restore: new revision name pr-42-tpl-<epoch>, service etag, no traffic key, no output-only fields" || bad "restore: body shape ($(cat "$PATCH_BODY"))"
+CURL_SVC="$T/svc_preview.json" run_restore && jq -e '.template.revision | test("^onolys-api-staging-pr-0-tpl-")' "$PATCH_BODY" >/dev/null && ok "restore: PR argument optional" || bad "restore: PR argument optional"
+CURL_SVC="$T/svc_notraffic.json" run_restore 42 && bad "restore: refuses when no revision serves traffic" || ok "restore: refuses when no revision serves traffic"
+[[ ! -e "$PATCH_BODY" ]] && ok "restore: no PATCH when no revision serves traffic" || bad "restore: no PATCH when no revision serves traffic"
+CURL_SVC="$T/svc_preview.json" CURL_PATCH_RC=22 CURL_PATCH_MSG='{"error":{"code":409,"status":"ABORTED"}}' run_restore 42 && bad "restore: persistent etag conflict fails" || ok "restore: persistent etag conflict fails"
+[[ "$(grep -c '^curl .*-X PATCH' "$CALLS")" == 3 ]] && ok "restore: etag conflict retried (3 attempts, re-read each time)" || bad "restore: etag conflict retried"
+CURL_SVC="$T/svc_preview.json" CURL_PATCH_RC=22 CURL_PATCH_MSG='{"error":{"code":403,"status":"PERMISSION_DENIED"}}' run_restore 42 && bad "restore: permission error fails" || ok "restore: permission error fails"
+[[ "$(grep -c '^curl .*-X PATCH' "$CALLS")" == 1 ]] && ok "restore: non-conflict error not retried" || bad "restore: non-conflict error not retried"
+CURL_SVC="$T/svc_preview.json" CURL_POLL="$T/svc_failed.json" run_restore 42 && bad "restore: failed service condition fails" || ok "restore: failed service condition fails"
+CURL_SVC="$T/svc_preview.json" CURL_POLL="$T/svc_pending.json" RESTORE_POLLS=2 run_restore 42 && bad "restore: service still reconciling (observedGeneration < generation) fails at timeout" || ok "restore: service still reconciling fails at timeout"
+CURL_SVC="$T/svc_preview.json" CURL_POLL="$T/svc_newer.json" run_restore 42 && ok "restore: newer observed generation (concurrent update) counts as done" || bad "restore: newer observed generation counts as done"
+grep -q '/operations/' "$CALLS" && bad "restore: never polls the operations endpoint (no IAM for it)" || ok "restore: never polls the operations endpoint"
+CURL_SVC="$T/svc_preview.json" run_restore 42 && ok "restore: done once observedGeneration >= PATCH generation and Ready" || bad "restore: done once observedGeneration >= PATCH generation"
+grep -q '/operations/' "$CALLS" && bad "restore: success path polls no operation" || ok "restore: success path polls no operation"
+run_restore abc && bad "restore: rejects bad PR number" || ok "restore: rejects bad PR number"
+# review fixes: restore only a preview template (a main deploy's template must never be rolled back), never while reconciling
+CURL_SVC="$T/svc_maindeploy.json" run_restore 42 && ok "restore: main-named template (deploy gap) is left alone" || bad "restore: main-named template left alone (rc)"
+[[ ! -e "$PATCH_BODY" ]] && ok "restore: no PATCH when the template revision is not a preview revision" || bad "restore: no PATCH when the template revision is not a preview revision"
+CURL_SVC="$T/svc_tplname.json" run_restore 42 && [[ ! -e "$PATCH_BODY" ]] && ok "restore: no PATCH when the template is already a -tpl- restore revision" || bad "restore: no PATCH for -tpl- template"
+CURL_SVC="$T/svc_reconciling.json" run_restore 42 && [[ ! -e "$PATCH_BODY" ]] && ok "restore: no PATCH while the service is reconciling" || bad "restore: no PATCH while reconciling"
+# system labels/annotations: stripped from the write and from the comparison
+CURL_SVC="$T/svc_clean.json" run_restore 42; [[ ! -e "$PATCH_BODY" ]] && ok "restore: system labels/annotations on the revision do not cause a permanent mismatch" || bad "restore: system keys cause mismatch"
+CURL_SVC="$T/svc_preview.json" run_restore 42
+jq -e '[.template.labels, .template.annotations | keys[]] | (map(test("^(serving|cloud|run|autoscaling|client)\\.(knative\\.dev|googleapis\\.com)/")) | any | not) and (index("team") != null) and (index("managed-by") != null)' "$PATCH_BODY" >/dev/null && ok "restore: PATCH body has no system label/annotation keys, keeps user ones" || bad "restore: system keys in PATCH body ($(jq -c '[.template.labels,.template.annotations]' "$PATCH_BODY" 2>/dev/null))"
+grep -q 'Authorization: Bearer' "$CALLS" && bad "restore: bearer token not in curl argv" || ok "restore: bearer token not in curl argv (stdin header)"
+# cleanup restores before deleting revisions, and fails when the restore fails
+GC_REVS=$'onolys-api-staging-pr-42-fc89744-14-1\n' CURL_SVC="$T/svc_preview.json" run_cleanup 42 && ok "cleanup with preview template succeeds" || bad "cleanup with preview template succeeds"
+pl="$(grep -n '^curl .*-X PATCH' "$CALLS" | head -1 | cut -d: -f1)"; dl2="$(grep -n 'revisions delete' "$CALLS" | head -1 | cut -d: -f1)"
+[[ -n "$pl" && -n "$dl2" && "$pl" -lt "$dl2" ]] && ok "cleanup restores the template before deleting revisions" || bad "cleanup restores the template before deleting revisions"
+GC_REVS="" CURL_SVC="$T/svc_notraffic.json" run_cleanup 42 && bad "cleanup fails when restore fails" || ok "cleanup fails when restore fails"
+GC_REVS="" CURL_SVC="$T/svc_clean.json" run_cleanup 42 && ok "cleanup with clean template succeeds (restore is a no-op)" || bad "cleanup with clean template succeeds"
 
 GC_REVS=$'onolys-api-staging-pr-9-abcdef1-3-1\nonolys-api-staging-pr-9-1234567-4-1\n' run_cleanup 9 && ok "cleanup succeeds when everything exists" || bad "cleanup succeeds when everything exists"
 grep -q 'gcloud run services update-traffic onolys-api-staging --remove-tags pr-9 ' "$CALLS" && ok "cleanup removes tag pr-9 from onolys-api-staging" || bad "cleanup removes tag pr-9 from onolys-api-staging"

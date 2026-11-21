@@ -10,6 +10,7 @@
 #   pr_preview.sh comment <pr> <url> <sha> <mode>                   create-or-update the ONE marker comment (needs gh, GITHUB_REPOSITORY, GH_TOKEN)
 #   pr_preview.sh is-not-found <text>                               exit 0 when text looks like a not-found error
 #   pr_preview.sh cleanup <pr>                                      remove tag pr-<pr> + delete its revisions on the staging API service, delete the Hosting channel (not-found ignored). The newest revision cannot be deleted by Cloud Run: logged `left for sweep`, channel step always runs
+#   pr_preview.sh restore-template [pr]                             put the staging API service TEMPLATE back to the config of the revision that serves traffic (a preview deploy rewrites it); no-op when it already matches; traffic/tags untouched
 #   pr_preview.sh sweep                                             delete untagged, 0%-traffic, non-latest ^<service>-pr-<N>- revisions (non-preview and tagged revisions untouched)
 set -euo pipefail
 MARKER='<!-- onolys-pr-preview -->'
@@ -149,11 +150,101 @@ sweep() {
   return $rc
 }
 
+# --- restore-template -------------------------------------------------------------------------------------------------
+# `gcloud run deploy --no-traffic --tag` always rewrites the service template, so after a preview the template (env
+# ADAPTERS=stub, SERVICE_MODE=combined, GIT_SHA, CORS_ORIGINS, cpu_idle=false) differs from the revision that serves traffic:
+# Terraform sees drift and any later template-based revision would start in preview mode. restore-template puts the template back
+# to the serving revision's config with a Cloud Run v2 PATCH (updateMask=template). Only `template` is in the mask, so traffic
+# (pinned to revisions by name) and tags are untouched; the restore creates one more 0%-traffic revision, named
+# <service>-pr-<N>-tpl-<epoch> so cleanup / sweep delete it like any preview revision. The etag in the body makes a concurrent
+# staging deploy fail the PATCH (409) instead of being overwritten; the whole read-compare-patch is then retried.
+# TPL_KEYS: RevisionTemplate fields (a Revision has the same ones plus output-only fields, which are dropped).
+TPL_KEYS='["labels","annotations","scaling","vpcAccess","timeout","serviceAccount","containers","volumes","executionEnvironment","encryptionKey","maxInstanceRequestConcurrency","serviceMesh","encryptionKeyRevocationAction","encryptionKeyShutdownDuration","sessionAffinity","healthCheckDisabled","nodeSelector","gpuZonalRedundancyDisabled"]'
+# Compare form: image and container name are excluded (the service stores the image as submitted, the revision the resolved
+# digest, so they differ on a clean service; a preview always changes env/cpu, which this detects).
+# System-managed label/annotation keys are stripped (they are rejected on write or never match the service template); empty maps dropped.
+TPL_SYS='^(serving\\.knative\\.dev|cloud\\.googleapis\\.com|run\\.googleapis\\.com|autoscaling\\.knative\\.dev|client\\.knative\\.dev)/'
+TPL_PICK="with_entries(select(.key as \$k | ${TPL_KEYS} | index(\$k))) | (.labels, .annotations) |= (if . == null then null else with_entries(select(.key | test(\"${TPL_SYS}\") | not)) end) | with_entries(select(.value != null and .value != {}))"
+TPL_CMP="${TPL_PICK} | if .containers then .containers |= map(del(.image, .name)) else . end"
+RUN_BASE="projects/${PROJECT}/locations/${REGION}"
+
+run_api() {  # run_api <METHOD> <path under https://run.googleapis.com/v2/> [json body] -> body; non-zero on HTTP/transport error
+  local method="$1" path="$2" body="${3:-}" token
+  token="$(gcloud auth print-access-token)" || return 1
+  # The bearer header goes through stdin (-H @-), not argv (visible in the process list).
+  if [[ -n "$body" ]]; then
+    printf 'Authorization: Bearer %s\n' "$token" | curl -sS --fail-with-body -X "$method" -H @- -H 'Content-Type: application/json' -d "$body" "https://run.googleapis.com/v2/$path"
+  else
+    printf 'Authorization: Bearer %s\n' "$token" | curl -sS --fail-with-body -X "$method" -H @- "https://run.googleapis.com/v2/$path"
+  fi
+}
+
+# rc 0 = matches / restored, 1 = hard error, 3 = etag conflict (caller retries)
+restore_template_once() {
+  local svc serving tplrev rev want have body resp gen obs state i
+  svc="$(run_api GET "$RUN_BASE/services/$SERVICE")" || { echo "restore-template: cannot read service" >&2; return 1; }
+  serving="$(printf '%s' "$svc" | jq -er '[.traffic[]? | select(.type == "TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION" and (.percent // 0) > 0)] | sort_by(.percent) | last | .revision // empty')" \
+    || { echo "restore-template: no revision serves traffic; template left alone" >&2; return 1; }
+  # Only ever undo a PREVIEW deploy. A staging deploy sets the template to the new release while traffic is still on the old revision
+  # (30-60 s); restoring then would roll the template (and deploy-prod's blank-sha GIT_SHA read) back. So: template revision must be a
+  # preview revision (<service>-pr-<N>-..., not one of our own -tpl- restores) and the service must not be reconciling.
+  tplrev="$(printf '%s' "$svc" | jq -r '.template.revision // empty')"
+  if [[ ! "$tplrev" =~ ^${SERVICE}-pr-[0-9]+- || "$tplrev" == *-tpl-* ]]; then
+    echo "restore-template: template revision '${tplrev:-none}' is not a preview revision; left alone"; return 0
+  fi
+  if [[ "$(printf '%s' "$svc" | jq -r '.reconciling // false')" == true ]]; then
+    echo "restore-template: service is reconciling (another update in flight); left alone"; return 0
+  fi
+  rev="$(run_api GET "$RUN_BASE/services/$SERVICE/revisions/$serving")" || { echo "restore-template: cannot read revision $serving" >&2; return 1; }
+  want="$(printf '%s' "$rev" | jq -S "$TPL_CMP")" && have="$(printf '%s' "$svc" | jq -S ".template | $TPL_CMP")" || { echo "restore-template: unreadable JSON" >&2; return 1; }
+  [[ -n "$want" && "$want" != null ]] || { echo "restore-template: empty revision template" >&2; return 1; }
+  if [[ "$want" == "$have" ]]; then echo "restore-template: template already matches serving revision $serving"; return 0; fi
+  body="$(jq -nc --argjson rev "$rev" --arg etag "$(printf '%s' "$svc" | jq -r '.etag // empty')" --arg n "${SERVICE}-pr-${TPL_PR:-0}-tpl-$(date +%s)" \
+    "{etag: \$etag, template: ((\$rev | ${TPL_PICK}) + {revision: \$n})}")" || return 1
+  if ! resp="$(run_api PATCH "$RUN_BASE/services/$SERVICE?updateMask=template" "$body" 2>&1)"; then
+    printf '%s\n' "$resp" >&2
+    printf '%s' "$resp" | grep -Eiq 'ABORTED|etag|409|modified|conflict' && return 3
+    echo "restore-template: PATCH failed" >&2; return 1
+  fi
+  # Wait on the SERVICE, not the long-running operation (the deployer SA may not read operations): the PATCH response carries the
+  # service generation this update produced; done = Ready and observedGeneration >= that generation (a later one = a newer update).
+  gen="$(printf '%s' "$resp" | jq -r '.metadata.generation // empty')"
+  [[ "$gen" =~ ^[0-9]+$ ]] || gen="$(( $(printf '%s' "$svc" | jq -r '.generation // 0') + 1 ))"
+  for i in $(seq 1 "${RESTORE_POLLS:-60}"); do
+    resp="$(run_api GET "$RUN_BASE/services/$SERVICE")" || { echo "restore-template: cannot poll service" >&2; return 1; }
+    state="$(printf '%s' "$resp" | jq -r '.terminalCondition.state // empty')"
+    obs="$(printf '%s' "$resp" | jq -r '.observedGeneration // 0')"
+    if [[ "$obs" =~ ^[0-9]+$ && "$obs" -ge "$gen" ]]; then
+      case "$state" in
+        CONDITION_SUCCEEDED) echo "restore-template: template restored from serving revision $serving (generation $obs)"; return 0 ;;
+        CONDITION_FAILED) echo "restore-template: service update failed: $(printf '%s' "$resp" | jq -c '.terminalCondition')" >&2; return 1 ;;
+      esac
+    fi
+    sleep "${RESTORE_POLL_SLEEP:-5}"
+  done
+  echo "restore-template: service did not reach generation $gen (Ready) in time" >&2; return 1
+}
+
+restore_template() {
+  local attempt rc
+  [[ -z "${1:-}" ]] || { need_pr "$1"; TPL_PR="$1"; }
+  for attempt in 1 2 3; do
+    rc=0; restore_template_once || rc=$?
+    [[ $rc -ne 3 ]] && return $rc
+    echo "restore-template: concurrent update; retrying ($attempt)" >&2; sleep "${RESTORE_RETRY_SLEEP:-10}"
+  done
+  return 1
+}
+
 cleanup() {
   local pr="${1:-}"; need_pr "$pr"
   local fail=0 names rev
   delete_ignoring_not_found "Cloud Run tag pr-$pr" \
     gcloud run services update-traffic "$SERVICE" --remove-tags "pr-$pr" --region "$REGION" --project "$PROJECT" --quiet || fail=1
+  # Safety net: a preview deploy cancelled before its own restore (cancel-in-progress) would leave the preview template. Idempotent
+  # (only acts on a preview-named template). When it acts, its own <service>-pr-<N>-tpl-<epoch> revision becomes the newest revision,
+  # which Cloud Run will not delete: it is logged `left for sweep` below and removed by the next sweep; the older preview revisions can go.
+  restore_template "$pr" || { echo "pr_preview.sh: restore-template failed" >&2; fail=1; }
   # Tag first: a revision that still carries a tag (or traffic) cannot be deleted. Revision names: <service>-pr-<N>-<sha7>-<run>-<attempt>.
   # Cloud Run never deletes the newest revision of a service; that case is left for `sweep`. Whatever happens above, the channel step still runs.
   if names="$(gcloud run revisions list --service "$SERVICE" --region "$REGION" --project "$PROJECT" \
@@ -182,6 +273,7 @@ case "$cmd" in
   comment)         post_comment "$@" ;;
   is-not-found)    is_not_found "$@" ;;
   cleanup)         cleanup "$@" ;;
+  restore-template) restore_template "$@" ;;
   sweep)           sweep ;;
-  *) die "usage: pr_preview.sh firebase-config|env-overrides|tag-url|comment-body|comment-id|comment|is-not-found|cleanup|sweep ..." ;;
+  *) die "usage: pr_preview.sh firebase-config|env-overrides|tag-url|comment-body|comment-id|comment|is-not-found|cleanup|restore-template|sweep ..." ;;
 esac
