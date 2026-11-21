@@ -4,7 +4,8 @@
 through it, and it writes `sessions/{sid}` and `session_status/{sid}` in one repo call. The
 status document carries no text (R7, AC11).
 
-Not transactional: callers that race (the first-run gate, Task 7) add their own transaction.
+Not transactional: callers that race (the first-run gate, `POST /runs`) use their own repo
+transaction (`start_first_run`, `start_run`) for the check-and-move to `running`.
 """
 
 from typing import Any, get_args

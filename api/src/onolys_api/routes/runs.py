@@ -18,7 +18,7 @@ from onolys_api import logs
 from onolys_api.auth.deps import AuthUser, current_user
 from onolys_api.errors import ApiError, ErrorResponse
 from onolys_api.jobs import caps
-from onolys_api.jobs.machine import advance, invalid_state
+from onolys_api.jobs.machine import RUN_START_PROGRESS, advance, invalid_state
 from onolys_api.jobs.queue import TaskPayload
 from onolys_api.jobs.run import release_once
 from onolys_api.presets import UnknownPreset
@@ -129,24 +129,20 @@ def start_run(id: str, request: Request, user: User, body: RunRequest | None = N
         except UnknownPreset:
             raise ApiError.of(422, "invalid_parameters", "preset: unknown preset") from None
     settings = app.state.settings
-    date = caps.reserve_run(repo, settings, uid)
     run_id = uuid4().hex
-    rating = repo.latest_rating(uid, id)
-    try:
-        repo.create_run(
-            uid, id, run_id,
-            RunDoc(
-                uid=uid, session_id=id, run_id=run_id, n_runs=body.n_runs or s.n_runs,
-                preset=preset, rating_id=rating.id if rating else None, stt=s.stt,
-                code_version=settings.git_sha, cap_date=date,
-            ),
-        )  # fmt: skip
-        advance(repo, uid, id, to="running", step=None)  # 409 if another call won the race
-        if s.first_run_id is None:
-            repo.update_session(uid, id, {"first_run_id": run_id})
-    except Exception:
-        _compensate(repo, uid, id, run_id, date)
-        raise
+    date = caps.utc_date()
+    # One transaction: state check, cap reservation, run creation, first_run_id and `running`.
+    # The loser of a race gets 409 and holds no slot.
+    outcome = repo.start_run(
+        uid, id, run_id, date, settings.daily_run_cap, settings.max_active_runs,
+        settings.git_sha, RUN_START_PROGRESS, RERUN_STATES, body.n_runs, preset,
+    )  # fmt: skip
+    if outcome == "not_ready":
+        raise invalid_state()
+    if outcome == "daily_cap":
+        raise ApiError.of(429, "daily_cap_reached", caps.DAILY_MESSAGE)
+    if outcome == "concurrent":
+        raise ApiError.of(429, "daily_cap_reached", caps.CONCURRENT_MESSAGE)
     try:
         queue = getattr(app.state, "queue", None)
         if queue is None:

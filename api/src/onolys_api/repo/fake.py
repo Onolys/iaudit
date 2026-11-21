@@ -513,6 +513,58 @@ class FakeRepo:
             self._record_status(uid, sid)
             return "started"
 
+    def start_run(
+        self, uid: str, sid: str, run_id: str, date: str, cap: int, max_active: int,
+        code_version: str, start_progress: int, allowed_states: tuple[str, ...],
+        n_runs: int | None, preset: str | None,
+    ) -> StartOutcome:  # fmt: skip
+        with self._claim_lock:  # the fake's "transaction"
+            sess = self._owned(f"sessions/{sid}", uid)
+            assert sess is not None
+            if sess.get("state") not in allowed_states or not (
+                sess.get("transcript_ready")
+                and sess.get("speaker_confirmed")
+                and sess.get("clinician_speaker")
+            ):
+                return "not_ready"
+            status = self._get(f"session_status/{sid}") or {}
+            user = self._get(f"users/{uid}") or {}
+            usage = self._get(f"usage/{uid}_{date}") or {"uid": uid, "date": date, "runs": 0}
+            eff_cap, eff_active = user.get("daily_cap"), user.get("max_active_runs")
+            if usage.get("runs", 0) >= (cap if eff_cap is None else eff_cap):
+                return "daily_cap"
+            if user.get("active_runs", 0) >= (max_active if eff_active is None else eff_active):
+                return "concurrent"
+            revs = [(i, d) for i, d in self._children(sid, "ratings") if i != DRAFT_ID]
+            rating_id = max(revs, key=lambda t: (t[1]["created_at"], t[0]))[0] if revs else None
+            run = RunDoc(
+                uid=uid, session_id=sid, run_id=run_id,
+                n_runs=n_runs or sess.get("n_runs", 1),
+                preset=preset or sess.get("preset"), rating_id=rating_id,
+                stt=sess.get("stt"), code_version=code_version, cap_date=date,
+            )  # fmt: skip
+            now = utcnow()
+            progress = (
+                start_progress
+                if sess["state"] in ("report_ready", "failed")
+                else max(status.get("progress", 0), start_progress)
+            )
+            self._create(f"sessions/{sid}/runs/{run_id}", run.to_store())
+            self._put(f"usage/{uid}_{date}", {**usage, "runs": usage.get("runs", 0) + 1})
+            self._put(f"users/{uid}", {**user, "active_runs": user.get("active_runs", 0) + 1})
+            self._put(
+                f"sessions/{sid}",
+                {**sess, "first_run_id": sess.get("first_run_id") or run_id, "state": "running",
+                 "step": None, "error": None, "updated_at": now},
+            )  # fmt: skip
+            self._put(
+                f"session_status/{sid}",
+                {**status, "state": "running", "step": None, "error_code": None,
+                 "progress": progress, "updated_at": now},
+            )  # fmt: skip
+            self._record_status(uid, sid)
+            return "started"
+
     def release_run(self, uid: str, date: str, refund: bool) -> None:
         with self._claim_lock:
             user = self._get(f"users/{uid}") or {}

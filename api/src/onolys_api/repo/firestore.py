@@ -586,6 +586,69 @@ class FirestoreRepo:
 
         return self._contended(txn_fn)
 
+    def start_run(
+        self, uid: str, sid: str, run_id: str, date: str, cap: int, max_active: int,
+        code_version: str, start_progress: int, allowed_states: tuple[str, ...],
+        n_runs: int | None, preset: str | None,
+    ) -> StartOutcome:  # fmt: skip
+        sref = self._session_ref(uid, sid)
+        stref = self._top("session_status", sid)
+        usage_ref = self._top("usage", f"{uid}_{date}")
+        user_ref = self._top("users", uid)
+        run_ref = sref.collection("runs").document(run_id)
+        ratings = sref.collection("ratings")
+        newest = ratings.order_by("created_at", direction=firestore.Query.DESCENDING).limit(1)
+
+        @firestore.transactional
+        def txn_fn(txn) -> StartOutcome:
+            snap = sref.get(transaction=txn)
+            sess = snap.to_dict() or {}
+            if not snap.exists or sess.get("uid") != uid:
+                raise NotFoundError()
+            if sess.get("state") not in allowed_states or not (
+                sess.get("transcript_ready")
+                and sess.get("speaker_confirmed")
+                and sess.get("clinician_speaker")
+            ):
+                return "not_ready"
+            status = stref.get(transaction=txn).to_dict() or {}
+            user = user_ref.get(transaction=txn).to_dict() or {}
+            usage = usage_ref.get(transaction=txn).to_dict() or {}
+            latest = [s for s in newest.get(transaction=txn) if s.id != DRAFT_ID]
+            eff_cap, eff_active = user.get("daily_cap"), user.get("max_active_runs")
+            if usage.get("runs", 0) >= (cap if eff_cap is None else eff_cap):
+                return "daily_cap"
+            if user.get("active_runs", 0) >= (max_active if eff_active is None else eff_active):
+                return "concurrent"
+            run = RunDoc(
+                uid=uid, session_id=sid, run_id=run_id, n_runs=n_runs or sess.get("n_runs", 1),
+                preset=preset or sess.get("preset"), rating_id=latest[0].id if latest else None,
+                stt=sess.get("stt"), code_version=code_version, cap_date=date,
+            )  # fmt: skip
+            progress = (
+                start_progress
+                if sess["state"] in ("report_ready", "failed")
+                else max(status.get("progress", 0), start_progress)
+            )
+            fields = {"state": "running", "step": None, "error": None, "updated_at": utcnow()}
+            if not sess.get("first_run_id"):
+                fields["first_run_id"] = run_id
+            txn.create(run_ref, run.to_store())
+            txn.set(
+                usage_ref, {"uid": uid, "date": date, "runs": usage.get("runs", 0) + 1}, merge=True
+            )
+            txn.set(user_ref, {"active_runs": user.get("active_runs", 0) + 1}, merge=True)
+            txn.update(sref, fields)
+            txn.set(
+                stref,
+                {"state": "running", "step": None, "error_code": None, "uid": uid,
+                 "progress": progress, "updated_at": fields["updated_at"]},
+                merge=True,
+            )  # fmt: skip
+            return "started"
+
+        return self._contended(txn_fn)
+
     def release_run(self, uid: str, date: str, refund: bool) -> None:
         usage_ref = self._top("usage", f"{uid}_{date}")
         user_ref = self._top("users", uid)
