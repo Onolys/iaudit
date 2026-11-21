@@ -465,7 +465,8 @@ describe("rating draft vs final", () => {
       const err = e as MockHttpError;
       expect(err.status).toBe(422);
       expect(err.details.every((d) => d.code === "rating_invalid")).toBe(true);
-      expect(err.details.map((d) => d.message).join("|")).toContain(field);
+      expect(err.details.map((d) => d.field)).toContain(field.replaceAll(".", "/"));
+      expect(err.details.every((d) => typeof d.issue === "string")).toBe(true);
     }
   });
 

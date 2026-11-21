@@ -102,6 +102,34 @@ describe("issuesFromApi", () => {
     expect(issues.notes).toMatch(/3,000/);
     expect(issues.change_goal).toMatch(/required/i);
   });
+  it("reads the real API shape: `/` field paths and `issue` codes", () => {
+    const d = (field: string, issue: string) => ({ code: "rating_invalid" as const, field, issue: issue as never, message: `${field}: ${issue}` });
+    const issues = issuesFromApi(
+      new ApiError(422, "rating_invalid", [
+        d("globals/cct/reason", "too_long"),
+        d("notes", "too_long"),
+        d("change_goal", "required"),
+        d("globals/cct/score", "out_of_range"),
+        d("counts/gi/count", "out_of_range"),
+        d("globals/cct/example/text", "too_long"),
+        d("coded_span", "order"),
+        d("$", "too_large"),
+        d("globals/nope", "unknown_key"),
+      ]),
+    );
+    expect(issues["globals.cct.reason"]).toMatch(/1,000/);
+    expect(issues.notes).toMatch(/3,000/);
+    expect(issues.change_goal).toMatch(/required/i);
+    expect(issues["globals.cct.score"]).toMatch(/1 to 5/);
+    expect(issues["counts.gi.count"]).toMatch(/whole number/);
+    expect(issues["globals.cct.example.text"]).toMatch(/1,000/);
+    expect(issues.coded_span).toMatch(/before/);
+    expect(issues["$"]).toBeUndefined();
+  });
+  it("never echoes server message text", () => {
+    const issues = issuesFromApi(new ApiError(422, "rating_invalid", [{ code: "rating_invalid", field: "notes", issue: "invalid", message: "SECRET" }]));
+    expect(issues.notes).toBe("Check this field.");
+  });
   it("returns nothing for details it cannot place", () => {
     expect(issuesFromApi(new ApiError(422, "rating_invalid", [{ code: "rating_invalid", message: "The rating card is not valid (shape or length limits)." }]))).toEqual({});
   });

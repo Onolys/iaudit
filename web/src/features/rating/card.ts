@@ -135,13 +135,42 @@ export function localIssues(form: RatingForm, opts: { noRating?: boolean } = {})
 const fmt = (n: number) => n.toLocaleString("en-US");
 const lengthMessage = (path: string) => `Too long: keep this to ${fmt(path === "notes" ? LIMITS.notes : LIMITS.item)} characters or fewer.`;
 
+const COUNT_MESSAGE = "Enter a whole number, 0 or more.";
+const SCORE_MESSAGE = "Choose a score from 1 to 5.";
+
+/** Local message for an engine `issue` at a card path (`/` already converted to `.`). */
+function messageForIssue(path: string, issue: string): string {
+  const numeric = /^globals\.[^.]+\.score$/.test(path) ? SCORE_MESSAGE : /^counts\.[^.]+\.count$/.test(path) ? COUNT_MESSAGE : undefined;
+  switch (issue) {
+    case "too_long":
+      return lengthMessage(path);
+    case "required":
+      return "This is required.";
+    case "out_of_range":
+    case "invalid_type":
+      return numeric ?? "Check this field.";
+    case "order":
+      return "The start must be before the end.";
+    default:
+      return "Check this field.";
+  }
+}
+
 /**
- * Per-field messages from a 422 `rating_invalid`. Each detail is expected to start with a dotted
- * card path; the message is chosen locally, server text is never shown (no PHI, R8).
+ * Per-field messages from a 422 `rating_invalid`. Real API details carry `field` (a `/`-joined card
+ * path, `$` = whole card) and `issue`; both are mapped to the form's dotted keys. Details without
+ * `field` fall back to a leading dotted path in `message` (older mock shape). The message shown is
+ * always chosen locally, server text is never shown (no PHI, R8).
  */
 export function issuesFromApi(err: ApiError): Issues {
   const out: Issues = {};
   for (const d of err.details) {
+    if (d.field) {
+      if (d.field === "$") continue;
+      const path = d.field.replaceAll("/", ".");
+      out[path] = messageForIssue(path, d.issue ?? "invalid");
+      continue;
+    }
     const m = /^([a-z_]+(?:\.[a-z_0-9]+)*)\s(.*)$/.exec(d.message);
     if (!m) continue;
     const [, path, rest] = m;
@@ -150,9 +179,9 @@ export function issuesFromApi(err: ApiError): Issues {
       : /required/i.test(rest)
         ? "This is required."
         : /between 1 and 5/.test(rest)
-          ? "Choose a score from 1 to 5."
+          ? SCORE_MESSAGE
           : /whole number/.test(rest)
-            ? "Enter a whole number, 0 or more."
+            ? COUNT_MESSAGE
             : "Check this field.";
   }
   return out;

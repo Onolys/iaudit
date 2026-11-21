@@ -675,30 +675,31 @@ function cardHasContent(card: RatingCard): boolean {
 
 /** Hard limits (SP04 R2): UI only warns, the API rejects with `rating_invalid`. */
 function validateCard(card: RatingCard, final: boolean): void {
-  const errors: string[] = [];
+  type Issue = { field: string; issue: "required" | "too_long" | "out_of_range" };
+  const errors: Issue[] = [];
   const max = (path: string, v: unknown, n: number) => {
-    if (typeof v === "string" && v.length > n) errors.push(`${path} exceeds ${n} characters`);
+    if (typeof v === "string" && [...v].length > n) errors.push({ field: path, issue: "too_long" });
   };
   if (final && !(typeof card.change_goal === "string" && card.change_goal.trim()))
-    errors.push("change_goal is required");
+    errors.push({ field: "change_goal", issue: "required" });
   max("change_goal", card.change_goal, 1000);
   max("notes", card.notes, 3000);
   for (const [id, g] of Object.entries(card.globals ?? {})) {
     if (g.score != null && (!Number.isInteger(g.score) || g.score < 1 || g.score > 5))
-      errors.push(`globals.${id}.score must be between 1 and 5`);
-    max(`globals.${id}.reason`, g.reason, 1000);
-    max(`globals.${id}.example.text`, g.example?.text, 1000);
+      errors.push({ field: `globals/${id}/score`, issue: "out_of_range" });
+    max(`globals/${id}/reason`, g.reason, 1000);
+    max(`globals/${id}/example/text`, g.example?.text, 1000);
   }
   for (const [id, c] of Object.entries(card.counts ?? {})) {
     if (c.count != null && (!Number.isInteger(c.count) || c.count < 0))
-      errors.push(`counts.${id}.count must be a whole number, zero or more`);
-    max(`counts.${id}.note`, c.note, 1000);
+      errors.push({ field: `counts/${id}/count`, issue: "out_of_range" });
+    max(`counts/${id}/note`, c.note, 1000);
   }
   if (errors.length)
     bad(
       422,
       "rating_invalid",
       "The rating card is invalid.",
-      errors.map((message) => ({ code: "rating_invalid", message })),
+      errors.map((e) => ({ code: "rating_invalid", field: e.field, issue: e.issue, message: `${e.field}: ${e.issue}` })),
     );
 }
