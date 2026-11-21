@@ -79,20 +79,28 @@ jobs:
           git checkout --detach "$SHA"
       - name: Config guard (source tree at this commit)
         run: bash scripts/ci/check_config.sh
-      - name: Resolve the sha tag to a digest and require that staging deployed exactly that digest
+      - name: Resolve the sha tag to a digest and require that staging ran exactly that image at that commit
         id: digest
         env:
           SHA: ${{ steps.sha.outputs.sha }}
+          TOKEN: ${{ steps.auth.outputs.access_token }}
         run: |
           repo="${REGION}-docker.pkg.dev/${PROJECT}/onolys/api"
           digest="$(gcloud artifacts docker images describe "${repo}:${SHA}" --format='value(image_summary.digest)')"
           [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "no image tagged ${SHA} in ${repo} (was it built by deploy-staging?)" >&2; exit 1; }
           image="${repo}@${digest}"
+          # The tag digest is an OCI index; Cloud Run records the resolved platform manifest digest in its revisions.
+          # So fetch the index and accept either the index digest or any platform digest it lists (plus GIT_SHA == sha).
+          curl -fsS -o index.json \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json' \
+            "https://${REGION}-docker.pkg.dev/v2/${PROJECT}/onolys/api/manifests/${digest}"
           for svc in onolys-api-staging onolys-worker-staging; do
-            gcloud run revisions list --service "$svc" --region "$REGION" --project "$PROJECT" --format=json \
-              | jq -e --arg image "$image" 'any(.[]; .spec.containers[0].image == $image)' >/dev/null \
-              || { echo "digest ${digest} (commit ${SHA}) never ran on ${svc}; deploy it to staging first" >&2; exit 1; }
+            gcloud run revisions list --service "$svc" --region "$REGION" --project "$PROJECT" --format=json > revisions.json
+            python3 scripts/ci/staging_ran_image.py --sha "$SHA" --digest "$digest" --index index.json --revisions revisions.json >/dev/null \
+              || { echo "digest ${digest} (commit ${SHA}) never ran on ${svc} with GIT_SHA=${SHA}; deploy it to staging first" >&2; exit 1; }
           done
+          rm -f index.json revisions.json
           echo "image=${image}" >> "$GITHUB_OUTPUT"
           echo "promoting ${image} (commit ${SHA})"
       - uses: docker/login-action@v3
