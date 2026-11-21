@@ -60,9 +60,9 @@ npm test            # vitest run
 
 ### Flaky tests
 
-Mark a known-flaky test by moving it to a `*.flaky.test.ts(x)` file next to its suite and giving it `{ retry: 2 }`. The default `npm test` excludes these files (blocking); `npm run test:flaky` runs only them, in a `continue-on-error` CI step (visible, non-blocking). Every flaky test needs a follow-up issue to fix the root cause, then move it back into the normal suite.
+Mark a known-flaky test by moving it to a `*.flaky.test.ts(x)` file next to its suite and giving it `{ retry: 2 }`. The default `npm test` excludes these files (blocking); `npm run test:flaky` runs only them, in a `continue-on-error` CI step that never fails CI; a failure shows as a warning annotation on the PR checks plus a job summary line. Every flaky test needs a follow-up issue to fix the root cause, then move it back into the normal suite.
 
-Python api: mark a flaky test `@pytest.mark.flaky` (marker registered in `api/pyproject.toml`); the emulator-contention tests are marked by `FLAKY_FIRESTORE_TESTS` in `api/tests/conftest.py` (firestore params only; fake params stay blocking). Default `addopts` is `-m 'not live and not flaky'`, so they are deselected; CI runs them in the `api` job step "pytest flaky (non-blocking)" (`continue-on-error`, no retry plugin, no coverage). Locally: `-m flaky` under the emulator.
+Python api: mark a flaky test `@pytest.mark.flaky` (marker registered in `api/pyproject.toml`); the emulator-contention tests are marked by `FLAKY_FIRESTORE_TESTS` in `api/tests/conftest.py` (firestore params only; fake params stay blocking). Default `addopts` is `-m 'not live and not flaky'`, so they are deselected; CI runs them in the `api` job step "pytest flaky (non-blocking)" (`continue-on-error`; failure shows as a warning annotation + job summary, never fails CI; no retry plugin, no coverage). Locally: `-m flaky` under the emulator.
 
 ## Firestore emulator
 
