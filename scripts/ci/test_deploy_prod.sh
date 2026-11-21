@@ -57,7 +57,19 @@ has   "dispatch input version"               '^      version:'
 has   "version regex validation"             'prod-\[0-9\]\{4\}-\[0-9\]\{2\}-\[0-9\]\{2\}\\\.\[0-9\]\+\$'
 has   "sha and version mutually exclusive"   'INPUT_SHA.*INPUT_VERSION|INPUT_VERSION.*INPUT_SHA'
 has   "version resolved to its commit"       'refs/tags/\$\{INPUT_VERSION\}\^\{commit\}'
-has   "next tag via script"                  'scripts/ci/next_prod_tag\.py'
+hasnt "no python script for tag naming"      'next_prod_tag'
+printf '%s\n' "$TAGJOB" | grep -Eq 'set -o pipefail|set -[a-z]*o pipefail|shell: bash' && ok "tag step has pipefail" || bad "tag step has pipefail"
+printf '%s\n' "$TAGJOB" | grep -Eq 'git ls-remote --tags --refs origin "prod-\$d\.\*"' && ok "tag N computed inline from ls-remote" || bad "tag N computed inline from ls-remote"
+has   "resolve summary shows sha"            'GITHUB_STEP_SUMMARY'
+# Run the real n=/tag= snippet from the workflow against fixture ls-remote output (.9/.10 ordering, none -> .1, other days ignored)
+snippet="$(printf '%s\n' "$TAGJOB" | grep -E '^ *(n=|tag=)' | sed 's/^ *//')"
+check_tag() { # $1 = expected, $2 = fixture lines
+  got="$(FIXTURE="$2" bash -c 'set -o pipefail; git() { printf "%b" "$FIXTURE"; }; d=2026-11-21; '"$snippet"'; echo "$tag"' 2>&1)"
+  [[ "$got" == "$1" ]] && ok "tag snippet: $1" || { bad "tag snippet: expected $1 got '$got'"; }
+}
+check_tag "prod-2026-11-21.1"  ""
+check_tag "prod-2026-11-21.11" "aaa\trefs/tags/prod-2026-11-21.9\nbbb\trefs/tags/prod-2026-11-21.10\nccc\trefs/tags/prod-2026-11-21.2\n"
+check_tag "prod-2026-11-21.4"  "aaa\trefs/tags/prod-2026-11-21.3\nbbb\trefs/tags/prod-2026-11-20.99\n"
 has   "tag pushed"                           'git push origin "refs/tags/'
 
 command -v actionlint >/dev/null 2>&1 && { (cd "$ROOT" && actionlint "$WF") && ok "actionlint" || bad "actionlint"; }

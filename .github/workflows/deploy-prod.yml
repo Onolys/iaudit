@@ -4,9 +4,12 @@ name: deploy-prod
 #   workflow_dispatch (input sha, or input version; both empty = the commit staging api runs now) or push of a tag v*.
 #   The prod deploy jobs run in the GitHub environment `production` (required reviewer = Tejit).
 #   Release = dispatch with sha empty (or a sha). Every successful deploy is tagged prod-<UTC date>.<n> by the final `tag` job
-#   (rollbacks and re-deploys included), so the newest prod-* tag is what is live.
+#   (rollbacks and re-deploys included; only after smoke passes), so the newest prod-* tag is the last fully successful deploy
+#   and the right rollback target. After a failed run prod may be mixed: check /v1/healthz code_version or the revisions' GIT_SHA.
 #   Rollback = dispatch with version=<prod-* tag> (or an earlier sha that was deployed to staging): api, worker, rules, web all
-#   go back to that commit. List versions: git ls-remote --tags origin 'prod-*'. Set sha OR version, not both.
+#   go back to that commit. List versions: git ls-remote --tags --refs --sort=-v:refname origin 'prod-*' | head
+#   Set sha OR version, not both. `v*` = optional human release trigger; `prod-*` = bot record of each successful deploy;
+#   roll back only by `prod-*` version or `sha`.
 #   The prod-* tags cannot re-trigger this workflow: they do not match `v*`, and tags pushed with GITHUB_TOKEN never trigger workflows.
 # Repo variables (owner sets from Terraform outputs; see docs/reference/infra.md):
 #   WIF_PROVIDER, DEPLOYER_STAGING_SA (read-only resolve step), DEPLOYER_PROD_SA, GCP_PROJECT (optional), GCP_REGION (optional),
@@ -92,6 +95,11 @@ jobs:
           fi
           [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "sha must be a full 40-char lowercase hex commit sha, got '$sha'" >&2; exit 1; }
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Promoting to prod"
+            echo "- commit: \`${sha}\`"
+            [ -z "$INPUT_VERSION" ] || echo "- version: \`${INPUT_VERSION}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Move the workspace to the resolved commit (plain git, keeps the creds file)
         env:
           SHA: ${{ steps.sha.outputs.sha }}
@@ -249,8 +257,8 @@ jobs:
 
   # Runs only when every prod deploy job AND the healthz smoke succeeded (default success() over `needs`). Tags the promoted commit
   # prod-<UTC date>.<n>, always a NEW tag (also for a rollback / re-deploy of an already-tagged sha), so the newest
-  # prod-* tag = what is live. The only job that may write to the repo. Checks out the workflow ref (not the target sha) so
-  # next_prod_tag.py is available (limitation: a v* tag pushed from a commit that predates that script would fail here; no v* tags exist yet); the target commit is fetched just to tag it.
+  # prod-* tag = the last fully successful deploy (rollback target). The only job that may write to the repo. The checkout is
+  # only a git repo to push from; the target commit is fetched just to tag it.
   tag:
     needs: [resolve, deploy-api, deploy-worker, rules, web, smoke]
     runs-on: ubuntu-latest
@@ -263,7 +271,9 @@ jobs:
         env:
           SHA: ${{ needs.resolve.outputs.sha }}
           IMAGE: ${{ needs.resolve.outputs.image }}
+        shell: bash
         run: |
+          set -o pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch --no-tags --depth=1 origin "$SHA"
@@ -271,7 +281,9 @@ jobs:
           pushed=""
           for attempt in 1 2 3 4 5; do
             # ls-remote is authoritative; recomputed each attempt so a race (tag already taken) picks the next N.
-            tag="$(git ls-remote --tags origin 'prod-*' | awk '{print $2}' | python3 scripts/ci/next_prod_tag.py --date "$(date -u +%F)")"
+            d="$(date -u +%F)"
+            n="$(git ls-remote --tags --refs origin "prod-$d.*" | sed -nE "s#.*/prod-$d\.([0-9]+)\$#\1#p" | sort -n | tail -1)"
+            tag="prod-$d.$((${n:-0}+1))"
             git tag -a "$tag" "$SHA" -m "prod deploy ${tag}" -m "commit: ${SHA}" -m "image: ${IMAGE}" -m "run: ${run_url}"
             if git push origin "refs/tags/${tag}"; then pushed=1; break; fi
             echo "push of ${tag} failed (attempt ${attempt}); recomputing" >&2
