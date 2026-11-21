@@ -1,0 +1,53 @@
+:root {
+  --color-background: #ffffff;
+  --color-text: #171c1c;
+  /* WCAG relative luminance: #0B5F5A against #FFFFFF = 7.5033:1.
+     The same ratio applies to white labels on teal buttons (AA >= 4.5:1). */
+  --color-accent: #0b5f5a;
+  --color-on-accent: #ffffff;
+  --color-gray-50: #f7f9f9;
+  --color-gray-100: #edf1f1;
+  --color-gray-300: #c7d1d0;
+  --color-gray-600: #536160;
+  --color-gray-900: #171c1c;
+  /* Score chips also require a visible text label; color alone carries no meaning. */
+  --color-score-good: #175b42;
+  --color-score-good-background: #e5f4ec;
+  --color-score-fair: #71500a;
+  --color-score-fair-background: #fff3d6;
+  --color-score-low: #8a3030;
+  --color-score-low-background: #fbe9e9;
+
+  /* Section band backgrounds; adjacent sections on each page must differ. */
+  --tone-hero: #ffffff;
+  --tone-features: #e4f2ef;
+  --tone-evaluates: #eef2f7;
+  --tone-compare: #e8f6ee;
+  --tone-team: #f8f2e5;
+  --tone-benefits: #f1f4fa;
+  --tone-footer: #0a3b38;
+  --hdr: 64px;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --gutter: 16px;
+
+  --font-family-sans: 'Inter Variable', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 3rem;
+  --font-size-4xl: 4rem;
+  --line-height-body: 1.6;
+  --line-height-heading: 1.15;
+}

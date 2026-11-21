@@ -1,0 +1,3242 @@
+{
+  "components": {
+    "schemas": {
+      "ApiKeyCreated": {
+        "properties": {
+          "api_key": {
+            "title": "Api Key",
+            "type": "string"
+          },
+          "created": {
+            "format": "date-time",
+            "title": "Created",
+            "type": "string"
+          },
+          "key_id": {
+            "title": "Key Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key_id",
+          "api_key",
+          "created"
+        ],
+        "title": "ApiKeyCreated",
+        "type": "object"
+      },
+      "ApiKeyInfo": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "created": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created"
+          },
+          "key_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Id"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          }
+        },
+        "required": [
+          "active"
+        ],
+        "title": "ApiKeyInfo",
+        "type": "object"
+      },
+      "AudioReadResponse": {
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "expires_at"
+        ],
+        "title": "AudioReadResponse",
+        "type": "object"
+      },
+      "AudioUploadRequest": {
+        "properties": {
+          "content_type": {
+            "default": "",
+            "description": "Browser type; may be empty",
+            "maxLength": 100,
+            "title": "Content Type",
+            "type": "string"
+          },
+          "filename_ext": {
+            "default": "",
+            "description": "Used only when content_type is empty",
+            "maxLength": 16,
+            "title": "Filename Ext",
+            "type": "string"
+          },
+          "size_bytes": {
+            "description": "File size; above 300 MB is `audio_too_large`",
+            "minimum": 1.0,
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "size_bytes"
+        ],
+        "title": "AudioUploadRequest",
+        "type": "object"
+      },
+      "AudioUploadResponse": {
+        "properties": {
+          "required_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Send exactly these headers with the PUT (the canonical Content-Type)",
+            "title": "Required Headers",
+            "type": "object"
+          },
+          "upload_id": {
+            "title": "Upload Id",
+            "type": "string"
+          },
+          "upload_url": {
+            "title": "Upload Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "upload_url",
+          "upload_id",
+          "required_headers"
+        ],
+        "title": "AudioUploadResponse",
+        "type": "object"
+      },
+      "ConfirmRequest": {
+        "properties": {
+          "clinician_speaker": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Clinician Speaker",
+            "type": "string"
+          }
+        },
+        "required": [
+          "clinician_speaker"
+        ],
+        "title": "ConfirmRequest",
+        "type": "object"
+      },
+      "ConfirmResponse": {
+        "properties": {
+          "clinician_speaker": {
+            "title": "Clinician Speaker",
+            "type": "string"
+          },
+          "session": {
+            "$ref": "#/components/schemas/ConfirmSessionRef"
+          }
+        },
+        "required": [
+          "session",
+          "clinician_speaker"
+        ],
+        "title": "ConfirmResponse",
+        "type": "object"
+      },
+      "ConfirmSessionRef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "uploading",
+              "validating",
+              "transcribing",
+              "awaiting_input",
+              "running",
+              "report_ready",
+              "failed",
+              "deleting"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "ConfirmSessionRef",
+        "type": "object"
+      },
+      "CreateSessionRequest": {
+        "properties": {
+          "language": {
+            "default": "auto",
+            "description": "BCP-47 tag or `auto`",
+            "title": "Language",
+            "type": "string"
+          },
+          "n_runs": {
+            "default": 1,
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "N Runs",
+            "type": "integer"
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Allowlisted preset name",
+            "title": "Preset"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "CreateSessionRequest",
+        "type": "object"
+      },
+      "CreateSessionResponse": {
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/SessionRef"
+          }
+        },
+        "required": [
+          "session"
+        ],
+        "title": "CreateSessionResponse",
+        "type": "object"
+      },
+      "DraftRating": {
+        "properties": {
+          "card": {
+            "additionalProperties": true,
+            "title": "Card",
+            "type": "object"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card",
+          "updated_at"
+        ],
+        "title": "DraftRating",
+        "type": "object"
+      },
+      "ErrorDetailModel": {
+        "properties": {
+          "code": {
+            "enum": [
+              "invalid_json",
+              "unsupported_media_type",
+              "schema_violation",
+              "empty_transcript",
+              "empty_assessment",
+              "duplicate_ids",
+              "invalid_parameters",
+              "body_too_large",
+              "too_many_turns",
+              "too_many_sections",
+              "rate_limited",
+              "not_found",
+              "method_not_allowed",
+              "cors_rejected",
+              "request_rejected",
+              "upstream_unavailable",
+              "deadline_exceeded",
+              "internal_error",
+              "missing_parameter",
+              "unknown_pack",
+              "input_rejected",
+              "run_failed",
+              "unauthenticated",
+              "forbidden",
+              "invalid_state",
+              "unsupported_audio",
+              "audio_too_long",
+              "audio_too_large",
+              "audio_unreadable",
+              "no_speech",
+              "speakers_not_separated",
+              "transcription_failed",
+              "rating_invalid",
+              "daily_cap_reached",
+              "conflict"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`/`-joined path of the offending field in the rating card (e.g. `globals/cct/reason`); `$` is the whole card. Set on `rating_invalid`. A path only, never user text.",
+            "title": "Field"
+          },
+          "issue": {
+            "anyOf": [
+              {
+                "enum": [
+                  "invalid_type",
+                  "too_long",
+                  "out_of_range",
+                  "required",
+                  "unknown_key",
+                  "invalid",
+                  "order",
+                  "too_large"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What is wrong at `field`. Set on `rating_invalid`.",
+            "title": "Issue"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorDetailModel",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "description": "Body of every non-2xx response (docs/contracts/public/public-error-response.schema.json).",
+        "properties": {
+          "details": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorDetailModel"
+            },
+            "title": "Details",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "schema_version": {
+            "const": "0.0.1",
+            "default": "0.0.1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "status",
+          "message",
+          "details"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "FinalRating": {
+        "properties": {
+          "card": {
+            "additionalProperties": true,
+            "title": "Card",
+            "type": "object"
+          },
+          "no_rating": {
+            "title": "No Rating",
+            "type": "boolean"
+          },
+          "rating_id": {
+            "title": "Rating Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rating_id",
+          "no_rating",
+          "card"
+        ],
+        "title": "FinalRating",
+        "type": "object"
+      },
+      "Flags": {
+        "properties": {
+          "has_rating": {
+            "title": "Has Rating",
+            "type": "boolean"
+          },
+          "rating_submitted": {
+            "title": "Rating Submitted",
+            "type": "boolean"
+          },
+          "speaker_confirmed": {
+            "title": "Speaker Confirmed",
+            "type": "boolean"
+          },
+          "transcript_ready": {
+            "title": "Transcript Ready",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "transcript_ready",
+          "speaker_confirmed",
+          "rating_submitted",
+          "has_rating"
+        ],
+        "title": "Flags",
+        "type": "object"
+      },
+      "Healthz": {
+        "properties": {
+          "code_version": {
+            "title": "Code Version",
+            "type": "string"
+          },
+          "service_mode": {
+            "title": "Service Mode",
+            "type": "string"
+          },
+          "status": {
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service_mode",
+          "code_version"
+        ],
+        "title": "Healthz",
+        "type": "object"
+      },
+      "RatingRequest": {
+        "properties": {
+          "card": {
+            "additionalProperties": true,
+            "description": "The rating card (`rating.schema.json`)",
+            "title": "Card",
+            "type": "object"
+          },
+          "final": {
+            "description": "`false` autosaves the draft; `true` submits a new revision",
+            "title": "Final",
+            "type": "boolean"
+          },
+          "no_rating": {
+            "default": false,
+            "description": "With `final`: submit as a \"no rating\" revision",
+            "title": "No Rating",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "final",
+          "card"
+        ],
+        "title": "RatingRequest",
+        "type": "object"
+      },
+      "RatingSaved": {
+        "properties": {
+          "final": {
+            "title": "Final",
+            "type": "boolean"
+          },
+          "has_rating": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Rating"
+          },
+          "no_rating": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "No Rating"
+          },
+          "rating_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating Id"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "final",
+          "updated_at"
+        ],
+        "title": "RatingSaved",
+        "type": "object"
+      },
+      "RatingView": {
+        "properties": {
+          "draft": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DraftRating"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only when newer than the last final"
+          },
+          "final": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FinalRating"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "RatingView",
+        "type": "object"
+      },
+      "ReportList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReportListItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ReportList",
+        "type": "object"
+      },
+      "ReportListItem": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "report_id": {
+            "title": "Report Id",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "report_id",
+          "run_id",
+          "created_at"
+        ],
+        "title": "ReportListItem",
+        "type": "object"
+      },
+      "ReportView": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "report": {
+            "additionalProperties": true,
+            "description": "The typed report JSON, stored verbatim",
+            "title": "Report",
+            "type": "object"
+          },
+          "report_id": {
+            "title": "Report Id",
+            "type": "string"
+          },
+          "report_schema_version": {
+            "title": "Report Schema Version",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "report_id",
+          "run_id",
+          "created_at",
+          "report_schema_version",
+          "report"
+        ],
+        "title": "ReportView",
+        "type": "object"
+      },
+      "RunList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RunView"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "RunList",
+        "type": "object"
+      },
+      "RunRequest": {
+        "properties": {
+          "n_runs": {
+            "anyOf": [
+              {
+                "maximum": 5.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Default: the session's",
+            "title": "N Runs"
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Allowlisted; LLM routes only",
+            "title": "Preset"
+          }
+        },
+        "title": "RunRequest",
+        "type": "object"
+      },
+      "RunSessionRef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "uploading",
+              "validating",
+              "transcribing",
+              "awaiting_input",
+              "running",
+              "report_ready",
+              "failed",
+              "deleting"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "RunSessionRef",
+        "type": "object"
+      },
+      "RunStarted": {
+        "properties": {
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "session": {
+            "$ref": "#/components/schemas/RunSessionRef"
+          }
+        },
+        "required": [
+          "run_id",
+          "session"
+        ],
+        "title": "RunStarted",
+        "type": "object"
+      },
+      "RunView": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "code_version": {
+            "title": "Code Version",
+            "type": "string"
+          },
+          "ended": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "n_runs": {
+            "title": "N Runs",
+            "type": "integer"
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preset"
+          },
+          "rating_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating Id"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "run_info": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Info"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "started": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "stt": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SttInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "run_id",
+          "session_id",
+          "status",
+          "n_runs",
+          "code_version",
+          "attempts"
+        ],
+        "title": "RunView",
+        "type": "object"
+      },
+      "SessionDetail": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "flags": {
+            "$ref": "#/components/schemas/Flags"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "latest_report_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Report Version"
+          },
+          "links": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "object"
+          },
+          "n_runs": {
+            "title": "N Runs",
+            "type": "integer"
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preset"
+          },
+          "progress": {
+            "title": "Progress",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "uploading",
+              "validating",
+              "transcribing",
+              "awaiting_input",
+              "running",
+              "report_ready",
+              "failed",
+              "deleting"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "progress",
+          "flags",
+          "warnings",
+          "language",
+          "n_runs",
+          "created_at",
+          "updated_at",
+          "links"
+        ],
+        "title": "SessionDetail",
+        "type": "object"
+      },
+      "SessionErrorInfo": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "SessionErrorInfo",
+        "type": "object"
+      },
+      "SessionList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SessionListItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "SessionList",
+        "type": "object"
+      },
+      "SessionListItem": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "latest_report_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Report Version"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "uploading",
+              "validating",
+              "transcribing",
+              "awaiting_input",
+              "running",
+              "report_ready",
+              "failed",
+              "deleting"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "created_at"
+        ],
+        "title": "SessionListItem",
+        "type": "object"
+      },
+      "SessionRef": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "uploading",
+              "validating",
+              "transcribing",
+              "awaiting_input",
+              "running",
+              "report_ready",
+              "failed",
+              "deleting"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "SessionRef",
+        "type": "object"
+      },
+      "SpeakerInfo": {
+        "properties": {
+          "samples": {
+            "description": "Up to 3 of the speaker's first lines",
+            "items": {
+              "type": "string"
+            },
+            "title": "Samples",
+            "type": "array"
+          },
+          "speaker": {
+            "title": "Speaker",
+            "type": "string"
+          },
+          "turn_count": {
+            "title": "Turn Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "speaker",
+          "turn_count",
+          "samples"
+        ],
+        "title": "SpeakerInfo",
+        "type": "object"
+      },
+      "SpeakersView": {
+        "properties": {
+          "clinician_speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinician Speaker"
+          },
+          "speakers": {
+            "items": {
+              "$ref": "#/components/schemas/SpeakerInfo"
+            },
+            "title": "Speakers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "speakers"
+        ],
+        "title": "SpeakersView",
+        "type": "object"
+      },
+      "SttInfo": {
+        "properties": {
+          "language": {
+            "default": "",
+            "title": "Language",
+            "type": "string"
+          },
+          "model": {
+            "default": "",
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "default": "",
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "title": "SttInfo",
+        "type": "object"
+      },
+      "TranscriptTurn": {
+        "properties": {
+          "end_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Ms"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`clinician`/`client`; null until confirmed",
+            "title": "Role"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "start_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Ms"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "TranscriptTurn",
+        "type": "object"
+      },
+      "TranscriptView": {
+        "properties": {
+          "clinician_speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinician Speaker"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/TranscriptTurn"
+            },
+            "title": "Turns",
+            "type": "array"
+          }
+        },
+        "required": [
+          "turns"
+        ],
+        "title": "TranscriptView",
+        "type": "object"
+      },
+      "Usage": {
+        "properties": {
+          "daily_cap": {
+            "title": "Daily Cap",
+            "type": "integer"
+          },
+          "resets_at": {
+            "format": "date-time",
+            "title": "Resets At",
+            "type": "string"
+          },
+          "runs_today": {
+            "title": "Runs Today",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "runs_today",
+          "daily_cap",
+          "resets_at"
+        ],
+        "title": "Usage",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "description": "`onolys_<id>_<secret>` (see /v1/api-key)",
+        "in": "header",
+        "name": "X-API-Key",
+        "type": "apiKey"
+      },
+      "HTTPBearer": {
+        "description": "Identity Platform ID token",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Public API of Onolys (`/v1`, JSON, scoped to the calling user). The contract is this document; the machine-readable schemas live in `docs/contracts/public/`.\n\n## Quickstart\n\nCreate a session, upload audio, submit the rating card, confirm the speaker, wait for the\nreport. Every call needs credentials: an `X-API-Key: onolys_<id>_<secret>` header (create a key\nin the web app or with `POST /v1/api-key`) or an `Authorization: Bearer <ID token>` header.\n\n```bash\nset -euo pipefail\nBASE=${BASE:-https://app.onolys.com/v1}\nAUTH=${AUTH:-\"X-API-Key: onolys_<id>_<secret>\"}\nAUDIO=${AUDIO:-session.m4a}\nJSON='Content-Type: application/json'\n\n# 1. Create the session (the Idempotency-Key makes a retried POST safe for 24 h)\nSID=$(curl -sf -X POST \"$BASE/sessions\" -H \"$AUTH\" -H \"$JSON\" \\\n  -H \"Idempotency-Key: quickstart-$(date +%s)-$$\" \\\n  -d '{\"language\":\"auto\",\"n_runs\":1,\"title\":\"Quickstart\"}' | jq -r .session.id)\n\n# 2. Ask for a signed upload URL, then PUT the file straight to storage\nUP=$(curl -sf -X POST \"$BASE/sessions/$SID/audio\" -H \"$AUTH\" -H \"$JSON\" \\\n  -d \"{\\\"content_type\\\":\\\"audio/mp4\\\",\\\"size_bytes\\\":$(wc -c < \"$AUDIO\" | tr -d ' ')}\")\n# send every required header (not Host: curl sets it); the signed URL rejects a PUT without them\nmapfile -t HDRS < <(echo \"$UP\" | jq -r '.required_headers | to_entries[]\n  | select(.key != \"Host\") | \"-H\\n\\(.key): \\(.value)\"')\ncurl -sf -X PUT \"$(echo \"$UP\" | jq -r .upload_url)\" \"${HDRS[@]}\" --data-binary @\"$AUDIO\"\n\n# 3. Tell the API the upload is done; validation and transcription start\ncurl -sf -X POST \"$BASE/sessions/$SID/audio/complete\" -H \"$AUTH\" > /dev/null\n\n# wait until the session reaches a status (fails the script on `failed`)\nwait_for() {\n  for _ in $(seq 1 120); do\n    STATUS=$(curl -sf \"$BASE/sessions/$SID\" -H \"$AUTH\" | jq -r .status)\n    [ \"$STATUS\" = \"$1\" ] && return 0\n    [ \"$STATUS\" = \"failed\" ] && { echo \"session failed\" >&2; return 1; }\n    sleep 1\n  done\n  echo \"timed out waiting for $1\" >&2; return 1\n}\n\n# 4. Submit the rating card (final=true; use final=false for draft autosaves)\ncurl -sf -X PUT \"$BASE/sessions/$SID/rating\" -H \"$AUTH\" -H \"$JSON\" \\\n  -d '{\"final\":true,\"card\":{\"change_goal\":\"Reduce evening drinking\",\"notes\":\"Quickstart\"}}' \\\n  > /dev/null\n\n# 5. Confirm which speaker is the clinician once the transcript is ready\nwait_for awaiting_input\nCLINICIAN=$(curl -sf \"$BASE/sessions/$SID/speakers\" -H \"$AUTH\" | jq -r '.speakers[0].speaker')\ncurl -sf -X POST \"$BASE/sessions/$SID/speakers/confirm\" -H \"$AUTH\" -H \"$JSON\" \\\n  -d \"{\\\"clinician_speaker\\\":\\\"$CLINICIAN\\\"}\" > /dev/null\n\n# 6. Poll the session, then fetch the report\nwait_for report_ready\nVERSION=$(curl -sf \"$BASE/sessions/$SID\" -H \"$AUTH\" | jq -r .latest_report_version)\ncurl -sf \"$BASE/sessions/$SID/reports/$VERSION\" -H \"$AUTH\" | jq -c .\n```\n\nErrors share one body (`ErrorResponse`): `status`, `message`, `details[]` with a stable `code`\n(and, for `rating_invalid`, the card `field` path). Mutations return `202` immediately; the\nsession `status` moves `created` → `uploading` → `validating` → `transcribing` →\n`awaiting_input` → `running` → `report_ready` (or `failed`).\n",
+    "title": "Onolys API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/api-key": {
+      "delete": {
+        "operationId": "deleteApiKey",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Revoke the active key (idempotent)",
+        "tags": [
+          "api-key"
+        ]
+      },
+      "get": {
+        "operationId": "getApiKey",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyInfo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Active key metadata",
+        "tags": [
+          "api-key"
+        ]
+      },
+      "post": {
+        "operationId": "createApiKey",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Create a key (revokes the current one); the secret is shown once",
+        "tags": [
+          "api-key"
+        ]
+      }
+    },
+    "/v1/healthz": {
+      "get": {
+        "operationId": "getHealthz",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Healthz"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "summary": "Liveness (no auth)",
+        "tags": [
+          "system"
+        ]
+      }
+    },
+    "/v1/runs/{run_id}": {
+      "get": {
+        "operationId": "getRun",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "One run: status, params, run_info",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/sessions": {
+      "get": {
+        "operationId": "listSessions",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_parameters`, `unsupported_audio`, `audio_too_large` or `rating_invalid`"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "The caller's sessions, newest first (in-flight and failed included)",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "post": {
+        "description": "Writes the session and its PHI-free `session_status` document before returning. `Idempotency-Key` replays the original response for 24 h; the same key with a different body is 409 `conflict`.",
+        "operationId": "createSession",
+        "parameters": [
+          {
+            "description": "Client-chosen key; replays for 24 h",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Client-chosen key; replays for 24 h",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSessionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_state` or `conflict`: not allowed in the session's current state"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_parameters`, `unsupported_audio`, `audio_too_large` or `rating_invalid`"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Create a session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}": {
+      "delete": {
+        "description": "Marks the session `deleting`, removes every stored object and document, then answers 204. If storage or Firestore fails the session stays `deleting` (hidden everywhere), a cleanup task finishes it, and this call answers 503 `upstream_unavailable`: repeat it or wait. Deleting a finished session again answers 404. Usage counters are kept.",
+        "operationId": "deleteSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`upstream_unavailable`: retry shortly"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Hard delete: audio, transcript, ratings, runs, reports, status",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "get": {
+        "operationId": "getSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Session status snapshot (the web app uses the session_status listener instead)",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/audio": {
+      "get": {
+        "operationId": "getAudio",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioReadResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Short-lived signed read URL for the original upload",
+        "tags": [
+          "audio"
+        ]
+      },
+      "post": {
+        "description": "Maps browser aliases (`audio/x-m4a`, `audio/mp4`, `audio/mpeg`, empty type + `filename_ext`) to one canonical type, returns one signed PUT (15 min) pinned to it and to a 300 MB size range; the client sends exactly `required_headers`. Unknown type is 422 `unsupported_audio`, over 300 MB is 422 `audio_too_large`. State becomes `uploading`.",
+        "operationId": "requestAudioUpload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AudioUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioUploadResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_state` or `conflict`: not allowed in the session's current state"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_parameters`, `unsupported_audio`, `audio_too_large` or `rating_invalid`"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Get a signed PUT URL for the recording",
+        "tags": [
+          "audio"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/audio/complete": {
+      "post": {
+        "description": "Returns 202 and enqueues `validate`; transcription starts after it passes.",
+        "operationId": "completeAudioUpload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/SessionRef"
+                  },
+                  "title": "Response Completeaudioupload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_state` or `conflict`: not allowed in the session's current state"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`upstream_unavailable`: retry shortly"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Tell the server the PUT finished",
+        "tags": [
+          "audio"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/rating": {
+      "get": {
+        "operationId": "getRating",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RatingView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "The latest final revision and, if newer, the autosaved draft",
+        "tags": [
+          "rating"
+        ]
+      },
+      "put": {
+        "description": "`final=false`: overwrites the draft; the shape and size limits are checked (an unset `change_goal` is fine) and nothing else changes. `final=true`: validates the card (`change_goal` required), writes a new revision and sets `rating_submitted`/`has_rating`; `no_rating=true`, or a card with no scores, counts or notes, is a \"no rating\" revision (`has_rating=false`). Over 1,000 chars per reason/note/example or 3,000 for `notes` is 422 `rating_invalid`. Allowed in every state but `deleting`. A final card may start the first run (R4).",
+        "operationId": "putRating",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RatingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RatingSaved"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_parameters`, `unsupported_audio`, `audio_too_large` or `rating_invalid`"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Save the rating card (draft autosave or final revision)",
+        "tags": [
+          "rating"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/reports": {
+      "get": {
+        "operationId": "listReports",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Report versions, oldest first",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/reports/{version}": {
+      "get": {
+        "description": "`Cache-Control: private, no-store`: the report carries PHI.",
+        "operationId": "getReport",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version",
+            "required": true,
+            "schema": {
+              "title": "Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "One report by integer version (the public report address)",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/runs": {
+      "get": {
+        "operationId": "listRuns",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "The session's runs, oldest first",
+        "tags": [
+          "runs"
+        ]
+      },
+      "post": {
+        "description": "Needs the transcript and the confirmed speaker; uses the latest final rating revision or runs as no-rating. `preset` changes LLM routes only (the transcript is reused). Counts against the daily cap: 429 `daily_cap_reached`. 409 `invalid_state` while a run is in progress or before the inputs exist.",
+        "operationId": "startRun",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RunRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunStarted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_state` or `conflict`: not allowed in the session's current state"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_parameters`, `unsupported_audio`, `audio_too_large` or `rating_invalid`"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`upstream_unavailable`: retry shortly"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Start a run by hand (re-run, or the first run held back by the cap)",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/speakers": {
+      "get": {
+        "description": "Every speaker in first-appearance order, each with up to 3 sample lines. 409 `invalid_state` until the transcript is ready.",
+        "operationId": "getSpeakers",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpeakersView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Speakers with sample lines, for picking the clinician",
+        "tags": [
+          "speakers"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/speakers/confirm": {
+      "post": {
+        "description": "Allowed once the transcript is ready and not while a run is in progress. In `report_ready|failed` it applies to the next run only. May start the first run (R4).",
+        "operationId": "confirmSpeakers",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_state` or `conflict`: not allowed in the session's current state"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`invalid_parameters`, `unsupported_audio`, `audio_too_large` or `rating_invalid`"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Pick the clinician speaker (every other speaker is the client)",
+        "tags": [
+          "speakers"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/transcript": {
+      "get": {
+        "description": "Owner-scoped; `Cache-Control: private, no-store`. Report offsets are code points into `turn.text`. 409 `invalid_state` before transcription finishes.",
+        "operationId": "getTranscript",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`not_found`: no such resource for this user (never 403, so ids cannot be probed)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "The transcript, with roles once the clinician is confirmed",
+        "tags": [
+          "speakers"
+        ]
+      }
+    },
+    "/v1/usage": {
+      "get": {
+        "operationId": "getUsage",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`unauthenticated`: missing, invalid or revoked credentials"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`daily_cap_reached` (daily run cap or concurrent-run limit) or `rate_limited`"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`internal_error`"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          },
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Runs used today (UTC day)",
+        "tags": [
+          "usage"
+        ]
+      }
+    }
+  }
+}

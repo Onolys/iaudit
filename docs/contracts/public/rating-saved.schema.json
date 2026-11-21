@@ -1,0 +1,57 @@
+{
+  "$id": "rating-saved.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "final": {
+      "title": "Final",
+      "type": "boolean"
+    },
+    "has_rating": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Has Rating"
+    },
+    "no_rating": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "No Rating"
+    },
+    "rating_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rating Id"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "final",
+    "updated_at"
+  ],
+  "title": "RatingSaved",
+  "type": "object"
+}

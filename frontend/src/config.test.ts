@@ -39,3 +39,15 @@ describe("getConfig", () => {
     expect(getConfig().auditUrl).toBeNull();
   });
 });
+
+describe("getConfig evalEnabled", () => {
+  it.each([undefined, "", "true", "1"])("is true (local default) for %j", (v) => {
+    vi.stubEnv("VITE_EVAL_ENABLED", v);
+    expect(getConfig().evalEnabled).toBe(true);
+  });
+
+  it("is false only for exactly 'false'", () => {
+    vi.stubEnv("VITE_EVAL_ENABLED", "false");
+    expect(getConfig().evalEnabled).toBe(false);
+  });
+});

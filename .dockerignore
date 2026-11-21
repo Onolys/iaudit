@@ -1,0 +1,25 @@
+# Build context for api/Dockerfile is the repo root; keep it small.
+**/.git
+.worktrees
+**/__pycache__
+**/*.pyc
+**/.venv
+**/node_modules
+**/.pytest_cache
+**/.ruff_cache
+**/.coverage
+**/tests
+**/dist
+docs
+web
+frontend
+infra
+eval
+**/eval
+firestore-rules-test
+.github
+.claude
+**/datasets
+**/.env
+**/.env.*
+!docs/contracts

@@ -1,0 +1,183 @@
+{
+  "synthetic": true,
+  "description": "SYNTHETIC role-play (invented, fictional people; written for testing). Poor MI practice: Persuade and Confront.",
+  "language": "en",
+  "duration_ms": 995000,
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "B",
+      "text": "Hi. My wife asked me to come and talk about my drinking, so here I am.",
+      "start_ms": 0,
+      "end_ms": 35000
+    },
+    {
+      "id": "t2",
+      "speaker": "A",
+      "text": "Let's get started. How many drinks do you have a night?",
+      "start_ms": 40000,
+      "end_ms": 75000
+    },
+    {
+      "id": "t3",
+      "speaker": "B",
+      "text": "A couple of glasses of wine, usually. It helps me unwind after work.",
+      "start_ms": 80000,
+      "end_ms": 115000
+    },
+    {
+      "id": "t4",
+      "speaker": "A",
+      "text": "A couple? People always say a couple. I doubt that's the real number. How about being honest with me?",
+      "start_ms": 120000,
+      "end_ms": 155000
+    },
+    {
+      "id": "t5",
+      "speaker": "B",
+      "text": "Okay, maybe closer to four. But I don't think it's a big problem. I never miss work.",
+      "start_ms": 160000,
+      "end_ms": 195000
+    },
+    {
+      "id": "t6",
+      "speaker": "A",
+      "text": "Four glasses a night is a problem, and you need to cut it down right away. Alcohol will wreck your liver and your sleep.",
+      "start_ms": 200000,
+      "end_ms": 235000
+    },
+    {
+      "id": "t7",
+      "speaker": "B",
+      "text": "I hear that a lot, honestly. I'm just not sure I'm ready to stop completely.",
+      "start_ms": 240000,
+      "end_ms": 275000
+    },
+    {
+      "id": "t8",
+      "speaker": "A",
+      "text": "Not ready? Then what are you doing here?",
+      "start_ms": 280000,
+      "end_ms": 315000
+    },
+    {
+      "id": "t9",
+      "speaker": "B",
+      "text": "That's not fair. I came because my wife asked me to. She worries.",
+      "start_ms": 320000,
+      "end_ms": 355000
+    },
+    {
+      "id": "t10",
+      "speaker": "A",
+      "text": "Your wife is right to worry. Here is what you should do: pour out everything in the house and go to a meeting every night.",
+      "start_ms": 360000,
+      "end_ms": 395000
+    },
+    {
+      "id": "t11",
+      "speaker": "B",
+      "text": "That seems like a lot. I don't know if I can do that.",
+      "start_ms": 400000,
+      "end_ms": 435000
+    },
+    {
+      "id": "t12",
+      "speaker": "A",
+      "text": "The guidelines say men should have no more than fourteen units a week. Do you know how many units that is?",
+      "start_ms": 440000,
+      "end_ms": 475000
+    },
+    {
+      "id": "t13",
+      "speaker": "B",
+      "text": "Not really, no. I guess it's less than I have.",
+      "start_ms": 480000,
+      "end_ms": 515000
+    },
+    {
+      "id": "t14",
+      "speaker": "A",
+      "text": "It's a lot less. Do you drink on weekends too? Do you drink alone? Do you drink before noon?",
+      "start_ms": 520000,
+      "end_ms": 555000
+    },
+    {
+      "id": "t15",
+      "speaker": "B",
+      "text": "Weekends, yes. Alone, mostly. Not before noon, no.",
+      "start_ms": 560000,
+      "end_ms": 595000
+    },
+    {
+      "id": "t16",
+      "speaker": "A",
+      "text": "You drink alone every night and you think that's fine?",
+      "start_ms": 600000,
+      "end_ms": 635000
+    },
+    {
+      "id": "t17",
+      "speaker": "B",
+      "text": "I never said it was fine. I just don't know what else to do at night.",
+      "start_ms": 640000,
+      "end_ms": 675000
+    },
+    {
+      "id": "t18",
+      "speaker": "A",
+      "text": "Plenty of people manage without drinking, so you can too. Just stop.",
+      "start_ms": 680000,
+      "end_ms": 715000
+    },
+    {
+      "id": "t19",
+      "speaker": "B",
+      "text": "It sounds easy when you say it.",
+      "start_ms": 720000,
+      "end_ms": 755000
+    },
+    {
+      "id": "t20",
+      "speaker": "A",
+      "text": "It is easy if you want it badly enough. Maybe you don't.",
+      "start_ms": 760000,
+      "end_ms": 795000
+    },
+    {
+      "id": "t21",
+      "speaker": "B",
+      "text": "I do want to. I'm tired of feeling guilty.",
+      "start_ms": 800000,
+      "end_ms": 835000
+    },
+    {
+      "id": "t22",
+      "speaker": "A",
+      "text": "Good. Write down every drink for the next month and bring it back, no excuses.",
+      "start_ms": 840000,
+      "end_ms": 875000
+    },
+    {
+      "id": "t23",
+      "speaker": "B",
+      "text": "Fine. I'll try.",
+      "start_ms": 880000,
+      "end_ms": 915000
+    },
+    {
+      "id": "t24",
+      "speaker": "A",
+      "text": "Come back next week. Don't miss the appointment.",
+      "start_ms": 920000,
+      "end_ms": 955000
+    },
+    {
+      "id": "t25",
+      "speaker": "B",
+      "text": "Okay.",
+      "start_ms": 960000,
+      "end_ms": 995000
+    }
+  ]
+}

@@ -12,24 +12,245 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  EAUDIT_DIR: engines/eaudit
+
 jobs:
-  eaudit:
+  changes:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: eaudit
+    outputs:
+      eaudit: ${{ steps.flags.outputs.eaudit }}
+      core: ${{ steps.flags.outputs.core }}
+      paudit: ${{ steps.flags.outputs.paudit }}
+      evaluation: ${{ steps.flags.outputs.evaluation }}
+      api: ${{ steps.flags.outputs.api }}
+      admin-auth: ${{ steps.flags.outputs.admin-auth }}
+      admin-backend: ${{ steps.flags.outputs.admin-backend }}
+      frontend: ${{ steps.flags.outputs.frontend }}
+      web: ${{ steps.flags.outputs.web }}
+      infra: ${{ steps.flags.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Test changes.sh
+        run: bash scripts/ci/test_changes.sh
+      - name: Test changes.sh DEPS map against pyproject dependencies
+        run: python3 scripts/ci/test_changes_deps.py
+      - name: Check markdown links
+        run: python3 scripts/ci/check_links.py
+      - name: No LLM/STT keys in PR workflows (guard + planted-reference check)
+        run: |
+          python3 scripts/ci/check_no_llm_keys_in_pr_workflows.py
+          if python3 scripts/ci/check_no_llm_keys_in_pr_workflows.py scripts/ci/key_guard_fixtures/bad >/dev/null; then
+            echo "key guard did not fail on the planted fixture"; exit 1
+          fi
+      - name: Test workflow_run fork-safety guard
+        run: python3 scripts/ci/test_workflow_run_guard.py
+      - name: Test config guard
+        run: bash scripts/ci/test_check_config.sh
+      - name: Test deploy-prod workflow guard
+        run: bash scripts/ci/test_deploy_prod.sh
+      - name: Test deploy-admin workflow guard
+        run: bash scripts/ci/test_deploy_admin.sh
+      - name: Test Hosting targets resolve per app (.firebaserc)
+        run: bash scripts/ci/test_hosting_targets.sh
+      - name: Test PR preview workflows and helpers
+        run: bash scripts/ci/test_pr_preview.sh
+      - name: actionlint (workflows)
+        run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7 && ./actionlint -color
+      - id: flags
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" = "push" ]; then
+            export FORCE_ALL=true
+            files=""
+          else
+            files="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
+          fi
+          printf '%s\n' "$files" | bash scripts/ci/changes.sh
+
+  eaudit:
+    needs: changes
+    if: needs.changes.outputs.eaudit == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: eaudit/uv.lock
-      - run: uv sync --frozen
-      - run: uv run --no-sync ruff check src tests
-      - run: uv run --no-sync pytest -q
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package eaudit
+      - run: uv run --no-sync --package eaudit ruff check ${{ env.EAUDIT_DIR }}/src ${{ env.EAUDIT_DIR }}/tests
+      - run: uv run --no-sync --package eaudit pytest -q ${{ env.EAUDIT_DIR }}
+
+  core:
+    needs: changes
+    if: needs.changes.outputs.core == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-core
+      - run: uv run --no-sync --package onolys-core ruff check engines/core
+      - name: pytest with coverage
+        run: |
+          uv run --no-sync --package onolys-core pytest engines/core -m "not live" \
+            --cov=engines/core/src --cov-report=
+          {
+            echo "### Coverage: onolys-core"
+            uv run --no-sync --package onolys-core coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FIREBASE_TOOLS_VERSION: 15.37.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cache firebase-tools and emulator jars
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.cache/firebase/emulators
+          key: firebase-${{ runner.os }}-${{ env.FIREBASE_TOOLS_VERSION }}
+      - run: npm install -g firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }}
+      - name: Install ffmpeg (validate step + integration test)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - run: uv sync --frozen --package onolys-api
+      - run: uv run --no-sync --package onolys-api ruff check api
+      - name: pytest with coverage (Firestore emulator)
+        run: |
+          firebase emulators:exec --config api/firebase.json --only firestore --project demo-onolys \
+            'uv run --no-sync --package onolys-api pytest api -m "not live" --cov=api/src --cov-report='
+          {
+            echo "### Coverage: onolys-api"
+            uv run --no-sync --package onolys-api coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Firestore rules tests (emulator)
+        run: |
+          npm ci --prefix firestore-rules-test
+          firebase emulators:exec --config firebase.json --only firestore --project demo-onolys \
+            'npm test --prefix firestore-rules-test'
+      - name: OpenAPI and public contracts are up to date
+        run: |
+          uv run --no-sync --package onolys-api python -m onolys_api.openapi
+          uv run --no-sync --package onolys-api python -m onolys_api.contracts
+          git diff --exit-code api/openapi.json docs/contracts/public
+      - name: Image builds and answers /v1/healthz (SERVICE_MODE=combined)
+        run: |
+          docker build -f api/Dockerfile --build-arg GIT_SHA="$GITHUB_SHA" -t onolys-api:ci .
+          docker run -d --name onolys-api -p 8080:8080 -e ENV=local -e SERVICE_MODE=combined \
+            onolys-api:ci
+          for _ in $(seq 1 30); do curl -sf localhost:8080/v1/healthz && break; sleep 1; done
+          curl -sf localhost:8080/v1/healthz \
+            | jq -e --arg sha "$GITHUB_SHA" '.service_mode == "combined" and .code_version == $sha'
+          docker logs onolys-api
+          docker rm -f onolys-api
+
+  admin-auth:
+    needs: changes
+    if: needs.changes.outputs.admin-auth == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-admin-auth
+      - run: uv run --no-sync --package onolys-admin-auth ruff check admin/auth
+      - run: uv run --no-sync --package onolys-admin-auth pytest admin/auth
+
+  admin-backend:
+    needs: changes
+    if: needs.changes.outputs.admin-backend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-admin-backend
+      - run: uv run --no-sync --package onolys-admin-backend ruff check admin/backend
+      - run: uv run --no-sync --package onolys-admin-backend pytest admin/backend
+      - name: Image builds, rejects anonymous calls, refuses an empty allowlist, ships no eval data
+        run: bash scripts/ci/test_admin_image.sh onolys-admin-backend:ci
+
+  paudit:
+    needs: changes
+    if: needs.changes.outputs.paudit == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-paudit
+      - run: uv run --no-sync --package onolys-paudit ruff check engines/paudit
+      - name: pytest with coverage
+        run: |
+          uv run --no-sync --package onolys-paudit pytest engines/paudit -m "not live" \
+            --cov=engines/paudit/src --cov-report=
+          {
+            echo "### Coverage: onolys-paudit"
+            uv run --no-sync --package onolys-paudit coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  evaluation:
+    needs: changes
+    if: needs.changes.outputs.evaluation == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-evaluation
+      - run: uv run --no-sync --package onolys-evaluation ruff check engines/evaluation
+      - name: pytest with coverage
+        run: |
+          uv run --no-sync --package onolys-evaluation pytest engines/evaluation -m "not live" \
+            --cov=engines/evaluation/src --cov-report=
+          {
+            echo "### Coverage: onolys-evaluation"
+            uv run --no-sync --package onolys-evaluation coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
 
   frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -45,3 +266,54 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+
+  web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: gen:api staleness (generated types must match api/openapi.json and report.schema.json)
+        run: npm run check:api
+      - run: npm run typecheck
+      - run: npm run lint
+      - name: vitest with coverage
+        shell: bash   # pipefail: a failing test fails the step despite tee
+        run: |
+          # needs @vitest/coverage-v8 in web/devDependencies
+          npm test -- --coverage --coverage.reporter=text-summary | tee coverage-summary.txt
+          {
+            echo "### Coverage: web"
+            echo '```'
+            cat coverage-summary.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - run: npm run build
+
+  infra:
+    needs: changes
+    if: needs.changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false
+      - run: terraform validate

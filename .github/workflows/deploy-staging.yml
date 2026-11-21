@@ -1,0 +1,223 @@
+name: deploy-staging
+
+# Merge to main -> staging (SP06 R13, R14 config guard, D5, D15). Runs after CI is green on main.
+# Repo variables (owner sets from Terraform outputs; see docs/reference/infra.md):
+#   WIF_PROVIDER, DEPLOYER_STAGING_SA, GCP_PROJECT (optional, default onolys), GCP_REGION (optional, default us-central1),
+#   STAGING_VITE_FIREBASE_API_KEY, STAGING_VITE_FIREBASE_AUTH_DOMAIN, STAGING_VITE_FIREBASE_APP_ID,
+#   STAGING_VITE_FIREBASE_STORAGE_BUCKET, STAGING_VITE_FIREBASE_MESSAGING_SENDER_ID, STAGING_VITE_CONTACT_EMAIL (optional)
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: ${{ vars.GCP_PROJECT || 'onolys' }}
+  REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+  STAGING_SITE: onolys-app-staging
+  FIREBASE_TOOLS_VERSION: 15.37.0
+
+jobs:
+  build:
+    # workflow_run `branches` matches the head branch NAME, so a fork PR from a branch called `main` would pass it.
+    # Require a push-triggered CI run on this repo's own main before building/deploying that SHA.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      sha: ${{ steps.vars.outputs.sha }}
+      image: ${{ steps.vars.outputs.repo }}@${{ steps.push.outputs.digest }}
+    steps:
+      - id: vars
+        env:
+          RUN_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          echo "sha=$RUN_SHA" >> "$GITHUB_OUTPUT"
+          echo "repo=${REGION}-docker.pkg.dev/${PROJECT}/onolys/api" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.vars.outputs.sha }}
+      - name: Config guard (source tree)
+        run: bash scripts/ci/check_config.sh
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+          token_format: access_token
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Build once, tag sha, push to Artifact Registry
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: api/Dockerfile
+          push: true
+          tags: ${{ steps.vars.outputs.repo }}:${{ steps.vars.outputs.sha }}
+          build-args: GIT_SHA=${{ steps.vars.outputs.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Config guard (inside the pushed image, by digest)
+        # Runs: docker run --rm --entrypoint test <image@digest> -s /app/config/<env>/<file>.yaml for each file.
+        env:
+          IMAGE: ${{ steps.vars.outputs.repo }}@${{ steps.push.outputs.digest }}
+        run: bash scripts/ci/check_config.sh --image "$IMAGE"
+
+  deploy-api:
+    needs: build
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_deploy-cloudrun.yml
+    with:
+      env: staging
+      service: onolys-api-staging
+      image: ${{ needs.build.outputs.image }}
+      region: us-central1
+      git_sha: ${{ needs.build.outputs.sha }}
+      # PR previews (pr-preview.yml) are no-traffic tagged revisions of THIS service and edit its template (combined mode,
+      # stub adapters, CORS for the channel, CPU always allocated). Re-specify every key they override so none leaks
+      # into staging (values mirror infra/modules/environment/services.tf for env=staging; CORS = app_staging_site_id + localhost),
+      # and pin traffic to this revision by name.
+      env_vars: |-
+        SERVICE_MODE=api
+        ADAPTERS=real
+        CORS_ORIGINS=https://onolys-app-staging.web.app\,http://localhost:5173
+      flags: --cpu-throttling
+      pin_traffic: true
+    secrets: inherit
+
+  sweep-previews:
+    # Orphan PR-preview revisions whose cleanup could not delete them (Cloud Run keeps the newest revision). Never fatal.
+    needs: [build, deploy-api]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+      - name: Delete untagged non-latest preview revisions (non-fatal)
+        env:
+          GCP_PROJECT: ${{ env.PROJECT }}
+          GCP_REGION: ${{ env.REGION }}
+        run: bash scripts/ci/pr_preview.sh sweep || echo "::warning::preview revision sweep failed"
+
+  deploy-worker:
+    needs: [build, deploy-api]
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_deploy-cloudrun.yml
+    with:
+      env: staging
+      service: onolys-worker-staging
+      image: ${{ needs.build.outputs.image }}
+      region: us-central1
+      git_sha: ${{ needs.build.outputs.sha }}
+    secrets: inherit
+
+  rules:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Deploy Firestore rules and indexes to the staging database only
+        run: npx --yes firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }} deploy --only firestore:staging --project "$PROJECT" --non-interactive
+
+  web:
+    needs: [build, deploy-api]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build web (staging)
+        working-directory: web
+        env:
+          VITE_API_BASE_URL: /v1
+          VITE_FIREBASE_PROJECT_ID: ${{ env.PROJECT }}
+          VITE_FIREBASE_API_KEY: ${{ vars.STAGING_VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.STAGING_VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_APP_ID: ${{ vars.STAGING_VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.STAGING_VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.STAGING_VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_CONTACT_EMAIL: ${{ vars.STAGING_VITE_CONTACT_EMAIL }}
+          VITE_FIRESTORE_DATABASE: staging
+        run: |
+          npm ci
+          npm run build
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+      - name: Deploy to Hosting target app-staging (site onolys-app-staging, /v1/** rewrite to onolys-api-staging)
+        run: npx --yes firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }} deploy --config web/firebase.json --only hosting:app-staging --project "$PROJECT" --non-interactive
+
+  smoke:
+    needs: [build, deploy-api, deploy-worker, rules, web]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET /v1/healthz through the Hosting rewrite
+        env:
+          SHA: ${{ needs.build.outputs.sha }}
+        run: |
+          url="https://${STAGING_SITE}.web.app/v1/healthz"
+          for i in $(seq 1 10); do
+            if body="$(curl -sf --max-time 20 "$url")"; then break; fi
+            echo "attempt $i failed; retrying"; sleep 6; body=""
+          done
+          [ -n "$body" ] || { echo "healthz did not return 200 at $url" >&2; exit 1; }
+          echo "$body"
+          echo "$body" | jq -e --arg sha "$SHA" '.code_version == $sha'

@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "onolys"
+  },
+  "targets": {
+    "onolys": {
+      "hosting": {
+        "app": ["onolys-app"],
+        "app-staging": ["onolys-app-staging"]
+      }
+    }
+  }
+}

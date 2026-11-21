@@ -1,0 +1,63 @@
+{
+  "globals": {
+    "cct": {
+      "score": 3,
+      "reason": "The clinician asked what made walking important and the client then named their blood pressure and their kids.",
+      "example": {
+        "at_s": 165,
+        "text": "What makes walking more important to you right now?"
+      }
+    },
+    "sst": {
+      "score": 4,
+      "reason": "The clinician moved on from the client's tiredness quickly and returned to the plan."
+    },
+    "partnership": {
+      "score": 5,
+      "reason": "The clinician asked permission before offering ideas."
+    },
+    "empathy": {
+      "score": 3,
+      "reason": "Several reflections, but few went beyond what the client had said."
+    }
+  },
+  "counts": {
+    "gi": {
+      "count": 2
+    },
+    "persuade": {
+      "count": 0
+    },
+    "persuade_permission": {
+      "count": 1
+    },
+    "question": {
+      "count": 6
+    },
+    "sr": {
+      "count": 4,
+      "note": "Counted the short repeats of the client's words."
+    },
+    "cr": {
+      "count": 3
+    },
+    "affirm": {
+      "count": 2
+    },
+    "seek_collab": {
+      "count": 2
+    },
+    "emphasize_autonomy": {
+      "count": 1
+    },
+    "confront": {
+      "count": 0
+    }
+  },
+  "notes": "A collaborative session. The client left with a plan for three lunch walks.",
+  "change_goal": "walk more during the working week",
+  "coded_span": {
+    "from_s": 0,
+    "to_s": 600
+  }
+}

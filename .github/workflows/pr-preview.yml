@@ -1,0 +1,193 @@
+name: pr-preview
+
+# One preview per same-repo PR (SP00 R3, D4-D7): a NO-TRAFFIC TAGGED REVISION (tag pr-<N>) of the staging API service
+# onolys-api-staging (combined mode, fake adapters, staging DB) + Firebase Hosting channel pr-<N> on onolys-app-staging
+# (7 days) + ONE marker PR comment, edited in place. Owner decision 2026-11-21: separate onolys-pr-<N> services need Cloud
+# Run IAM that cannot be scoped (no resource.name conditions), so previews use only what deployer-staging already has
+# (run.developer on the staging services). Hosting cannot rewrite to a tag, so the web build calls the tag URL
+# https://pr-<N>---<staging api host> directly (CORS allows the channel origin on this revision; the CSP is extended).
+# Fork PRs get no preview (no secrets, no WIF). Cleanup: pr-preview-cleanup.yml.
+#
+# Shared-service safety (this deploy edits the staging API service template, which the next staging deploy inherits):
+#  - env/flags this workflow overrides (SERVICE_MODE, ADAPTERS, GIT_SHA, CORS_ORIGINS, --no-cpu-throttling) are all
+#    re-specified by deploy-staging.yml (deploy-api inputs env_vars + flags), so nothing leaks into staging.
+#  - --no-traffic: preview revisions never get traffic; deploy-staging moves 100% to its own, explicitly named revision.
+#  - No shared concurrency group with deploy-staging on purpose: GitHub cancels the older PENDING run of a group, so a
+#    queued staging deploy could be dropped by a preview. Races are safe instead: Cloud Run rejects a stale template
+#    update (the loser fails loudly; the deploy step below retries) and traffic is pinned by revision name, never "latest".
+# Repo variables (same as deploy-staging.yml): WIF_PROVIDER, DEPLOYER_STAGING_SA, GCP_PROJECT / GCP_REGION (optional),
+#   STAGING_VITE_FIREBASE_API_KEY, STAGING_VITE_FIREBASE_AUTH_DOMAIN, STAGING_VITE_FIREBASE_APP_ID,
+#   STAGING_VITE_FIREBASE_STORAGE_BUCKET, STAGING_VITE_FIREBASE_MESSAGING_SENDER_ID, STAGING_VITE_CONTACT_EMAIL (optional)
+# This workflow never reads LLM/STT keys (scripts/ci/check_no_llm_keys_in_pr_workflows.py).
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: pr-preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: ${{ vars.GCP_PROJECT || 'onolys' }}
+  REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+  STAGING_SITE: onolys-app-staging
+  FIREBASE_TOOLS_VERSION: 15.37.0
+  # `preview-real` label is wired but inert until SP09 ships the real adapters: flip to "true" then.
+  PREVIEW_REAL_ENABLED: "false"
+
+jobs:
+  preview:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    env:
+      PR: ${{ github.event.number }}
+      SHA: ${{ github.event.pull_request.head.sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - id: vars
+        env:
+          HAS_REAL_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'preview-real') }}
+        run: |
+          adapters=stub; mode=fake
+          if [ "$HAS_REAL_LABEL" = "true" ]; then
+            if [ "$PREVIEW_REAL_ENABLED" = "true" ]; then adapters=real; mode=real
+            else echo "::notice::preview-real label ignored: real adapters are not available on previews yet (SP09)"; fi
+          fi
+          {
+            echo "adapters=$adapters"
+            echo "mode=$mode"
+            echo "repo=${REGION}-docker.pkg.dev/${PROJECT}/onolys/api"
+            echo "service=onolys-api-staging"
+            echo "revision_suffix=pr-${PR}-${SHA:0:7}-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
+            echo "channel=pr-${PR}"
+          } >> "$GITHUB_OUTPUT"
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+          token_format: access_token
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Build and push pr-<N>-<sha>
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: api/Dockerfile
+          push: true
+          tags: ${{ steps.vars.outputs.repo }}:pr-${{ github.event.number }}-${{ github.event.pull_request.head.sha }}
+          build-args: GIT_SHA=${{ github.event.pull_request.head.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Resolve the tag URL (https://pr-<N>---<staging api host>)
+        id: api
+        env:
+          SERVICE: ${{ steps.vars.outputs.service }}
+        run: |
+          svc_url="$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format 'value(status.url)')"
+          [ -n "$svc_url" ] || { echo "no URL for service $SERVICE" >&2; exit 1; }
+          tag_url="$(bash scripts/ci/pr_preview.sh tag-url "$svc_url" "$PR")"
+          echo "url=$tag_url" >> "$GITHUB_OUTPUT"
+          echo "tag url: $tag_url"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build web (staging settings)
+        working-directory: web
+        env:
+          VITE_API_BASE_URL: ${{ steps.api.outputs.url }}/v1
+          VITE_FIREBASE_PROJECT_ID: ${{ env.PROJECT }}
+          VITE_FIREBASE_API_KEY: ${{ vars.STAGING_VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.STAGING_VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_APP_ID: ${{ vars.STAGING_VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.STAGING_VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.STAGING_VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_CONTACT_EMAIL: ${{ vars.STAGING_VITE_CONTACT_EMAIL }}
+          VITE_FIRESTORE_DATABASE: staging
+        run: |
+          npm ci
+          npm run build
+      - name: Generate firebase config (tag URL allowed in CSP connect-src, no /v1/** rewrite)
+        env:
+          API_URL: ${{ steps.api.outputs.url }}
+        run: bash scripts/ci/pr_preview.sh firebase-config "$API_URL" web/firebase.json web/firebase.preview.json
+      - name: Deploy Hosting channel pr-<N> (7 days)
+        id: hosting
+        env:
+          CHANNEL: ${{ steps.vars.outputs.channel }}
+        run: |
+          npx --yes firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }} hosting:channel:deploy "$CHANNEL" \
+            --config web/firebase.preview.json --only app-staging --expires 7d \
+            --project "$PROJECT" --non-interactive --json > channel.json
+          url="$(bash scripts/ci/pr_preview.sh channel-url channel.json "$STAGING_SITE")" || { cat channel.json >&2; exit 1; }
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Deploy tagged revision pr-<N> on onolys-api-staging (no traffic, combined mode, CPU always allocated)
+        id: run
+        env:
+          IMAGE: ${{ steps.vars.outputs.repo }}@${{ steps.push.outputs.digest }}
+          SERVICE: ${{ steps.vars.outputs.service }}
+          SUFFIX: ${{ steps.vars.outputs.revision_suffix }}
+          ADAPTERS: ${{ steps.vars.outputs.adapters }}
+          CHANNEL_URL: ${{ steps.hosting.outputs.url }}
+          EXPECTED_TAG_URL: ${{ steps.api.outputs.url }}
+        run: |
+          case "$IMAGE" in *@sha256:*) ;; *) echo "image must be pinned by digest" >&2; exit 1 ;; esac
+          # Runs as the staging api SA with its secrets (the service template). Combined mode runs tasks in process (in-memory
+          # queue): the TASKS_*/WORKER_URL env inherited from the service are unused. Only these keys are overridden:
+          overrides="$(bash scripts/ci/pr_preview.sh env-overrides "$ADAPTERS" "$SHA" "$CHANNEL_URL")"
+          for attempt in 1 2 3; do
+            if out="$(gcloud run deploy "$SERVICE" \
+                --project "$PROJECT" --region "$REGION" --image "$IMAGE" \
+                --no-traffic --tag "pr-${PR}" --revision-suffix "$SUFFIX" \
+                --no-cpu-throttling \
+                --update-env-vars "$overrides" \
+                --quiet 2>&1)"; then
+              printf '%s\n' "$out"; break
+            fi
+            printf '%s\n' "$out" >&2
+            # Cloud Run rejects an update based on a stale template when a staging deploy lands at the same time: retry.
+            if [ "$attempt" = 3 ] || ! printf '%s' "$out" | grep -Eiq 'modified|aborted|conflict|409'; then exit 1; fi
+            echo "concurrent update on $SERVICE; retrying ($attempt)"; sleep $((attempt * 15))
+          done
+          actual="$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format json \
+            | jq -r --arg t "pr-${PR}" '.status.traffic[]? | select(.tag == $t) | .url')"
+          [ "$actual" = "$EXPECTED_TAG_URL" ] || { echo "tag url mismatch: expected $EXPECTED_TAG_URL, service reports '$actual'" >&2; exit 1; }
+      - name: Smoke the tag URL (healthz sha, CORS preflight for the channel origin)
+        env:
+          API_URL: ${{ steps.api.outputs.url }}
+          CHANNEL_URL: ${{ steps.hosting.outputs.url }}
+        run: |
+          for i in $(seq 1 10); do
+            if body="$(curl -sf --max-time 20 "${API_URL}/v1/healthz")"; then break; fi
+            echo "attempt $i failed; retrying"; sleep 6; body=""
+          done
+          [ -n "$body" ] || { echo "healthz did not return 200 at ${API_URL}/v1/healthz" >&2; exit 1; }
+          echo "$body"
+          echo "$body" | jq -e --arg sha "$SHA" '.code_version == $sha'
+          hdrs="$(curl -s --max-time 20 -D - -o /dev/null -X OPTIONS "${API_URL}/v1/healthz" \
+            -H "Origin: ${CHANNEL_URL}" -H "Access-Control-Request-Method: GET")"
+          printf '%s\n' "$hdrs"
+          printf '%s' "$hdrs" | grep -iq "^access-control-allow-origin: ${CHANNEL_URL}"
+      - name: Create or update the marker PR comment
+        env:
+          URL: ${{ steps.hosting.outputs.url }}
+          MODE: ${{ steps.vars.outputs.mode }}
+        run: bash scripts/ci/pr_preview.sh comment "$PR" "$URL" "$SHA" "$MODE"

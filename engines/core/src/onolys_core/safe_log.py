@@ -1,0 +1,94 @@
+"""PHI-safe logging: an allowlist of field names; text-like names are always dropped."""
+
+import json
+import logging
+import sys
+
+log = logging.getLogger("iaudit")
+
+
+class _StderrHandler(logging.StreamHandler):
+    """Writes to whatever sys.stderr is at emit time (survives stream swaps)."""
+
+    _iaudit = True
+
+    def __init__(self) -> None:
+        super().__init__(sys.stderr)
+
+    @property
+    def stream(self):
+        return sys.stderr
+
+    @stream.setter
+    def stream(self, _value) -> None:
+        pass
+
+
+def setup_logging(level: str = "INFO") -> None:
+    """Attach one stderr handler to the iaudit logger; safe to call repeatedly."""
+    log.setLevel(level)
+    if not any(getattr(h, "_iaudit", False) for h in log.handlers):
+        h = _StderrHandler()
+        h.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s"))
+        log.addHandler(h)
+
+
+# Generic base allowlist; engines add theirs via register_fields().
+# Audio URIs, transcript text and ratings are deliberately never loggable.
+ALLOWED_FIELDS: set[str] = {
+    "request_id",
+    "status",
+    "outcome",
+    "total_ms",
+    "calls",
+    "calls_ok",
+    "input_tokens",
+    "output_tokens",
+    "cache_read_tokens",
+    "cache_write_tokens",
+    "models",
+    "retries",
+    "failure",
+    "exc_class",
+    "audio_ms",
+    "stt_provider",
+    "stt_model",
+    "language",
+    "speakers",
+    "job_id",
+    "step",
+}
+
+
+def register_fields(fields: frozenset[str] | set[str]) -> None:
+    """Add engine-specific loggable field names (blocked name parts still always drop)."""
+    ALLOWED_FIELDS.update(fields)
+
+
+_BLOCKED_PARTS = ("text", "body", "transcript", "excerpt", "message")
+
+
+def _blocked(name: str) -> bool:
+    # body_bytes is a size, not content
+    return name != "body_bytes" and any(p in name for p in _BLOCKED_PARTS)
+
+
+MAX_VALUE_CHARS = 200
+
+
+def _fmt(value) -> str:
+    """Numbers bare; everything else a capped, JSON-escaped string (no CR/LF, no forged fields)."""
+    if isinstance(value, bool | int | float):
+        return str(value)
+    return json.dumps(str(value)[:MAX_VALUE_CHARS])
+
+
+def safe_fields(fields: dict) -> dict:
+    """Only allowlisted, non-text-like names survive (for callers that format their own line)."""
+    return {k: v for k, v in fields.items() if k in ALLOWED_FIELDS and not _blocked(k)}
+
+
+def log_event(event: str, level: int = logging.INFO, **fields) -> None:
+    kept = safe_fields(fields)
+    pairs = " ".join(f"{k}={_fmt(v)}" for k, v in sorted(kept.items()))
+    log.log(level, "%s %s", event, pairs)

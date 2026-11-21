@@ -1,0 +1,49 @@
+{
+  "$defs": {
+    "ReportListItem": {
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "report_id": {
+          "title": "Report Id",
+          "type": "string"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "report_id",
+        "run_id",
+        "created_at"
+      ],
+      "title": "ReportListItem",
+      "type": "object"
+    }
+  },
+  "$id": "report-list.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ReportListItem"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "title": "ReportList",
+  "type": "object"
+}

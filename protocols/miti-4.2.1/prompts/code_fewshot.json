@@ -1,0 +1,39 @@
+[
+  {
+    "synthetic": true,
+    "note": "Invented example for prompt illustration only; not from any real session.",
+    "input": {
+      "volley_id": "v1",
+      "previous_other_turn": "I keep saying I'll walk every morning and then I just don't.",
+      "clinician_turns": [
+        {"turn_id": "t2", "text": "It sounds like you really want that routine and something keeps getting in the way. What gets in the way most mornings?"}
+      ]
+    },
+    "output": {
+      "volley_id": "v1",
+      "utterances": [
+        {"quote": "It sounds like you really want that routine and something keeps getting in the way.", "code": "cr", "rationale": "Adds the meaning that the client wants the routine, beyond what was said."},
+        {"quote": "What gets in the way most mornings?", "code": "question", "rationale": "An open question."}
+      ]
+    }
+  },
+  {
+    "synthetic": true,
+    "note": "Invented example for prompt illustration only; not from any real session.",
+    "input": {
+      "volley_id": "v2",
+      "previous_other_turn": "I guess I could try the stairs at work.",
+      "clinician_turns": [
+        {"turn_id": "t4", "text": "Okay. Would it be all right if I shared a few ideas other people have used? You can take or leave any of them."}
+      ]
+    },
+    "output": {
+      "volley_id": "v2",
+      "utterances": [
+        {"quote": "Okay.", "code": null, "rationale": "Facilitative comment."},
+        {"quote": "Would it be all right if I shared a few ideas other people have used?", "code": "seek_collab", "rationale": "Asks permission before giving information."},
+        {"quote": "You can take or leave any of them.", "code": "emphasize_autonomy", "rationale": "Highlights the client's freedom of choice."}
+      ]
+    }
+  }
+]

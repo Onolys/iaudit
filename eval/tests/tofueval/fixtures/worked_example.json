@@ -38,7 +38,7 @@
     }
   ],
   "response": {
-    "schema_version": "0.0.1",
+    "schema_version": "0.0.2",
     "status": "complete",
     "warnings": [],
     "claims": [

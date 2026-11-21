@@ -1,0 +1,55 @@
+"""Interview Evidence Auditor backend."""
+
+from onolys_core.safe_log import register_fields
+
+register_fields(
+    frozenset(
+        {
+            "audit_uuid",
+            "turns",
+            "sections",
+            "body_bytes",
+            "tier_calls",
+            "pairs",
+            "undecided",
+            "chunks",
+            "degraded_chunks",
+            "claim_id",
+            "mode",
+            "shortlist_size",
+            "items_returned",
+            "items_kept",
+            "coerced",
+            "section_index",
+            "claims",
+            "dropped",
+            "gaps",
+            "prep_ms",
+            "atomize_ms",
+            "link_ms",
+            "check_ms",
+            "assemble_ms",
+            "sections_ok",
+            "sections_failed",
+            "claims_in_scope",
+            "claims_oos",
+            "claims_stalled",
+            "claims_ok",
+            "truncated",
+            "deadline_hit",
+            "cancelled",
+            "called",
+            "verdict",
+            "row",
+            "flags_seen",
+            "flags_below_floor",
+            "flags_suppressed",
+            "items_below_floor",
+            "inferences_below_floor",
+            "items_dropped",
+            "role_skipped",
+            "role_disagreements",
+            "frames",
+        }
+    )
+)

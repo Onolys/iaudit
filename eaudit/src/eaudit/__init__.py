@@ -1,1 +1,0 @@
-"""Interview Evidence Auditor backend."""

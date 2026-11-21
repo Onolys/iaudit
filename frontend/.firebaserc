@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "onolys"
+  },
+  "targets": {
+    "onolys": {
+      "hosting": {
+        "admin": ["onolys-admin"],
+        "admin-staging": ["onolys-admin-staging"]
+      }
+    }
+  }
+}

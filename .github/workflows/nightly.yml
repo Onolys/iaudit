@@ -15,12 +15,27 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: eaudit
+        working-directory: engines/eaudit
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: eaudit/uv.lock
-      - run: uv sync --frozen
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package eaudit
       - run: uv run --no-sync python -m eval.run --mode oracle --gate poc
+
+  api-real-mode:
+    # SP09 R5: real evaluation with no GCP (fixture STT, real Claude LLM, fake repo and blobs).
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --package onolys-api
+      - run: uv run --no-sync --package onolys-api pytest api/tests/test_live_real_mode.py -m live -s

@@ -2,7 +2,7 @@ import type { EvidenceRole, Verdict } from "../tokens";
 
 export type { EvidenceRole, Verdict };
 
-export const SCHEMA_VERSION = "0.0.1" as const;
+export const SCHEMA_VERSION = "0.0.2" as const;
 
 export const VERDICTS = [
   "supported",

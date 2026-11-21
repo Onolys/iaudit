@@ -2,7 +2,7 @@
 
 **Audience:** users.
 
-Start the service from `eaudit/` (see [eaudit/README.md](../../eaudit/README.md)). To try it without a provider key, start the stub pipeline, which returns an empty valid audit:
+Start the service from `engines/eaudit/` (see [engines/eaudit/README.md](../../engines/eaudit/README.md)). To try it without a provider key, start the stub pipeline, which returns an empty valid audit:
 
 ```bash
 IAUDIT_PIPELINE=stub uv run uvicorn eaudit.app:app --port 8000

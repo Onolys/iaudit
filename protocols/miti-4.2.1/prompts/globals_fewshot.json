@@ -1,0 +1,23 @@
+[
+  {
+    "synthetic": true,
+    "note": "Invented, abbreviated example for prompt illustration only; not from any real session. Real inputs are the full coded span.",
+    "input": {
+      "change_goal": "walk more each day",
+      "turns": [
+        {"turn_id": "t1", "speaker": "client", "text": "I keep meaning to walk more and I don't."},
+        {"turn_id": "t2", "speaker": "clinician", "text": "You want to walk more and it keeps slipping. What would be different if it happened?"},
+        {"turn_id": "t3", "speaker": "client", "text": "I'd have more energy, I think."},
+        {"turn_id": "t4", "speaker": "clinician", "text": "More energy matters to you. You decide what fits your week; where would you like to start?"}
+      ]
+    },
+    "output": {
+      "globals": {
+        "cct": {"score": 4, "reason": "Asks what would be different and returns to the client's reason for change.", "evidence": [{"turn_id": "t2", "quote": "What would be different if it happened?"}], "poor_practice_cited": []},
+        "sst": {"score": 3, "reason": "Little sustain talk appears; no evidence either way, so the default is kept.", "evidence": [], "poor_practice_cited": []},
+        "partnership": {"score": 4, "reason": "Hands the decision to the client.", "evidence": [{"turn_id": "t4", "quote": "You decide what fits your week"}], "poor_practice_cited": []},
+        "empathy": {"score": 4, "reason": "Accurate reflections of what the client said.", "evidence": [{"turn_id": "t2", "quote": "You want to walk more and it keeps slipping."}, {"turn_id": "t4", "quote": "More energy matters to you."}], "poor_practice_cited": []}
+      }
+    }
+  }
+]

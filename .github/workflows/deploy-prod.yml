@@ -1,0 +1,211 @@
+name: deploy-prod
+
+# Gated promotion to prod (SP06 R13, D5, D6, AC6, AC9): ships the EXACT image digest that ran in staging. No rebuild.
+#   workflow_dispatch (input sha; empty = the commit staging api runs now) or push of a tag v*.
+#   The prod deploy jobs run in the GitHub environment `production` (required reviewer = Tejit).
+#   Rollback = dispatch with an earlier sha that was deployed to staging: api, worker, rules, web all go back to that commit.
+# Repo variables (owner sets from Terraform outputs; see docs/reference/infra.md):
+#   WIF_PROVIDER, DEPLOYER_STAGING_SA (read-only resolve step), DEPLOYER_PROD_SA, GCP_PROJECT (optional), GCP_REGION (optional),
+#   PROD_VITE_FIREBASE_{API_KEY,AUTH_DOMAIN,APP_ID,STORAGE_BUCKET,MESSAGING_SENDER_ID} (Terraform output web_env_prod),
+#   PROD_VITE_CONTACT_EMAIL (optional)
+# Approval: the prod jobs (api, worker, rules, web) all start right after `resolve`, so GitHub shows ONE
+# "Review pending deployments" prompt for `production` and one click releases them all (a later-starting gated job
+# would need a second approval). Trade-off: no ordering between api and web; the Hosting rewrite targets the service
+# by name, so that is safe. `resolve` uses the staging deployer, which can only read, before approval.
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Full 40-char commit sha to promote or roll back to (empty = the commit the staging api runs now)
+        type: string
+        required: false
+        default: ""
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: ${{ vars.GCP_PROJECT || 'onolys' }}
+  REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+  FIREBASE_TOOLS_VERSION: 15.37.0
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
+      image: ${{ steps.digest.outputs.image }}
+    steps:
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+          token_format: access_token
+      - name: Pick the commit (input, else tag commit, else what staging api runs now)
+        id: sha
+        env:
+          INPUT_SHA: ${{ inputs.sha }}
+          REF_TYPE: ${{ github.ref_type }}
+          TAG_SHA: ${{ github.sha }}
+        run: |
+          sha="$INPUT_SHA"
+          [ -n "$sha" ] || { [ "$REF_TYPE" = tag ] && sha="$TAG_SHA"; } || true
+          if [ -z "$sha" ]; then
+            sha="$(gcloud run services describe onolys-api-staging --region "$REGION" --project "$PROJECT" --format=json \
+              | jq -r '.spec.template.spec.containers[0].env[] | select(.name=="GIT_SHA") | .value')"
+          fi
+          [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "sha must be a full 40-char lowercase hex commit sha, got '$sha'" >&2; exit 1; }
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.sha.outputs.sha }}
+      - name: Config guard (source tree at this commit)
+        run: bash scripts/ci/check_config.sh
+      - name: Resolve the sha tag to a digest and require that staging deployed exactly that digest
+        id: digest
+        env:
+          SHA: ${{ steps.sha.outputs.sha }}
+        run: |
+          repo="${REGION}-docker.pkg.dev/${PROJECT}/onolys/api"
+          digest="$(gcloud artifacts docker images describe "${repo}:${SHA}" --format='value(image_summary.digest)')"
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "no image tagged ${SHA} in ${repo} (was it built by deploy-staging?)" >&2; exit 1; }
+          image="${repo}@${digest}"
+          for svc in onolys-api-staging onolys-worker-staging; do
+            gcloud run revisions list --service "$svc" --region "$REGION" --project "$PROJECT" --format=json \
+              | jq -e --arg image "$image" 'any(.[]; .spec.containers[0].image == $image)' >/dev/null \
+              || { echo "digest ${digest} (commit ${SHA}) never ran on ${svc}; deploy it to staging first" >&2; exit 1; }
+          done
+          echo "image=${image}" >> "$GITHUB_OUTPUT"
+          echo "promoting ${image} (commit ${SHA})"
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - name: Config guard (inside the image, by digest)
+        env:
+          IMAGE: ${{ steps.digest.outputs.image }}
+        run: bash scripts/ci/check_config.sh --image "$IMAGE"
+
+  deploy-api:
+    needs: resolve
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_deploy-cloudrun.yml
+    with:
+      env: prod
+      service: onolys-api-prod
+      image: ${{ needs.resolve.outputs.image }}
+      region: us-central1
+      git_sha: ${{ needs.resolve.outputs.sha }}
+    secrets: inherit
+
+  deploy-worker:
+    needs: resolve
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_deploy-cloudrun.yml
+    with:
+      env: prod
+      service: onolys-worker-prod
+      image: ${{ needs.resolve.outputs.image }}
+      region: us-central1
+      git_sha: ${{ needs.resolve.outputs.sha }}
+    secrets: inherit
+
+  rules:
+    needs: resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve.outputs.sha }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_PROD_SA }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Deploy Firestore rules and indexes to the (default) database only
+        run: npx --yes firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }} deploy --only 'firestore:(default)' --project "$PROJECT" --non-interactive
+
+  web:
+    needs: resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build web (prod)
+        working-directory: web
+        env:
+          VITE_API_BASE_URL: /v1
+          VITE_FIREBASE_PROJECT_ID: ${{ env.PROJECT }}
+          VITE_FIREBASE_API_KEY: ${{ vars.PROD_VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.PROD_VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_APP_ID: ${{ vars.PROD_VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.PROD_VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.PROD_VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_CONTACT_EMAIL: ${{ vars.PROD_VITE_CONTACT_EMAIL }}
+          VITE_FIRESTORE_DATABASE: "(default)"
+        run: |
+          for v in VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_APP_ID; do
+            [ -n "${!v}" ] || { echo "missing repo variable PROD_${v}" >&2; exit 1; }
+          done
+          npm ci
+          npm run build
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_PROD_SA }}
+      - name: Deploy to Hosting target app (site onolys-app, app.onolys.com, /v1/** rewrite to onolys-api-prod)
+        run: npx --yes firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }} deploy --config web/firebase.json --only hosting:app --project "$PROJECT" --non-interactive
+
+  smoke:
+    needs: [resolve, deploy-api, deploy-worker, rules, web]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET https://app.onolys.com/v1/healthz returns 200 with the promoted commit
+        env:
+          SHA: ${{ needs.resolve.outputs.sha }}
+        run: |
+          url="https://app.onolys.com/v1/healthz"
+          body=""
+          for i in $(seq 1 10); do
+            if body="$(curl -sf --max-time 20 "$url")"; then break; fi
+            echo "attempt $i failed; retrying"; sleep 6; body=""
+          done
+          [ -n "$body" ] || { echo "healthz did not return 200 at $url" >&2; exit 1; }
+          echo "$body"
+          echo "$body" | jq -e --arg sha "$SHA" '.code_version == $sha'

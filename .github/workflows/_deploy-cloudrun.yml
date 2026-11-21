@@ -1,0 +1,107 @@
+name: _deploy-cloudrun
+
+# Reusable: deploy ONE Cloud Run service by image digest (SP06 R13, D5, D15).
+# Auth is Workload Identity Federation only (no JSON keys): the job impersonates deployer-<env>.
+# Repo variables used (owner sets them from Terraform outputs):
+#   vars.WIF_PROVIDER            <- output wif_provider
+#   vars.DEPLOYER_STAGING_SA     <- output deployer_staging_email  (env == staging)
+#   vars.DEPLOYER_PROD_SA        <- output deployer_prod_email     (env == prod; runs in GitHub environment `production`)
+on:
+  workflow_call:
+    inputs:
+      env:
+        description: staging | prod
+        required: true
+        type: string
+      service:
+        description: Cloud Run service name, e.g. onolys-api-staging
+        required: true
+        type: string
+      image:
+        description: Full image reference pinned by digest (REGION-docker.pkg.dev/PROJECT/onolys/api@sha256:...)
+        required: true
+        type: string
+      region:
+        required: true
+        type: string
+      git_sha:
+        description: Commit sha recorded as env GIT_SHA on the revision (D15)
+        required: true
+        type: string
+      project:
+        description: GCP project id
+        required: false
+        type: string
+        default: onolys
+      env_vars:
+        description: Extra KEY=VALUE env vars (newline-separated) set on the revision after GIT_SHA, merged with the service's own
+        required: false
+        type: string
+        default: ''
+      flags:
+        description: Extra `gcloud run deploy` flags (space-separated)
+        required: false
+        type: string
+        default: ''
+      pin_traffic:
+        description: >-
+          Name the revision <service>-<sha7>-<run number>-<attempt> and send it 100% of traffic explicitly. Use on a service that
+          also receives no-traffic tagged preview revisions: they can leave traffic pinned, and "latest" could be a preview.
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      url:
+        description: Deployed service URL
+        value: ${{ jobs.deploy.outputs.url }}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Prod deployer is only impersonable from the `production` GitHub environment (WIF attribute.environment).
+    environment: ${{ inputs.env == 'prod' && 'production' || 'staging' }}
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Check inputs
+        env:
+          IMAGE: ${{ inputs.image }}
+          ENV_NAME: ${{ inputs.env }}
+        run: |
+          case "$ENV_NAME" in staging|prod) ;; *) echo "env must be staging or prod" >&2; exit 1 ;; esac
+          case "$IMAGE" in *@sha256:*) ;; *) echo "image must be pinned by digest (@sha256:...)" >&2; exit 1 ;; esac
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ inputs.env == 'prod' && vars.DEPLOYER_PROD_SA || vars.DEPLOYER_STAGING_SA }}
+      - id: rev
+        env:
+          PIN: ${{ inputs.pin_traffic }}
+          SERVICE: ${{ inputs.service }}
+          GIT_SHA: ${{ inputs.git_sha }}
+        run: |
+          suffix=""; traffic=""
+          if [ "$PIN" = "true" ]; then
+            suffix="${GIT_SHA:0:7}-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
+            traffic="${SERVICE}-${suffix}=100"
+          fi
+          echo "suffix=$suffix" >> "$GITHUB_OUTPUT"
+          echo "traffic=$traffic" >> "$GITHUB_OUTPUT"
+      - id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ inputs.service }}
+          region: ${{ inputs.region }}
+          project_id: ${{ inputs.project }}
+          image: ${{ inputs.image }}
+          env_vars: |-
+            GIT_SHA=${{ inputs.git_sha }}
+            ${{ inputs.env_vars }}
+          flags: ${{ inputs.flags }}
+          suffix: ${{ steps.rev.outputs.suffix }}
+          revision_traffic: ${{ steps.rev.outputs.traffic }}

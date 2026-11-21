@@ -1,0 +1,751 @@
+{
+  "schema_version": "0.0.1",
+  "request_id": null,
+  "protocol": {
+    "id": "miti",
+    "version": "4.2.1",
+    "pack_hash": "80ed58b99b2ef764",
+    "pack_format": "0.0.1"
+  },
+  "language": "en",
+  "change_goal": "walk more during the working week",
+  "coded_span": null,
+  "subject_speaker": "A",
+  "n_runs": 1,
+  "results": [
+    {
+      "run_index": 0,
+      "instances": [
+        {
+          "id": "i1",
+          "volley_id": "v1",
+          "turn_id": "t2",
+          "start": 0,
+          "end": 21,
+          "start_ms": 55000,
+          "end_ms": 105000,
+          "quote": "Thanks for coming in.",
+          "code": null,
+          "counted": false,
+          "uncounted_reason": "uncoded",
+          "rationale": "Intended code: none (synthetic)."
+        },
+        {
+          "id": "i2",
+          "volley_id": "v1",
+          "turn_id": "t2",
+          "start": 22,
+          "end": 67,
+          "start_ms": 55000,
+          "end_ms": 105000,
+          "quote": "Is it all right if we spend our time on that?",
+          "code": "seek_collab",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: seek_collab (synthetic)."
+        },
+        {
+          "id": "i3",
+          "volley_id": "v2",
+          "turn_id": "t4",
+          "start": 0,
+          "end": 51,
+          "start_ms": 165000,
+          "end_ms": 215000,
+          "quote": "What makes walking more important to you right now?",
+          "code": "question",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: question (synthetic)."
+        },
+        {
+          "id": "i4",
+          "volley_id": "v3",
+          "turn_id": "t6",
+          "start": 0,
+          "end": 101,
+          "start_ms": 275000,
+          "end_ms": 325000,
+          "quote": "You want to be there for your kids, and you remember feeling great when walking was part of your day.",
+          "code": "cr",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: cr (synthetic)."
+        },
+        {
+          "id": "i5",
+          "volley_id": "v3",
+          "turn_id": "t6",
+          "start": 102,
+          "end": 131,
+          "start_ms": 275000,
+          "end_ms": 325000,
+          "quote": "What was different back then?",
+          "code": "question",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: question (synthetic)."
+        },
+        {
+          "id": "i6",
+          "volley_id": "v4",
+          "turn_id": "t8",
+          "start": 0,
+          "end": 112,
+          "start_ms": 385000,
+          "end_ms": 435000,
+          "quote": "A forty-minute loop on a Saturday took real commitment, and it shows you can do it when you set your mind to it.",
+          "code": "affirm",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: affirm (synthetic)."
+        },
+        {
+          "id": "i7",
+          "volley_id": "v4",
+          "turn_id": "t8",
+          "start": 113,
+          "end": 142,
+          "start_ms": 385000,
+          "end_ms": 435000,
+          "quote": "You're tired in the evenings.",
+          "code": "sr",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: sr (synthetic)."
+        },
+        {
+          "id": "i8",
+          "volley_id": "v4",
+          "turn_id": "t9",
+          "start": 0,
+          "end": 41,
+          "start_ms": 440000,
+          "end_ms": 490000,
+          "quote": "Where would a walk fit best in your week?",
+          "code": "question",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: question (synthetic)."
+        },
+        {
+          "id": "i9",
+          "volley_id": "v5",
+          "turn_id": "t11",
+          "start": 0,
+          "end": 51,
+          "start_ms": 550000,
+          "end_ms": 600000,
+          "quote": "Three days a week at lunchtime feels doable to you.",
+          "code": "sr",
+          "counted": false,
+          "uncounted_reason": "superseded_by_cr",
+          "rationale": "Intended code: sr (synthetic)."
+        },
+        {
+          "id": "i10",
+          "volley_id": "v5",
+          "turn_id": "t11",
+          "start": 52,
+          "end": 101,
+          "start_ms": 550000,
+          "end_ms": 600000,
+          "quote": "You also want to protect that time from meetings.",
+          "code": "cr",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: cr (synthetic)."
+        },
+        {
+          "id": "i11",
+          "volley_id": "v5",
+          "turn_id": "t11",
+          "start": 102,
+          "end": 185,
+          "start_ms": 550000,
+          "end_ms": 600000,
+          "quote": "How confident are you, from one to ten, that you can make three lunch walks happen?",
+          "code": "question",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: question (synthetic)."
+        },
+        {
+          "id": "i12",
+          "volley_id": "v6",
+          "turn_id": "t13",
+          "start": 0,
+          "end": 26,
+          "start_ms": 660000,
+          "end_ms": 710000,
+          "quote": "Why a six and not a three?",
+          "code": "question",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: question (synthetic)."
+        },
+        {
+          "id": "i13",
+          "volley_id": "v6",
+          "turn_id": "t13",
+          "start": 27,
+          "end": 121,
+          "start_ms": 660000,
+          "end_ms": 710000,
+          "quote": "You've already thought about blocking your calendar, which shows you're taking this seriously.",
+          "code": "affirm",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: affirm (synthetic)."
+        },
+        {
+          "id": "i14",
+          "volley_id": "v7",
+          "turn_id": "t15",
+          "start": 0,
+          "end": 81,
+          "start_ms": 770000,
+          "end_ms": 820000,
+          "quote": "Would it be helpful if I shared some ideas other people have used for rainy days?",
+          "code": "seek_collab",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: seek_collab (synthetic)."
+        },
+        {
+          "id": "i15",
+          "volley_id": "v7",
+          "turn_id": "t15",
+          "start": 82,
+          "end": 175,
+          "start_ms": 770000,
+          "end_ms": 820000,
+          "quote": "Some people keep walking shoes at the office, walk indoor laps, or take a call while walking.",
+          "code": "persuade_permission",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: persuade_permission (synthetic)."
+        },
+        {
+          "id": "i16",
+          "volley_id": "v7",
+          "turn_id": "t15",
+          "start": 176,
+          "end": 245,
+          "start_ms": 770000,
+          "end_ms": 820000,
+          "quote": "The guidelines suggest about thirty minutes of activity on most days.",
+          "code": "gi",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: gi (synthetic)."
+        },
+        {
+          "id": "i17",
+          "volley_id": "v7",
+          "turn_id": "t15",
+          "start": 246,
+          "end": 286,
+          "start_ms": 770000,
+          "end_ms": 820000,
+          "quote": "Even ten-minute walks count toward that.",
+          "code": "gi",
+          "counted": false,
+          "uncounted_reason": "duplicate_in_volley",
+          "rationale": "Intended code: gi (synthetic)."
+        },
+        {
+          "id": "i18",
+          "volley_id": "v7",
+          "turn_id": "t15",
+          "start": 287,
+          "end": 349,
+          "start_ms": 770000,
+          "end_ms": 820000,
+          "quote": "Both ideas are only options, and you know your workplace best.",
+          "code": "emphasize_autonomy",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: emphasize_autonomy (synthetic)."
+        },
+        {
+          "id": "i19",
+          "volley_id": "v8",
+          "turn_id": "t17",
+          "start": 0,
+          "end": 127,
+          "start_ms": 880000,
+          "end_ms": 930000,
+          "quote": "You have a plan for sunny and rainy days, and the confidence you're showing comes from what you already did on those Saturdays.",
+          "code": "cr",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: cr (synthetic)."
+        },
+        {
+          "id": "i20",
+          "volley_id": "v8",
+          "turn_id": "t17",
+          "start": 128,
+          "end": 160,
+          "start_ms": 880000,
+          "end_ms": 930000,
+          "quote": "What would you like to do first?",
+          "code": "question",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: question (synthetic)."
+        },
+        {
+          "id": "i21",
+          "volley_id": "v9",
+          "turn_id": "t19",
+          "start": 0,
+          "end": 41,
+          "start_ms": 990000,
+          "end_ms": 1040000,
+          "quote": "It's entirely your decision how to start.",
+          "code": "emphasize_autonomy",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: emphasize_autonomy (synthetic)."
+        },
+        {
+          "id": "i22",
+          "volley_id": "v9",
+          "turn_id": "t19",
+          "start": 42,
+          "end": 94,
+          "start_ms": 990000,
+          "end_ms": 1040000,
+          "quote": "Blocking those days sounds like a strong first step.",
+          "code": null,
+          "counted": false,
+          "uncounted_reason": "uncoded",
+          "rationale": "Intended code: none (synthetic)."
+        },
+        {
+          "id": "i23",
+          "volley_id": "v9",
+          "turn_id": "t19",
+          "start": 95,
+          "end": 244,
+          "start_ms": 990000,
+          "end_ms": 1040000,
+          "quote": "So you want to be there for your kids, you miss how you felt when you walked, and you have a plan: three lunch walks, with indoor laps when it rains.",
+          "code": "cr",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: cr (synthetic)."
+        },
+        {
+          "id": "i24",
+          "volley_id": "v10",
+          "turn_id": "t21",
+          "start": 0,
+          "end": 45,
+          "start_ms": 1100000,
+          "end_ms": 1150000,
+          "quote": "You came in tired and you're leaving hopeful.",
+          "code": "sr",
+          "counted": true,
+          "uncounted_reason": null,
+          "rationale": "Intended code: sr (synthetic)."
+        },
+        {
+          "id": "i25",
+          "volley_id": "v10",
+          "turn_id": "t21",
+          "start": 46,
+          "end": 80,
+          "start_ms": 1100000,
+          "end_ms": 1150000,
+          "quote": "Let's check in again in two weeks.",
+          "code": null,
+          "counted": false,
+          "uncounted_reason": "uncoded",
+          "rationale": "Intended code: none (synthetic)."
+        }
+      ],
+      "counts": {
+        "gi": 1,
+        "persuade": 0,
+        "persuade_permission": 1,
+        "question": 6,
+        "sr": 2,
+        "cr": 4,
+        "affirm": 2,
+        "seek_collab": 2,
+        "emphasize_autonomy": 2,
+        "confront": 0
+      },
+      "globals": {
+        "cct": {
+          "score": 4,
+          "source": "model",
+          "raw_score": 4,
+          "reason": "Attends to and evokes the client's own language about walking and confidence.",
+          "evidence": [
+            {
+              "turn_id": "t5",
+              "start": 20,
+              "end": 52,
+              "quote": "my blood pressure is creeping up"
+            },
+            {
+              "turn_id": "t16",
+              "start": 83,
+              "end": 111,
+              "quote": "I think I can really do this"
+            }
+          ]
+        },
+        "sst": {
+          "score": 4,
+          "source": "model",
+          "raw_score": 4,
+          "reason": "Keeps a clear, client-centred direction toward the walking goal.",
+          "evidence": [
+            {
+              "turn_id": "t4",
+              "start": 0,
+              "end": 51,
+              "quote": "What makes walking more important to you right now?"
+            },
+            {
+              "turn_id": "t15",
+              "start": 0,
+              "end": 42,
+              "quote": "Would it be helpful if I shared some ideas"
+            }
+          ]
+        },
+        "partnership": {
+          "score": 5,
+          "source": "model",
+          "raw_score": 5,
+          "reason": "Asks permission, treats the client as the expert on their own week.",
+          "evidence": [
+            {
+              "turn_id": "t15",
+              "start": 320,
+              "end": 348,
+              "quote": "you know your workplace best"
+            },
+            {
+              "turn_id": "t19",
+              "start": 0,
+              "end": 41,
+              "quote": "It's entirely your decision how to start."
+            }
+          ]
+        },
+        "empathy": {
+          "score": 4,
+          "source": "model",
+          "raw_score": 4,
+          "reason": "Reflects the client's feelings and view accurately and often.",
+          "evidence": [
+            {
+              "turn_id": "t6",
+              "start": 0,
+              "end": 34,
+              "quote": "You want to be there for your kids"
+            },
+            {
+              "turn_id": "t21",
+              "start": 0,
+              "end": 45,
+              "quote": "You came in tired and you're leaving hopeful."
+            }
+          ]
+        }
+      },
+      "summaries": {
+        "technical": {
+          "value": 4.0,
+          "label": "good",
+          "reference": {
+            "fair": 3.0,
+            "good": 4.0
+          }
+        },
+        "relational": {
+          "value": 4.5,
+          "label": "good",
+          "reference": {
+            "fair": 3.5,
+            "good": 4.0
+          }
+        },
+        "pct_cr": {
+          "value": 0.6666666666666666,
+          "label": "good",
+          "reference": {
+            "fair": 0.4,
+            "good": 0.5
+          }
+        },
+        "reflection_question_ratio": {
+          "value": 1.0,
+          "label": "fair",
+          "reference": {
+            "fair": 1.0,
+            "good": 2.0
+          }
+        },
+        "total_mia": {
+          "value": 6.0,
+          "label": null,
+          "reference": null
+        },
+        "total_mina": {
+          "value": 0.0,
+          "label": null,
+          "reference": null
+        }
+      },
+      "warnings": []
+    }
+  ],
+  "aggregate": {
+    "counts": {
+      "gi": {
+        "mean": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "values": [
+          1.0
+        ]
+      },
+      "persuade": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "values": [
+          0.0
+        ]
+      },
+      "persuade_permission": {
+        "mean": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "values": [
+          1.0
+        ]
+      },
+      "question": {
+        "mean": 6.0,
+        "min": 6.0,
+        "max": 6.0,
+        "values": [
+          6.0
+        ]
+      },
+      "sr": {
+        "mean": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "values": [
+          2.0
+        ]
+      },
+      "cr": {
+        "mean": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "values": [
+          4.0
+        ]
+      },
+      "affirm": {
+        "mean": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "values": [
+          2.0
+        ]
+      },
+      "seek_collab": {
+        "mean": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "values": [
+          2.0
+        ]
+      },
+      "emphasize_autonomy": {
+        "mean": 2.0,
+        "min": 2.0,
+        "max": 2.0,
+        "values": [
+          2.0
+        ]
+      },
+      "confront": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "values": [
+          0.0
+        ]
+      }
+    },
+    "globals": {
+      "cct": {
+        "mean": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "values": [
+          4.0
+        ]
+      },
+      "sst": {
+        "mean": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "values": [
+          4.0
+        ]
+      },
+      "partnership": {
+        "mean": 5.0,
+        "min": 5.0,
+        "max": 5.0,
+        "values": [
+          5.0
+        ]
+      },
+      "empathy": {
+        "mean": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "values": [
+          4.0
+        ]
+      }
+    },
+    "summaries": {
+      "technical": {
+        "mean": 4.0,
+        "min": 4.0,
+        "max": 4.0,
+        "values": [
+          4.0
+        ],
+        "label": "good",
+        "reference": {
+          "fair": 3.0,
+          "good": 4.0
+        }
+      },
+      "relational": {
+        "mean": 4.5,
+        "min": 4.5,
+        "max": 4.5,
+        "values": [
+          4.5
+        ],
+        "label": "good",
+        "reference": {
+          "fair": 3.5,
+          "good": 4.0
+        }
+      },
+      "pct_cr": {
+        "mean": 0.6666666666666666,
+        "min": 0.6666666666666666,
+        "max": 0.6666666666666666,
+        "values": [
+          0.6666666666666666
+        ],
+        "label": "good",
+        "reference": {
+          "fair": 0.4,
+          "good": 0.5
+        }
+      },
+      "reflection_question_ratio": {
+        "mean": 1.0,
+        "min": 1.0,
+        "max": 1.0,
+        "values": [
+          1.0
+        ],
+        "label": "fair",
+        "reference": {
+          "fair": 1.0,
+          "good": 2.0
+        }
+      },
+      "total_mia": {
+        "mean": 6.0,
+        "min": 6.0,
+        "max": 6.0,
+        "values": [
+          6.0
+        ],
+        "label": null,
+        "reference": null
+      },
+      "total_mina": {
+        "mean": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "values": [
+          0.0
+        ],
+        "label": null,
+        "reference": null
+      }
+    },
+    "representative_run": 0
+  },
+  "warnings": [],
+  "run_info": {
+    "engine": "paudit",
+    "code_version": "unknown",
+    "preset": null,
+    "routes": {
+      "paudit_code": {
+        "litellm_id": "anthropic/claude-sonnet-5-5",
+        "provider": "anthropic",
+        "structured_output_mode": "json_object",
+        "temperature_effective": null,
+        "params_hash": "6656172429332cca"
+      },
+      "paudit_globals": {
+        "litellm_id": "anthropic/claude-sonnet-5-5",
+        "provider": "anthropic",
+        "structured_output_mode": "json_object",
+        "temperature_effective": null,
+        "params_hash": "6656172429332cca"
+      }
+    },
+    "stt": null,
+    "pack": {
+      "id": "miti",
+      "version": "4.2.1",
+      "hash": "80ed58b99b2ef764"
+    },
+    "prompt_hashes": {
+      "code_system.md": "c2b9e2ee9ad63129",
+      "code_fewshot.json": "66067cb3cdb0d3b4",
+      "globals_system.md": "defd14fd71dada50",
+      "globals_fewshot.json": "d1c0578f710ce40c",
+      "engine:code_output_format": "5cb7e6b942d0602b",
+      "engine:code_templates": "8a4ebcfbfb90cba0",
+      "engine:globals_output_format": "2ef1aa6d4656444c",
+      "engine:globals_templates": "a3929d2477e13168"
+    },
+    "n_runs": 1,
+    "usage": {
+      "calls": 2,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 0,
+      "cost_usd": null
+    }
+  }
+}

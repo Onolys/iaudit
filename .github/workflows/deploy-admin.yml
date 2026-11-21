@@ -1,0 +1,199 @@
+name: deploy-admin
+
+# Admin backend (Cloud Run) + admin site (Firebase Hosting) deploy (SP07 R9, D8; follows SP06 deploy-staging.yml).
+#   push to main touching the admin inputs -> staging.   workflow_dispatch -> staging or prod (prod waits for
+#   approval in the GitHub `production` environment).
+# Repo variables (owner sets them; see the list in the SP07 task 10 report / docs):
+#   shared with SP06: WIF_PROVIDER, DEPLOYER_STAGING_SA, DEPLOYER_PROD_SA, GCP_PROJECT (optional), GCP_REGION (optional)
+#   per env (Terraform outputs web_env_admin_staging / web_env_admin_prod):
+#     ADMIN_STAGING_VITE_FIREBASE_{API_KEY,AUTH_DOMAIN,APP_ID}   ADMIN_PROD_VITE_FIREBASE_{API_KEY,AUTH_DOMAIN,APP_ID}
+# VITE_EVAL_ENABLED is deliberately never set here: frontend/.env.production sets it to false (SP07 R1).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "admin/**"
+      - "frontend/**"
+      - "engines/**"
+      - "protocols/**"
+      - "docs/contracts/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".dockerignore"
+      - ".github/workflows/deploy-admin.yml"
+      - ".github/workflows/_deploy-cloudrun.yml"
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Target environment (prod requires approval)
+        type: choice
+        options: [staging, prod]
+        default: staging
+
+concurrency:
+  group: deploy-admin-${{ github.event_name == 'workflow_dispatch' && inputs.env || 'staging' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: ${{ vars.GCP_PROJECT || 'onolys' }}
+  REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+  TARGET: ${{ github.event_name == 'workflow_dispatch' && inputs.env || 'staging' }}
+  FIREBASE_TOOLS_VERSION: 15.37.0
+
+jobs:
+  target:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      env: ${{ steps.t.outputs.env }}
+      service: ${{ steps.t.outputs.service }}
+      site: ${{ steps.t.outputs.site }}
+      hosting_target: ${{ steps.t.outputs.hosting_target }}
+    steps:
+      - id: t
+        run: |
+          case "$TARGET" in
+            staging) site=onolys-admin-staging; hosting_target=admin-staging ;;
+            prod) site=onolys-admin; hosting_target="admin" ;;
+            *) echo "env must be staging or prod" >&2; exit 1 ;;
+          esac
+          {
+            echo "env=$TARGET"
+            echo "service=onolys-admin-backend-$TARGET"
+            echo "site=$site"
+            echo "hosting_target=$hosting_target"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: target
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Images are always pushed with the staging deployer (as in deploy-staging.yml) so that only the deploy
+    # and hosting jobs of a prod run wait for production approval. The same digest is deployed to prod.
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      image: ${{ steps.vars.outputs.repo }}@${{ steps.push.outputs.digest }}
+    steps:
+      - id: vars
+        run: echo "repo=${REGION}-docker.pkg.dev/${PROJECT}/onolys/admin-backend" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+          token_format: access_token
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Build once, tag sha, push to Artifact Registry
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: admin/backend/Dockerfile
+          push: true
+          tags: ${{ steps.vars.outputs.repo }}:${{ github.sha }}
+          cache-from: type=gha,scope=admin-backend
+          cache-to: type=gha,mode=max,scope=admin-backend
+      - name: Smoke the pushed image by digest (anonymous 401, empty allowlist refused, no eval data)
+        env:
+          IMAGE: ${{ steps.vars.outputs.repo }}@${{ steps.push.outputs.digest }}
+        run: |
+          docker pull "$IMAGE"
+          SKIP_BUILD=1 bash scripts/ci/test_admin_image.sh "$IMAGE"
+
+  deploy-backend:
+    needs: [target, build]
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_deploy-cloudrun.yml
+    with:
+      env: ${{ needs.target.outputs.env }}
+      service: ${{ needs.target.outputs.service }}
+      image: ${{ needs.build.outputs.image }}
+      # The reusable workflow takes a literal-compatible string; REGION is the same us-central1 default.
+      region: us-central1
+      git_sha: ${{ github.sha }}
+    secrets: inherit
+
+  site:
+    needs: [target, deploy-backend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: ${{ needs.target.outputs.env == 'prod' && 'production' || 'staging' }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build frontend (admin, auth required, eval off via .env.production)
+        working-directory: frontend
+        env:
+          BACKEND_URL: ${{ needs.deploy-backend.outputs.url }}
+          VITE_AUTH_REQUIRED: "true"
+          VITE_AUDIT_URL: ${{ needs.deploy-backend.outputs.url }}/v1/audit
+          VITE_FIREBASE_PROJECT_ID: ${{ env.PROJECT }}
+          VITE_FIREBASE_API_KEY: ${{ needs.target.outputs.env == 'prod' && vars.ADMIN_PROD_VITE_FIREBASE_API_KEY || vars.ADMIN_STAGING_VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ needs.target.outputs.env == 'prod' && vars.ADMIN_PROD_VITE_FIREBASE_AUTH_DOMAIN || vars.ADMIN_STAGING_VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_APP_ID: ${{ needs.target.outputs.env == 'prod' && vars.ADMIN_PROD_VITE_FIREBASE_APP_ID || vars.ADMIN_STAGING_VITE_FIREBASE_APP_ID }}
+        run: |
+          [ -n "$BACKEND_URL" ] || { echo "deploy-backend returned no service URL" >&2; exit 1; }
+          for v in VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_APP_ID; do
+            [ -n "${!v}" ] || { echo "missing repo variable for $v" >&2; exit 1; }
+          done
+          npm ci
+          npm run build
+      - name: Put the real admin-backend origin into the Hosting CSP (fails if the placeholder remains)
+        env:
+          BACKEND_URL: ${{ needs.deploy-backend.outputs.url }}
+        run: bash scripts/ci/set_admin_origin.sh "${BACKEND_URL%/}" frontend/firebase.json
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ needs.target.outputs.env == 'prod' && vars.DEPLOYER_PROD_SA || vars.DEPLOYER_STAGING_SA }}
+      - name: Deploy Hosting target ${{ needs.target.outputs.hosting_target }}
+        env:
+          HOSTING_TARGET: ${{ needs.target.outputs.hosting_target }}
+        run: npx --yes firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }} deploy --config frontend/firebase.json --only "hosting:${HOSTING_TARGET}" --project "$PROJECT" --non-interactive
+
+  smoke:
+    needs: [target, deploy-backend, site]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Anonymous calls are rejected with 401 (not 5xx); site is up with the backend in its CSP
+        env:
+          BACKEND_URL: ${{ needs.deploy-backend.outputs.url }}
+          SITE: ${{ needs.target.outputs.site }}
+        run: |
+          origin="${BACKEND_URL%/}"
+          # Not /healthz: Cloud Run reserves paths ending in z (like /healthz) and answers 404 before the app.
+          for path in /v1/audit /v1/paudit/fixtures; do
+            code=000
+            for i in $(seq 1 10); do
+              code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "${origin}${path}" || true)"
+              [ "$code" = 401 ] && break
+              echo "attempt $i: ${path} -> ${code}; retrying"; sleep 6
+            done
+            [ "$code" = 401 ] || { echo "anonymous ${path} returned ${code}, want 401" >&2; exit 1; }
+            echo "ok anonymous ${path} -> 401"
+          done
+          headers="$(curl -sfI --max-time 20 "https://${SITE}.web.app/")"
+          echo "$headers" | grep -i '^content-security-policy:' | grep -qF "$origin" \
+            || { echo "site CSP does not allow the backend origin $origin" >&2; exit 1; }
+          echo "ok site CSP allows $origin"

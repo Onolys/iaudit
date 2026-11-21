@@ -1,0 +1,59 @@
+{
+  "$defs": {
+    "SpeakerInfo": {
+      "properties": {
+        "samples": {
+          "description": "Up to 3 of the speaker's first lines",
+          "items": {
+            "type": "string"
+          },
+          "title": "Samples",
+          "type": "array"
+        },
+        "speaker": {
+          "title": "Speaker",
+          "type": "string"
+        },
+        "turn_count": {
+          "title": "Turn Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "speaker",
+        "turn_count",
+        "samples"
+      ],
+      "title": "SpeakerInfo",
+      "type": "object"
+    }
+  },
+  "$id": "speakers-view.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clinician_speaker": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Clinician Speaker"
+    },
+    "speakers": {
+      "items": {
+        "$ref": "#/$defs/SpeakerInfo"
+      },
+      "title": "Speakers",
+      "type": "array"
+    }
+  },
+  "required": [
+    "speakers"
+  ],
+  "title": "SpeakersView",
+  "type": "object"
+}

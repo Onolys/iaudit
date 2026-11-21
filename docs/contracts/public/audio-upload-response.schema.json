@@ -1,0 +1,29 @@
+{
+  "$id": "audio-upload-response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "required_headers": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Send exactly these headers with the PUT (the canonical Content-Type)",
+      "title": "Required Headers",
+      "type": "object"
+    },
+    "upload_id": {
+      "title": "Upload Id",
+      "type": "string"
+    },
+    "upload_url": {
+      "title": "Upload Url",
+      "type": "string"
+    }
+  },
+  "required": [
+    "upload_url",
+    "upload_id",
+    "required_headers"
+  ],
+  "title": "AudioUploadResponse",
+  "type": "object"
+}

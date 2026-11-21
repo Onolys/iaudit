@@ -1,0 +1,87 @@
+{
+ "type": "object",
+ "required": [
+  "schema_version",
+  "protocol",
+  "language",
+  "change_goal",
+  "coded_span",
+  "subject_speaker",
+  "n_runs",
+  "results",
+  "aggregate",
+  "warnings",
+  "run_info"
+ ],
+ "properties": {
+  "schema_version": {
+   "const": "0.0.1"
+  },
+  "protocol": {
+   "type": "object",
+   "required": [
+    "id",
+    "version",
+    "pack_hash",
+    "pack_format"
+   ],
+   "properties": {}
+  },
+  "results": {
+   "type": "array",
+   "minItems": 1,
+   "items": {
+    "type": "object",
+    "required": [
+     "run_index",
+     "instances",
+     "counts",
+     "globals",
+     "summaries",
+     "warnings"
+    ],
+    "properties": {
+     "instances": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "id",
+        "volley_id",
+        "turn_id",
+        "start",
+        "end",
+        "quote",
+        "code",
+        "counted",
+        "rationale"
+       ],
+       "properties": {}
+      }
+     }
+    }
+   }
+  },
+  "aggregate": {
+   "type": "object",
+   "required": [
+    "counts",
+    "globals",
+    "summaries",
+    "representative_run"
+   ],
+   "properties": {}
+  },
+  "run_info": {
+   "type": "object",
+   "required": [
+    "engine",
+    "code_version",
+    "n_runs",
+    "usage"
+   ],
+   "properties": {}
+  }
+ },
+ "$comment": "LOCAL STAND-IN from the SP03 R7 / SP02 R3 PRD shapes; used only until engines/*/schemas exist (tests prefer the real file)."
+}

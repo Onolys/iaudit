@@ -1,0 +1,18 @@
+rules_version = '2';
+
+// Client access: an owner may read their own PHI-free status doc. Everything else is
+// server-only (the Admin SDK bypasses rules). Deployed to both DBs by CI.
+// Note: the read rule uses resource.data.uid, so a get/listen on a missing doc is denied;
+// POST /sessions therefore creates the status doc before returning.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /session_status/{sid} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

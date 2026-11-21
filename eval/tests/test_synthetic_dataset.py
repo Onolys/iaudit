@@ -90,7 +90,7 @@ def _strings(o):
 
 
 def test_no_fewshot_overlap_or_speaker_ids(ds):
-    pdir = paths.repo_root() / "eaudit" / "src" / "eaudit" / "prompts"
+    pdir = paths.repo_root() / "engines" / "eaudit" / "src" / "eaudit" / "prompts"
     files = sorted(pdir.glob("*_fewshot.json"))
     if not files:
         pytest.skip("backend few-shot files absent")

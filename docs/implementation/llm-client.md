@@ -1,14 +1,24 @@
 # LLM client
 
-Every model call goes through one interface. Code: `eaudit/src/eaudit/llm/`.
+Every model call goes through one interface. Code: `engines/core/src/onolys_core/llm/`.
 
 **Audience:** maintainers and coding agents.
 
 `LLMClient.complete_json(req, metrics)` takes an `LLMRequest` (tier, system text, user text, a pydantic `response_model`, a `call_tag`, optional cache prefixes, token cap, per-call timeout, fixture key, deadline, retry flag) and returns an `LLMResult` holding the parsed object, usage, latency, model and attempts.
 
-## Tiers
+## Tiers and routes
 
-`cheap`, `mid` and `strong` map to LiteLLM model ids in settings (`model_cheap`, `model_mid`, `model_strong`). Prompts name tiers only, never model ids. `strong` is for offline use.
+`LLMRequest.tier` names a **route**. Routes come from the registry in `llm/routes.py`, not from per-tier settings. Prompts name routes only, never model ids. The original tiers `cheap`, `mid` and `strong` are route names (so fixture keys are unchanged); `strong` is for offline use.
+
+## Routes
+
+Model choice is data. The registry loads `llm/routes.default.yaml`, or the file named by env `ROUTES_FILE`. Each route entry holds:
+
+- `litellm_id`, `api_key_env` (the variable name, never the key).
+- `structured_output_mode` (`json_object` or `json_schema`), `caching_mode` (`none`, `provider_implicit`, `anthropic_ephemeral`), `supports_temperature`, `extra_params`.
+- `max_output_tokens`, `context_tokens`, `timeout_s` (a larger request value is clamped), `max_concurrency` (semaphore per route), `max_retries`, `backoff_s`.
+
+A route may be an alias (`paudit_code: {alias: mid}`). A `presets:` section bundles route overrides plus an STT key; env `DEFAULT_PRESET` picks one (default `default`). Env overrides for the three tier ids keep older deploys working. Startup fails with an error naming the variable when a route's `api_key_env` is unset. The default routes are Claude Sonnet via the Anthropic API; adding Gemini or another provider is a YAML entry, not code. A live check of the shipped routes: `python -m onolys_core.llm.smoke --preset default`. A live check of the api in real mode with no GCP (fixture STT, real Claude, fake repo/blobs; needs `ANTHROPIC_API_KEY`; nightly job `api-real-mode`): `uv run --package onolys-api pytest api/tests/test_live_real_mode.py -m live -s`. Rationale: [ADR 0017](../decisions/0017-workspace-routes-shared-core.md).
 
 ## Implementations
 
@@ -20,11 +30,11 @@ Every model call goes through one interface. Code: `eaudit/src/eaudit/llm/`.
 | `StubClient` | Canned answers per call tag, for tests. |
 | `FailingClient` | Always raises, for failure tests. |
 
-`make_client(settings)` picks one from `llm_mode`.
+`make_client(settings.llm_config())` picks one from `llm_mode`. `warm_then_fanout()` (`llm/warm.py`) sends one call first so a prompt cache entry exists before parallel calls.
 
 ## Errors
 
-`LLMTimeout`, `LLMUnavailable` and `LLMBadOutput` (all `LLMError`). A transport retry happens at most `llm_max_retries` times, only if the request deadline leaves room, and never for errors retrying cannot fix (authentication, not found). A request with `retry=False` is tried once.
+`LLMTimeout`, `LLMUnavailable`, `LLMRateLimited` and `LLMBadOutput` (all `LLMError`). A 429 or 529 raises `LLMRateLimited`; it backs off at least `retry-after` inside the deadline rather than consuming retries. A transport retry happens at most `llm_max_retries` times, only if the request deadline leaves room, and never for errors retrying cannot fix (authentication, not found). A request with `retry=False` is tried once.
 
 ## Caching
 
