@@ -23,3 +23,4 @@ export function sliceCodePoints(text: string, start: number, end: number): strin
   const map = buildIndexMap(text);
   return text.slice(map[start], map[end]);
 }
+// scratch: preview cleanup proof (no behaviour change)
