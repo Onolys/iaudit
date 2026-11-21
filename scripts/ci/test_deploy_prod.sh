@@ -23,6 +23,10 @@ has   "api service onolys-api-prod"          'service: onolys-api-prod'
 has   "worker service onolys-worker-prod"    'service: onolys-worker-prod'
 has   "git_sha passed to the revisions"      'git_sha: \$\{\{ needs\.resolve\.outputs\.sha \}\}'
 has   "image passed by digest"               'needs\.resolve\.outputs\.image'
+has   "matcher copied before the detach checkout" 'cp scripts/ci/staging_ran_image\.py "\$RUNNER_TEMP/staging_ran_image\.py"'
+has   "matcher run from RUNNER_TEMP"          'python3 "\$RUNNER_TEMP/staging_ran_image\.py"'
+hasnt "matcher not run from the checked-out tree" 'python3 scripts/ci/staging_ran_image\.py'
+hasnt "no scratch files in the workspace"    '(-o|>) (index|revisions)\.json'
 hasnt "no rebuild (no build-push-action)"    'docker/build-push-action'
 has   "resolves tag to digest"               'image_summary\.digest'
 has   "checks the digest ran in staging"     'onolys-api-staging'
@@ -38,6 +42,35 @@ has   "smoke checks code_version"            'code_version'
 has   "WIF auth"                             'google-github-actions/auth@v2'
 hasnt "no JSON key auth"                     'credentials_json|GOOGLE_CREDENTIALS|service_account_key'
 hasnt "sha not interpolated in run scripts"  'run:.*\$\{\{ *(inputs|github\.event)\.'
+
+# Version tagging (prod-<date>.<n>) and rollback by version
+TAGJOB="$(awk '/^  tag:/{f=1;print;next} f&&/^  [A-Za-z_-]+:/{exit} f{print}' "$WF")"
+[[ -n "$TAGJOB" ]] && ok "tag job exists" || bad "tag job exists"
+needs_line="$(printf '%s\n' "$TAGJOB" | grep -E '^    needs:' | head -1)"
+for j in resolve deploy-api deploy-worker rules web smoke; do
+  [[ "$needs_line" =~ (\[|[[:space:],])"$j"([],[:space:]]|$) ]] && ok "tag job needs $j" || bad "tag job needs $j"
+done
+printf '%s\n' "$TAGJOB" | grep -Eq '^      contents: write' && ok "tag job has contents: write" || bad "tag job has contents: write"
+[[ "$(grep -Ec 'contents: write' "$WF")" == 1 ]] && ok "contents: write only on the tag job" || bad "contents: write only on the tag job"
+has   "top-level permissions stay read"      '^permissions:'
+has   "dispatch input version"               '^      version:'
+has   "version regex validation"             'prod-\[0-9\]\{4\}-\[0-9\]\{2\}-\[0-9\]\{2\}\\\.\[0-9\]\+\$'
+has   "sha and version mutually exclusive"   'INPUT_SHA.*INPUT_VERSION|INPUT_VERSION.*INPUT_SHA'
+has   "version resolved to its commit"       'refs/tags/\$\{INPUT_VERSION\}\^\{commit\}'
+hasnt "no python script for tag naming"      'next_prod_tag'
+printf '%s\n' "$TAGJOB" | grep -Eq 'set -o pipefail|set -[a-z]*o pipefail|shell: bash' && ok "tag step has pipefail" || bad "tag step has pipefail"
+printf '%s\n' "$TAGJOB" | grep -Eq 'git ls-remote --tags --refs origin "prod-\$d\.\*"' && ok "tag N computed inline from ls-remote" || bad "tag N computed inline from ls-remote"
+has   "resolve summary shows sha"            'GITHUB_STEP_SUMMARY'
+# Run the real n=/tag= snippet from the workflow against fixture ls-remote output (.9/.10 ordering, none -> .1, other days ignored)
+snippet="$(printf '%s\n' "$TAGJOB" | grep -E '^ *(n=|tag=)' | sed 's/^ *//')"
+check_tag() { # $1 = expected, $2 = fixture lines
+  got="$(FIXTURE="$2" bash -c 'set -o pipefail; git() { printf "%b" "$FIXTURE"; }; d=2026-11-21; '"$snippet"'; echo "$tag"' 2>&1)"
+  [[ "$got" == "$1" ]] && ok "tag snippet: $1" || { bad "tag snippet: expected $1 got '$got'"; }
+}
+check_tag "prod-2026-11-21.1"  ""
+check_tag "prod-2026-11-21.11" "aaa\trefs/tags/prod-2026-11-21.9\nbbb\trefs/tags/prod-2026-11-21.10\nccc\trefs/tags/prod-2026-11-21.2\n"
+check_tag "prod-2026-11-21.4"  "aaa\trefs/tags/prod-2026-11-21.3\nbbb\trefs/tags/prod-2026-11-20.99\n"
+has   "tag pushed"                           'git push origin "refs/tags/'
 
 command -v actionlint >/dev/null 2>&1 && { (cd "$ROOT" && actionlint "$WF") && ok "actionlint" || bad "actionlint"; }
 exit $fail

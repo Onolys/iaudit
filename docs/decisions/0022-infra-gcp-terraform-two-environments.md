@@ -24,7 +24,7 @@
 - **D12 Provider keys**: `llm_secrets` / `stt_secrets` maps looped into secret shells, accessor bindings and Cloud Run env refs; adding a provider is one tfvars line, a seeded value and a route. **Amended 2026-11-20: per-environment keys.** The maps hold base ids; the environment module creates `<base>-{env}` (e.g. `anthropic-api-key-staging`, `anthropic-api-key-prod`), and each env's service accounts get accessor only on their own env's secrets. Staging and prod use separate provider keys (no shared project-level key). The old shared `anthropic-api-key` is dropped from state and removed by hand after cutover.
 - **D13 STT settings** live in `config/{env}/stt_providers.yaml` in the image; no STT env vars.
 - **D14 Worker sizing**: concurrency 2, max 3 instances in prod until measured; queue dispatches = concurrency x max instances.
-- **D15 Version stamp**: CI sets `GIT_SHA` on api and worker; the rollback target is a sha.
+- **D15 Version stamp**: CI sets `GIT_SHA` on api and worker; the rollback target is a `prod-YYYY-MM-DD.N` tag (each successful prod deploy is auto-tagged; owner 2026-11-21) or an earlier staging-deployed sha.
 - **D16 Failure visibility**: two log-based alerts (failed step/run, api 5xx) to the owner's email, plus the runbook.
 - **D17 Status listener**: `VITE_FIRESTORE_DATABASE` per web build, because staging uses the named DB.
 - **D18 Cut to after launch**: `infra-plan.yml` with a `tf-plan` service account, Artifact Registry cleanup policy, browser API-key restriction, Data Access audit logs. PR previews stay in v1 (SP00).
@@ -35,4 +35,4 @@
 
 **Alternatives.** Two projects (more isolation, more setup and cost); collection prefixes for environments (weaker boundary); IAP behind a load balancer for admin (about $18 a month, slower to ship); a service-account JSON key in GitHub (long-lived secret in a public repo).
 
-**Consequences.** Cold starts are accepted (min instances 0). Budgets alert but do not stop spend; caps are max instances, dispatch limits and the per-user daily run cap. `terraform apply` is manual. Rollback redeploys a previous sha through `deploy-prod`; data is not rolled back.
+**Consequences.** Cold starts are accepted (min instances 0). Budgets alert but do not stop spend; caps are max instances, dispatch limits and the per-user daily run cap. `terraform apply` is manual. Rollback dispatches `deploy-prod` with `version=<prod-* tag>` (or an earlier staging-deployed sha); data is not rolled back.
