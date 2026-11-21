@@ -1,0 +1,17 @@
+{
+  "$id": "confirm-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "clinician_speaker": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Clinician Speaker",
+      "type": "string"
+    }
+  },
+  "required": [
+    "clinician_speaker"
+  ],
+  "title": "ConfirmRequest",
+  "type": "object"
+}

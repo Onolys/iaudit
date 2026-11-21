@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "audit-request.schema.json",
   "title": "AuditRequest",
-  "description": "Body of one evidence-consistency audit request, schema 0.0.1. This is the JSON body only. HTTP path, method, and auth are out of scope. label and score are display-only and must not be audited.",
+  "description": "Body of one evidence-consistency audit request, schema 0.0.2. This is the JSON body only. HTTP path, method, and auth are out of scope. label and score are display-only and must not be audited.",
   "type": "object",
   "required": ["schema_version", "transcript", "assessment"],
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "0.0.1",
+      "const": "0.0.2",
       "description": "Contract version. Producers must send exactly this value until the contract is bumped."
     },
     "request_id": {
@@ -27,9 +27,47 @@
       "minItems": 1,
       "description": "Clinician reasoning, split only for display. A single section is valid. Claim spans use this array's index, not section.id.",
       "items": { "$ref": "#/$defs/Section" }
-    }
+    },
+    "profile": { "$ref": "#/$defs/Profile" }
   },
   "$defs": {
+    "Profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional request-level audit profile. Without it the audit runs as before. Both fields are optional.",
+      "properties": {
+        "suppress_concerns": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "unsupported_claim",
+              "contradictory_evidence",
+              "wrong_attribution",
+              "timeframe_mismatch",
+              "negation_reversal",
+              "certainty_inflation",
+              "frequency_severity_inflation",
+              "context_stripping",
+              "question_as_answer",
+              "correction_ignored",
+              "conflicting_accounts_flattened",
+              "unsupported_causal_link",
+              "quantity_mismatch",
+              "opinion_as_fact",
+              "calculation_error",
+              "meaning_shift",
+              "unsupported_inference"
+            ]
+          },
+          "description": "Concern types to drop. The filter runs before the decision table, so verdicts are recomputed from the remaining signals; a concern is never hidden after the verdict. Only types the checker derives from verifier flags or observations can be dropped; structural types (contradictory_evidence, wrong_attribution, negation_reversal, question_as_answer, and unsupported_claim from missing evidence) are kept even if listed."
+        },
+        "context_note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short plain-text note appended to the atomize prompt, for example who the first person refers to. Prompts of requests without it are unchanged."
+        }
+      }
+    },
     "Turn": {
       "type": "object",
       "required": ["id", "text"],

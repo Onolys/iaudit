@@ -1,4 +1,4 @@
-# Audit contract 0.0.1
+# Audit contract 0.0.2
 
 Source of truth for the evidence-audit request and response. The frontend owns this contract. The backend implements it.
 
@@ -20,9 +20,11 @@ If this file and a schema disagree about **structure**, the schema wins. If they
 
 The verdict list and the concern-type list mirror [../mission.md](../mission.md). When the mission changes, update both schemas and this file.
 
-Version: `0.0.1`; no compatibility promise.
+Version: `0.0.2`; no compatibility promise.
 
-**Contract-versioning rule (whole initiative): all schemas are `"0.0.1"`; the project is not deployed; no legacy/back-compat code, version history or migration; a non-conforming file just shows a validation error and the owner deletes it.**
+Protocol-audit (`paudit`) packs and results are separate from this contract; see [ADR 0018](../decisions/0018-protocol-pack-data-vs-code.md) and [engines/paudit](../../engines/paudit/README.md).
+
+**Contract-versioning rule (whole initiative): all schemas are `"0.0.1"` except the audit contract (request, response, error), which is `"0.0.2"` since the optional `profile` was added; the project is not deployed; no legacy/back-compat code, version history or migration; a non-conforming file just shows a validation error and the owner deletes it.**
 
 A consumer must not render a partial audit from an invalid body.
 
@@ -64,7 +66,7 @@ A claim uses the same walk inside one section, so only step 3 applies, against `
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"0.0.1"`. |
+| `schema_version` | yes | Always `"0.0.2"`. |
 | `request_id` | no | Caller-chosen id. Echoed on the response. Not a content hash. |
 | `transcript` | yes | Non-empty array of turns, in order. |
 | `transcript[].id` | yes | Log id. Not an evidence anchor. |
@@ -77,6 +79,9 @@ A claim uses the same walk inside one section, so only step 3 applies, against `
 | `assessment[].label` | no | Domain or sub-domain name. Display only. |
 | `assessment[].score` | no | Number or string. Display only. Never audited. |
 | `assessment[].text` | yes | The clinician's reasoning for this section. |
+| `profile` | no | Optional audit profile; without it the audit runs as before. Example: [examples/profile.request.json](examples/profile.request.json). |
+| `profile.suppress_concerns` | no | Concern types to drop. Applied before the decision table, so verdicts are recomputed from the remaining signals. Structural types (`contradictory_evidence`, `wrong_attribution`, `negation_reversal`, `question_as_answer`, and `unsupported_claim` from missing evidence) are kept even if listed. |
+| `profile.context_note` | no | Plain-text note appended to the atomize prompt (for example who "I" is). Prompts without it are unchanged. |
 
 Ids must be unique among turns, and unique among sections.
 
@@ -86,7 +91,7 @@ A turn without `speaker` stays unknown. Speaker-dependent checks and question/an
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"0.0.1"`. |
+| `schema_version` | yes | Always `"0.0.2"`. |
 | `request_id` | when sent | Exact echo of the request id. |
 | `status` | yes | `complete` or `partial`. |
 | `warnings` | yes | May be empty. |
@@ -227,11 +232,11 @@ Rules 2–6 and 11 are also enforced by the response schema.
 
 ## Error response
 
-Every non-2xx reply carries this body instead of an audit. Examples: [examples/error.json](examples/error.json), [examples/multi-error.json](examples/multi-error.json). Request, response and error bodies share `schema_version: "0.0.1"`.
+Every non-2xx reply carries this body instead of an audit. Examples: [examples/error.json](examples/error.json), [examples/multi-error.json](examples/multi-error.json). Request, response and error bodies share `schema_version: "0.0.2"`.
 
 | Field | Required | Meaning |
 |---|---|---|
-| `schema_version` | yes | Always `"0.0.1"`. |
+| `schema_version` | yes | Always `"0.0.2"`. |
 | `request_id` | no | Echo of the request id, when known. |
 | `status` | yes | Integer from 400 through 599; equals the HTTP response status. |
 | `message` | yes | Non-empty plain text shown to the reviewer as-is. Fixed backend text for the error class. |
@@ -261,6 +266,10 @@ The body has no top-level code or nested `error` object. A wrong `schema_version
 | `upstream_unavailable` | 503 | `LLMUnavailable` | Model provider unreachable or failing after retries | Audit service temporarily unavailable. | Retry later (retryable). |
 | `deadline_exceeded` | 504 | `DeadlineExceeded`/`TimeoutError` | Audit deadline passed with no usable result | The audit ran out of time. | Retry or use a shorter input (retryable). |
 | `internal_error` | 500 | catch-all; response self-validation failure | Backend bug | Internal server error. | Report; retry once (retryable). |
+| `missing_parameter` | 400 | admin `POST /v1/paudit` | A required `params` field is absent (paths only) | Request rejected: params.… is required. | Add the field. |
+| `unknown_pack` | 400 | admin `POST /v1/paudit` | `pack` is not the supported pack ref | Request rejected: unknown pack. | Use the supported pack. |
+| `input_rejected` | 400 | admin `POST /v1/paudit` | The engine refused the input (e.g. too few subject turns) | Request rejected. | Fix the input. |
+| `run_failed` | 502 | admin `POST /v1/paudit` | Every protocol-audit run failed | The protocol audit failed. | Retry later (retryable). |
 
 Consumer rule: if the body validates against the error schema and its `status` equals the HTTP response status, show `message`, followed by each `details[].message` as a list. Otherwise (including empty, HTML, or other JSON), use generic text for the HTTP status. Never render an audit from an error body. Retry decisions use HTTP status only; detail codes are for display and diagnostics. Automatic audit POST retry is limited to 429.
 

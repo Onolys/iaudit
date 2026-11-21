@@ -1,9 +1,8 @@
-import Ajv2020 from "ajv/dist/2020";
-import errorSchema from "@contracts/error-response.schema.json";
+import type { ValidateFunction } from "ajv";
+import { checkError as compiled } from "../generated/errorBody";
 
-// Same options as ../contract/validate.ts; kept local so the contract core is untouched.
-const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true, strictTypes: false });
-const checkError = ajv.compile<ErrorBody>(errorSchema);
+// Precompiled by scripts/compile-validators.mjs (no runtime codegen; strict CSP).
+const checkError = compiled as ValidateFunction<ErrorBody>;
 
 export interface ErrorDetail {
   code: string;

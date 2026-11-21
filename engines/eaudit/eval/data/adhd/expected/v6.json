@@ -1,0 +1,10 @@
+{
+ "fixture": "adhd-v6",
+ "target_text": "Both Alex and his partner agree he forgets errands about twice a month.",
+ "verdict": "partially_supported",
+ "concerns_required": [
+  "conflicting_accounts_flattened"
+ ],
+ "concerns_allowed": [],
+ "explanation_contains": []
+}

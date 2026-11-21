@@ -1,0 +1,48 @@
+{
+  "$id": "create-session-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "language": {
+      "default": "auto",
+      "description": "BCP-47 tag or `auto`",
+      "title": "Language",
+      "type": "string"
+    },
+    "n_runs": {
+      "default": 1,
+      "maximum": 5,
+      "minimum": 1,
+      "title": "N Runs",
+      "type": "integer"
+    },
+    "preset": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Allowlisted preset name",
+      "title": "Preset"
+    },
+    "title": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Title"
+    }
+  },
+  "title": "CreateSessionRequest",
+  "type": "object"
+}

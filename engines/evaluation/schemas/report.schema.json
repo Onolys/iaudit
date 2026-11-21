@@ -1,0 +1,1626 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Report",
+  "$defs": {
+    "Aggregates": {
+      "additionalProperties": false,
+      "properties": {
+        "globals_compared": {
+          "minimum": 0,
+          "title": "Globals Compared",
+          "type": "integer"
+        },
+        "avg_abs_global_difference": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Avg Abs Global Difference"
+        },
+        "within_one_share": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Within One Share"
+        },
+        "counts_flagged": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Counts Flagged"
+        }
+      },
+      "required": [
+        "globals_compared",
+        "avg_abs_global_difference",
+        "within_one_share",
+        "counts_flagged"
+      ],
+      "title": "Aggregates",
+      "type": "object"
+    },
+    "AuditClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "span": {
+          "description": "The claim text as written in the clinician's reason.",
+          "title": "Span",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "supported",
+            "partially_supported",
+            "contradicted",
+            "insufficient_evidence",
+            "out_of_scope"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "concerns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Concerns",
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/AuditEvidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "span",
+        "verdict",
+        "explanation",
+        "concerns",
+        "evidence"
+      ],
+      "title": "AuditClaim",
+      "type": "object"
+    },
+    "AuditEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "supporting",
+            "contradicting",
+            "qualifying"
+          ],
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_id",
+        "start",
+        "end",
+        "quote",
+        "role"
+      ],
+      "title": "AuditEvidence",
+      "type": "object"
+    },
+    "AuditItem": {
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "description": "Pack item id, or `notes` for the additional-notes box.",
+          "title": "Item Id",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "claims": {
+          "items": {
+            "$ref": "#/$defs/AuditClaim"
+          },
+          "title": "Claims",
+          "type": "array"
+        }
+      },
+      "required": [
+        "item_id",
+        "reason",
+        "claims"
+      ],
+      "title": "AuditItem",
+      "type": "object"
+    },
+    "BehaviourEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "clinician_count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Clinician Count"
+        },
+        "clinician_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Clinician Note"
+        },
+        "onolys_count": {
+          "$ref": "#/$defs/RunStats"
+        },
+        "instances": {
+          "items": {
+            "$ref": "#/$defs/Instance"
+          },
+          "title": "Instances",
+          "type": "array"
+        },
+        "instances_total": {
+          "minimum": 0,
+          "title": "Instances Total",
+          "type": "integer"
+        },
+        "diff": {
+          "$ref": "#/$defs/Diff"
+        },
+        "explanation": {
+          "$ref": "#/$defs/Explanation"
+        }
+      },
+      "required": [
+        "item_id",
+        "clinician_count",
+        "onolys_count",
+        "instances",
+        "instances_total",
+        "diff",
+        "explanation"
+      ],
+      "title": "BehaviourEntry",
+      "type": "object"
+    },
+    "ClinicianExample": {
+      "additionalProperties": false,
+      "properties": {
+        "at_s": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At S"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "ClinicianExample",
+      "type": "object"
+    },
+    "ClinicianGlobal": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "example": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ClinicianExample"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "ClinicianGlobal",
+      "type": "object"
+    },
+    "ClinicianValue": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "ClinicianValue",
+      "type": "object"
+    },
+    "CodedSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "from_s": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "From S"
+        },
+        "to_s": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "To S"
+        }
+      },
+      "title": "CodedSpan",
+      "type": "object"
+    },
+    "Diff": {
+      "additionalProperties": false,
+      "properties": {
+        "signed": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Signed"
+        },
+        "abs": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Abs"
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Direction"
+        },
+        "status": {
+          "enum": [
+            "agree",
+            "differs",
+            "flagged",
+            "not_rated",
+            "no_onolys_value"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "within_one": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Within One"
+        }
+      },
+      "required": [
+        "signed",
+        "abs",
+        "direction",
+        "status"
+      ],
+      "title": "Diff",
+      "type": "object"
+    },
+    "Explanation": {
+      "additionalProperties": false,
+      "properties": {
+        "headline": {
+          "title": "Headline",
+          "type": "string"
+        },
+        "body": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Body",
+          "type": "array"
+        },
+        "onolys_lines": {
+          "items": {
+            "$ref": "#/$defs/Line"
+          },
+          "title": "Onolys Lines",
+          "type": "array"
+        },
+        "clinician_support_lines": {
+          "items": {
+            "$ref": "#/$defs/Line"
+          },
+          "title": "Clinician Support Lines",
+          "type": "array"
+        }
+      },
+      "required": [
+        "headline",
+        "body",
+        "onolys_lines",
+        "clinician_support_lines"
+      ],
+      "title": "Explanation",
+      "type": "object"
+    },
+    "GlobalEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "onolys": {
+          "$ref": "#/$defs/OnolysGlobal"
+        },
+        "clinician": {
+          "$ref": "#/$defs/ClinicianGlobal"
+        },
+        "diff": {
+          "$ref": "#/$defs/Diff"
+        },
+        "explanation": {
+          "$ref": "#/$defs/Explanation"
+        }
+      },
+      "required": [
+        "item_id",
+        "onolys",
+        "clinician",
+        "diff",
+        "explanation"
+      ],
+      "title": "GlobalEntry",
+      "type": "object"
+    },
+    "Header": {
+      "additionalProperties": false,
+      "properties": {
+        "change_goal": {
+          "title": "Change Goal",
+          "type": "string"
+        },
+        "protocol": {
+          "$ref": "#/$defs/Protocol"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "coded_span": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodedSpan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subject_speaker": {
+          "title": "Subject Speaker",
+          "type": "string"
+        },
+        "n_runs": {
+          "minimum": 1,
+          "title": "N Runs",
+          "type": "integer"
+        },
+        "models": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "route name -> litellm id",
+          "title": "Models",
+          "type": "object"
+        },
+        "stt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SttRun"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The transcript's typed SttRun; null for text-only."
+        },
+        "preset": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Preset"
+        },
+        "code_version": {
+          "title": "Code Version",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": true,
+          "title": "Params",
+          "type": "object"
+        },
+        "has_clinician_rating": {
+          "title": "Has Clinician Rating",
+          "type": "boolean"
+        },
+        "rating_coverage": {
+          "$ref": "#/$defs/RatingCoverage"
+        }
+      },
+      "required": [
+        "change_goal",
+        "protocol",
+        "language",
+        "coded_span",
+        "subject_speaker",
+        "n_runs",
+        "models",
+        "stt",
+        "preset",
+        "code_version",
+        "params",
+        "has_clinician_rating",
+        "rating_coverage"
+      ],
+      "title": "Header",
+      "type": "object"
+    },
+    "Instance": {
+      "additionalProperties": false,
+      "properties": {
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_id",
+        "start",
+        "end",
+        "quote",
+        "id",
+        "rationale"
+      ],
+      "title": "Instance",
+      "type": "object"
+    },
+    "LayoutEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "section": {
+          "title": "Section",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "items": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Items"
+        }
+      },
+      "required": [
+        "section",
+        "title"
+      ],
+      "title": "LayoutEntry",
+      "type": "object"
+    },
+    "Line": {
+      "additionalProperties": false,
+      "description": "A quote located in a turn. `start`/`end` are code-point offsets into the turn's text.",
+      "properties": {
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_id",
+        "start",
+        "end",
+        "quote"
+      ],
+      "title": "Line",
+      "type": "object"
+    },
+    "Method": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "title": "Statement",
+          "type": "string"
+        },
+        "limits": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limits",
+          "type": "array"
+        },
+        "not_official_miti_coding": {
+          "const": true,
+          "title": "Not Official Miti Coding",
+          "type": "boolean"
+        },
+        "citation": {
+          "title": "Citation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "statement",
+        "limits",
+        "not_official_miti_coding",
+        "citation"
+      ],
+      "title": "Method",
+      "type": "object"
+    },
+    "OnolysGlobal": {
+      "additionalProperties": false,
+      "properties": {
+        "score": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Score"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "enum": [
+                "model",
+                "default",
+                "capped"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Line"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "score",
+        "source",
+        "evidence"
+      ],
+      "title": "OnolysGlobal",
+      "type": "object"
+    },
+    "OnolysScoreStats": {
+      "additionalProperties": false,
+      "properties": {
+        "mean": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mean"
+        },
+        "min": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min"
+        },
+        "max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max"
+        },
+        "values": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Values",
+          "type": "array"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "mean",
+        "min",
+        "max",
+        "values",
+        "value"
+      ],
+      "title": "OnolysScoreStats",
+      "type": "object"
+    },
+    "PackFacts": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "hash": {
+          "title": "Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "hash"
+      ],
+      "title": "PackFacts",
+      "type": "object"
+    },
+    "Protocol": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "pack_hash": {
+          "title": "Pack Hash",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "pack_hash",
+        "label"
+      ],
+      "title": "Protocol",
+      "type": "object"
+    },
+    "RatingCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "rated": {
+          "minimum": 0,
+          "title": "Rated",
+          "type": "integer"
+        },
+        "total": {
+          "minimum": 0,
+          "title": "Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "rated",
+        "total"
+      ],
+      "title": "RatingCoverage",
+      "type": "object"
+    },
+    "ReasonsAudit": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "ran",
+            "partial",
+            "skipped",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/AuditItem"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "status",
+        "items"
+      ],
+      "title": "ReasonsAudit",
+      "type": "object"
+    },
+    "ReportRunInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "evaluation": {
+          "$ref": "#/$defs/RunInfo"
+        },
+        "paudit": {
+          "$ref": "#/$defs/RunInfo"
+        },
+        "eaudit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "null when no reasons audit ran."
+        }
+      },
+      "required": [
+        "evaluation",
+        "paudit",
+        "eaudit"
+      ],
+      "title": "ReportRunInfo",
+      "type": "object"
+    },
+    "RouteFacts": {
+      "additionalProperties": false,
+      "properties": {
+        "litellm_id": {
+          "title": "Litellm Id",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "structured_output_mode": {
+          "enum": [
+            "json_object",
+            "json_schema"
+          ],
+          "title": "Structured Output Mode",
+          "type": "string"
+        },
+        "temperature_effective": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Temperature Effective"
+        },
+        "params_hash": {
+          "title": "Params Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "litellm_id",
+        "provider",
+        "structured_output_mode",
+        "temperature_effective",
+        "params_hash"
+      ],
+      "title": "RouteFacts",
+      "type": "object"
+    },
+    "RunInfo": {
+      "additionalProperties": false,
+      "description": "Provenance of one engine run (PRD R10). Never holds text or key values.",
+      "properties": {
+        "engine": {
+          "title": "Engine",
+          "type": "string"
+        },
+        "code_version": {
+          "title": "Code Version",
+          "type": "string"
+        },
+        "preset": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Preset"
+        },
+        "routes": {
+          "additionalProperties": {
+            "$ref": "#/$defs/RouteFacts"
+          },
+          "default": {},
+          "title": "Routes",
+          "type": "object"
+        },
+        "stt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SttRun"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "pack": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PackFacts"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "prompt_hashes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Prompt Hashes",
+          "type": "object"
+        },
+        "n_runs": {
+          "default": 1,
+          "title": "N Runs",
+          "type": "integer"
+        },
+        "usage": {
+          "$ref": "#/$defs/RunUsage",
+          "default": {
+            "calls": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cost_usd": null
+          }
+        }
+      },
+      "required": [
+        "engine",
+        "code_version"
+      ],
+      "title": "RunInfo",
+      "type": "object"
+    },
+    "RunStats": {
+      "additionalProperties": false,
+      "properties": {
+        "mean": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mean"
+        },
+        "min": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min"
+        },
+        "max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max"
+        },
+        "values": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mean",
+        "min",
+        "max",
+        "values"
+      ],
+      "title": "RunStats",
+      "type": "object"
+    },
+    "RunUsage": {
+      "additionalProperties": false,
+      "properties": {
+        "calls": {
+          "default": 0,
+          "title": "Calls",
+          "type": "integer"
+        },
+        "input_tokens": {
+          "default": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "output_tokens": {
+          "default": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "cache_read_tokens": {
+          "default": 0,
+          "title": "Cache Read Tokens",
+          "type": "integer"
+        },
+        "cache_write_tokens": {
+          "default": 0,
+          "title": "Cache Write Tokens",
+          "type": "integer"
+        },
+        "cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Usd"
+        }
+      },
+      "title": "RunUsage",
+      "type": "object"
+    },
+    "ScorecardRow": {
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "global",
+            "count"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "clinician": {
+          "$ref": "#/$defs/ClinicianValue"
+        },
+        "onolys": {
+          "$ref": "#/$defs/OnolysScoreStats"
+        },
+        "diff": {
+          "$ref": "#/$defs/Diff"
+        }
+      },
+      "required": [
+        "item_id",
+        "kind",
+        "label",
+        "clinician",
+        "onolys",
+        "diff"
+      ],
+      "title": "ScorecardRow",
+      "type": "object"
+    },
+    "SttRun": {
+      "properties": {
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "language_requested": {
+          "title": "Language Requested",
+          "type": "string"
+        },
+        "language_detected": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language Detected"
+        },
+        "adapter_version": {
+          "title": "Adapter Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider",
+        "model",
+        "language_requested",
+        "adapter_version"
+      ],
+      "title": "SttRun",
+      "type": "object"
+    },
+    "SummaryEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "clinician": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SummaryValue"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "onolys": {
+          "$ref": "#/$defs/SummaryValue"
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SummaryReference"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "clinician",
+        "onolys",
+        "reference",
+        "note"
+      ],
+      "title": "SummaryEntry",
+      "type": "object"
+    },
+    "SummaryReference": {
+      "additionalProperties": false,
+      "properties": {
+        "fair": {
+          "title": "Fair",
+          "type": "number"
+        },
+        "good": {
+          "title": "Good",
+          "type": "number"
+        }
+      },
+      "required": [
+        "fair",
+        "good"
+      ],
+      "title": "SummaryReference",
+      "type": "object"
+    },
+    "SummaryValue": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "enum": [
+                "below_fair",
+                "fair",
+                "good"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Label"
+        }
+      },
+      "required": [
+        "value",
+        "label"
+      ],
+      "title": "SummaryValue",
+      "type": "object"
+    },
+    "Tip": {
+      "additionalProperties": false,
+      "properties": {
+        "rank": {
+          "minimum": 1,
+          "title": "Rank",
+          "type": "integer"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "observation": {
+          "title": "Observation",
+          "type": "string"
+        },
+        "quote": {
+          "$ref": "#/$defs/TipQuote"
+        },
+        "alternative": {
+          "title": "Alternative",
+          "type": "string"
+        },
+        "why_it_matters": {
+          "title": "Why It Matters",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rank",
+        "item_id",
+        "observation",
+        "quote",
+        "alternative",
+        "why_it_matters"
+      ],
+      "title": "Tip",
+      "type": "object"
+    },
+    "TipQuote": {
+      "additionalProperties": false,
+      "properties": {
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_id",
+        "start",
+        "end",
+        "text"
+      ],
+      "title": "TipQuote",
+      "type": "object"
+    },
+    "Warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "description": "Engine code (see WARNING_CODES), a paudit code, or a pack-defined code.",
+          "examples": [
+            "reasons_audit_failed",
+            "reason_withheld_tone",
+            "reasons_audit_partial",
+            "tips_failed",
+            "fewer_tips"
+          ],
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "item_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Item Id"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "Warning",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Request Id"
+    },
+    "created_at": {
+      "title": "Created At",
+      "type": "string"
+    },
+    "header": {
+      "$ref": "#/$defs/Header"
+    },
+    "layout": {
+      "items": {
+        "$ref": "#/$defs/LayoutEntry"
+      },
+      "title": "Layout",
+      "type": "array"
+    },
+    "scorecard": {
+      "items": {
+        "$ref": "#/$defs/ScorecardRow"
+      },
+      "title": "Scorecard",
+      "type": "array"
+    },
+    "globals": {
+      "items": {
+        "$ref": "#/$defs/GlobalEntry"
+      },
+      "title": "Globals",
+      "type": "array"
+    },
+    "behaviours": {
+      "items": {
+        "$ref": "#/$defs/BehaviourEntry"
+      },
+      "title": "Behaviours",
+      "type": "array"
+    },
+    "summaries": {
+      "items": {
+        "$ref": "#/$defs/SummaryEntry"
+      },
+      "title": "Summaries",
+      "type": "array"
+    },
+    "reasons_audit": {
+      "$ref": "#/$defs/ReasonsAudit"
+    },
+    "tips": {
+      "items": {
+        "$ref": "#/$defs/Tip"
+      },
+      "title": "Tips",
+      "type": "array"
+    },
+    "method": {
+      "$ref": "#/$defs/Method"
+    },
+    "aggregates": {
+      "$ref": "#/$defs/Aggregates"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/Warning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "run_info": {
+      "$ref": "#/$defs/ReportRunInfo"
+    }
+  },
+  "required": [
+    "schema_version",
+    "created_at",
+    "header",
+    "layout",
+    "scorecard",
+    "globals",
+    "behaviours",
+    "summaries",
+    "reasons_audit",
+    "tips",
+    "method",
+    "aggregates",
+    "warnings",
+    "run_info"
+  ],
+  "type": "object"
+}

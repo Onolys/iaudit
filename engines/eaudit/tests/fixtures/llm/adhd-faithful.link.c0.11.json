@@ -1,0 +1,18 @@
+{
+ "items": [
+  {
+   "key": "e1",
+   "role": "supporting",
+   "link_type": "quote",
+   "segments": [
+    {
+     "turn": 5,
+     "text": "Not really."
+    }
+   ],
+   "premises": [],
+   "inference_step": null,
+   "note": "The respondent denies careless mistakes."
+  }
+ ]
+}

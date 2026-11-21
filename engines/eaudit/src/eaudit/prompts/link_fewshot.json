@@ -1,0 +1,338 @@
+{
+ "split": "prompt",
+ "note": "Fictional 'Jordan' cases. Excluded from every eval set; never reuse eval sentences.",
+ "examples": [
+  {
+   "claim": {
+    "proposition": "Jordan skips breakfast daily.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "quantities": [
+     "daily"
+    ]
+   },
+   "turns": [
+    {
+     "i": 2,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "What does a normal morning look like?"
+    },
+    {
+     "i": 3,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Coffee and out the door. I skip breakfast every single day."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "e1",
+      "role": "supporting",
+      "link_type": "quote",
+      "segments": [
+       {
+        "turn": 3,
+        "text": "I skip breakfast every single day"
+       }
+      ],
+      "premises": [],
+      "inference_step": null,
+      "note": "The respondent states it happens every day."
+     }
+    ]
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan has trouble waking up on time.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 7,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "The alarm goes off and I just keep hitting snooze until I'm late."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "e1",
+      "role": "supporting",
+      "link_type": "paraphrase",
+      "segments": [
+       {
+        "turn": 7,
+        "text": "I just keep hitting snooze until I'm late"
+       }
+      ],
+      "premises": [],
+      "inference_step": null,
+      "note": "Repeated snoozing leads to being late."
+     }
+    ]
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan drives at night.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 11,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Do you drive after dark?"
+    },
+    {
+     "i": 12,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Yes."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "e1",
+      "role": "supporting",
+      "link_type": "quote",
+      "segments": [
+       {
+        "turn": 11,
+        "text": "Do you drive after dark?"
+       },
+       {
+        "turn": 12,
+        "text": "Yes."
+       }
+      ],
+      "premises": [],
+      "inference_step": null,
+      "note": "The reply agrees with the question asked."
+     }
+    ]
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan never forgets appointments.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "negated",
+    "timeframe": "current",
+    "quantities": [
+     "never"
+    ]
+   },
+   "turns": [
+    {
+     "i": 20,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I'm good with appointments."
+    },
+    {
+     "i": 21,
+     "speaker": "riley1",
+     "role": "informant",
+     "text": "She forgets appointments all the time and I remind her."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "e1",
+      "role": "contradicting",
+      "link_type": "quote",
+      "segments": [
+       {
+        "turn": 21,
+        "text": "She forgets appointments all the time"
+       }
+      ],
+      "premises": [],
+      "inference_step": null,
+      "note": "The informant describes frequent forgetting."
+     },
+     {
+      "key": "e2",
+      "role": "supporting",
+      "link_type": "paraphrase",
+      "segments": [
+       {
+        "turn": 20,
+        "text": "I'm good with appointments"
+       }
+      ],
+      "premises": [],
+      "inference_step": null,
+      "note": "The respondent says appointments go well."
+     }
+    ]
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan sleeps poorly.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 30,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Do you sleep okay?"
+    },
+    {
+     "i": 31,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Hm."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "e1",
+      "role": "qualifying",
+      "link_type": "quote",
+      "segments": [
+       {
+        "turn": 30,
+        "text": "Do you sleep okay?"
+       },
+       {
+        "turn": 31,
+        "text": "Hm."
+       }
+      ],
+      "premises": [],
+      "inference_step": null,
+      "note": "The reply does not address the question."
+     }
+    ]
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan lives alone.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 40,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "My roommate moved out in March."
+    },
+    {
+     "i": 41,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I haven't found anyone to replace them."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "e1",
+      "role": "supporting",
+      "link_type": "quote",
+      "segments": [
+       {
+        "turn": 40,
+        "text": "My roommate moved out in March"
+       }
+      ],
+      "premises": [],
+      "inference_step": null,
+      "note": "The only roommate left."
+     },
+     {
+      "key": "e2",
+      "role": "supporting",
+      "link_type": "quote",
+      "segments": [
+       {
+        "turn": 41,
+        "text": "I haven't found anyone to replace them"
+       }
+      ],
+      "premises": [],
+      "inference_step": null,
+      "note": "No new roommate."
+     },
+     {
+      "key": "e3",
+      "role": "supporting",
+      "link_type": "inference",
+      "segments": [],
+      "premises": [
+       "e1",
+       "e2"
+      ],
+      "inference_step": "With the roommate gone and no replacement, nobody else lives there.",
+      "note": "Follows from the two statements."
+     }
+    ]
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan has a gambling habit.",
+    "reported_by": [
+     "assessor"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "unspecified",
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 50,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "How was your week?"
+    },
+    {
+     "i": 51,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Busy but fine."
+    }
+   ],
+   "output": {
+    "items": []
+   }
+  }
+ ]
+}

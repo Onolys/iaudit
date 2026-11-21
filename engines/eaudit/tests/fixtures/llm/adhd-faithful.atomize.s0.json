@@ -1,0 +1,295 @@
+{
+ "claims": [
+  {
+   "ref": "a",
+   "segments": [
+    "Alex reports losing attention in most meetings, about three to four times a week"
+   ],
+   "proposition": "Alex loses attention in most meetings, about three to four times a week.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "Alex",
+   "subject_speaker": "alex1",
+   "reported_by": [
+    {
+     "source": "self",
+     "speaker": "alex1"
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [
+    {
+     "kind": "frequency",
+     "raw": "most meetings",
+     "bucket": "most",
+     "rate_per_week": null
+    },
+    {
+     "kind": "frequency",
+     "raw": "about three to four times a week",
+     "bucket": "often",
+     "rate_per_week": 3.5
+    }
+   ],
+   "timeframe": "current",
+   "timeframe_explicit": false,
+   "hedged": true
+  },
+  {
+   "ref": "b",
+   "segments": [
+    "He reports misplacing his phone daily"
+   ],
+   "proposition": "Alex misplaces his phone daily.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "Alex",
+   "subject_speaker": "alex1",
+   "reported_by": [
+    {
+     "source": "self",
+     "speaker": "alex1"
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [
+    {
+     "kind": "frequency",
+     "raw": "daily",
+     "bucket": "always",
+     "rate_per_week": 7.0
+    }
+   ],
+   "timeframe": "current",
+   "timeframe_explicit": false,
+   "hedged": true
+  },
+  {
+   "ref": "c",
+   "segments": [
+    "has a system for keys"
+   ],
+   "proposition": "Alex has a system for keeping track of his keys.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "Alex",
+   "subject_speaker": "alex1",
+   "reported_by": [
+    {
+     "source": "self",
+     "speaker": "alex1"
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [],
+   "timeframe": "current",
+   "timeframe_explicit": false,
+   "hedged": false
+  },
+  {
+   "ref": "d",
+   "segments": [
+    "He describes some difficulty finishing household projects"
+   ],
+   "proposition": "Alex has some difficulty finishing household projects.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "Alex",
+   "subject_speaker": "alex1",
+   "reported_by": [
+    {
+     "source": "self",
+     "speaker": "alex1"
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [
+    {
+     "kind": "severity",
+     "raw": "some difficulty",
+     "bucket": "mild",
+     "rate_per_week": null
+    }
+   ],
+   "timeframe": "current",
+   "timeframe_explicit": false,
+   "hedged": false
+  },
+  {
+   "ref": "e",
+   "segments": [
+    "the current unfinished project is partly because they ran out of paint"
+   ],
+   "proposition": "The current unfinished project is partly due to running out of paint.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "the current unfinished project",
+   "subject_speaker": null,
+   "reported_by": [
+    {
+     "source": "unspecified",
+     "speaker": null
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [],
+   "timeframe": "current",
+   "timeframe_explicit": false,
+   "hedged": false
+  },
+  {
+   "ref": "f",
+   "segments": [
+    "His partner reports he forgets agreed errands about twice a month"
+   ],
+   "proposition": "Alex forgets agreed errands about twice a month, according to his partner.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "he",
+   "subject_speaker": "alex1",
+   "reported_by": [
+    {
+     "source": "informant",
+     "speaker": "sam1"
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [
+    {
+     "kind": "frequency",
+     "raw": "about twice a month",
+     "bucket": "sometimes",
+     "rate_per_week": 0.46
+    }
+   ],
+   "timeframe": "current",
+   "timeframe_explicit": false,
+   "hedged": true
+  },
+  {
+   "ref": "g",
+   "segments": [
+    "Alex estimates once a month"
+   ],
+   "proposition": "Alex estimates he forgets agreed errands once a month.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "Alex",
+   "subject_speaker": "alex1",
+   "reported_by": [
+    {
+     "source": "self",
+     "speaker": "alex1"
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [
+    {
+     "kind": "frequency",
+     "raw": "once a month",
+     "bucket": "sometimes",
+     "rate_per_week": 0.23
+    }
+   ],
+   "timeframe": "current",
+   "timeframe_explicit": false,
+   "hedged": true
+  },
+  {
+   "ref": "h",
+   "segments": [
+    "Childhood report cards repeatedly noted daydreaming"
+   ],
+   "proposition": "Childhood report cards repeatedly noted daydreaming.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "Childhood report cards",
+   "subject_speaker": null,
+   "reported_by": [
+    {
+     "source": "unspecified",
+     "speaker": null
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [
+    {
+     "kind": "frequency",
+     "raw": "repeatedly",
+     "bucket": "often",
+     "rate_per_week": null
+    }
+   ],
+   "timeframe": "childhood",
+   "timeframe_explicit": true,
+   "hedged": false
+  },
+  {
+   "ref": "i",
+   "segments": [
+    "unfinished work"
+   ],
+   "proposition": "Childhood report cards repeatedly noted unfinished work.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "Childhood report cards",
+   "subject_speaker": null,
+   "reported_by": [
+    {
+     "source": "unspecified",
+     "speaker": null
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [],
+   "timeframe": "childhood",
+   "timeframe_explicit": true,
+   "hedged": false
+  },
+  {
+   "ref": "j",
+   "segments": [
+    "He received a review comment about seeming disengaged in meetings"
+   ],
+   "proposition": "Alex received a review comment about seeming disengaged in meetings.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "Alex",
+   "subject_speaker": "alex1",
+   "reported_by": [
+    {
+     "source": "unspecified",
+     "speaker": null
+    }
+   ],
+   "polarity": "affirmed",
+   "quantities": [],
+   "timeframe": "past",
+   "timeframe_explicit": false,
+   "hedged": false
+  },
+  {
+   "ref": "k",
+   "segments": [
+    "He denies careless mistakes at work"
+   ],
+   "proposition": "Alex does not make careless mistakes at work.",
+   "scope": "in_scope",
+   "oos_category": null,
+   "subject_text": "Alex",
+   "subject_speaker": "alex1",
+   "reported_by": [
+    {
+     "source": "self",
+     "speaker": "alex1"
+    }
+   ],
+   "polarity": "negated",
+   "quantities": [],
+   "timeframe": "current",
+   "timeframe_explicit": false,
+   "hedged": false
+  }
+ ],
+ "links": []
+}

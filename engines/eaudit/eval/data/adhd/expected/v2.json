@@ -1,0 +1,12 @@
+{
+ "fixture": "adhd-v2",
+ "target_text": "He makes frequent careless mistakes in reports.",
+ "verdict": "contradicted",
+ "concerns_required": [
+  "negation_reversal"
+ ],
+ "concerns_allowed": [
+  "contradictory_evidence"
+ ],
+ "explanation_contains": []
+}

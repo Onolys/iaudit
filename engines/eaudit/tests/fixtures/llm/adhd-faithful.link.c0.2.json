@@ -1,0 +1,18 @@
+{
+ "items": [
+  {
+   "key": "e1",
+   "role": "supporting",
+   "link_type": "quote",
+   "segments": [
+    {
+     "turn": 7,
+     "text": "My phone, constantly. Probably every day I'm hunting for it."
+    }
+   ],
+   "premises": [],
+   "inference_step": null,
+   "note": "The respondent says the phone is lost daily."
+  }
+ ]
+}

@@ -1,0 +1,35 @@
+# Report layout and static strings (SP03 R6/R7). Owner wording sign-off pending.
+# Every string here is linted against pack.yaml > evaluation.tone.banned by a unit test.
+# `sections[].id/label/items` are also read by paudit's pack loader (id parity check).
+headline: "Onolys disagrees, here's why"
+max_instances_shown: 5
+method:
+  statement: >-
+    Onolys reads the recording against the MITI 4.2.1 coding manual and scores the same items
+    you rated. Where Onolys and your rating differ, the report shows Onolys's reading and the
+    lines of the session it is based on, next to the lines that support your rating.
+  limits:
+    - Onolys reads the transcript only; tone of voice, pauses and body language are not available to it.
+    - Speaker labels and timestamps come from automatic transcription and can contain errors.
+    - A difference between two readings is a prompt to look at the session again, not a verdict on either one.
+    - Behaviour counts depend on where each utterance is split, so small differences are expected.
+  citation: Moyers, T. B., Manuel, J. K., & Ernst, D. (2014). Motivational Interviewing Treatment Integrity Coding Manual 4.2.1.
+sections:
+  - id: globals
+    label: Global ratings
+    items: [cct, sst, partnership, empathy]
+  - id: counts
+    label: Behavior counts
+    items: [gi, persuade, persuade_permission, question, sr, cr, affirm, seek_collab, emphasize_autonomy, confront]
+  - id: summaries
+    label: Summary scores
+    items: [technical, relational, pct_cr, reflection_question_ratio, total_mia, total_mina]
+  - id: reasons_audit
+    label: Your written reasons, checked against the session
+    items: []
+  - id: tips
+    label: Ideas to try next time
+    items: []
+  - id: method
+    label: How Onolys reads this
+    items: []

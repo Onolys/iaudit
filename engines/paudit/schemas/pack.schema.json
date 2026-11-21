@@ -1,0 +1,434 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onolys.invalid/schemas/pack.schema.json",
+  "title": "Protocol pack (pack.yaml)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "pack_format",
+    "id",
+    "version",
+    "source",
+    "speaker_roles",
+    "items",
+    "volley"
+  ],
+  "properties": {
+    "pack_format": {
+      "const": "0.0.1"
+    },
+    "id": {
+      "$ref": "#/$defs/ident"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9A-Za-z][0-9A-Za-z._+-]*$"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "citation"
+      ],
+      "properties": {
+        "citation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string"
+        },
+        "permission_note": {
+          "type": "string"
+        }
+      }
+    },
+    "speaker_roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "other"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "other": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    },
+    "params": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "volleys_per_call": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "code_max_tokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "globals_max_tokens": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule"
+      }
+    },
+    "volley": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "breaks_on"
+      ],
+      "properties": {
+        "breaks_on": {
+          "const": "other_speaker"
+        },
+        "min_other_words": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      }
+    },
+    "summaries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/summary"
+      }
+    },
+    "input_checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/input_check"
+      }
+    },
+    "compare": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/ident"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "ident": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "label",
+        "definition"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/ident"
+        },
+        "kind": {
+          "enum": [
+            "global",
+            "count"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "definition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scale": {
+          "$ref": "#/$defs/scale"
+        },
+        "evidence_min": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "caps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cap"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "global"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "scale",
+              "evidence_min"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "scale"
+                  ]
+                },
+                {
+                  "required": [
+                    "evidence_min"
+                  ]
+                },
+                {
+                  "required": [
+                    "caps"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "scale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max",
+        "default"
+      ],
+      "properties": {
+        "min": {
+          "type": "integer"
+        },
+        "max": {
+          "type": "integer"
+        },
+        "default": {
+          "type": "integer"
+        }
+      }
+    },
+    "cap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max",
+        "when",
+        "source"
+      ],
+      "properties": {
+        "max": {
+          "type": "integer"
+        },
+        "when": {
+          "const": "poor_practice_cited"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "rule": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "one_code_per_utterance"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "unit",
+            "code",
+            "n"
+          ],
+          "properties": {
+            "kind": {
+              "const": "max_per_unit"
+            },
+            "unit": {
+              "const": "volley"
+            },
+            "code": {
+              "type": "string",
+              "minLength": 1
+            },
+            "n": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "unit",
+            "codes"
+          ],
+          "properties": {
+            "kind": {
+              "const": "exclusive_group"
+            },
+            "unit": {
+              "const": "volley"
+            },
+            "codes": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/ident"
+              }
+            },
+            "precedence": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ident"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "expr"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/ident"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expr": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fair",
+            "good"
+          ],
+          "properties": {
+            "fair": {
+              "type": "number"
+            },
+            "good": {
+              "type": "number"
+            },
+            "direction": {
+              "enum": [
+                "higher_better",
+                "lower_better"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "input_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "value",
+        "severity"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/ident"
+        },
+        "kind": {
+          "enum": [
+            "duration_max",
+            "duration_min",
+            "param_required",
+            "min_subject_turns",
+            "min_other_turns"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warn"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+ "fixture": "adhd-v3",
+ "target_text": "He frequently forgets appointments.",
+ "verdict": "contradicted",
+ "concerns_required": [
+  "wrong_attribution"
+ ],
+ "concerns_allowed": [],
+ "explanation_contains": []
+}

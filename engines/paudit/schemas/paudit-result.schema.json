@@ -1,0 +1,926 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PauditResult",
+  "$defs": {
+    "Aggregate": {
+      "additionalProperties": false,
+      "properties": {
+        "counts": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Stat"
+          },
+          "title": "Counts",
+          "type": "object"
+        },
+        "globals": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Stat"
+          },
+          "title": "Globals",
+          "type": "object"
+        },
+        "summaries": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SummaryStat"
+          },
+          "title": "Summaries",
+          "type": "object"
+        },
+        "representative_run": {
+          "description": "`run_index` of the run closest to the mean vector.",
+          "minimum": 0,
+          "title": "Representative Run",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "counts",
+        "globals",
+        "summaries",
+        "representative_run"
+      ],
+      "title": "Aggregate",
+      "type": "object"
+    },
+    "CodedSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "from_s": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "From S"
+        },
+        "to_s": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "To S"
+        }
+      },
+      "title": "CodedSpan",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "turn_id",
+        "start",
+        "end",
+        "quote"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "GlobalScore": {
+      "additionalProperties": false,
+      "properties": {
+        "score": {
+          "title": "Score",
+          "type": "integer"
+        },
+        "source": {
+          "enum": [
+            "model",
+            "default",
+            "capped"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "raw_score": {
+          "title": "Raw Score",
+          "type": "integer"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "score",
+        "source",
+        "raw_score",
+        "reason",
+        "evidence"
+      ],
+      "title": "GlobalScore",
+      "type": "object"
+    },
+    "Instance": {
+      "additionalProperties": false,
+      "description": "One coded utterance. Offsets are code points into the turn's text.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "volley_id": {
+          "title": "Volley Id",
+          "type": "string"
+        },
+        "turn_id": {
+          "title": "Turn Id",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "start_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Ms"
+        },
+        "end_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Ms"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        },
+        "code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Code"
+        },
+        "counted": {
+          "title": "Counted",
+          "type": "boolean"
+        },
+        "uncounted_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncounted Reason"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "volley_id",
+        "turn_id",
+        "start",
+        "end",
+        "quote",
+        "code",
+        "counted",
+        "rationale"
+      ],
+      "title": "Instance",
+      "type": "object"
+    },
+    "PackFacts": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "hash": {
+          "title": "Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "hash"
+      ],
+      "title": "PackFacts",
+      "type": "object"
+    },
+    "ProtocolBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "pack_hash": {
+          "title": "Pack Hash",
+          "type": "string"
+        },
+        "pack_format": {
+          "title": "Pack Format",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "pack_hash",
+        "pack_format"
+      ],
+      "title": "ProtocolBlock",
+      "type": "object"
+    },
+    "Reference": {
+      "additionalProperties": false,
+      "properties": {
+        "fair": {
+          "title": "Fair",
+          "type": "number"
+        },
+        "good": {
+          "title": "Good",
+          "type": "number"
+        }
+      },
+      "required": [
+        "fair",
+        "good"
+      ],
+      "title": "Reference",
+      "type": "object"
+    },
+    "ResultWarning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "description": "Engine code (see WARNING_CODES) or a pack-defined code.",
+          "examples": [
+            "short_session",
+            "quote_not_found",
+            "overlap",
+            "insufficient_evidence",
+            "capped",
+            "span_ignored",
+            "unknown_speaker",
+            "language_not_validated",
+            "run_failed"
+          ],
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "default": "warning",
+          "enum": [
+            "info",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "item_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Item Id"
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detail"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "ResultWarning",
+      "type": "object"
+    },
+    "RouteFacts": {
+      "additionalProperties": false,
+      "properties": {
+        "litellm_id": {
+          "title": "Litellm Id",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "structured_output_mode": {
+          "enum": [
+            "json_object",
+            "json_schema"
+          ],
+          "title": "Structured Output Mode",
+          "type": "string"
+        },
+        "temperature_effective": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Temperature Effective"
+        },
+        "params_hash": {
+          "title": "Params Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "litellm_id",
+        "provider",
+        "structured_output_mode",
+        "temperature_effective",
+        "params_hash"
+      ],
+      "title": "RouteFacts",
+      "type": "object"
+    },
+    "RunInfo": {
+      "additionalProperties": false,
+      "description": "Provenance of one engine run (PRD R10). Never holds text or key values.",
+      "properties": {
+        "engine": {
+          "title": "Engine",
+          "type": "string"
+        },
+        "code_version": {
+          "title": "Code Version",
+          "type": "string"
+        },
+        "preset": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Preset"
+        },
+        "routes": {
+          "additionalProperties": {
+            "$ref": "#/$defs/RouteFacts"
+          },
+          "default": {},
+          "title": "Routes",
+          "type": "object"
+        },
+        "stt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SttRun"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "pack": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PackFacts"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "prompt_hashes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "title": "Prompt Hashes",
+          "type": "object"
+        },
+        "n_runs": {
+          "default": 1,
+          "title": "N Runs",
+          "type": "integer"
+        },
+        "usage": {
+          "$ref": "#/$defs/RunUsage",
+          "default": {
+            "calls": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0,
+            "cost_usd": null
+          }
+        }
+      },
+      "required": [
+        "engine",
+        "code_version"
+      ],
+      "title": "RunInfo",
+      "type": "object"
+    },
+    "RunResult": {
+      "additionalProperties": false,
+      "properties": {
+        "run_index": {
+          "minimum": 0,
+          "title": "Run Index",
+          "type": "integer"
+        },
+        "instances": {
+          "items": {
+            "$ref": "#/$defs/Instance"
+          },
+          "title": "Instances",
+          "type": "array"
+        },
+        "counts": {
+          "additionalProperties": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "title": "Counts",
+          "type": "object"
+        },
+        "globals": {
+          "additionalProperties": {
+            "$ref": "#/$defs/GlobalScore"
+          },
+          "title": "Globals",
+          "type": "object"
+        },
+        "summaries": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Summary"
+          },
+          "title": "Summaries",
+          "type": "object"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/ResultWarning"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "run_index",
+        "instances",
+        "counts",
+        "globals",
+        "summaries",
+        "warnings"
+      ],
+      "title": "RunResult",
+      "type": "object"
+    },
+    "RunUsage": {
+      "additionalProperties": false,
+      "properties": {
+        "calls": {
+          "default": 0,
+          "title": "Calls",
+          "type": "integer"
+        },
+        "input_tokens": {
+          "default": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "output_tokens": {
+          "default": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "cache_read_tokens": {
+          "default": 0,
+          "title": "Cache Read Tokens",
+          "type": "integer"
+        },
+        "cache_write_tokens": {
+          "default": 0,
+          "title": "Cache Write Tokens",
+          "type": "integer"
+        },
+        "cost_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Usd"
+        }
+      },
+      "title": "RunUsage",
+      "type": "object"
+    },
+    "Stat": {
+      "additionalProperties": false,
+      "properties": {
+        "mean": {
+          "title": "Mean",
+          "type": "number"
+        },
+        "min": {
+          "title": "Min",
+          "type": "number"
+        },
+        "max": {
+          "title": "Max",
+          "type": "number"
+        },
+        "values": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mean",
+        "min",
+        "max",
+        "values"
+      ],
+      "title": "Stat",
+      "type": "object"
+    },
+    "SttRun": {
+      "properties": {
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "language_requested": {
+          "title": "Language Requested",
+          "type": "string"
+        },
+        "language_detected": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language Detected"
+        },
+        "adapter_version": {
+          "title": "Adapter Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provider",
+        "model",
+        "language_requested",
+        "adapter_version"
+      ],
+      "title": "SttRun",
+      "type": "object"
+    },
+    "Summary": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "enum": [
+                "below_fair",
+                "fair",
+                "good"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Label"
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Reference"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "value",
+        "label",
+        "reference"
+      ],
+      "title": "Summary",
+      "type": "object"
+    },
+    "SummaryStat": {
+      "additionalProperties": false,
+      "properties": {
+        "mean": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mean"
+        },
+        "min": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min"
+        },
+        "max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max"
+        },
+        "values": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Values",
+          "type": "array"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "enum": [
+                "below_fair",
+                "fair",
+                "good"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Reference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "mean",
+        "min",
+        "max",
+        "values"
+      ],
+      "title": "SummaryStat",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.0.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Request Id"
+    },
+    "protocol": {
+      "$ref": "#/$defs/ProtocolBlock"
+    },
+    "language": {
+      "title": "Language",
+      "type": "string"
+    },
+    "change_goal": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Change Goal"
+    },
+    "coded_span": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CodedSpan"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "subject_speaker": {
+      "title": "Subject Speaker",
+      "type": "string"
+    },
+    "n_runs": {
+      "minimum": 1,
+      "title": "N Runs",
+      "type": "integer"
+    },
+    "results": {
+      "items": {
+        "$ref": "#/$defs/RunResult"
+      },
+      "minItems": 1,
+      "title": "Results",
+      "type": "array"
+    },
+    "aggregate": {
+      "$ref": "#/$defs/Aggregate"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/ResultWarning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "run_info": {
+      "$ref": "#/$defs/RunInfo"
+    }
+  },
+  "required": [
+    "schema_version",
+    "protocol",
+    "language",
+    "subject_speaker",
+    "n_runs",
+    "results",
+    "aggregate",
+    "warnings",
+    "run_info"
+  ],
+  "type": "object"
+}

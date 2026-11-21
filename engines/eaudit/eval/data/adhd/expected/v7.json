@@ -1,0 +1,10 @@
+{
+ "fixture": "adhd-v7",
+ "target_text": "The unfinished bathroom shows his difficulty completing tasks.",
+ "verdict": "partially_supported",
+ "concerns_required": [
+  "context_stripping"
+ ],
+ "concerns_allowed": [],
+ "explanation_contains": []
+}

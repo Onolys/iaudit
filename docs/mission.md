@@ -57,6 +57,18 @@ The idea is also independent of the original source format. The interview might 
 
 **The essential inputs are readable interview content and the assessor’s written response.** Supporting every recording or file format is separate from the mission.
 
+## Platform scope
+
+*Widened by the owner on 2026-11-20 for the MITI platform.* The platform has three audit engines. This document's checks, results and boundaries describe the first:
+
+| Engine | Audit | Status |
+|---|---|---|
+| `eaudit` | **Evidence audit:** does the interview substantiate the assessment's factual claims? (the seventeen checks below) | In scope; built |
+| `paudit` | **Protocol audit:** scoring and protocol review against a protocol pack | In scope; separate engine |
+| `caudit` | **Clinician audit** | Future |
+
+Scoring and protocol review are now in scope, but they live in `paudit`, not in `eaudit`. Shared services (model routes, speech-to-text, transcripts, logging) live in `engines/core`. See [ADR 0017](decisions/0017-workspace-routes-shared-core.md).
+
 ## What the tool checks
 
 The following seventeen checks define the scope of this build. The examples are illustrative.
@@ -147,15 +159,15 @@ That is different from alleging fabrication, dishonesty, or professional miscond
 
 ### Factual premises rather than clinical correctness
 
-The tool does not diagnose, assign scores, audit scoring rules, or decide whether a final clinical conclusion is correct.
+The evidence audit (`eaudit`) does not diagnose, assign scores, audit scoring rules, or decide whether a final clinical conclusion is correct. It is not a clinical-correctness judge; scoring review belongs to `paudit`.
 
 For example, if a clinician explains a diagnosis using three reported behaviors, the tool can check whether the interview supports those behaviors. It does not determine whether those behaviors satisfy diagnostic criteria.
 
 A clinical conclusion can be a legitimate inference without being directly spoken by the participant.
 
-### No interview administration or protocol review
+### Scoped boundaries: what `eaudit` does not do
 
-This build does not check:
+Per the owner's decision of 2026-11-20, the following are in scope for the platform but live in other engines (protocol review and scoring in `paudit`). The evidence audit (`eaudit`) does not check:
 
 - Required questions or probes.
 - Interview completeness or interviewing skill.
@@ -164,8 +176,6 @@ This build does not check:
 - Protocol compliance.
 - Numerical score calculations: scoring rules, rubric totals, and rating arithmetic. Stated interview figures (counts, doses, amounts and other values) are checked under check 13; totals or arithmetic derived from figures the supplied interview gives are checked under check 15. This does not include calculating or validating clinical scores.
 - Specialty-specific diagnostic or rating criteria.
-
-Those are separate builds and should not expand today’s scope.
 
 ### Supplied evidence defines the limit
 
@@ -183,4 +193,4 @@ These limitations should produce a narrower finding or an insufficient-evidence 
 4. **Accept legitimate summarization.** Check meaning, not wording.
 5. **Separate facts from inference.** Audit factual premises without pretending to validate every conclusion.
 6. **Keep human judgment central.** Findings are proposals to review, not automatic corrections.
-7. **Keep the build narrow.** The mission is evidence consistency across domains.
+7. **Keep each engine narrow.** `eaudit`'s mission is evidence consistency across domains.

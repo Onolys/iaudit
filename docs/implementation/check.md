@@ -1,6 +1,6 @@
 # Check
 
-Stage 3: the verifier observes, code decides. Code: `eaudit/src/eaudit/check/`.
+Stage 3: the verifier observes, code decides. Code: `engines/eaudit/src/eaudit/check/`.
 
 **Audience:** maintainers and coding agents.
 

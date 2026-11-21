@@ -1,0 +1,1156 @@
+{
+ "split": "prompt",
+ "note": "Fictional 'Jordan' cases. Excluded from every eval set; never reuse eval sentences.",
+ "examples": [
+  {
+   "claim": {
+    "proposition": "Jordan regularly skips lunch.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": [
+     "regularly"
+    ]
+   },
+   "turns": [
+    {
+     "i": 4,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "How are your lunches?"
+    },
+    {
+     "i": 5,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Most days I skip it. Maybe five days a week."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      5
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Most days I skip it. Maybe five days a week."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [
+       {
+        "raw": "Most days",
+        "rate_per_week": null,
+        "bucket_guess": "most",
+        "basis": "relative"
+       },
+       {
+        "raw": "five days a week",
+        "rate_per_week": 5,
+        "bucket_guess": "most",
+        "basis": "numeric"
+       }
+      ],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan misses deadlines.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 8,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Do you miss deadlines?"
+    },
+    {
+     "i": 9,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "No, never. My teammate Riley misses them all the time."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      9
+     ],
+     "linker_role": "contradicting",
+     "answer_status": "endorsed",
+     "text": "No, never. My teammate Riley misses them all the time."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "contradicts",
+      "polarity": "negated",
+      "frequency": [
+       {
+        "raw": "never",
+        "rate_per_week": null,
+        "bucket_guess": "never",
+        "basis": "relative"
+       }
+      ],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan currently bites their nails.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": true,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 14,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Any habits as a kid?"
+    },
+    {
+     "i": 15,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I bit my nails until I was ten. I stopped after that."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      15
+     ],
+     "linker_role": "qualifying",
+     "answer_status": "endorsed",
+     "text": "I bit my nails until I was ten. I stopped after that."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "childhood",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "timeframe_mismatch",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": "Jordan bit their nails as a child."
+   }
+  },
+  {
+   "claim": {
+    "proposition": "The garden shows Jordan's trouble finishing projects.",
+    "reported_by": [
+     "unspecified"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 20,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "What about the garden?"
+    },
+    {
+     "i": 21,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "It is half dug. The shed collapsed, so I had to stop until it is rebuilt."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      21
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "It is half dug. The shed collapsed, so I had to stop until it is rebuilt."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "medium"
+     }
+    ],
+    "flags": [
+     {
+      "type": "context_stripping",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": "The garden is unfinished because the shed collapsed."
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan works at night.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 30,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "My shift starts at ten."
+    },
+    {
+     "i": 32,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I am home by six in the morning."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      30
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "My shift starts at ten."
+    },
+    {
+     "key": "c0.1:e2",
+     "turns": [
+      32
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I am home by six in the morning."
+    },
+    {
+     "key": "c0.1:e3",
+     "inference": true,
+     "premises": [
+      "c0.1:e1",
+      "c0.1:e2"
+     ],
+     "step": "A shift from ten until six runs overnight."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "medium"
+     },
+     {
+      "key": "c0.1:e2",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "medium"
+     }
+    ],
+    "flags": [],
+    "inferences": [
+     {
+      "key": "c0.1:e3",
+      "step_acceptable": true,
+      "conf": "high"
+     }
+    ],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan manages a team of eight.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": [
+     "eight"
+    ]
+   },
+   "turns": [
+    {
+     "i": 50,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Tell me about work."
+    },
+    {
+     "i": 51,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I lead the design group. There are four of us in it."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      51
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I lead the design group. There are four of us in it."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "quantity_mismatch",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": "Jordan manages a team of four."
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan walks about two miles to the depot.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": [
+     "about two miles"
+    ]
+   },
+   "turns": [
+    {
+     "i": 60,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "How do you get to work?"
+    },
+    {
+     "i": 61,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I walk to the depot, 2.3 miles, give or take."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      61
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I walk to the depot, 2.3 miles, give or take."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan reviews the budget every day.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": [
+     "every day"
+    ]
+   },
+   "turns": [
+    {
+     "i": 70,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "How often do you review the budget?"
+    },
+    {
+     "i": 71,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Once a month, when the invoices come in."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      71
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Once a month, when the invoices come in."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [
+       {
+        "raw": "Once a month",
+        "rate_per_week": 0.23,
+        "bucket_guess": "sometimes",
+        "basis": "numeric"
+       }
+      ],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan reports side effects from Odamet.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 80,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Any side effects?"
+    },
+    {
+     "i": 81,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "The nausea was from Ravelin, the one I took before. Odamet has been fine."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      81
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "The nausea was from Ravelin, the one I took before. Odamet has been fine."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "contradicts",
+      "polarity": "negated",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "other_person",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan avoids all group events.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 90,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "Do you go to group events?"
+    },
+    {
+     "i": 91,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I skip the big office parties, but I go to my book club every week."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      91
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I skip the big office parties, but I go to my book club every week."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "unsupported_inference",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": "Jordan skips large office parties but attends a book club weekly."
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan finds crowded places hard.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 100,
+     "speaker": "dr_vale",
+     "role": "interviewer",
+     "text": "How are crowds for you?"
+    },
+    {
+     "i": 101,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Malls, stations, concerts, I cannot stand any of them."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      101
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Malls, stations, concerts, I cannot stand any of them."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "The amber lamp makes Jordan restless.",
+    "reported_by": [
+     "unspecified"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I believe the amber lamp makes me restless."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I believe the amber lamp makes me restless."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "opinion_as_fact",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan believes the amber lamp causes restlessness.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I believe the amber lamp makes me restless."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I believe the amber lamp makes me restless."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan packed nine ceramic tiles in total.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I packed three ceramic tiles before lunch and four after lunch."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I packed three ceramic tiles before lunch and four after lunch."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "calculation_error",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan packed seven ceramic tiles in total.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I packed three ceramic tiles before lunch and four after lunch."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I packed three ceramic tiles before lunch and four after lunch."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan authorized the mural sketch.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I suggested using the mural sketch."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I suggested using the mural sketch."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "meaning_shift",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Jordan proposed using the mural sketch.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "I suggested using the mural sketch."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "I suggested using the mural sketch."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "The whole pottery circle opposed the new kiln.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Some members of our pottery circle opposed the new kiln."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Some members of our pottery circle opposed the new kiln."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [
+     {
+      "type": "unsupported_inference",
+      "keys": [
+       "c0.1:e1"
+      ],
+      "conf": "high"
+     }
+    ],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  },
+  {
+   "claim": {
+    "proposition": "Some pottery circle members opposed the new kiln.",
+    "reported_by": [
+     "jordan1"
+    ],
+    "polarity": "affirmed",
+    "timeframe": "current",
+    "timeframe_explicit": false,
+    "hedged": false,
+    "quantities": []
+   },
+   "turns": [
+    {
+     "i": 110,
+     "speaker": "jordan1",
+     "role": "respondent",
+     "text": "Some members of our pottery circle opposed the new kiln."
+    }
+   ],
+   "evidence": [
+    {
+     "key": "c0.1:e1",
+     "turns": [
+      110
+     ],
+     "linker_role": "supporting",
+     "answer_status": "endorsed",
+     "text": "Some members of our pottery circle opposed the new kiln."
+    }
+   ],
+   "output": {
+    "items": [
+     {
+      "key": "c0.1:e1",
+      "relation": "entails",
+      "polarity": "affirmed",
+      "frequency": [],
+      "severity": [],
+      "timeframe": "current",
+      "certainty": "definite",
+      "experiencer": "claim_subject",
+      "conf": "high"
+     }
+    ],
+    "flags": [],
+    "inferences": [],
+    "suggested_revision": null
+   }
+  }
+ ]
+}

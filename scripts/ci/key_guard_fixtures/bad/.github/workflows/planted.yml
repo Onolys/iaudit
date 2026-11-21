@@ -1,0 +1,11 @@
+# Planted fixture for the key guard: a PR-triggered workflow that references an LLM key.
+name: Planted
+on:
+  pull_request:
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - run: echo hi

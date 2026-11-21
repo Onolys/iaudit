@@ -5,6 +5,7 @@ import { defineConfig } from "vitest/config";
 
 const contracts = fileURLToPath(new URL("../docs/contracts", import.meta.url));
 const evalApi = fileURLToPath(new URL("../eval/api", import.meta.url));
+const pauditSchema = fileURLToPath(new URL("../engines/paudit/schemas", import.meta.url));
 const root = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig(({ mode }) => {
@@ -18,8 +19,8 @@ export default defineConfig(({ mode }) => {
   };
   return {
     plugins: [react()],
-    resolve: { alias: { "@contracts": contracts, "@eval-api": evalApi } },
-    server: { fs: { allow: [root, contracts, evalApi] }, proxy },
+    resolve: { alias: { "@contracts": contracts, "@eval-api": evalApi, "@paudit-schema": pauditSchema } },
+    server: { fs: { allow: [root, contracts, evalApi, pauditSchema] }, proxy },
     preview: { proxy },
     test: { environment: "node" },
   };

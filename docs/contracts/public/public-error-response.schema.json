@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "public-error-response.schema.json",
+  "title": "PublicErrorResponse",
+  "description": "Body returned with every non-2xx status of the public /v1 API. Same shape as error-response.schema.json; details[].code is a superset of its enum. Messages are fixed text only, never instance values.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "message",
+    "details"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.0.1"
+    },
+    "request_id": {
+      "type": "string",
+      "description": "Echo of the request id, when readable."
+    },
+    "status": {
+      "type": "integer",
+      "minimum": 400,
+      "maximum": 599,
+      "description": "Equals the HTTP response status."
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1
+    },
+    "details": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "invalid_json",
+              "unsupported_media_type",
+              "schema_violation",
+              "empty_transcript",
+              "empty_assessment",
+              "duplicate_ids",
+              "invalid_parameters",
+              "body_too_large",
+              "too_many_turns",
+              "too_many_sections",
+              "rate_limited",
+              "not_found",
+              "method_not_allowed",
+              "cors_rejected",
+              "request_rejected",
+              "upstream_unavailable",
+              "deadline_exceeded",
+              "internal_error",
+              "missing_parameter",
+              "unknown_pack",
+              "input_rejected",
+              "run_failed",
+              "unauthenticated",
+              "forbidden",
+              "invalid_state",
+              "unsupported_audio",
+              "audio_too_long",
+              "audio_too_large",
+              "audio_unreadable",
+              "no_speech",
+              "speakers_not_separated",
+              "transcription_failed",
+              "rating_invalid",
+              "daily_cap_reached",
+              "conflict"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Schema paths and fixed text only; never instance values."
+          },
+          "field": {
+            "type": "string",
+            "description": "`/`-joined path of the offending field in the rating card (e.g. `globals/cct/reason`); `$` is the whole card. Set on `rating_invalid`. A path only, never user text."
+          },
+          "issue": {
+            "enum": [
+              "invalid_type",
+              "too_long",
+              "out_of_range",
+              "required",
+              "unknown_key",
+              "invalid",
+              "order",
+              "too_large"
+            ],
+            "description": "What is wrong at `field`. Set on `rating_invalid`."
+          }
+        }
+      }
+    }
+  }
+}

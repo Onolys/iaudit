@@ -1,0 +1,31 @@
+{
+  "$id": "audio-upload-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "content_type": {
+      "default": "",
+      "description": "Browser type; may be empty",
+      "maxLength": 100,
+      "title": "Content Type",
+      "type": "string"
+    },
+    "filename_ext": {
+      "default": "",
+      "description": "Used only when content_type is empty",
+      "maxLength": 16,
+      "title": "Filename Ext",
+      "type": "string"
+    },
+    "size_bytes": {
+      "description": "File size; above 300 MB is `audio_too_large`",
+      "minimum": 1,
+      "title": "Size Bytes",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "size_bytes"
+  ],
+  "title": "AudioUploadRequest",
+  "type": "object"
+}

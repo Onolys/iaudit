@@ -1,0 +1,10 @@
+{
+ "fixture": "adhd-v8",
+ "target_text": "His distractibility caused a negative performance review.",
+ "verdict": "partially_supported",
+ "concerns_required": [
+  "unsupported_causal_link"
+ ],
+ "concerns_allowed": [],
+ "explanation_contains": []
+}

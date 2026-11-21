@@ -1,0 +1,170 @@
+{
+  "synthetic": true,
+  "description": "SYNTHETIC role-play (invented, fictional people; written for testing). Good MI practice.",
+  "language": "en",
+  "duration_ms": 1205000,
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "B",
+      "text": "Hello, thanks for seeing me today. I'm hoping to talk about getting more walking into my week.",
+      "start_ms": 0,
+      "end_ms": 50000
+    },
+    {
+      "id": "t2",
+      "speaker": "A",
+      "text": "Thanks for coming in. Is it all right if we spend our time on that?",
+      "start_ms": 55000,
+      "end_ms": 105000
+    },
+    {
+      "id": "t3",
+      "speaker": "B",
+      "text": "Sure. I sit at a desk all day and I feel stiff and tired by evening. I know I should move more.",
+      "start_ms": 110000,
+      "end_ms": 160000
+    },
+    {
+      "id": "t4",
+      "speaker": "A",
+      "text": "What makes walking more important to you right now?",
+      "start_ms": 165000,
+      "end_ms": 215000
+    },
+    {
+      "id": "t5",
+      "speaker": "B",
+      "text": "My doctor mentioned my blood pressure is creeping up, and I want to be around for my kids. I used to walk to work years ago and I felt great.",
+      "start_ms": 220000,
+      "end_ms": 270000
+    },
+    {
+      "id": "t6",
+      "speaker": "A",
+      "text": "You want to be there for your kids, and you remember feeling great when walking was part of your day. What was different back then?",
+      "start_ms": 275000,
+      "end_ms": 325000
+    },
+    {
+      "id": "t7",
+      "speaker": "B",
+      "text": "Back then it was just built in. Now I have to find the time, and by evening I'm wiped out. But on Saturdays I did a forty-minute loop around the park and it felt easy.",
+      "start_ms": 330000,
+      "end_ms": 380000
+    },
+    {
+      "id": "t8",
+      "speaker": "A",
+      "text": "A forty-minute loop on a Saturday took real commitment, and it shows you can do it when you set your mind to it. You're tired in the evenings.",
+      "start_ms": 385000,
+      "end_ms": 435000
+    },
+    {
+      "id": "t9",
+      "speaker": "A",
+      "text": "Where would a walk fit best in your week?",
+      "start_ms": 440000,
+      "end_ms": 490000
+    },
+    {
+      "id": "t10",
+      "speaker": "B",
+      "text": "Probably lunchtime, if my team doesn't schedule meetings over it. Maybe three days a week.",
+      "start_ms": 495000,
+      "end_ms": 545000
+    },
+    {
+      "id": "t11",
+      "speaker": "A",
+      "text": "Three days a week at lunchtime feels doable to you. You also want to protect that time from meetings. How confident are you, from one to ten, that you can make three lunch walks happen?",
+      "start_ms": 550000,
+      "end_ms": 600000
+    },
+    {
+      "id": "t12",
+      "speaker": "B",
+      "text": "About a six. The meetings are the hard part. I could block it on my calendar though.",
+      "start_ms": 605000,
+      "end_ms": 655000
+    },
+    {
+      "id": "t13",
+      "speaker": "A",
+      "text": "Why a six and not a three? You've already thought about blocking your calendar, which shows you're taking this seriously.",
+      "start_ms": 660000,
+      "end_ms": 710000
+    },
+    {
+      "id": "t14",
+      "speaker": "B",
+      "text": "Because I did it on weekends before, and I really do want it. I'd just need a plan for the rainy days.",
+      "start_ms": 715000,
+      "end_ms": 765000
+    },
+    {
+      "id": "t15",
+      "speaker": "A",
+      "text": "Would it be helpful if I shared some ideas other people have used for rainy days? Some people keep walking shoes at the office, walk indoor laps, or take a call while walking. The guidelines suggest about thirty minutes of activity on most days. Even ten-minute walks count toward that. Both ideas are only options, and you know your workplace best.",
+      "start_ms": 770000,
+      "end_ms": 820000
+    },
+    {
+      "id": "t16",
+      "speaker": "B",
+      "text": "The indoor laps idea is good, we have a long corridor. I'll do that when it rains. I think I can really do this.",
+      "start_ms": 825000,
+      "end_ms": 875000
+    },
+    {
+      "id": "t17",
+      "speaker": "A",
+      "text": "You have a plan for sunny and rainy days, and the confidence you're showing comes from what you already did on those Saturdays. What would you like to do first?",
+      "start_ms": 880000,
+      "end_ms": 930000
+    },
+    {
+      "id": "t18",
+      "speaker": "B",
+      "text": "I'll block Monday, Wednesday and Friday at noon on my calendar today and tell my team.",
+      "start_ms": 935000,
+      "end_ms": 985000
+    },
+    {
+      "id": "t19",
+      "speaker": "A",
+      "text": "It's entirely your decision how to start. Blocking those days sounds like a strong first step. So you want to be there for your kids, you miss how you felt when you walked, and you have a plan: three lunch walks, with indoor laps when it rains.",
+      "start_ms": 990000,
+      "end_ms": 1040000
+    },
+    {
+      "id": "t20",
+      "speaker": "B",
+      "text": "Thanks. I feel more hopeful than when I walked in.",
+      "start_ms": 1045000,
+      "end_ms": 1095000
+    },
+    {
+      "id": "t21",
+      "speaker": "A",
+      "text": "You came in tired and you're leaving hopeful. Let's check in again in two weeks.",
+      "start_ms": 1100000,
+      "end_ms": 1150000
+    },
+    {
+      "id": "t22",
+      "speaker": "B",
+      "text": "Sounds good. See you then.",
+      "start_ms": 1155000,
+      "end_ms": 1205000
+    }
+  ],
+  "stt_run": {
+    "provider": "stub",
+    "model": "synthetic-fixture",
+    "location": null,
+    "language_requested": "en",
+    "language_detected": "en",
+    "adapter_version": "fixture-0.0.1"
+  }
+}

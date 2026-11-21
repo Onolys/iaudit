@@ -1,0 +1,180 @@
+{
+  "$defs": {
+    "Flags": {
+      "properties": {
+        "has_rating": {
+          "title": "Has Rating",
+          "type": "boolean"
+        },
+        "rating_submitted": {
+          "title": "Rating Submitted",
+          "type": "boolean"
+        },
+        "speaker_confirmed": {
+          "title": "Speaker Confirmed",
+          "type": "boolean"
+        },
+        "transcript_ready": {
+          "title": "Transcript Ready",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "transcript_ready",
+        "speaker_confirmed",
+        "rating_submitted",
+        "has_rating"
+      ],
+      "title": "Flags",
+      "type": "object"
+    },
+    "SessionErrorInfo": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "SessionErrorInfo",
+      "type": "object"
+    }
+  },
+  "$id": "session-detail.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SessionErrorInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "flags": {
+      "$ref": "#/$defs/Flags"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "language": {
+      "title": "Language",
+      "type": "string"
+    },
+    "latest_report_version": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Latest Report Version"
+    },
+    "links": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Links",
+      "type": "object"
+    },
+    "n_runs": {
+      "title": "N Runs",
+      "type": "integer"
+    },
+    "preset": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Preset"
+    },
+    "progress": {
+      "title": "Progress",
+      "type": "integer"
+    },
+    "status": {
+      "enum": [
+        "created",
+        "uploading",
+        "validating",
+        "transcribing",
+        "awaiting_input",
+        "running",
+        "report_ready",
+        "failed",
+        "deleting"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "step": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Step"
+    },
+    "title": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Title"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "status",
+    "progress",
+    "flags",
+    "warnings",
+    "language",
+    "n_runs",
+    "created_at",
+    "updated_at",
+    "links"
+  ],
+  "title": "SessionDetail",
+  "type": "object"
+}

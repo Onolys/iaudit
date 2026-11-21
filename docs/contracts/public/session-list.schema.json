@@ -1,0 +1,103 @@
+{
+  "$defs": {
+    "SessionListItem": {
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Code"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "latest_report_version": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Latest Report Version"
+        },
+        "status": {
+          "enum": [
+            "created",
+            "uploading",
+            "validating",
+            "transcribing",
+            "awaiting_input",
+            "running",
+            "report_ready",
+            "failed",
+            "deleting"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "created_at"
+      ],
+      "title": "SessionListItem",
+      "type": "object"
+    }
+  },
+  "$id": "session-list.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/SessionListItem"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "next_cursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Next Cursor"
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "title": "SessionList",
+  "type": "object"
+}
