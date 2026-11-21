@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 summary: Generic per-user usage limits for two kinds (eval, interview) over two periods (UTC day, UTC month), enforced atomically in Firestore, defaults from config, per-user overrides in `users/{uid}.limits`, new `GET /usage` shape and error codes, first AI-linked evaluation exempt; replaces SP04 R8's single daily cap. Built after SP00-SP09.
 date: 2026-11-20
 ---
@@ -76,10 +76,10 @@ Kind -> field map `{"eval": "runs", "interview": "interviews"}` lives in one pla
 - Tejit/CI: `terraform apply` for staging then prod (new env vars); no new secrets.
 
 ## Risks / Open Questions
-- Risk: first-run exemption means a failed (pre-LLM) first run on an AI session cannot be refunded and the next `POST /runs` counts. [OPEN: accept; default accept, since SP10 already charged the AI cap and a pre-LLM failure is rare (Tejit)]
+- Risk: first-run exemption means a failed (pre-LLM) first run on an AI session cannot be refunded and the next `POST /runs` counts. [RESOLVED: accept (owner 2026-11-21)]
 - Risk: legacy `daily_cap` fallback plus new `limits` can confuse the console editor. Mitigated by R10 naming the new field only. [RESOLVED: deprecate `daily_cap` after launch]
-- [OPEN: should the concurrent-run refusal get its own code/copy instead of `daily_cap_reached`? default: keep (D8)]
-- [OPEN: do exempt (free) first runs still occupy a `MAX_ACTIVE_RUNS` slot? default yes — it is a real concurrent job]
+- [RESOLVED: keep daily_cap_reached, D8 (owner 2026-11-21)]
+- [RESOLVED: yes (owner 2026-11-21)]
 - [RESOLVED: SP10 R5 stores reservation_date on interviews/{id}]
 - [DEFERRED: per-user concurrent-interview limit, yearly limits, admin UI, local-time-zone days]
 - [RESOLVED: usage counters are not deleted with a session (SP04 delete.py comment: counters are per user); account deletion is deferred in SP04]
