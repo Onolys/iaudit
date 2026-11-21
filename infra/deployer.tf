@@ -145,48 +145,11 @@ resource "google_project_iam_member" "deployer_staging_rules_admin" {
 }
 
 # --- PR previews (SP00 R3, PRD R13) ---
-# Cloud Run does NOT support `resource.name` in IAM Conditions (it is absent from the "resource name" service list in
-# https://docs.cloud.google.com/iam/docs/conditions-attribute-reference; Cloud Run's own docs only document
-# request.host/request.path conditions, for invoking). A conditional run.admin binding on `onolys-pr-*` therefore
-# never grants anything (run 44837572867: run.services.get denied on onolys-pr-35). The service does not exist yet on
-# a first preview, so no per-service binding can precede it either. Hence an unconditional project-level custom role,
-# limited to Cloud Run service lifecycle (no jobs, worker pools, instances, ssh, tag bindings).
-# Trade-off (like Hosting/rules above, ADR 0022 D5): deployer-staging can now also update/delete/set IAM on the
-# prod and staging Cloud Run services. Accepted: same GitHub repo trust, and workflows only target their own service.
-resource "google_project_iam_custom_role" "preview_run_deployer" {
-  project     = var.project
-  role_id     = "previewRunDeployer"
-  title       = "Cloud Run preview deployer"
-  description = "Create/update/delete Cloud Run services and set their IAM (PR previews); no jobs, worker pools or instances."
-  permissions = [
-    "run.configurations.get",
-    "run.configurations.list",
-    "run.locations.list",
-    "run.operations.delete",
-    "run.operations.get",
-    "run.operations.list",
-    "run.revisions.delete",
-    "run.revisions.get",
-    "run.revisions.list",
-    "run.routes.get",
-    "run.routes.list",
-    "run.services.create",
-    "run.services.delete",
-    "run.services.get",
-    "run.services.getIamPolicy",
-    "run.services.list",
-    "run.services.setIamPolicy",
-    "run.services.update",
-  ]
-}
-
-resource "google_project_iam_member" "deployer_staging_preview_run" {
-  project = var.project
-  role    = google_project_iam_custom_role.preview_run_deployer.name
-  member  = local.deployer_staging_member
-}
-
-# Preview services run as api-staging: covered by deployer_staging_runtime_user["api"] above.
+# A preview is a no-traffic TAGGED REVISION (tag `pr-<N>`) on the existing staging API service, so it needs no grant
+# beyond `roles/run.developer` on the staging services (deployer_staging_developer above) and actAs on `api-staging`
+# (deployer_staging_runtime_user). Do NOT add a Cloud Run role scoped to `onolys-pr-*`: Cloud Run does not support
+# `resource.name` IAM conditions, so such a binding grants nothing (run 44837572867: run.services.get denied), and an
+# unconditional role would let the staging deployer touch prod (owner rejected it 2026-11-21).
 
 output "wif_provider" {
   description = "Value for google-github-actions/auth `workload_identity_provider`."

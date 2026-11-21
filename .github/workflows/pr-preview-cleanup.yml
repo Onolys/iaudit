@@ -1,6 +1,7 @@
 name: pr-preview-cleanup
 
-# Delete the PR preview (SP00 R3): Cloud Run service onolys-pr-<N> and Hosting channel pr-<N>. Not-found is ignored,
+# Delete the PR preview (SP00 R3): remove tag pr-<N> from onolys-api-staging, delete that PR's revisions, delete Hosting
+# channel pr-<N>. Not-found is ignored,
 # so re-running on a clean PR succeeds. Same WIF identity as pr-preview.yml; same-repo PRs only (fork PRs have none).
 # Shares the concurrency group with pr-preview.yml and cancels an in-flight deploy for the same PR.
 on:
@@ -38,7 +39,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Delete service onolys-pr-<N> and channel pr-<N> (ignore not-found)
+      - name: Remove tag pr-<N>, delete its revisions and channel pr-<N> (ignore not-found)
         env:
           PR: ${{ github.event.number }}
         run: bash scripts/ci/pr_preview.sh cleanup "$PR"

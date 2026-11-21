@@ -10,7 +10,7 @@ Date: 2026-11-20. Project `onolys`, env `staging`. Re-run any time: `python3 inf
 | Anonymous call to api | HTTP 200 (placeholder image) |
 | Anonymous call to worker | HTTP 403 |
 | Worker env | `ANTHROPIC_API_KEY` as secret ref only; no other `*_API_KEY`, no `STT_*`, no plaintext |
-| Staging SA isolation | Project-level grants for `api-/worker-/tasks-invoker-/deployer-staging` are all conditioned to the `staging` DB, staging site/rulesets, or `onolys-pr-*`, except `speech.client` and `serviceusage.serviceUsageConsumer` (shared, no data). `onolys-audio-prod` and `uid-hmac-key-prod` do not exist yet (404); no staging SA is bound on them |
+| Staging SA isolation | Project-level grants for `api-/worker-/tasks-invoker-/deployer-staging` are all conditioned to the `staging` DB or staging site/rulesets, except `speech.client` and `serviceusage.serviceUsageConsumer` (shared, no data). `onolys-audio-prod` and `uid-hmac-key-prod` do not exist yet (404); no staging SA is bound on them |
 | Cloud Run egress to `api.anthropic.com` | **Works**: one-off Cloud Run job (python:3.12-slim via mirror.gcr.io, SA `worker-staging`) got an HTTP reply; job deleted afterwards |
 | Anthropic rate tier (step 7a) | unknown, owner to confirm; worker max instances stays 3 |
 

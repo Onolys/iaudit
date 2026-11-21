@@ -95,6 +95,16 @@ jobs:
       image: ${{ needs.build.outputs.image }}
       region: us-central1
       git_sha: ${{ needs.build.outputs.sha }}
+      # PR previews (pr-preview.yml) are no-traffic tagged revisions of THIS service and edit its template (combined mode,
+      # stub adapters, CORS for the channel, CPU always allocated). Re-specify every key they override so none leaks
+      # into staging (values mirror infra/modules/environment/services.tf for env=staging; CORS = app_staging_site_id + localhost),
+      # and pin traffic to this revision by name.
+      env_vars: |-
+        SERVICE_MODE=api
+        ADAPTERS=real
+        CORS_ORIGINS=https://onolys-app-staging.web.app\,http://localhost:5173
+      flags: --cpu-throttling
+      pin_traffic: true
     secrets: inherit
 
   deploy-worker:

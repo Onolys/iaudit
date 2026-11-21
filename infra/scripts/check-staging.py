@@ -71,7 +71,7 @@ def worker_env_problems(env):
 
 
 def _cond_scoped(cond, env):
-    staging_marks = ("databases/staging" in cond or "-staging" in cond or "onolys-pr-" in cond or "releases/cloud.firestore/staging" in cond)
+    staging_marks = ("databases/staging" in cond or "-staging" in cond or "releases/cloud.firestore/staging" in cond)
     if env == "staging":
         return staging_marks and "databases/(default)" not in cond
     prod_marks = "databases/(default)" in cond or "sites/onolys-app" in cond or "releases/cloud.firestore\"" in cond
