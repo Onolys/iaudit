@@ -171,6 +171,10 @@ cd infra && terraform plan && terraform apply
 
 Then dispatch `deploy-staging` / `deploy-prod` (or just confirm the new worker revisions are healthy) and, once both envs work on the new keys, delete the orphaned shared secret `anthropic-api-key` in the console (or `gcloud secrets delete`). Rotate the old key since it was shared.
 
+## Deploy workflow guard (fork safety)
+
+`deploy-staging.yml` runs after CI via `workflow_run`. That trigger's `branches: [main]` filter matches the head branch name, so a fork PR from a branch named `main` would match, and the deploy job would check out fork code with WIF access. The `build` job therefore requires `workflow_run.event == 'push'`, `head_repository.full_name == github.repository` and `head_branch == 'main'`; every other job `needs` it. `scripts/ci/test_workflow_run_guard.py` (run in CI) enforces this for any `workflow_run` workflow and bans `pull_request_target`. The WIF `attribute_condition` in `infra/deployer.tf` only checks the repository; tightening it to a ref is a separate owner apply.
+
 ## Admin access
 
 Who may use the admin app is a comma-separated list of emails in Secret Manager `admin-allowed-emails-{env}` (case-insensitive, spaces around commas ignored). The admin backend reads it as env `ADMIN_ALLOWED_EMAILS` (secret ref, `latest`). Anyone signed in but not on the list gets 403; no token gets 401.
