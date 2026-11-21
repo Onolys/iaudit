@@ -1,6 +1,26 @@
-# 0023 Admin deployment and auth
+# 0023. Admin deployment and auth
 
-Status: draft. Task 12 writes the decisions; only the staging verification record is here.
+**Audience:** contributors.
+
+**Status:** accepted. Reference: [backend-api.md, Admin deployment](../reference/backend-api.md#admin-deployment). Built after launch (D9); verified on staging, prod stays off until launch.
+
+**Context.** Tejit's team needs a shared internal place to run the eaudit review UI and paudit on MITI synthetic fixtures without exposing clinical text. The app's Identity Platform project has open sign-up, so a login alone is not an access list.
+
+**Decision.** Headlines of the SP07 decisions (D1-D9):
+
+- **D1 One service.** `onolys-admin-backend-{env}` serves eaudit and the admin-only paudit routes. The eval server and Eval tab are not deployed (not a v1 priority, may break); they stay local.
+- **D2 Browser calls Cloud Run directly.** Hosting rewrites cap at 60 s, audits run up to 100 s, and shortening deadlines would change eaudit. So CORS plus a bearer token, and Cloud Run timeout 130 s.
+- **D3 Auth is a shared ASGI middleware** (`admin/auth`, `onolys_admin_auth`). eaudit and eval code are untouched; local dev is identical with auth off.
+- **D4 Verified email plus allowlist, no MFA.** The allowlist lives in Secret Manager; same Identity Platform project as the app (no separate tenant, no IAP or load balancer). Both checks are required because sign-up is open.
+- **D5 Email/password and Google sign-in**, both gated by the allowlist. No MFA anywhere (Tejit).
+- **D6 Eval storage deferred.** No GCS FUSE volume or admin data bucket.
+- **D7 paudit eval deferred.** The tab is single-run only; the eval client is hard-wired to the audit contract.
+- **D8 Staging and prod**, one project. Staging is live; prod admin is off (`admin_enabled.prod=false`).
+- **D9 After launch.** Until used, results are inspected with `python -m paudit.cli` and run artifacts in GCS.
+
+Consequences worth knowing: the Cloud Run service is public by design (`allUsers` invoker), so the app's 401/403 is the only gate; a changed allowlist needs a new revision; the CSP stays strict (`script-src 'self' https://apis.google.com`), so the frontend validators are precompiled (commit 4a2b33a) because Ajv's `new Function` was blocked and the deployed site rendered blank.
+
+**Not measured.** Hosting-to-Cloud-Run rewrite timeout and header pass-through: not measured, because the deployed Hosting config has no `/v1` rewrite by design (D2). The documented limit is 60 s.
 
 ## Staging verification (Task 11)
 

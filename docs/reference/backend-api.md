@@ -4,7 +4,7 @@ What the backend accepts, returns, and reads from the environment. Facts are tak
 
 **Audience:** users.
 
-The request and response bodies are defined by the [contract](../contracts/README.md). This page covers only what the contract leaves out: the HTTP path, status codes, limits, settings, and when each warning is emitted. There is no authentication in this release.
+The request and response bodies are defined by the [contract](../contracts/README.md). This page covers only what the contract leaves out: the HTTP path, status codes, limits, settings, and when each warning is emitted. The eaudit backend described above has no authentication. The admin deployment adds some; see [Admin deployment](#admin-deployment).
 
 ## Endpoints
 
@@ -69,3 +69,64 @@ Every `IAUDIT_*` setting, its default and its meaning is in [configuration.md](c
 Every 200 reply carries a `warnings` list, and `status` is `partial` if and only if a `section_not_processed` warning is present. When each code is emitted: [warnings.md](warnings.md).
 
 A claim that stalls on a model failure or the deadline is returned with verdict `insufficient_evidence`, not dropped.
+
+## Admin deployment
+
+The internal admin site (`admin.onolys.com`, staging `onolys-admin-staging.web.app`) runs one Cloud Run service, `onolys-admin-backend-{env}`. It serves the unchanged eaudit app (`POST /v1/audit`) plus admin-only paudit routes, behind a login check. Everything above applies to `/v1/audit` there. Code: `admin/backend/src/onolys_admin_backend/app.py`, `admin/auth/src/onolys_admin_auth/`. Why it is built this way: [ADR 0023](../decisions/0023-admin-deployment-and-auth.md).
+
+### Auth
+
+Every request except a CORS preflight (`OPTIONS`) must carry `Authorization: Bearer <Identity Platform ID token>` (`middleware.py`). The token is checked for an RS256 signature, `aud` equal to the project (`ADMIN_AUTH_PROJECT`), `iss` equal to `https://securetoken.google.com/<project>`, and expiry (`verifier.py`). Then `email_verified` must be true and the email must be in `ADMIN_ALLOWED_EMAILS` (case-insensitive). No second factor is required. Token and email are never logged.
+
+| HTTP | `error.code` | When |
+|---|---|---|
+| 401 | `unauthenticated` | No bearer header, or the token is invalid or expired. Reply carries `WWW-Authenticate: Bearer`. |
+| 403 | `forbidden` | Valid token, but the email is unverified or not on the list. |
+| 503 | `upstream_unavailable` | The token signing keys could not be fetched. |
+
+These three replies use a small body `{"error": {"code", "message"}}`, not the contract error body of the routes below.
+
+### Routes
+
+| Method and path | Purpose |
+|---|---|
+| `POST /v1/audit` | eaudit, unchanged. |
+| `POST /v1/paudit` | Run a paudit pass. Body: `{transcript, pack: "miti@4.2.1", params}`; optional `request_id`. `params` needs `speaker_map.subject` and `change_goal`; optional `coded_span {from_s, to_s}`, `language`, `n_runs` (integer 1 to 5). Reply: a `PauditResult` (schema: `engines/paudit/schemas/paudit-result.schema.json`). Synchronous; nothing is stored. |
+| `GET /v1/paudit/fixtures` | List the synthetic MITI fixtures with ready-to-run `params`. |
+| `GET /v1/paudit/fixtures/{name}` | One fixture: `{name, description, pack, transcript, params}`. Synthetic fixtures only. |
+
+paudit errors use the contract error body (same shape as [Errors](#errors)), from `paudit_routes.py`:
+
+| HTTP | `details[].code` | When |
+|---|---|---|
+| 400 | `invalid_json` | Body not JSON or not an object. |
+| 400 | `unknown_pack`, `missing_parameter`, `invalid_parameters`, `schema_violation`, `empty_transcript`, `input_rejected` | Bad `pack`, `params` or transcript. |
+| 404 | `not_found` | Unknown fixture name. |
+| 413 | `body_too_large` | Body over the eaudit body limit (default 2,000,000 bytes). |
+| 415 | `unsupported_media_type` | `Content-Type` present and not `application/json`. |
+| 500 | `internal_error` | Unexpected failure. |
+| 502 | `run_failed` | Every run failed. |
+| 503 | `upstream_unavailable` | Model provider unavailable. |
+| 504 | `deadline_exceeded` | `ADMIN_PAUDIT_DEADLINE_S` passed. |
+
+### CORS
+
+Handled before auth, so preflights need no token and 401/403 replies also carry CORS headers (`app.py`). Only the exact origins in `ADMIN_CORS_ORIGINS` are allowed (a wildcard or `null` stops startup). Methods: `GET`, `POST`, `OPTIONS`. Allowed headers: `authorization`, `content-type`. Credentials are off. The browser calls the Cloud Run URL directly, so the site's CSP `connect-src` lists that origin (`frontend/firebase.json`, filled in by `scripts/ci/set_admin_origin.sh`).
+
+### Environment variables
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `ENV` | none (image sets `prod`) | `local` or `test` allows auth off. Any other value or unset counts as non-local. |
+| `ADMIN_AUTH` | `on` (`off` when `ENV` is `local`/`test`) | `on` or `off`. `off` with a non-local `ENV` stops startup. |
+| `ADMIN_AUTH_PROJECT` | `GCP_PROJECT` | Project whose ID tokens are accepted. Required with auth on. |
+| `ADMIN_ALLOWED_EMAILS` | none | Comma list. Empty stops startup with auth on. Cloud Run reads it from Secret Manager `admin-allowed-emails-{env}` (version `latest`, read when an instance starts, so a change needs a new revision). |
+| `ADMIN_CORS_ORIGINS` | empty (no origin allowed) | Comma list of exact origins. |
+| `ADMIN_PAUDIT_DEADLINE_S` | `100` | Hard time cap for `POST /v1/paudit`. |
+| `PORT` | `8080` | Listen port (image). |
+
+Cloud Run request timeout is 130 s, above both deadlines (`IAUDIT_AUDIT_DEADLINE_S` for audit, `ADMIN_PAUDIT_DEADLINE_S` for paudit). The service is public at Cloud Run (`allUsers` invoker); access is enforced only by the app. Terraform: `infra/modules/environment/services.tf`. Deploy: `.github/workflows/deploy-admin.yml`.
+
+### Deadline and hosting
+
+The Firebase Hosting rewrite limit (60 s) is below the 100 s deadlines, so the site has no `/v1` rewrite. The frontend is built with `VITE_AUTH_REQUIRED=true`, `VITE_AUDIT_URL` (the Cloud Run URL plus `/v1/audit`) and the `VITE_FIREBASE_*` values; `VITE_EVAL_ENABLED` is `false` in the deployed build, so there is no Eval tab and no eval call.
