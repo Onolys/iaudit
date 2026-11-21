@@ -4,8 +4,9 @@ name: deploy-prod
 #   workflow_dispatch (input sha, or input version; both empty = the commit staging api runs now) or push of a tag v*.
 #   The prod deploy jobs run in the GitHub environment `production` (required reviewer = Tejit).
 #   Release = dispatch with sha empty (or a sha). Every successful deploy is tagged prod-<UTC date>.<n> by the final `tag` job
-#   (rollbacks and re-deploys included; only after smoke passes), so the newest prod-* tag is the last fully successful deploy
-#   and the right rollback target. After a failed run prod may be mixed: check /v1/healthz code_version or the revisions' GIT_SHA.
+#   (rollbacks and re-deploys included; only after smoke passes). The newest prod-* tag = last fully successful deploy;
+#   to undo a bad release, roll back to the tag before it. After a failed run prod may be mixed (check /v1/healthz code_version
+#   or the revisions' GIT_SHA).
 #   Rollback = dispatch with version=<prod-* tag> (or an earlier sha that was deployed to staging): api, worker, rules, web all
 #   go back to that commit. List versions: git ls-remote --tags --refs --sort=-v:refname origin 'prod-*' | head
 #   Set sha OR version, not both. `v*` = optional human release trigger; `prod-*` = bot record of each successful deploy;
@@ -283,7 +284,7 @@ jobs:
             # ls-remote is authoritative; recomputed each attempt so a race (tag already taken) picks the next N.
             d="$(date -u +%F)"
             n="$(git ls-remote --tags --refs origin "prod-$d.*" | sed -nE "s#.*/prod-$d\.([0-9]+)\$#\1#p" | sort -n | tail -1)"
-            tag="prod-$d.$((${n:-0}+1))"
+            tag="prod-$d.$((10#${n:-0}+1))"
             git tag -a "$tag" "$SHA" -m "prod deploy ${tag}" -m "commit: ${SHA}" -m "image: ${IMAGE}" -m "run: ${run_url}"
             if git push origin "refs/tags/${tag}"; then pushed=1; break; fi
             echo "push of ${tag} failed (attempt ${attempt}); recomputing" >&2
