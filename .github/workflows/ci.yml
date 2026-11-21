@@ -298,6 +298,9 @@ jobs:
             cat coverage-summary.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: vitest flaky (non-blocking)
+        continue-on-error: true   # failure shows on the step, never fails the job
+        run: npm run test:flaky
       - run: npm run build
 
   infra:

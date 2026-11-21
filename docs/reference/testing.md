@@ -58,6 +58,10 @@ npm run typecheck   # tsc
 npm test            # vitest run
 ```
 
+### Flaky tests (web)
+
+Mark a known-flaky test by moving it to a `*.flaky.test.ts(x)` file next to its suite and giving it `{ retry: 2 }`. The default `npm test` excludes these files (blocking); `npm run test:flaky` runs only them, in a `continue-on-error` CI step (visible, non-blocking). Every flaky test needs a follow-up issue to fix the root cause, then move it back into the normal suite.
+
 ## Firestore emulator
 
 Used by `api` integration tests and Firestore rules tests. Unit tests use `FakeRepo` instead. Run a suite under the emulator with:

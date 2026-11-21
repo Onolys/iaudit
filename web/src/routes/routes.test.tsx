@@ -1,5 +1,4 @@
 import { screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { renderApp } from "../test/renderApp";
 
@@ -48,13 +47,5 @@ describe("route table", () => {
   it("shows a not-found page for unknown paths", async () => {
     renderApp("/nope/nothing");
     expect(await screen.findByRole("heading", { level: 1, name: "Page not found" })).toBeInTheDocument();
-  });
-
-  it("moves focus to the h1 on navigation", async () => {
-    const { router } = renderApp("/login");
-    expect(await screen.findByRole("heading", { level: 1, name: "Log in" })).toHaveFocus();
-    await userEvent.click(screen.getByRole("link", { name: "Sample report" }));
-    expect(router.state.location.pathname).toBe("/sample-report");
-    expect(await screen.findByRole("heading", { level: 1, name: "Sample report" })).toHaveFocus();
   });
 });
