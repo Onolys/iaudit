@@ -39,3 +39,8 @@ def test_deps_map_matches_pyproject_dependencies() -> None:
         name, deps = entry.split(":")
         actual[name] = sorted(deps.split())
     assert actual == expected
+
+
+if __name__ == "__main__":
+    test_deps_map_matches_pyproject_dependencies()
+    print("ok   changes.sh DEPS map matches pyproject dependencies")

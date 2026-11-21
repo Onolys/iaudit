@@ -36,6 +36,8 @@ jobs:
           fetch-depth: 0
       - name: Test changes.sh
         run: bash scripts/ci/test_changes.sh
+      - name: Test changes.sh DEPS map against pyproject dependencies
+        run: python3 scripts/ci/test_changes_deps.py
       - name: Check markdown links
         run: python3 scripts/ci/check_links.py
       - name: No LLM/STT keys in PR workflows (guard + planted-reference check)
