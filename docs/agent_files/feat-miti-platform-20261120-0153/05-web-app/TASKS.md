@@ -21,7 +21,7 @@ Source of truth: [PRD.md](PRD.md). Lane C. Built on MSW mocks from day one (D5);
 | 11 | Settings and API key | 3 | done |
 | 12 | Hosting config, privacy and CSP checks, ADR 0021 | 1 | done |
 | 13 | Switch to generated types and `gen:api` staleness check | 2, 9, SP04 T1, SP03 T1 (contracts committed) | done |
-| 14 | Flow tests, staging deploy check, manual preview click-through | 5, 6, 7, 9, 10, 11, 12, 13 | todo |
+| 14 | Flow tests, staging deploy check, manual preview click-through | 5, 6, 7, 9, 10, 11, 12, 13 | done (flows 1d4c8d6, click-through b1b0ac3; iOS phone = owner) |
 
 Parallel lanes: Tasks 1, 2, 3 are the shared scaffolding (app shell, MSW, auth); one person does them, in order, and pushes as soon as green. After Task 3, three people can work at once: (a) the session chain: Task 4, then 5, 6 and 7 are independent screens on the session page and can split between people; (b) the report chain: Task 8, then 9, then 10 (needs 9 for the sample report); (c) Tasks 11 and 12 (settings, hosting/privacy) which touch separate files. Task 8 only needs Task 2, so it can start as soon as MSW fixtures exist. Task 13 waits for SP04 and SP03 to commit their contracts; Task 14 is last. Cross-lane syncs: SP00 PR preview needs Task 1 buildable; SP06 staging deploy needs Task 12.
 

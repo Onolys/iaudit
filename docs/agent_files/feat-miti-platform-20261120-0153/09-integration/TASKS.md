@@ -21,7 +21,7 @@ Code-only vs staging-only: Tasks 1-7 need no GCP and no network in CI. They can 
 | 9 | Staging API-key flow + no-rating run | 8, SP04 T15 | done |
 | 10 | Forced failures by preset + failure alert | 7, 8, SP06 T10 | done |
 | 11 | Handed-over checks: Hosting, CSP, `validate` memory, phone | 8, SP05 T12 | blocked (a-c done; d iOS Safari phone check = owner step) |
-| 12 | Results record, "Engine errors" doc, acceptance sweep | 1-11 | todo |
+| 12 | Results record, "Engine errors" doc, acceptance sweep | 1-11 | done (staging leftovers: 3 sessions 2026-11-20 22:35Z kept pending owner OK) |
 
 Parallel lanes: three people can split after the shared seam exists. (a) Task 1 (error map) then 5 (wiring, needs 1-4); (b) Task 2 (Stt) then 6; (c) Task 3 then 4 (Evaluation + artifacts), which both touch the run path, so one person. Task 7 is tiny and independent; give it to whoever finishes first. Tasks 8-11 are sequential on one staging env except 11 (phone/Hosting/CSP) can run beside 10 by a second person once 8 is green. The `preview-real` label from SP00 T7 stays SP00's workflow; it only becomes usable because Task 5 makes `ADAPTERS=real` work. SP09 adds no preview scope. Cross-lane sync points: SP03 signature (Task 3), SP04 Protocols (Tasks 2, 3), SP06 staging + alert channel (Tasks 8, 10), SP05 buildable web and Hosting/CSP config (Tasks 8, 11); SP06 Task 15 consumes Task 12's measurements.
 

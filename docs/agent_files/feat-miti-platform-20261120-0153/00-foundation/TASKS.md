@@ -13,10 +13,10 @@ Source of truth: 00-foundation/PRD.md. Tasks 1-6 are CI/test work with no depend
 | 3 | Python package jobs: core, paudit, evaluation | 2 | done |
 | 4 | `api` job (emulator + OpenAPI diff) | 2, 3 | done |
 | 5 | `web` and `infra` jobs | 2 | done |
-| 6 | CI behaviour proof (skip, fail, live-excluded, fork) | 2, 3, 4, 5 | todo |
-| 7 | `pr-preview.yml`: build, deploy, comment | 6, SP06 T9, SP04 T1, SP05 T1 | todo |
-| 8 | `pr-preview-cleanup.yml` | 7 | todo |
-| 9 | Preview acceptance + build-time measurements | 7, 8 | todo |
+| 6 | CI behaviour proof (skip, fail, live-excluded, fork) | 2, 3, 4, 5 | done (fork PR #38 proof) |
+| 7 | `pr-preview.yml`: build, deploy, comment | 6, SP06 T9, SP04 T1, SP05 T1 | done (live on PR #35, run 44844334805) |
+| 8 | `pr-preview-cleanup.yml` | 7 | done (PR #39 re-proof, d6cb84d) |
+| 9 | Preview acceptance + build-time measurements | 7, 8 | done (Google sign-in on previews not needed, owner 2026-11-21) |
 
 Parallel lanes: all of 1-6 belong to Lane C (web/foundation), the first thing built; 1 and 2 can run at the same time (different files), then 3, 4, 5 can run in parallel with each other (same workflow file, so merge carefully; 3 and 5 are independent of 4). Lanes A (engine) and B (platform) should not start feature PRs until task 2 is green on main, and their packages then light up their own jobs automatically. 7-9 are Lane C, after SP05 is buildable and Lane B has staging minimal and combined mode.
 
