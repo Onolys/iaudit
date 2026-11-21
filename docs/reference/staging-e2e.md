@@ -191,3 +191,53 @@ Sign-in (Google redirect fallback) and a large upload on iOS Safari need a perso
 ### Cleanup
 
 6 sessions deleted (204, then 404), bucket `onolys-audio-staging` prefixes `{uid}/` and `uploads/{uid}/` empty, `users/{uid}` doc removed (no subcollections; `usage`, `api_keys`, `session_status` hold no doc for the user), test user deleted (lookup returns no account), local synthetic file and cached token removed.
+
+## Acceptance sweep (SP09 AC4-AC11)
+
+Written in Task 12. Every value below is copied from a section above; anything not recorded is "not measured". Real sample: `session1-1.mp3` (6.7 min, 405 s); the owner allowed the name to stay in the repo.
+
+| AC | Result | Where recorded |
+|---|---|---|
+| AC4 | PARTIAL. Web flow upload to `report_ready` done. Confirm to `report_ready` 67.9 s (target <= 300 s: met); upload-complete to `transcript_ready` 84.9 s. The 10-25 min recording criterion is NOT met: only a 6.7-min sample exists, so the 25-min time is not measured | Web / API end-to-end, Timings |
+| AC5 | PARTIAL. API-key flow with the curl quickstart gave a report. Run doc 53.5 s (run A) and confirm to `report_ready` 54.3 s (run B), both inside the target. Same 6.7-min limit as AC4; run A confirm to report not timed | Task 9 |
+| AC6 | MET. No-rating run B: report with 4 globals, 14 scorecard rows, 5 tips, `reasons_audit.status=skipped`, no `eaudit.json` | Task 9 |
+| AC7 | MET on `94c97ec` (not on `a47d593`, which gave `internal_error`). `test-broken-llm`: `failed`, `upstream_unavailable`, 2 attempts, 8.0 s POST to `failed`. "Run again" on `default` gave a report on `a47d593` (run 2, report v2, 42.3 s); it was not repeated after the `94c97ec` failure (the baseline `default` run on `94c97ec` gave `report_ready`, 66.7 s) | Task 10 and re-check |
+| AC8 | MET. `test-broken-eaudit`: `report_ready` (v3, 44.6 s), `reasons_audit.status=failed`, warning `reasons_audit_failed` | Task 10 |
+| AC9 | MET. `llm.smoke` 6/6, `paudit.cli check` PASS, `onolys_evaluation.check` PASS, `stt.check` PASS (6.7 min sample, 176 s wall) | Live checks |
+| AC10 | PARTIAL. Runbook query finds the one `run_failed` line by `request_id` (met). Alert incident opened 71 s after the log line (a47d593 run). Email arrival in the owner inbox: not checked by an agent, owner or orchestrator to confirm. The `94c97ec` failure fell inside the still-open incident, so no new incident | Task 10 and re-check |
+| AC11 | PARTIAL. Hosting forwards `Authorization`, no `/v1` caching: PASS. CSP: 0 violations: PASS. 300 MB `validate`: no OOM, worker memory peak 0.23 of 2 Gi: PASS. Phone check (iOS Safari): PENDING OWNER | Task 11 (a)-(d) |
+
+AC1-AC3 (offline, CI) are proven by tests that run in `uv run --package onolys-api pytest -q -m "not live"`:
+
+| AC | Tests |
+|---|---|
+| AC1 | `api/tests/test_real_flow.py`: `test_real_flow_reaches_report_ready_with_reasons_audit`, `test_stt_start_called_once_across_forced_retry`; `api/tests/test_real_stt.py` |
+| AC2 | `api/tests/test_error_map.py`: `test_to_public_table`, `test_wrapper_records_code_and_one_failed_line`, `test_message_is_never_the_exception_message`, `test_stubbed_engine_failure_maps_through_run_and_status_body`; the "Engine errors" section of `docs/reference/public-api.md` is checked against the table by `api/tests/test_engine_errors_doc.py` |
+| AC3 | `api/tests/test_run_artifacts.py`: `test_rated_run_leaves_artifacts_run_info_and_header`, `test_no_rating_run_has_no_eaudit_artifact` |
+
+### Measurements for SP06 Task 15
+
+| Item | Value |
+|---|---|
+| Audio length of every real sample | 6.7 min (405 s, 9.3 MB). 10-25 min: not measured |
+| Run start (confirm, card in) to `report_ready`, N=1 | 67.9 s, 67.3 s, 42.3 s, 44.6 s, 54.3 s, 66.7 s across runs (target 300 s) |
+| Upload-complete to `transcript_ready` | 84.9 s (Task 8), 80.1 s (Task 9 run B), 83.2 s (`94c97ec` re-check); `stt.check` wall 176 s and 89 s (Chirp varies about 2x) |
+| Transcription per audio second | 0.21 s (84.9 s over 405 s); p95 for 25 min: not measured; SP01 p95 figure not recorded anywhere |
+| `validate` peak worker memory, 302 MB upload | 0.23 of 2 Gi (about 470 MiB); calculated two concurrent validates about 1,264 MB (0.62 of 2 Gi) |
+| Evaluation usage, default preset, N=1 | 8,486 input / 1,303 output tokens (Task 8 run); `onolys_evaluation.check` 24 LLM calls, est. cost $0.96; `cost_usd` in run usage is `null` |
+| Anthropic rate-tier back-off | none seen at N=1 (runs completed with 1 attempt); N=6 parallel: not measured |
+| Levers used | None of the scaling levers (`max_concurrency`, route timeouts, `worker_max_instances`, worker memory 4 GiB, concurrency 1) were changed. Config changes made: STT gate minimum 5 min (owner decision), `BLOB_SIGNER_EMAIL` set, `staging_alerts=true`, clamp of Chirp `end_offset` 0 (code) |
+
+## Staging test data after the run (listed 2026-11-21, nothing deleted)
+
+Firestore database `staging`, bucket `onolys-audio-staging`, project `onolys`, read-only listing through ADC.
+
+| Store | Remaining |
+|---|---|
+| Bucket `onolys-audio-staging` | 0 objects (no uploaded recordings left) |
+| `sessions` | 3 docs (all one user, created 2026-11-20 22:35-22:37Z, each with a `recordings` subcollection of 1 doc; 2 also have `transcripts` of 1 doc), plus 3 matching `session_status` docs |
+| `users` | 6 docs (created 21:02-22:15Z) |
+| `usage` | 2 docs |
+| `idempotency` | 19 docs (21:39-22:39Z) |
+
+Origin of the remaining documents is not established (the sessions are from the last test user of 2026-11-20, after the Task 11 cleanup was recorded). Deletion is pending an owner or orchestrator decision.

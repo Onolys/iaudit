@@ -66,6 +66,23 @@ Every non-2xx body is `ErrorResponse` ([schema](../contracts/public/public-error
 
 Failures found by the worker (not an HTTP error) appear as `error.code` on the session: `unsupported_audio`, `audio_too_long` (recording over 20 minutes, the Chirp 3 batch limit; set by `max_audio_s` on the STT provider in `stt_providers.yaml`), `audio_unreadable`, `no_speech`, `speakers_not_separated`, `transcription_failed`, `upstream_unavailable`, `deadline_exceeded`.
 
+## Engine errors
+
+What a failed run or transcription turns into (`api/src/onolys_api/adapters/error_map.py`, `to_public(exc, attempt, stage) -> (code, retryable)`). Every failure is mapped to one existing public code above; the message is fixed text per code, never the exception message. Each mapped failure writes one worker log line with `status=failed`, `error_code` and `exc_class` (the runbook query finds it by `request_id`). `retry` is whether the worker makes another attempt (attempt limit 2).
+
+| Code | Raised by (engines) | Retry | What the user does |
+|---|---|---|---|
+| `invalid_parameters` | `InputError`: pack input checks (too long, no change goal, too few clinician or client turns), unknown preset | no | Fix the input (e.g. change who the clinician is) and run again |
+| `upstream_unavailable` | LLM unavailable, timeout, rate limited or bad output after the engine's own retries; a transient STT provider error on attempt 1 | yes | Run again |
+| `deadline_exceeded` | Internal run deadline passed, `TimeoutError`, eaudit `DeadlineExceeded` | yes | Run again |
+| `transcription_failed` | STT permanent error; a second transient STT error; no result within the poll limit | no | Upload a different file |
+| `no_speech` | Transcript with 0 turns or under 50 words | no | Upload a different file |
+| `speakers_not_separated` | Fewer than 2 usable speakers | no | Upload a different file |
+| `rate_limited` | Adapter error that already carries this code | yes | Try again shortly |
+| `internal_error` | `PackError`; any other exception, including engine `run_failed` errors with no LLM cause; an adapter code outside this table | no | Run again; the owner is alerted |
+
+An eaudit or tips failure inside the evaluation is not an error: the report is made with warning `reasons_audit_failed`, `reasons_audit_partial` or `tips_failed` and the session ends `report_ready`.
+
 ## Quickstart
 
 The same script is the intro of `/v1/docs`; a test runs it against a combined-mode server. See the [`/v1/docs`](https://app.onolys.com/v1/docs) page or the `info.description` of `openapi.json`.
