@@ -1,9 +1,13 @@
 name: deploy-prod
 
 # Gated promotion to prod (SP06 R13, D5, D6, AC6, AC9): ships the EXACT image digest that ran in staging. No rebuild.
-#   workflow_dispatch (input sha; empty = the commit staging api runs now) or push of a tag v*.
+#   workflow_dispatch (input sha, or input version; both empty = the commit staging api runs now) or push of a tag v*.
 #   The prod deploy jobs run in the GitHub environment `production` (required reviewer = Tejit).
-#   Rollback = dispatch with an earlier sha that was deployed to staging: api, worker, rules, web all go back to that commit.
+#   Release = dispatch with sha empty (or a sha). Every successful deploy is tagged prod-<UTC date>.<n> by the final `tag` job
+#   (rollbacks and re-deploys included), so the newest prod-* tag is what is live.
+#   Rollback = dispatch with version=<prod-* tag> (or an earlier sha that was deployed to staging): api, worker, rules, web all
+#   go back to that commit. List versions: git ls-remote --tags origin 'prod-*'. Set sha OR version, not both.
+#   The prod-* tags cannot re-trigger this workflow: they do not match `v*`, and tags pushed with GITHUB_TOKEN never trigger workflows.
 # Repo variables (owner sets from Terraform outputs; see docs/reference/infra.md):
 #   WIF_PROVIDER, DEPLOYER_STAGING_SA (read-only resolve step), DEPLOYER_PROD_SA, GCP_PROJECT (optional), GCP_REGION (optional),
 #   PROD_VITE_FIREBASE_{API_KEY,AUTH_DOMAIN,APP_ID,STORAGE_BUCKET,MESSAGING_SENDER_ID} (Terraform output web_env_prod),
@@ -17,6 +21,11 @@ on:
     inputs:
       sha:
         description: Full 40-char commit sha to promote or roll back to (empty = the commit the staging api runs now)
+        type: string
+        required: false
+        default: ""
+      version:
+        description: Prod version tag to promote or roll back to, e.g. prod-2026-11-21.1 (set this OR sha, not both)
         type: string
         required: false
         default: ""
@@ -56,14 +65,26 @@ jobs:
           workload_identity_provider: ${{ vars.WIF_PROVIDER }}
           service_account: ${{ vars.DEPLOYER_STAGING_SA }}
           token_format: access_token
-      - name: Pick the commit (input, else tag commit, else what staging api runs now)
+      - name: Pick the commit (input sha, else prod version tag, else pushed tag commit, else what staging api runs now)
         id: sha
         env:
           INPUT_SHA: ${{ inputs.sha }}
+          INPUT_VERSION: ${{ inputs.version }}
           REF_TYPE: ${{ github.ref_type }}
           TAG_SHA: ${{ github.sha }}
         run: |
+          if [ -n "$INPUT_SHA" ] && [ -n "$INPUT_VERSION" ]; then
+            echo "set either sha or version, not both" >&2; exit 1
+          fi
           sha="$INPUT_SHA"
+          if [ -n "$INPUT_VERSION" ]; then
+            version_re='^prod-[0-9]{4}-[0-9]{2}-[0-9]{2}\.[0-9]+$'
+            [[ "$INPUT_VERSION" =~ $version_re ]] || { echo "version must look like prod-YYYY-MM-DD.N, got '$INPUT_VERSION'" >&2; exit 1; }
+            git fetch --no-tags origin "refs/tags/${INPUT_VERSION}:refs/tags/${INPUT_VERSION}" \
+              || { echo "no tag ${INPUT_VERSION} on origin" >&2; exit 1; }
+            sha="$(git rev-parse "refs/tags/${INPUT_VERSION}^{commit}")" \
+              || { echo "tag ${INPUT_VERSION} does not point at a commit" >&2; exit 1; }
+          fi
           [ -n "$sha" ] || { [ "$REF_TYPE" = tag ] && sha="$TAG_SHA"; } || true
           if [ -z "$sha" ]; then
             sha="$(gcloud run services describe onolys-api-staging --region "$REGION" --project "$PROJECT" --format=json \
@@ -225,3 +246,43 @@ jobs:
           [ -n "$body" ] || { echo "healthz did not return 200 at $url" >&2; exit 1; }
           echo "$body"
           echo "$body" | jq -e --arg sha "$SHA" '.code_version == $sha'
+
+  # Runs only when every prod deploy job succeeded (default success() over `needs`). Tags the promoted commit
+  # prod-<UTC date>.<n>, always a NEW tag (also for a rollback / re-deploy of an already-tagged sha), so the newest
+  # prod-* tag = what is live. The only job that may write to the repo. Checks out the workflow ref (not the target sha) so
+  # next_prod_tag.py is available; the target commit is fetched just to tag it.
+  tag:
+    needs: [resolve, deploy-api, deploy-worker, rules, web]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create and push the annotated prod-<date>.<n> tag
+        env:
+          SHA: ${{ needs.resolve.outputs.sha }}
+          IMAGE: ${{ needs.resolve.outputs.image }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch --no-tags --depth=1 origin "$SHA"
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          pushed=""
+          for attempt in 1 2 3 4 5; do
+            # ls-remote is authoritative; recomputed each attempt so a race (tag already taken) picks the next N.
+            tag="$(git ls-remote --tags origin 'prod-*' | awk '{print $2}' | python3 scripts/ci/next_prod_tag.py --date "$(date -u +%F)")"
+            git tag -a "$tag" "$SHA" -m "prod deploy ${tag}" -m "commit: ${SHA}" -m "image: ${IMAGE}" -m "run: ${run_url}"
+            if git push origin "refs/tags/${tag}"; then pushed=1; break; fi
+            echo "push of ${tag} failed (attempt ${attempt}); recomputing" >&2
+            git tag -d "$tag"
+            sleep 2
+          done
+          [ -n "$pushed" ] || { echo "could not push a prod tag after 5 attempts" >&2; exit 1; }
+          echo "tagged ${SHA} as ${tag}"
+          {
+            echo "### Prod version \`${tag}\`"
+            echo "- commit: \`${SHA}\`"
+            echo "- image: \`${IMAGE}\`"
+            echo "- rollback: dispatch deploy-prod with version=\`${tag}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

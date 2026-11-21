@@ -131,7 +131,7 @@ Environments: create `production` with Tejit as required reviewer (all prod jobs
 
 Secrets: the only one is `ANTHROPIC_API_KEY`, read by `nightly.yml` (job `api-real-mode`, a live Claude run); it should hold the staging/test key, never the prod key (prod's key lives only in Secret Manager as `anthropic-api-key-prod`). Deploys use WIF, so no JSON key and no deploy secret exists. Do not add a GCP key.
 
-Workflows: `deploy-staging.yml` runs after the `CI` workflow succeeds on `main` (also manual). `deploy-prod.yml` is manual (`workflow_dispatch`, input `sha`) or on a `v*` tag. `deploy-admin.yml` is for SP07 and needs `admin_enabled` true for that env first. `nightly.yml` runs 06:17 UTC daily.
+Workflows: `deploy-staging.yml` runs after the `CI` workflow succeeds on `main` (also manual). `deploy-prod.yml` is manual (`workflow_dispatch`, input `sha` or `version`) or on a `v*` tag. `deploy-admin.yml` is for SP07 and needs `admin_enabled` true for that env first. `nightly.yml` runs 06:17 UTC daily.
 
 ## Operating Terraform
 
@@ -251,6 +251,8 @@ Other public codes (`unauthenticated`, `not_found`, `invalid_state`, `conflict`,
 
 ### Rollback
 
-Rollback = dispatch `deploy-prod` with the previous sha; it redeploys api, worker, web and rules from that commit.
+Release = dispatch `deploy-prod` with `sha` empty (promotes the commit staging runs now) or a specific `sha`. Every successful deploy is tagged `prod-<UTC date>.<n>` (annotated tag on the promoted commit, message has sha, image digest, run URL) by the final `tag` job, rollbacks included, so the newest `prod-*` tag is what is live. Rollback = dispatch `deploy-prod` with `version=<prod tag>`; it redeploys api, worker, web and rules from that tag's commit.
 
-Details (from `.github/workflows/deploy-prod.yml`): Actions > deploy-prod > Run workflow > `sha` = the full 40-char commit to return to. The commit must have been built by `deploy-staging` (image tagged with that sha in Artifact Registry) and its digest must have run on a staging service, otherwise `resolve` fails ("never ran on ... deploy it to staging first"). Approve the one `production` review prompt. After it finishes, the prod revisions carry `GIT_SHA=<sha>`, and `code_version` in new log lines shows it. Empty `sha` promotes the commit staging runs now. Firestore data is not rolled back.
+List prod versions: `git ls-remote --tags origin 'prod-*'` (or `gh api repos/Onolys/onolys/tags`).
+
+Details (from `.github/workflows/deploy-prod.yml`): Actions > deploy-prod > Run workflow > `version` = e.g. `prod-2026-11-21.1` (or `sha` = the full 40-char commit; set one, not both; empty both promotes the commit staging api runs now). The commit must have been built by `deploy-staging` (image tagged with that sha in Artifact Registry), and that image (the tag's index digest or one of its platform digests) must have run on both staging api and staging worker with `GIT_SHA=<sha>`, otherwise `resolve` fails ("never ran on ... deploy it to staging first"). Approve the one `production` review prompt. After it finishes, the prod revisions carry `GIT_SHA=<sha>`, and `code_version` in new log lines shows it. The `prod-*` tags cannot trigger `deploy-prod` (they do not match `v*`, and tags pushed with `GITHUB_TOKEN` trigger nothing). Firestore data is not rolled back.

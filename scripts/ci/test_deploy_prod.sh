@@ -43,5 +43,22 @@ has   "WIF auth"                             'google-github-actions/auth@v2'
 hasnt "no JSON key auth"                     'credentials_json|GOOGLE_CREDENTIALS|service_account_key'
 hasnt "sha not interpolated in run scripts"  'run:.*\$\{\{ *(inputs|github\.event)\.'
 
+# Version tagging (prod-<date>.<n>) and rollback by version
+TAGJOB="$(awk '/^  tag:/{f=1;print;next} f&&/^  [A-Za-z_-]+:/{exit} f{print}' "$WF")"
+[[ -n "$TAGJOB" ]] && ok "tag job exists" || bad "tag job exists"
+needs_line="$(printf '%s\n' "$TAGJOB" | grep -E '^    needs:' | head -1)"
+for j in resolve deploy-api deploy-worker rules web; do
+  [[ "$needs_line" =~ (\[|[[:space:],])"$j"([],[:space:]]|$) ]] && ok "tag job needs $j" || bad "tag job needs $j"
+done
+printf '%s\n' "$TAGJOB" | grep -Eq '^      contents: write' && ok "tag job has contents: write" || bad "tag job has contents: write"
+[[ "$(grep -Ec 'contents: write' "$WF")" == 1 ]] && ok "contents: write only on the tag job" || bad "contents: write only on the tag job"
+has   "top-level permissions stay read"      '^permissions:'
+has   "dispatch input version"               '^      version:'
+has   "version regex validation"             'prod-\[0-9\]\{4\}-\[0-9\]\{2\}-\[0-9\]\{2\}\\\.\[0-9\]\+\$'
+has   "sha and version mutually exclusive"   'INPUT_SHA.*INPUT_VERSION|INPUT_VERSION.*INPUT_SHA'
+has   "version resolved to its commit"       'refs/tags/\$\{INPUT_VERSION\}\^\{commit\}'
+has   "next tag via script"                  'scripts/ci/next_prod_tag\.py'
+has   "tag pushed"                           'git push origin "refs/tags/'
+
 command -v actionlint >/dev/null 2>&1 && { (cd "$ROOT" && actionlint "$WF") && ok "actionlint" || bad "actionlint"; }
 exit $fail
