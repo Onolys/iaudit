@@ -113,6 +113,14 @@ bash "$PP" env-overrides stub abcdef1 "https://x.web.app|EVIL=1" >/dev/null 2>&1
 [[ "$(bash "$PP" tag-url https://onolys-api-staging-abc123-uc.a.run.app 42)" == "https://pr-42---onolys-api-staging-abc123-uc.a.run.app" ]] && ok "tag-url form" || bad "tag-url form"
 [[ "$(bash "$PP" tag-url https://onolys-api-staging-abc123-uc.a.run.app/ 7)" == "https://pr-7---onolys-api-staging-abc123-uc.a.run.app" ]] && ok "tag-url strips trailing slash" || bad "tag-url strips trailing slash"
 bash "$PP" tag-url http://x.run.app 7 >/dev/null 2>&1 && bad "tag-url rejects http" || ok "tag-url rejects http"
+# channel-url: firebase-tools keys .result by hosting TARGET, not site (real output, run 44844044832)
+cat > "$T/channel.json" <<'JSON'
+{"status":"success","result":{"app-staging":{"target":"app-staging","site":"onolys-app-staging","url":"https://onolys-app-staging--pr-35-kkj34ogl.web.app","version":"4e325a6713286451","expireTime":"2026-11-28T00:00:00.000Z"}}}
+JSON
+[[ "$(bash "$PP" channel-url "$T/channel.json" onolys-app-staging)" == "https://onolys-app-staging--pr-35-kkj34ogl.web.app" ]] && ok "channel-url selects by site field (result keyed by target)" || bad "channel-url selects by site field (result keyed by target)"
+bash "$PP" channel-url "$T/channel.json" other-site >/dev/null 2>&1 && bad "channel-url fails for an unknown site" || ok "channel-url fails for an unknown site"
+has   "workflow reads channel url via helper"   "$WF" 'pr_preview\.sh channel-url channel\.json'
+hasnt "workflow does not index .result by key"  "$WF" '\.result\[\$'
 bash "$PP" tag-url https://x.run.app 0 >/dev/null 2>&1 && bad "tag-url rejects PR 0" || ok "tag-url rejects PR 0"
 
 # --- helper: comment marker

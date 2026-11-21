@@ -137,8 +137,7 @@ jobs:
           npx --yes firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }} hosting:channel:deploy "$CHANNEL" \
             --config web/firebase.preview.json --only app-staging --expires 7d \
             --project "$PROJECT" --non-interactive --json > channel.json
-          url="$(jq -r --arg s "$STAGING_SITE" '.result[$s].url // empty' channel.json)"
-          [ -n "$url" ] || { echo "no channel url in firebase output" >&2; cat channel.json >&2; exit 1; }
+          url="$(bash scripts/ci/pr_preview.sh channel-url channel.json "$STAGING_SITE")" || { cat channel.json >&2; exit 1; }
           echo "url=$url" >> "$GITHUB_OUTPUT"
       - name: Deploy tagged revision pr-<N> on onolys-api-staging (no traffic, combined mode, CPU always allocated)
         id: run

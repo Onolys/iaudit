@@ -4,6 +4,7 @@
 #                                                                          (the web build calls the tag URL directly), API origin added to CSP connect-src
 #   pr_preview.sh env-overrides <adapters> <sha> <cors origin>     value for `gcloud run deploy --update-env-vars` (custom `^|^` delimiter)
 #   pr_preview.sh tag-url <service url> <pr>                       https://pr-<pr>---<service host>
+#   pr_preview.sh channel-url <channel.json> <site>                url of <site> in `firebase hosting:channel:deploy --json` output (.result is keyed by target, so select by .site); exit 1 if absent
 #   pr_preview.sh comment-body <pr> <url> <sha> <fake|real>        marker PR comment body
 #   pr_preview.sh comment-id                                        stdin: JSON list of PR comments -> id of the first marker comment (or empty)
 #   pr_preview.sh comment <pr> <url> <sha> <mode>                   create-or-update the ONE marker comment (needs gh, GITHUB_REPOSITORY, GH_TOKEN)
@@ -62,6 +63,14 @@ tag_url() {
   [[ "$url" =~ ^https://[A-Za-z0-9.-]+/?$ ]] || die "bad service url: '$url'"
   url="${url%/}"
   printf 'https://pr-%s---%s\n' "$pr" "${url#https://}"
+}
+
+channel_url() {
+  local file="${1:-}" site="${2:-}" url
+  [[ -f "$file" && -n "$site" ]] || die "usage: channel-url <channel.json> <site>"
+  url="$(jq -r --arg s "$site" '[.result[]? | select(.site == $s) | .url][0] // empty' "$file")"
+  [[ -n "$url" ]] || die "no channel url for site '$site' in $file"
+  printf '%s\n' "$url"
 }
 
 comment_body() {
@@ -135,6 +144,7 @@ case "$cmd" in
   firebase-config) firebase_config "$@" ;;
   env-overrides)   env_overrides "$@" ;;
   tag-url)         tag_url "$@" ;;
+  channel-url)     channel_url "$@" ;;
   comment-body)    comment_body "$@" ;;
   comment-id)      comment_id ;;
   comment)         post_comment "$@" ;;
