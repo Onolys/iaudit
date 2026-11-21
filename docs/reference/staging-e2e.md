@@ -241,3 +241,17 @@ Firestore database `staging`, bucket `onolys-audio-staging`, project `onolys`, r
 | `idempotency` | 19 docs (21:39-22:39Z) |
 
 Origin of the remaining documents is not established (the sessions are from the last test user of 2026-11-20, after the Task 11 cleanup was recorded). Deletion is pending an owner or orchestrator decision.
+
+## Web click-through (SP05 task 14, manual part), 2026-11-21
+
+Playwright (Chromium headless), test account, desktop 1280 wide, on the PR #35 preview (stub adapters) and on staging (`onolys-app-staging.web.app`, real adapters, no real recording run).
+
+| Check | Result |
+|---|---|
+| Pages: `/login`, `/`, `/sessions/new`, `/sample-report`, `/settings`, `/sessions/<id>`, report `/sessions/<id>/reports/1`, unknown path, `/signup`, `/forgot-password` | All render on both hosts. Unknown path shows "Page not found"; `/signup` and `/forgot-password` when signed in redirect to `/`. |
+| Console errors, warnings, CSP violations (`securitypolicyviolation` listener) | None on the preview. Staging: only `net::ERR_ABORTED` on in-flight `/v1/*` requests cancelled by navigation (not errors). |
+| Real API through Hosting rewrite (staging) | Sessions list, usage and API key calls reach `/v1` on the same origin. |
+| Full flow on preview (stub): create, upload, rating, speaker, report | Pass at the API level (see testing.md, 27 s cold); report page rendered with scorecard, highlighted transcript, version select, Run again. |
+| Visual accessibility look (screenshots, no axe) | Landmarks and skip link present; focus ring visible on the `h1` after route change; headings ordered; badges use text plus colour; contrast looks fine. Nits: native file input and language `<select>` keep browser styling and a smaller font than the rest of the form; the sample report is long and the sticky transcript is only reachable after the tables. |
+| Google sign-in on the preview | Fails (host not authorised); works on staging. See testing.md "Preview acceptance". |
+| Not done (owner) | iOS Safari phone check, real-adapter run with real recordings. |
