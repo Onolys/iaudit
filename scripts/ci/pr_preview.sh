@@ -9,7 +9,8 @@
 #   pr_preview.sh comment-id                                        stdin: JSON list of PR comments -> id of the first marker comment (or empty)
 #   pr_preview.sh comment <pr> <url> <sha> <mode>                   create-or-update the ONE marker comment (needs gh, GITHUB_REPOSITORY, GH_TOKEN)
 #   pr_preview.sh is-not-found <text>                               exit 0 when text looks like a not-found error
-#   pr_preview.sh cleanup <pr>                                      remove tag pr-<pr> + delete its revisions on the staging API service, delete the Hosting channel (not-found ignored)
+#   pr_preview.sh cleanup <pr>                                      remove tag pr-<pr> + delete its revisions on the staging API service, delete the Hosting channel (not-found ignored). The newest revision cannot be deleted by Cloud Run: logged `left for sweep`, channel step always runs
+#   pr_preview.sh sweep                                             delete untagged, 0%-traffic, non-latest ^<service>-pr-<N>- revisions (non-preview and tagged revisions untouched)
 set -euo pipefail
 MARKER='<!-- onolys-pr-preview -->'
 REGION="${GCP_REGION:-us-central1}"
@@ -112,31 +113,62 @@ is_not_found() {
   printf '%s' "${1:-}" | grep -Eiq 'not[ _-]?found|cannot find|does not exist|could not be found|HTTP Error: 404|\b404\b'
 }
 
-# Run a delete command; succeed on not-found, fail on any other error.
+is_latest_revision_error() {
+  printf '%s' "${1:-}" | grep -Eiq 'latest created Revision.*cannot be directly deleted'
+}
+
+# Run a delete command. Returns 0 on success, not-found (ignored) or, with LATEST_OK=1, the Cloud Run "latest created
+# Revision cannot be directly deleted" rule (logged as `left for sweep: <rev>`); returns 1 on any other error. Never exits.
 delete_ignoring_not_found() {
   local what="$1"; shift
   local out rc=0
   out="$("$@" 2>&1)" || rc=$?
   printf '%s\n' "$out"
-  if [[ $rc -ne 0 ]]; then
-    if is_not_found "$out"; then echo "$what: already gone (ignored)"; else die "$what: delete failed"; fi
-  fi
+  [[ $rc -eq 0 ]] && return 0
+  if is_not_found "$out"; then echo "$what: already gone (ignored)"; return 0; fi
+  if [[ "${LATEST_OK:-}" == 1 ]] && is_latest_revision_error "$out"; then echo "left for sweep: ${what#Cloud Run revision }"; return 0; fi
+  echo "pr_preview.sh: $what: delete failed" >&2; return 1
+}
+
+# Delete orphan preview revisions of the staging API service: name ^<service>-pr-<digits>-, no traffic tag, 0% traffic,
+# not the latest created revision (Cloud Run refuses to delete that one). Never touches non-preview or tagged (open PR) revisions.
+sweep() {
+  local svc latest protected names rev rc=0
+  svc="$(gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT" --format json)" || { echo "sweep: describe failed" >&2; return 1; }
+  latest="$(printf '%s' "$svc" | jq -er '.status.latestCreatedRevisionName // empty')" || { echo "sweep: cannot read latest revision; not deleting anything" >&2; return 1; }
+  protected="$(printf '%s' "$svc" | jq -r '.status.traffic[]? | select((.tag // "") != "" or (.percent // 0) > 0) | .revisionName // empty')" || { echo "sweep: cannot read traffic" >&2; return 1; }
+  names="$(gcloud run revisions list --service "$SERVICE" --region "$REGION" --project "$PROJECT" \
+    --filter "metadata.name~^${SERVICE}-pr-[0-9]+-" --format 'value(metadata.name)')" || { echo "sweep: listing revisions failed" >&2; return 1; }
+  for rev in $names; do
+    [[ "$rev" =~ ^${SERVICE}-pr-[0-9]+- ]] || continue
+    [[ "$rev" == "$latest" ]] && { echo "sweep: keeping latest $rev"; continue; }
+    if printf '%s\n' "$protected" | grep -qxF "$rev"; then echo "sweep: keeping $rev (tagged or serving traffic)"; continue; fi
+    LATEST_OK=1 delete_ignoring_not_found "Cloud Run revision $rev" \
+      gcloud run revisions delete "$rev" --region "$REGION" --project "$PROJECT" --quiet || rc=1
+  done
+  return $rc
 }
 
 cleanup() {
   local pr="${1:-}"; need_pr "$pr"
+  local fail=0 names rev
   delete_ignoring_not_found "Cloud Run tag pr-$pr" \
-    gcloud run services update-traffic "$SERVICE" --remove-tags "pr-$pr" --region "$REGION" --project "$PROJECT" --quiet
+    gcloud run services update-traffic "$SERVICE" --remove-tags "pr-$pr" --region "$REGION" --project "$PROJECT" --quiet || fail=1
   # Tag first: a revision that still carries a tag (or traffic) cannot be deleted. Revision names: <service>-pr-<N>-<sha7>-<run>-<attempt>.
-  local names rev
-  names="$(gcloud run revisions list --service "$SERVICE" --region "$REGION" --project "$PROJECT" \
-    --filter "metadata.name~^${SERVICE}-pr-${pr}-" --format 'value(metadata.name)')" || die "listing revisions failed"
-  for rev in $names; do
-    delete_ignoring_not_found "Cloud Run revision $rev" \
-      gcloud run revisions delete "$rev" --region "$REGION" --project "$PROJECT" --quiet
-  done
+  # Cloud Run never deletes the newest revision of a service; that case is left for `sweep`. Whatever happens above, the channel step still runs.
+  if names="$(gcloud run revisions list --service "$SERVICE" --region "$REGION" --project "$PROJECT" \
+    --filter "metadata.name~^${SERVICE}-pr-${pr}-" --format 'value(metadata.name)')"; then
+    for rev in $names; do
+      LATEST_OK=1 delete_ignoring_not_found "Cloud Run revision $rev" \
+        gcloud run revisions delete "$rev" --region "$REGION" --project "$PROJECT" --quiet || fail=1
+    done
+  else
+    echo "pr_preview.sh: listing revisions failed" >&2; fail=1
+  fi
   delete_ignoring_not_found "Hosting channel pr-$pr" \
-    npx --yes "firebase-tools@${FIREBASE_TOOLS_VERSION}" hosting:channel:delete "pr-$pr" --site "$SITE" --project "$PROJECT" --force --non-interactive
+    npx --yes "firebase-tools@${FIREBASE_TOOLS_VERSION}" hosting:channel:delete "pr-$pr" --site "$SITE" --project "$PROJECT" --force --non-interactive || fail=1
+  sweep || echo "warning: orphan sweep failed (non-fatal)" >&2
+  return $fail
 }
 
 cmd="${1:-}"; [[ $# -gt 0 ]] && shift
@@ -150,5 +182,6 @@ case "$cmd" in
   comment)         post_comment "$@" ;;
   is-not-found)    is_not_found "$@" ;;
   cleanup)         cleanup "$@" ;;
-  *) die "usage: pr_preview.sh firebase-config|env-overrides|tag-url|comment-body|comment-id|comment|is-not-found|cleanup ..." ;;
+  sweep)           sweep ;;
+  *) die "usage: pr_preview.sh firebase-config|env-overrides|tag-url|comment-body|comment-id|comment|is-not-found|cleanup|sweep ..." ;;
 esac

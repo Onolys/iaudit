@@ -107,6 +107,28 @@ jobs:
       pin_traffic: true
     secrets: inherit
 
+  sweep-previews:
+    # Orphan PR-preview revisions whose cleanup could not delete them (Cloud Run keeps the newest revision). Never fatal.
+    needs: [build, deploy-api]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOYER_STAGING_SA }}
+      - name: Delete untagged non-latest preview revisions (non-fatal)
+        env:
+          GCP_PROJECT: ${{ env.PROJECT }}
+          GCP_REGION: ${{ env.REGION }}
+        run: bash scripts/ci/pr_preview.sh sweep || echo "::warning::preview revision sweep failed"
+
   deploy-worker:
     needs: [build, deploy-api]
     permissions:

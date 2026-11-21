@@ -188,5 +188,46 @@ GC_REVS=$'onolys-api-staging-pr-9-abcdef1-3-1\n' GC_DEL_RC=1 GC_DEL_MSG="ERROR: 
 NPX_RC=1 NPX_MSG="Error: 500 internal" run_cleanup 9 && bad "cleanup fails on a real channel error" || ok "cleanup fails on a real channel error"
 run_cleanup abc && bad "cleanup rejects bad PR number" || ok "cleanup rejects bad PR number"
 
+# --- cleanup: latest-created-revision rule (live run 44844909790) and sweep
+LATEST_MSG="ERROR: (gcloud.run.revisions.delete) FAILED_PRECONDITION: The latest created Revision onolys-api-staging-pr-9-abcdef1-3-1 cannot be directly deleted."
+GC_REVS=$'onolys-api-staging-pr-9-abcdef1-3-1\n' GC_DEL_RC=1 GC_DEL_MSG="$LATEST_MSG" run_cleanup 9 && ok "cleanup exits 0 when the only error is the latest-revision rule" || bad "cleanup exits 0 when the only error is the latest-revision rule"
+grep -q 'hosting:channel:delete pr-9 --site onolys-app-staging' "$CALLS" && ok "channel still deleted after the latest-revision error" || bad "channel still deleted after the latest-revision error"
+out="$(GC_REVS=$'onolys-api-staging-pr-9-abcdef1-3-1\n' GC_DEL_RC=1 GC_DEL_MSG="$LATEST_MSG" PATH="$T/bin:$PATH" bash "$PP" cleanup 9 2>&1)"
+printf '%s' "$out" | grep -q 'left for sweep: onolys-api-staging-pr-9-abcdef1-3-1' && ok "logs 'left for sweep: <rev>'" || bad "logs 'left for sweep: <rev>'"
+# real revision error: channel is still attempted, exit non-zero
+GC_REVS=$'onolys-api-staging-pr-9-abcdef1-3-1\n' GC_DEL_RC=1 GC_DEL_MSG="ERROR: PERMISSION_DENIED" run_cleanup 9 && bad "real revision error still exits non-zero" || ok "real revision error still exits non-zero"
+grep -q 'hosting:channel:delete pr-9' "$CALLS" && ok "channel attempted even after a real revision error" || bad "channel attempted even after a real revision error"
+GC_TAG_RC=1 GC_TAG_MSG="ERROR: PERMISSION_DENIED" run_cleanup 9; grep -q 'hosting:channel:delete pr-9' "$CALLS" && ok "channel attempted even after a real tag error" || bad "channel attempted even after a real tag error"
+
+# sweep: stub describe returns service JSON (GC_SVC). latest = pr-9-...-latest; pr-3 untagged old, pr-35 tagged (open PR), pr-3x anchoring, non-pr revision.
+SVC='{"status":{"latestCreatedRevisionName":"onolys-api-staging-pr-9-ffffff1-9-1","traffic":[{"revisionName":"onolys-api-staging-abcdef1-7-1","percent":100},{"revisionName":"onolys-api-staging-pr-35-1111111-2-1","percent":0,"tag":"pr-35"}]}}'
+REVS=$'onolys-api-staging-abcdef1-7-1\nonolys-api-staging-pr-3-2222222-1-1\nonolys-api-staging-pr-35-1111111-2-1\nonolys-api-staging-pr-9-ffffff1-9-1\nonolys-api-staging-pr-12-3333333-4-1\nonolys-api-staging-prod-x-1\n'
+cat > "$T/bin/gcloud" <<'STUB'
+#!/usr/bin/env bash
+echo "gcloud $*" >> "$CALLS"
+case "$*" in
+  "run services update-traffic"*) [[ -n "${GC_TAG_MSG:-}" ]] && echo "$GC_TAG_MSG" >&2; exit "${GC_TAG_RC:-0}" ;;
+  "run services describe"*) printf '%s' "${GC_SVC:-}"; exit 0 ;;
+  "run revisions list"*) printf '%s' "${GC_REVS:-}"; exit 0 ;;
+  "run revisions delete"*) [[ -n "${GC_DEL_MSG:-}" ]] && echo "$GC_DEL_MSG" >&2; exit "${GC_DEL_RC:-0}" ;;
+esac
+exit 0
+STUB
+run_sweep() { : > "$CALLS"; PATH="$T/bin:$PATH" bash "$PP" sweep >/dev/null 2>&1; }
+GC_SVC="$SVC" GC_REVS="$REVS" run_sweep && ok "sweep succeeds" || bad "sweep succeeds"
+deleted="$(grep -o 'revisions delete [^ ]*' "$CALLS" | awk '{print $3}' | sort | tr '\n' ' ')"
+[[ "$deleted" == "onolys-api-staging-pr-12-3333333-4-1 onolys-api-staging-pr-3-2222222-1-1 " ]] && ok "sweep deletes only untagged, non-latest, 0% pr revisions" || bad "sweep deletes only untagged non-latest pr revisions (got: $deleted)"
+grep -q 'revisions list .*--filter metadata.name~^onolys-api-staging-pr-\[0-9\]+-' "$CALLS" && ok "sweep filter anchored: pr-<digits>-" || bad "sweep filter anchored: pr-<digits>-"
+GC_SVC="" GC_REVS="$REVS" run_sweep && bad "sweep refuses when service state is unknown" || ok "sweep refuses when service state is unknown"
+grep -q 'revisions delete' "$CALLS" && bad "sweep deletes nothing when state unknown" || ok "sweep deletes nothing when state unknown"
+GC_SVC="$SVC" GC_REVS=$'onolys-api-staging-pr-3-2222222-1-1\n' GC_DEL_RC=1 GC_DEL_MSG="$LATEST_MSG" run_sweep && ok "sweep tolerates the latest-revision error" || bad "sweep tolerates the latest-revision error"
+# pr-3 cleanup must not touch pr-35 (filter anchored with trailing dash)
+: > "$CALLS"; GC_REVS="" PATH="$T/bin:$PATH" bash "$PP" cleanup 3 >/dev/null 2>&1
+grep -q 'metadata.name~^onolys-api-staging-pr-3-' "$CALLS" && ! grep -q 'pr-35' "$CALLS" && ok "cleanup 3 filter anchored (cannot match pr-35)" || bad "cleanup 3 filter anchored (cannot match pr-35)"
+# cleanup ends with a sweep (non-fatal)
+GC_SVC="$SVC" GC_REVS=$'onolys-api-staging-pr-3-2222222-1-1\n' run_cleanup 7; grep -q 'run services describe' "$CALLS" && ok "cleanup runs a sweep at the end" || bad "cleanup runs a sweep at the end"
+GC_SVC="not json" GC_REVS="" run_cleanup 7 && ok "sweep failure inside cleanup is non-fatal" || bad "sweep failure inside cleanup is non-fatal"
+has   "deploy-staging runs sweep after api deploy" "$DS" 'pr_preview\.sh sweep'
+
 command -v actionlint >/dev/null 2>&1 && { (cd "$ROOT" && actionlint "$WF" "$CL" "$DS" "$DC") && ok "actionlint" || bad "actionlint"; }
 exit $fail
