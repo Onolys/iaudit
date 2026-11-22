@@ -64,6 +64,12 @@
     "flags": {
       "$ref": "#/$defs/Flags"
     },
+    "free_run": {
+      "default": false,
+      "description": "True for an interview session whose free run stands: its run, and Try again after a failed free run, cost nothing against the daily evaluation cap.",
+      "title": "Free Run",
+      "type": "boolean"
+    },
     "id": {
       "title": "Id",
       "type": "string"
@@ -134,7 +140,8 @@
         "running",
         "report_ready",
         "failed",
-        "deleting"
+        "deleting",
+        "upload_incomplete"
       ],
       "title": "Status",
       "type": "string"

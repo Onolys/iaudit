@@ -96,3 +96,42 @@ Manual fallback:
 /plugin marketplace add tejitpabari99/thepass
 /plugin install thepass@thepass
 ```
+
+## Main app (web + api)
+
+Applies to `web/` and `api/` (not the legacy `frontend/` and `engines/` above). Needs node 22, `uv`, java 21. Install: `(cd web && npm ci)` and `uv sync --all-packages` from the repo root.
+
+**Mode A: web mock (MSW + fake auth).** `cd web && npm run dev:mock` serves `http://localhost:5173` with the API in-browser. No backend or login: sign up with any email and password (auto-verified, in memory, lost on reload).
+
+**Mode B: Firestore emulator + api (stub adapters) + web live.** Real Firebase Auth cannot run locally (no Auth emulator wiring), so use `AUTH_MODE=fake` on the api (`Bearer test:<uid>`) and `VITE_AUTH_MODE=fake` on the web. Open the app as `localhost`, not `127.0.0.1` (api CORS).
+
+Terminal 1, Firestore emulator (from repo root; firestore on 8081):
+
+```bash
+npx -y firebase-tools@15.37.0 emulators:start --only firestore --project demo-onolys
+```
+
+Terminal 2, api on port 8000 (`mkdir -p /tmp/onolys-blobs` first; env vars are in `api/.env.example`):
+
+```bash
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8081 ENV=local SERVICE_MODE=combined AUTH_MODE=fake ADAPTERS=stub \
+GCP_PROJECT=demo-onolys AUTH_PROJECT=demo-onolys FIRESTORE_DATABASE='(default)' \
+CORS_ORIGINS=http://localhost:5173 FAKE_BLOB_DIR=/tmp/onolys-blobs FAKE_BLOB_BASE_URL=http://127.0.0.1:8000 \
+uv run --package onolys-api uvicorn --factory onolys_api.app:create_app --host 127.0.0.1 --port 8000
+```
+
+Without `FIRESTORE_EMULATOR_HOST`, `ENV=local` uses the in-memory FakeRepo. Combined mode runs the worker in-process with stub STT and evaluation.
+
+Terminal 3, web live on port 5173 (no vite proxy, hence the absolute API URL):
+
+```bash
+cd web && VITE_USE_MOCKS=false VITE_AUTH_MODE=fake VITE_API_BASE_URL=http://127.0.0.1:8000/v1 \
+VITE_FIRESTORE_EMULATOR=127.0.0.1:8081 VITE_FIREBASE_PROJECT_ID=demo-onolys VITE_FIRESTORE_DATABASE='(default)' \
+npm run dev:live
+```
+
+Check: `GET :8000/v1/healthz` returns `{"status":"ok",...}`; `GET /v1/sessions` with `Authorization: Bearer test:alice` returns an empty list.
+
+Not available locally: real auth, real STT/LLM (stub adapters; `ADAPTERS=real` needs GCP creds), the voice relay websocket, the Hosting `/v1` rewrite. The audio `validate` step needs ffmpeg/ffprobe on PATH.
+
+E2E (Playwright, `web/e2e_review`): see its README. Screenshots only with `E2E_SHOTS=1`.

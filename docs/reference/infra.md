@@ -66,8 +66,8 @@ Set by Terraform (`infra/modules/environment/services.tf`). Values below are the
 | `WORKER_URL` | yes | yes | `https://onolys-worker-{env}-1054076260967.us-central1.run.app` (also the OIDC audience) |
 | `ADAPTERS` | yes | yes | `real` |
 | `BLOB_SIGNER_EMAIL` | yes | no | `api-{env}@onolys.iam.gserviceaccount.com` (signs V4 upload/read URLs through IAM `signBlob`) |
-| `EVAL_CAP_DAY`, `EVAL_CAP_MONTH` | yes | yes | `10`, `100` (per user evaluation runs per UTC day / month, app-side) |
-| `AI_CAP_DAY`, `AI_CAP_MONTH` | yes | yes | `5`, `30` (per user AI interviews per UTC day / month, app-side) |
+| `EVAL_CAP_DAY` | yes | yes | `10` (per user evaluation runs per UTC day, app-side) |
+| `AI_CAP_DAY` | yes | yes | `5` (per user AI interviews per UTC day, app-side) |
 | `ROUTES_FILE` | yes | yes | `config/{env}/routes.yaml` (baked into the image; `stt_providers.yaml` sits next to it) |
 | `DEFAULT_PRESET` | yes | yes | `default` |
 | `CORS_ORIGINS` | yes | no | staging `https://onolys-app-staging.web.app,http://localhost:5173`; prod `https://app.onolys.com` |
@@ -77,7 +77,7 @@ Set by Terraform (`infra/modules/environment/services.tf`). Values below are the
 
 There are no STT env vars. No model id appears in infra.
 
-The four cap vars are integers >= 0 (0 disables that kind); month must be >= day, else the service fails at startup with `ConfigError`. The old single daily-run-cap var was removed; a leftover value on a service is ignored. `MAX_ACTIVE_RUNS` is unchanged.
+The two cap vars are integers >= 0 (0 disables that kind). There are no monthly caps: one daily limit per flow (evaluation, AI interview). The old single daily-run-cap var and the `EVAL_CAP_MONTH` / `AI_CAP_MONTH` vars were removed; a leftover value on a service is ignored. `MAX_ACTIVE_RUNS` (concurrent evaluation runs per user) defaults to `1`: one run at a time; `users/{uid}.max_active_runs` overrides per user.
 
 ## Per-user limits (Firebase console)
 
@@ -86,14 +86,14 @@ Change one user's limits without a deploy. Defaults come from the env vars above
 1. Firebase console > Firestore. Database `(default)` for prod, `staging` for staging.
 2. Find the uid: Authentication > Users, look up the email, copy User UID.
 3. Collection `users`, document `users/{uid}` (the document id is the uid).
-4. Add a map field `limits`, e.g. `limits.eval.day = 25`. Shape: `limits = {eval: {day, month}, interview: {day, month}}`; every leaf is optional.
+4. Add a map field `limits`, e.g. `limits.eval.day = 25`. Shape: `limits = {eval: {day}, interview: {day}}`; every leaf is optional.
 5. Integers only. `0` disables that kind for the user. A leaf that is not an integer is ignored (the default applies, a warning is logged).
 6. Delete a leaf to return to the default.
 7. Takes effect on the next request; no deploy or restart.
 
 The legacy field `daily_cap` is still honoured for the evaluation day cap only (deprecated; use `limits.eval.day`).
 
-Usage counters live in collection `usage`: day doc `{uid}_{YYYY-MM-DD}` and month doc `{uid}_{YYYY-MM}`, each with `runs` and `interviews`. Edit them the same way (lower the number or set 0) to grant a one-off reset. Days and months are UTC. The first evaluation run of an AI-interview-linked session does not count toward the caps but still takes a concurrent-run slot.
+Usage counters live in collection `usage`: day doc `{uid}_{YYYY-MM-DD}` with `runs` and `interviews` (old month docs `{uid}_{YYYY-MM}` are no longer read or written). Edit them the same way (lower the number or set 0) to grant a one-off reset. Days are UTC. The first evaluation run of an AI-interview-linked session does not count toward the caps but still takes a concurrent-run slot.
 
 `GET /v1/usage` shows what a user sees: used, effective cap (overrides included) and reset time. `used` can exceed `cap` after a cap is lowered.
 
@@ -270,8 +270,7 @@ The code in the failed log line is the public code `to_public` (`api/src/onolys_
 | `invalid_parameters` | Engine rejected the input (`InputError`) | Not an outage; see the session input; fix the request |
 | `internal_error` | Anything else (pack error, unexpected exception, test fixture miss) | Read `exc_class`, then the trail; likely a bug or bad config (routes file, missing secret); roll back if it started with a deploy |
 | `daily_cap_reached` | Per-user evaluation day cap (`EVAL_CAP_DAY`, 10) or concurrent-run limit (HTTP 429, `period=day`) | Expected; raise the cap for one user in the console (Per-user limits) or the default via `EVAL_CAP_DAY` |
-| `monthly_cap_reached` | Per-user evaluation month cap (`EVAL_CAP_MONTH`, 100) (HTTP 429, `period=month`) | Expected; raise for one user in the console or the default via `EVAL_CAP_MONTH` |
-| `interview_cap_reached` | Per-user AI interview day or month cap (`AI_CAP_DAY` 5, `AI_CAP_MONTH` 30) (HTTP 429, `period=day` or `month`; both exhausted gives the month) | Expected; raise for one user in the console or the default via `AI_CAP_DAY` / `AI_CAP_MONTH` |
+| `interview_cap_reached` | Per-user AI interview day cap (`AI_CAP_DAY`, 5) (HTTP 429, `period=day`) | Expected; raise for one user in the console or the default via `AI_CAP_DAY` |
 
 Other public codes (`unauthenticated`, `not_found`, `invalid_state`, `conflict`, `unsupported_audio`, `audio_too_large`, `audio_too_long`, `audio_unreadable`, `rating_invalid`, ...) are returned to the client as 4xx and are not `status=failed` lines. A rise in 5xx without `failed` lines: filter `httpRequest.status>=500` on `onolys-api-{env}`.
 

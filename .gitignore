@@ -5,3 +5,10 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 firestore-debug.log
+
+# mutmut
+api/mutants/
+api/config/
+api/docs/
+api/engines/
+api/protocols/

@@ -58,7 +58,8 @@
             "running",
             "report_ready",
             "failed",
-            "deleting"
+            "deleting",
+            "upload_incomplete"
           ],
           "title": "Status",
           "type": "string"
